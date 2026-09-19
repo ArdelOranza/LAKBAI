@@ -11,6 +11,12 @@ app.get('/api/ready', (req, res) => {
   if (!gemini || !mapbox) return res.status(503).json({ gemini, mapbox, error: 'Missing API key(s). Set GEMINI_API_KEY and VITE_MAPBOX_TOKEN in root .env.' });
   res.json({ gemini, mapbox });
 });
+const { recommend } = require('./verify.js');
+app.post('/api/recommend', async (req, res) => {
+  try {
+    res.json(await recommend(req.body.message || '', req.body.proximity));
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
 const { chatRecommend } = require('./agent.js');
 app.post('/api/chat', async (req, res) => {
   try {
