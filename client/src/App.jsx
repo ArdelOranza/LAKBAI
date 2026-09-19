@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import MapView from './MapView.jsx';
 import { recommend } from './api.js';
 import { NearbyButton, Reviews, EmergencyPanel } from './Panels.jsx';
-import { thumbUrl } from './mapshot.js';
+import { PlacePhoto } from './photo.jsx';
 
 const BASE = import.meta.env.VITE_API_URL || '';
 
@@ -58,17 +58,15 @@ export default function App(){
       <MapView places={places} focus={focus} />
       {spotlight && (
         <article data-testid="spotlight">
-          {thumbUrl(spotlight, 640, 360) && <img src={thumbUrl(spotlight, 640, 360)} alt={'Map of ' + spotlight.name} loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }} />}
+          <PlacePhoto name={spotlight.name} large />
           <h3>Hidden gem: {spotlight.name}</h3>
           <p>{spotlight.reason}</p>
         </article>
       )}
       <ul>
-        {places.map((p, i) => {
-          const shot = thumbUrl(p);
-          return (
+        {places.map((p, i) => (
           <li key={p.id} data-testid="place-card" className="place-card" style={{ animationDelay: `${i * 120}ms` }} onClick={() => setFocus(p)}>
-            {shot && <img src={shot} alt={'Map of ' + p.name} loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }} />}
+            <PlacePhoto name={p.name} />
             <b>{p.name}</b> <span>{(p.categories || []).join(', ')}</span>
             <p>{p.reason}</p>
             {p.description && <p data-testid="place-desc">{p.description}</p>}
@@ -76,8 +74,7 @@ export default function App(){
             {p.fees && <p data-testid="place-fees">Fees: {p.fees}</p>}
             {(p.sources || []).map(s => <a key={s} href={s} target="_blank" rel="noreferrer">{p.sourceKind === 'map' ? 'map' : 'source'}</a>)}
           </li>
-          );
-        })}
+        ))}
       </ul>
       <NearbyButton onResults={applyResults} onNotice={setNotice} />
       {places.map(p => <Reviews key={'r-' + p.id} place={p} />)}

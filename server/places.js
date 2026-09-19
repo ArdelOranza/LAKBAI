@@ -4,6 +4,7 @@ async function searchPlaces(q, proximity){
   if (!token) { const e = new Error('Missing VITE_MAPBOX_TOKEN'); e.status = 503; throw e; }
   const params = new URLSearchParams({
     q, language: 'en', limit: '8',
+    country: 'PH',
     proximity: proximity || DEFAULT_CENTER.join(','),
     access_token: token
   });

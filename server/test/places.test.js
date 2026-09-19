@@ -17,6 +17,7 @@ test('searchPlaces maps features with no bbox lock', async () => {
     assert.equal(out.length, 1);
     assert.equal(out[0].name, 'Boracay');
     assert.ok(!url.includes('bbox='));
+    assert.ok(url.includes('country=PH'));
   } finally {
     global.fetch = realFetch;
   }
