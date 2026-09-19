@@ -6,15 +6,22 @@ const BASE = import.meta.env.VITE_API_URL || '';
 export function ItineraryPanel({ selected }){
   const [hours, setHours] = useState(4);
   const [schedule, setSchedule] = useState([]);
+  const [planError, setPlanError] = useState('');
   async function buildPlan(){
-    const out = await itinerary(selected, Number(hours) || 4);
-    setSchedule(out.schedule);
+    try {
+      const out = await itinerary(selected, Number(hours) || 4);
+      setSchedule(out.schedule || []);
+    } catch (e) {
+      setSchedule([]);
+      setPlanError(e.message);
+    }
   }
   return (
     <section>
       <h2>Itinerary ({selected.length} stops)</h2>
       <input data-testid="hours-input" value={hours} onChange={e => setHours(e.target.value)} inputMode="numeric" aria-label="Available hours" />
       <button data-testid="itinerary-build" onClick={buildPlan}>Build</button>
+      {planError && <p data-testid="notice">{planError}</p>}
       <ol>{schedule.map(s => <li key={s.placeId} data-testid="itinerary-item">{s.name} {s.arrive}–{s.depart}</li>)}</ol>
     </section>
   );
@@ -22,17 +29,30 @@ export function ItineraryPanel({ selected }){
 
 export function NearbyButton({ onResults, onNotice }){
   function nearby(){
+    if (!('geolocation' in navigator)) {
+      onNotice('GPS unavailable — showing Pangasinan');
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
       pos => recommend('nearby attractions and restaurants', `${pos.coords.longitude},${pos.coords.latitude}`).then(onResults).catch(e => onNotice(e.message)),
-      () => onNotice('GPS unavailable — showing Pangasinan')
+      () => onNotice('GPS unavailable — showing Pangasinan'),
+      { timeout: 8000 }
     );
   }
   return <button data-testid="nearby-btn" onClick={nearby}>Nearby</button>;
 }
 
+function readReviews(key){
+  try {
+    const v = JSON.parse(localStorage.getItem(key) || '[]');
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
+}
 export function useReviews(placeId){
   const key = 'lakbai-reviews:' + placeId;
-  const [reviews, setReviews] = useState(() => JSON.parse(localStorage.getItem(key) || '[]'));
+  const [reviews, setReviews] = useState(() => readReviews(key));
   function add(score, text){
     const next = [...reviews, { score, text, at: Date.now() }];
     setReviews(next); localStorage.setItem(key, JSON.stringify(next));
@@ -59,19 +79,30 @@ export function Reviews({ place }){
   );
 }
 
+const FALLBACK_HOTLINES = [
+  { name: 'Pangasinan PDRRMO', number: '(075) 542-6802' },
+  { name: 'National Emergency', number: '911' }
+];
 export function EmergencyPanel(){
   const [emer, setEmer] = useState(null);
-  useEffect(() => { fetch(`${BASE}/api/emergency?proximity=120.23,16.03`).then(r => r.json()).then(setEmer); }, []);
-  if (!emer) return null;
+  const [emerError, setEmerError] = useState('');
+  useEffect(() => {
+    fetch(`${BASE}/api/emergency?proximity=120.23,16.03`)
+      .then(r => { if (!r.ok) throw new Error('emergency lookup failed'); return r.json(); })
+      .then(setEmer)
+      .catch(e => setEmerError(e.message));
+  }, []);
+  const hotlines = (emer && emer.hotlines && emer.hotlines.length) ? emer.hotlines : FALLBACK_HOTLINES;
   return (
     <section data-testid="emergency-panel">
       <h2>Emergency</h2>
+      {emerError && <p data-testid="notice">{emerError} — showing hotlines.</p>}
       <h3>Hospitals</h3>
-      <ul>{(emer.hospitals || []).map(h => <li key={h.id}>{h.name} — {h.address}</li>)}</ul>
+      <ul>{((emer && emer.hospitals) || []).map(h => <li key={h.id}>{h.name} — {h.address}</li>)}</ul>
       <h3>Police</h3>
-      <ul>{(emer.police || []).map(p => <li key={p.id}>{p.name} — {p.address}</li>)}</ul>
+      <ul>{((emer && emer.police) || []).map(p => <li key={p.id}>{p.name} — {p.address}</li>)}</ul>
       <h3>Hotlines</h3>
-      <ul>{(emer.hotlines || []).map(h => <li key={h.name}>{h.name}: {h.number}</li>)}</ul>
+      <ul>{hotlines.map(h => <li key={h.name}>{h.name}: {h.number}</li>)}</ul>
     </section>
   );
 }

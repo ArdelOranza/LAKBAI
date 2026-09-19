@@ -10,13 +10,18 @@ async function recommend(message, proximity, deps = {}) {
   const seen = new Set();
   const places = [];
   for (const c of agent.candidates.slice(0, 8)) {
-    const hits = await searchFn(`${c.name} ${c.hint || ''} Pangasinan`, proximity);
+    let hits;
+    try {
+      hits = await searchFn(`${c.name} ${c.hint || ''} Pangasinan`, proximity);
+    } catch {
+      continue;
+    }
     const hit = hits.find(h => inBox(h.lng, h.lat) && !seen.has(h.id));
     if (!hit) continue;
     seen.add(hit.id);
-    const baseSources = (agent.sources && agent.sources.length) ? agent.sources : [];
+    const grounded = agent.sources && agent.sources.length;
     const mapLink = `https://www.google.com/maps/search/?api=1&query=${hit.lat},${hit.lng}`;
-    places.push({ ...hit, reason: c.reason || '', sources: baseSources.length ? baseSources : [mapLink] });
+    places.push({ ...hit, reason: c.reason || '', sources: grounded ? agent.sources : [mapLink], sourceKind: grounded ? 'article' : 'map' });
     if (places.length >= 8) break;
   }
   let spotlight = null;

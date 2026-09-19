@@ -32,7 +32,10 @@ GPS nearby → reviews → emergency info. All flows real APIs (Gemini, Mapbox).
 ## 4. Anti-slop contract (server-enforced)
 1. No Mapbox-verified coords → no card. Never invent locations.
 2. No invented ratings/hours: show "unrated" / "hours unknown" when absent.
-3. Every place carries ≥1 source URL (Gemini grounding citation).
+3. Every place carries ≥1 source URL. Grounded runs use Gemini citations
+   (`sourceKind: "article"`); when grounding quota is exhausted the server
+   falls back to a per-place verified-coordinates map link
+   (`sourceKind: "map"`), labeled "map" in the UI — never presented as an article.
 4. Dedupe by Mapbox `mapbox_id`; cap 8 cards per answer.
 5. Numbers (prices, times) only from sources; otherwise omitted.
 
