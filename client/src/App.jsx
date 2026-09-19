@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import MapView from './MapView.jsx';
 import { recommend } from './api.js';
 import { NearbyButton, Reviews, EmergencyPanel } from './Panels.jsx';
-import { PlacePhoto } from './photo.jsx';
 
 const BASE = import.meta.env.VITE_API_URL || '';
 
@@ -58,7 +57,7 @@ export default function App(){
       <MapView places={places} focus={focus} />
       {spotlight && (
         <article data-testid="spotlight">
-          <PlacePhoto name={spotlight.name} lng={spotlight.lng} lat={spotlight.lat} />
+          {spotlight.photo && <a href={spotlight.photoPage} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}><img src={spotlight.photo} alt={'Photo of ' + spotlight.name} loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }} /></a>}
           <h3>Hidden gem: {spotlight.name}</h3>
           <p>{spotlight.reason}</p>
         </article>
@@ -66,7 +65,7 @@ export default function App(){
       <ul>
         {places.map((p, i) => (
           <li key={p.id} data-testid="place-card" className="place-card" style={{ animationDelay: `${i * 120}ms` }} onClick={() => setFocus(p)}>
-            <PlacePhoto name={p.name} lng={p.lng} lat={p.lat} />
+            {p.photo && <a href={p.photoPage} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}><img src={p.photo} alt={'Photo of ' + p.name} loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }} /></a>}
             <b>{p.name}</b> <span>{(p.categories || []).join(', ')}</span>
             <p>{p.reason}</p>
             {p.description && <p data-testid="place-desc">{p.description}</p>}
