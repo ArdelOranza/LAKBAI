@@ -7,7 +7,7 @@ export default function MapView({ places, focus }){
   useEffect(() => {
     if (!TOKEN) return;
     mapboxgl.accessToken = TOKEN;
-    mapRef.current = new mapboxgl.Map({ container: divRef.current, style: 'mapbox://styles/mapbox/streets-v12', center: [121.77, 12.88], zoom: 5.5 });
+    mapRef.current = new mapboxgl.Map({ container: divRef.current, style: 'mapbox://styles/mapbox/streets-v12', center: [120.23, 16.03], zoom: 9.5 });
     return () => {
       timers.current.forEach(clearTimeout); timers.current = [];
       if (mapRef.current) mapRef.current.remove();
