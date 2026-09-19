@@ -73,7 +73,7 @@ export default function App(){
             <p>{p.reason}</p>
             {p.description && <p data-testid="place-desc">{p.description}</p>}
             {p.festival && <p data-testid="place-festival">Festival: {p.festival}</p>}
-            {p.fees && <p data-testid="place-fees">Bayarin: {p.fees}</p>}
+            {p.fees && <p data-testid="place-fees">Fees: {p.fees}</p>}
             {(p.sources || []).map(s => <a key={s} href={s} target="_blank" rel="noreferrer">{p.sourceKind === 'map' ? 'map' : 'source'}</a>)}
           </li>
           );
