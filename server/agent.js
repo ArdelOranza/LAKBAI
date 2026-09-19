@@ -1,4 +1,4 @@
-const MODEL = 'gemini-2.0-flash';
+const MODEL = 'gemini-3.6-flash';
 const SYSTEM = `You are Lakbai, a Pangasinan (Philippines) travel guide. Scope: ONLY Pangasinan province. Out-of-scope requests get intent "redirect" with an empty candidates list and a friendly redirect in answer. Never invent places, ratings, hours, or prices. Respond with JSON only: {"intent":"discover|food|event|itinerary|nearby|emergency|redirect","answer":"short markdown","candidates":[{"name":"exact place name","hint":"town or barangay","reason":"one grounded why"}],"spotlight":{"name":"...","reason":"..."}|null,"sources":["url"]}. Max 8 candidates. Spotlight = one non-obvious hidden gem from candidates, else null.`;
 function parseAgentJson(raw){
   const m = String(raw).match(/\{[\s\S]*\}/);
@@ -17,7 +17,7 @@ async function callGemini(payload, useTools){
   const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${key}`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   });
-  if (!r.ok) { const e = new Error('Gemini error ' + r.status); e.status = r.status === 400 ? 400 : 502; throw e; }
+  if (!r.ok) { const e = new Error('Gemini error ' + r.status); e.status = r.status || 502; throw e; }
   const data = await r.json();
   return data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
 }
@@ -26,7 +26,7 @@ async function chatRecommend(message){
   try {
     return parseAgentJson(await callGemini(payload, true));
   } catch (e) {
-    if (e.status === 400) return parseAgentJson(await callGemini(payload, false));
+    if ([400, 429, 500, 503].includes(e.status)) return parseAgentJson(await callGemini(payload, false));
     throw e;
   }
 }

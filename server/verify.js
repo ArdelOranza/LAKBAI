@@ -14,7 +14,9 @@ async function recommend(message, proximity, deps = {}) {
     const hit = hits.find(h => inBox(h.lng, h.lat) && !seen.has(h.id));
     if (!hit) continue;
     seen.add(hit.id);
-    places.push({ ...hit, reason: c.reason || '', sources: agent.sources || [] });
+    const baseSources = (agent.sources && agent.sources.length) ? agent.sources : [];
+    const mapLink = `https://www.google.com/maps/search/?api=1&query=${hit.lat},${hit.lng}`;
+    places.push({ ...hit, reason: c.reason || '', sources: baseSources.length ? baseSources : [mapLink] });
     if (places.length >= 8) break;
   }
   let spotlight = null;
