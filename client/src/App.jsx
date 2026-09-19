@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import MapView from './MapView.jsx';
 import { recommend } from './api.js';
-import { ItineraryPanel, NearbyButton, Reviews, EmergencyPanel } from './Panels.jsx';
+import { NearbyButton, Reviews, EmergencyPanel } from './Panels.jsx';
 
 const BASE = import.meta.env.VITE_API_URL || '';
 
@@ -12,7 +12,6 @@ export default function App(){
   const [spotlight, setSpotlight] = useState(null);
   const [status, setStatus] = useState('');
   const [focus, setFocus] = useState(null);
-  const [selected, setSelected] = useState([]);
   const [notice, setNotice] = useState('');
   const [readyError, setReadyError] = useState('');
 
@@ -35,7 +34,7 @@ export default function App(){
     if (!text) return;
     setMessages(m => [...m, { role: 'user', text }]);
     setInput('');
-    setStatus('Searching Pangasinan…');
+    setStatus('Searching…');
     try {
       applyResults(await recommend(text));
     } catch (e) {
@@ -44,18 +43,13 @@ export default function App(){
     }
   }
 
-  function toggleSelect(p){
-    setSelected(s => s.some(x => x.id === p.id) ? s.filter(x => x.id !== p.id) : [...s, p]);
-  }
-
   return (
     <div data-testid="app">
       <h1>Lakbai</h1>
-      <p data-testid="scope-note">Pangasinan only · MVP</p>
       {readyError && <p data-testid="notice">{readyError}</p>}
       <section data-testid="chat">
         <ul>{messages.map((m, i) => <li key={i}><b>{m.role}:</b> {m.text}</li>)}</ul>
-        <input data-testid="chat-input" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') send(); }} placeholder="Ask about Pangasinan…" />
+        <input data-testid="chat-input" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') send(); }} placeholder="Ask about places to visit…" />
         <button data-testid="chat-send" onClick={send}>Send</button>
       </section>
       {status && <p data-testid="search-status" className="shimmer">{status}</p>}
@@ -73,13 +67,9 @@ export default function App(){
             <b>{p.name}</b> <span>{(p.categories || []).join(', ')}</span>
             <p>{p.reason}</p>
             {(p.sources || []).map(s => <a key={s} href={s} target="_blank" rel="noreferrer">{p.sourceKind === 'map' ? 'map' : 'source'}</a>)}
-            <button onClick={e => { e.stopPropagation(); toggleSelect(p); }}>
-              {selected.some(x => x.id === p.id) ? 'Remove' : 'Add to itinerary'}
-            </button>
           </li>
         ))}
       </ul>
-      <ItineraryPanel selected={selected} />
       <NearbyButton onResults={applyResults} onNotice={setNotice} />
       {places.map(p => <Reviews key={'r-' + p.id} place={p} />)}
       <EmergencyPanel />
