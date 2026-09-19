@@ -58,7 +58,7 @@ export default function App(){
       <MapView places={places} focus={focus} />
       {spotlight && (
         <article data-testid="spotlight">
-          <PlacePhoto name={spotlight.name} large />
+          <PlacePhoto name={spotlight.name} lng={spotlight.lng} lat={spotlight.lat} />
           <h3>Hidden gem: {spotlight.name}</h3>
           <p>{spotlight.reason}</p>
         </article>
@@ -66,7 +66,7 @@ export default function App(){
       <ul>
         {places.map((p, i) => (
           <li key={p.id} data-testid="place-card" className="place-card" style={{ animationDelay: `${i * 120}ms` }} onClick={() => setFocus(p)}>
-            <PlacePhoto name={p.name} />
+            <PlacePhoto name={p.name} lng={p.lng} lat={p.lat} />
             <b>{p.name}</b> <span>{(p.categories || []).join(', ')}</span>
             <p>{p.reason}</p>
             {p.description && <p data-testid="place-desc">{p.description}</p>}
