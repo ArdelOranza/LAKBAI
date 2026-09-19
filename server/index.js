@@ -11,6 +11,13 @@ app.get('/api/ready', (req, res) => {
   if (!gemini || !mapbox) return res.status(503).json({ gemini, mapbox, error: 'Missing API key(s). Set GEMINI_API_KEY and VITE_MAPBOX_TOKEN in root .env.' });
   res.json({ gemini, mapbox });
 });
+const { searchPlaces } = require('./places.js');
+app.get('/api/places', async (req, res) => {
+  try {
+    const places = await searchPlaces(req.query.q || '', req.query.proximity);
+    res.json({ places });
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
 const PORT = process.env.PORT || 3001;
 if (require.main === module) app.listen(PORT, () => console.log('Lakbai server on ' + PORT));
 module.exports = app;
