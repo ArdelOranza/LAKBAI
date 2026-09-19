@@ -1,58 +1,90 @@
-# Lakbai MVP — Design Spec (2026-09-19)
+# Lakbai MVP — Design Spec (2026-09-19, rev2: Pangasinan-only)
 
 ## 1. Intended outcome
-A mobile-first web MVP where a tourist chats ("3 hours in Cebu, love food"),
-the AI searches the internet + Mapbox, and the app shows a Mapbox map with
-result cards. No styling; every core flow must work end-to-end.
+A mobile-first web MVP for **Pangasinan, Philippines only**. Tourist chats
+("3 hours near Alaminos, love seafood"), the AI searches the internet +
+Mapbox, and the app reveals suggestions with a wow moment, then a Mapbox
+map with cards. MVP-level polish (not full design system, not unstyled).
+Zero AI slop: every suggestion is real, verified, sourced.
 
-**Success criteria:** user can chat → see pins + cards on map → build an
-itinerary → find nearby via GPS → read/add reviews → see emergency info.
-Each flow works against real APIs (Gemini, Mapbox) with `.env` keys.
+**Success criteria:** chat → wow reveal → pins + cards on map → itinerary →
+GPS nearby → reviews → emergency info. All flows real APIs (Gemini, Mapbox).
+**Non-goals:** auth, database, offline, app-store packaging, business admin.
 
-**Non-goals (MVP):** styling/polish, auth, database, offline mode, app-store
-packaging, admin panel for businesses/tourism offices.
+## 2. Scope lock: Pangasinan only
+- Bounding box: lng 119.7–120.7, lat 15.7–16.5. Default center: Lingayen
+  (16.03, 120.23), zoom ~9.5.
+- Every server query auto-appends "Pangasinan" and passes Mapbox
+  `bbox` + `proximity` (map center or GPS fix).
+- Anti-slop gate: any place whose Mapbox-verified coords fall outside the
+  bbox is dropped, never shown. Out-of-scope requests ("Boracay?") get a
+  friendly redirect, not fake compliance.
 
-## 2. Architecture
+## 3. Wow-factor suggestion UX
+- Searching state: shimmer + live status line ("Searching Hundred Islands…").
+- Reveal: staggered card entrance + map `flyTo` tour of top 3 pins.
+- Spotlight: top "hidden gem" card (non-obvious pick: e.g. not Hundred
+  Islands when everyone asks beaches) with a "why this" reason line.
+- Every card: reason-why chip (grounded in source), category, distance,
+  source link, "add to itinerary". Card tap → map flies to pin.
+- `prefers-reduced-motion`: all animation off, final states only.
+
+## 4. Anti-slop contract (server-enforced)
+1. No Mapbox-verified coords → no card. Never invent locations.
+2. No invented ratings/hours: show "unrated" / "hours unknown" when absent.
+3. Every place carries ≥1 source URL (Gemini grounding citation).
+4. Dedupe by Mapbox `mapbox_id`; cap 8 cards per answer.
+5. Numbers (prices, times) only from sources; otherwise omitted.
+
+## 5. Architecture
 ```
-client/ (Vite + React, mobile-first, unstyled HTML + testids)
-  ChatPanel -> results state -> ResultsMap (mapbox-gl) + Cards + ItineraryPanel
-server/ (Node + Express, keys stay server-side)
-  POST /api/chat       -> Gemini (Google Search grounding) -> intent + recommendations
-  GET  /api/places     -> Mapbox Search Box API proxy (forward geocode + category search)
-  POST /api/itinerary  -> time-budget scheduler over selected places
-  GET  /api/emergency  -> Mapbox category search (hospital, police) + static hotlines
-Reviews: localStorage only (no backend table in MVP).
-GPS: browser geolocation API -> centers map, feeds /api/places proximity.
+client/ (Vite + React, mobile-first, design tokens §7, testids)
+  ChatPanel -> results store -> Reveal (stagger+flyTo) -> ResultsMap + Cards
+  + ItineraryPanel + NearbyButton + Reviews + EmergencyPanel
+server/ (Node + Express, keys server-side)
+  POST /api/chat       -> Gemini + Google Search grounding -> intent + candidates
+  GET  /api/places     -> Mapbox Search Box proxy (bbox-locked) -> verified coords
+  POST /api/chat+places pipeline: candidates -> verify -> drop out-of-bbox -> cards
+  POST /api/itinerary  -> time-budget scheduler over selected stops
+  GET  /api/emergency  -> hospitals/police near center + Pangasinan hotlines
+Reviews: localStorage keyed by mapbox_id. GPS: browser geolocation.
 ```
 
-## 3. Components
+## 6. Components
 | Unit | Does | Depends on |
 |---|---|---|
-| ChatPanel | message list + input, sends to /api/chat | results store |
-| Agent (server) | classifies intent (discover/food/event/itinerary/nearby/emergency), grounds via Search, returns structured places | Gemini API |
-| ResultsMap | Mapbox map, pins per place, centers on GPS or top result | Mapbox GL, VITE_MAPBOX_TOKEN |
-| PlaceCards | card per place: name, category, rating, source link, "add to itinerary" | results store |
-| ItineraryPanel | ordered stops with time blocks from available-hours input | /api/itinerary |
-| NearbyButton | GPS fix -> /api/places?proximity=... -> map + cards | geolocation |
-| Reviews | per-place 1-5 + text, localStorage keyed by place id | none |
-| EmergencyPanel | hospitals/police near map center + hotline list | /api/emergency |
+| ChatPanel | messages + input → /api/chat | results store |
+| Agent (server) | intent (discover/food/event/itinerary/nearby/emergency), Pangasinan-scoped grounding | Gemini API |
+| Verify (server) | Mapbox verify each candidate, enforce bbox + anti-slop §4 | Mapbox API |
+| ResultsMap | pins, flyTo tour, GPS recenter | mapbox-gl, VITE_MAPBOX_TOKEN |
+| PlaceCards | staggered reveal, reason chip, spotlight gem, add-to-itinerary | results store |
+| ItineraryPanel | ordered stops + time blocks from hours input | /api/itinerary |
+| NearbyButton | GPS → /api/places proximity → map + cards | geolocation |
+| Reviews | 1–5 + text, localStorage | none |
+| EmergencyPanel | hospitals/police near center + hotlines | /api/emergency |
 
-## 4. Data flow
-1. Chat text -> POST /api/chat {message, location?} -> {intent, places[], answer}.
-2. Places (name + Mapbox coords via /api/places) -> pins + cards.
-3. "Add" buttons -> itinerary list -> POST /api/itinerary {places, hours} -> schedule.
-4. GPS button -> geolocation -> re-centers map, nearby search.
-5. Every place carries source URLs (grounding citations) so info is traceable.
+## 7. Design tokens (via ui-ux-pro-max, Lakbai travel profile)
+Primary #EA580C (adventure orange) / Secondary #0891B2 (map teal) /
+Accent #D97706 / BG #FFF7ED / Ink #0F172A / Card #FFFFFF / Border #FCEAE1.
+Font: clean sans (Inter or Plus Jakarta Sans — plugin suggested Thai
+typeface rejected: wrong locale). Checklist enforced: SVG icons only,
+4.5:1 contrast, visible focus, reduced-motion, responsive 375/768/1024/1440.
 
-## 5. Secrets & config
-`.env` (gitignored): GEMINI_API_KEY, VITE_MAPBOX_TOKEN, PORT. Client only
-sees VITE_ vars. Keys never logged, never committed.
+## 8. Skills & process (consulted plugins)
+- superpowers: test-driven-development (RED-GREEN per endpoint/component),
+  verification-before-completion before "done", systematic-debugging on bugs.
+- graphify: `graphify update .` after code lands; query-first for later work.
+- ui-ux-pro-max: tokens §7 + pre-delivery checklist §7.
 
-## 6. Testing (no styling, function-first)
-Manual scripted flows, each must pass before done:
-- T1 chat "food in Cebu" -> >=3 cards with pins + sources.
-- T2 GPS nearby -> map centers, restaurants/attractions listed.
-- T3 itinerary "4 hours" -> ordered schedule covering selected stops.
-- T4 review add/read persists after reload (localStorage).
-- T5 emergency -> hospitals + police near center.
-- T6 no-key fallback: server returns 503 with clear message (not a crash).
+## 9. Secrets & config
+`.env` (gitignored): GEMINI_API_KEY, VITE_MAPBOX_TOKEN, PORT. Client sees
+only VITE_ vars. Never logged or committed.
+
+## 10. Acceptance (all must pass)
+- A1 chat "seafood Alaminos" → ≥3 verified Pangasinan cards + sources + pins.
+- A2 hidden-gem spotlight present with grounded reason line.
+- A3 out-of-scope "Boracay" → redirect, zero fake cards.
+- A4 GPS nearby → centered map + restaurants/attractions.
+- A5 itinerary "4 hours" → ordered schedule of selected stops.
+- A6 review persists after reload. A7 emergency shows hospitals + police.
+- A8 invented-rating scan: no card shows rating without source.
