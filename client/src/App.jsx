@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import MapView from './MapView.jsx';
 import { recommend } from './api.js';
+import { ItineraryPanel, NearbyButton, Reviews, EmergencyPanel } from './Panels.jsx';
 
 export default function App(){
   const [messages, setMessages] = useState([]);
@@ -68,6 +69,10 @@ export default function App(){
           </li>
         ))}
       </ul>
+      <ItineraryPanel selected={selected} />
+      <NearbyButton onResults={applyResults} onNotice={setNotice} />
+      {places.map(p => <Reviews key={'r-' + p.id} place={p} />)}
+      <EmergencyPanel />
     </div>
   );
 }
