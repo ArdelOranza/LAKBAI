@@ -1,7 +1,25 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { inBox } = require('../places.js');
-test('inBox accepts Alaminos, rejects Boracay', () => {
-  assert.equal(inBox(119.98, 16.15), true);
-  assert.equal(inBox(120.58, 11.97), false);
+const { searchPlaces, DEFAULT_CENTER } = require('../places.js');
+test('searchPlaces maps features with no bbox lock', async () => {
+  const realFetch = global.fetch;
+  let url = '';
+  global.fetch = async (u) => {
+    url = String(u);
+    return { ok: true, json: async () => ({ features: [
+      { properties: { mapbox_id: 'x1', name: 'Boracay', full_address: 'Aklan', poi_category: ['beach'] }, geometry: { coordinates: [121.92, 11.97] } },
+      { properties: { mapbox_id: 'x1', name: 'Dup', full_address: '', poi_category: [] }, geometry: { coordinates: [121.92, 11.97] } }
+    ] }) };
+  };
+  try {
+    const out = await searchPlaces('Boracay', null);
+    assert.equal(out.length, 1);
+    assert.equal(out[0].name, 'Boracay');
+    assert.ok(!url.includes('bbox='));
+  } finally {
+    global.fetch = realFetch;
+  }
+});
+test('default center is Philippines-wide', () => {
+  assert.deepEqual(DEFAULT_CENTER, [121.77, 12.88]);
 });

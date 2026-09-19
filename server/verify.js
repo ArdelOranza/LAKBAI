@@ -21,7 +21,7 @@ async function recommend(message, proximity, deps = {}) {
     seen.add(hit.id);
     const grounded = agent.sources && agent.sources.length;
     const mapLink = `https://www.google.com/maps/search/?api=1&query=${hit.lat},${hit.lng}`;
-    places.push({ ...hit, reason: c.reason || '', sources: grounded ? agent.sources : [mapLink], sourceKind: grounded ? 'article' : 'map' });
+    places.push({ ...hit, reason: c.reason || '', description: c.description || '', festival: c.festival || '', fees: c.fees || '', sources: grounded ? agent.sources : [mapLink], sourceKind: grounded ? 'article' : 'map' });
     if (places.length >= 8) break;
   }
   let spotlight = null;

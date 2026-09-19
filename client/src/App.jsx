@@ -66,6 +66,9 @@ export default function App(){
           <li key={p.id} data-testid="place-card" className="place-card" style={{ animationDelay: `${i * 120}ms` }} onClick={() => setFocus(p)}>
             <b>{p.name}</b> <span>{(p.categories || []).join(', ')}</span>
             <p>{p.reason}</p>
+            {p.description && <p data-testid="place-desc">{p.description}</p>}
+            {p.festival && <p data-testid="place-festival">Festival: {p.festival}</p>}
+            {p.fees && <p data-testid="place-fees">Bayarin: {p.fees}</p>}
             {(p.sources || []).map(s => <a key={s} href={s} target="_blank" rel="noreferrer">{p.sourceKind === 'map' ? 'map' : 'source'}</a>)}
           </li>
         ))}
