@@ -1,0 +1,16 @@
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
+const express = require('express');
+const cors = require('cors');
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.get('/api/health', (req, res) => res.json({ ok: true }));
+app.get('/api/ready', (req, res) => {
+  const gemini = Boolean(process.env.GEMINI_API_KEY);
+  const mapbox = Boolean(process.env.VITE_MAPBOX_TOKEN);
+  if (!gemini || !mapbox) return res.status(503).json({ gemini, mapbox, error: 'Missing API key(s). Set GEMINI_API_KEY and VITE_MAPBOX_TOKEN in root .env.' });
+  res.json({ gemini, mapbox });
+});
+const PORT = process.env.PORT || 3001;
+if (require.main === module) app.listen(PORT, () => console.log('Lakbai server on ' + PORT));
+module.exports = app;
