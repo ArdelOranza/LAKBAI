@@ -25,11 +25,6 @@ app.get('/api/emergency', async (req, res) => {
     res.json({ hospitals: hospitals.slice(0, 5), police: police.slice(0, 5), hotlines: HOTLINES });
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
-const { buildItinerary } = require('./itinerary.js');
-app.post('/api/itinerary', (req, res) => {
-  const { places = [], hours = 4, startHour = 9 } = req.body || {};
-  res.json(buildItinerary(places, Number(hours) || 4, Number(startHour) || 9));
-});
 const { recommend } = require('./verify.js');
 app.post('/api/recommend', async (req, res) => {
   try {

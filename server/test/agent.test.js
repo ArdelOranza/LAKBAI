@@ -46,6 +46,54 @@ test('chatRecommend backs off across 3 attempts then succeeds', async () => {
     global.fetch = realFetch;
   }
 });
+test('chatRecommend falls back to lite model when primary is throttled', async () => {
+  const { chatRecommend } = require('../agent.js');
+  const good = '{"intent":"food","answer":"a","candidates":[],"spotlight":null,"sources":[]}';
+  const realFetch = global.fetch;
+  const urls = [];
+  let calls = 0;
+  global.fetch = async (url) => {
+    calls++;
+    urls.push(String(url));
+    if (calls < 3) return { ok: false, status: 429 };
+    return { ok: true, json: async () => ({ candidates: [{ content: { parts: [{ text: good }] } }] }) };
+  };
+  try {
+    process.env.GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'test-key';
+    const out = await chatRecommend('x', { wait: async () => {} });
+    assert.equal(out.intent, 'food');
+    assert.equal(calls, 3);
+    assert.ok(urls[0].includes('gemini-3.6-flash'));
+    assert.ok(urls[2].includes('gemini-flash-lite-latest'));
+  } finally {
+    global.fetch = realFetch;
+  }
+});
+test('chatRecommend uses deepseek when all gemini attempts fail', async () => {
+  const { chatRecommend } = require('../agent.js');
+  const good = '{"intent":"food","answer":"a","candidates":[],"spotlight":null,"sources":[]}';
+  const realFetch = global.fetch;
+  const urls = [];
+  global.fetch = async (url) => {
+    urls.push(String(url));
+    if (String(url).includes('api.deepseek.com')) {
+      return { ok: true, json: async () => ({ choices: [{ message: { content: good } }] }) };
+    }
+    return { ok: false, status: 429 };
+  };
+  const hadKey = process.env.DEEPSEEK_API_KEY;
+  process.env.DEEPSEEK_API_KEY = 'test-key';
+  try {
+    process.env.GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'test-key';
+    const out = await chatRecommend('x', { wait: async () => {} });
+    assert.equal(out.intent, 'food');
+    assert.equal(urls.length, 4);
+    assert.ok(urls[3].includes('api.deepseek.com'));
+  } finally {
+    global.fetch = realFetch;
+    if (hadKey === undefined) delete process.env.DEEPSEEK_API_KEY;
+  }
+});
 test('chatRecommend gives friendly busy message when exhausted', async () => {
   const { chatRecommend } = require('../agent.js');
   const realFetch = global.fetch;

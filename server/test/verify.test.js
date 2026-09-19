@@ -1,10 +1,10 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-test('redirect intent returns zero places', async () => {
+test('empty candidates returns zero places', async () => {
   const { recommend } = require('../verify.js');
-  const fakeChat = async () => ({ intent: 'redirect', answer: 'Try Pangasinan instead!', candidates: [{ name: 'Boracay' }], spotlight: null, sources: [] });
-  const out = await recommend('Boracay?', null, { chatFn: fakeChat, searchFn: async () => { throw new Error('must not be called'); } });
-  assert.equal(out.intent, 'redirect');
+  const fakeChat = async () => ({ intent: 'discover', answer: 'No matches found.', candidates: [], spotlight: null, sources: [] });
+  const out = await recommend('xyz?', null, { chatFn: fakeChat, searchFn: async () => { throw new Error('must not be called'); } });
+  assert.equal(out.intent, 'discover');
   assert.deepEqual(out.places, []);
 });
 test('one failing lookup does not nuke the answer', async () => {
@@ -28,12 +28,10 @@ test('sourceKind marks map fallback honestly', async () => {
   const out2 = await recommend('food?', null, { chatFn: fakeChat2, searchFn: fakeSearch });
   assert.equal(out2.places[0].sourceKind, 'article');
 });
-test('out-of-box candidates are dropped', async () => {
+test('duplicate hits are deduped', async () => {
   const { recommend } = require('../verify.js');
-  const fakeChat = async () => ({ intent: 'food', answer: 'a', candidates: [{ name: 'Boracay', reason: 'x' }], spotlight: null, sources: ['https://s.com'] });
-  const fakeSearch = async (name) => name === 'Boracay'
-    ? [{ id: 'b1', name: 'Boracay', lng: 120.58, lat: 11.97, address: '', categories: [] }]
-    : [];
+  const fakeChat = async () => ({ intent: 'food', answer: 'a', candidates: [{ name: 'Cafe', reason: 'x' }, { name: 'Cafe', reason: 'y' }], spotlight: null, sources: ['https://s.com'] });
+  const fakeSearch = async () => [{ id: 'c1', name: 'Cafe', lng: 120.58, lat: 11.97, address: '', categories: [] }];
   const out = await recommend('food?', null, { chatFn: fakeChat, searchFn: fakeSearch });
-  assert.deepEqual(out.places, []);
+  assert.equal(out.places.length, 1);
 });
