@@ -11,6 +11,11 @@ app.get('/api/ready', (req, res) => {
   if (!gemini || !mapbox) return res.status(503).json({ gemini, mapbox, error: 'Missing API key(s). Set GEMINI_API_KEY and VITE_MAPBOX_TOKEN in root .env.' });
   res.json({ gemini, mapbox });
 });
+const { buildItinerary } = require('./itinerary.js');
+app.post('/api/itinerary', (req, res) => {
+  const { places = [], hours = 4, startHour = 9 } = req.body || {};
+  res.json(buildItinerary(places, Number(hours) || 4, Number(startHour) || 9));
+});
 const { recommend } = require('./verify.js');
 app.post('/api/recommend', async (req, res) => {
   try {
