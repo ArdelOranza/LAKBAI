@@ -48,15 +48,20 @@ async function callGemini(payload, useTools){
   return data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
 }
 const RETRYABLE = [400, 429, 500, 502, 503];
-async function chatRecommend(message){
+const BACKOFF_MS = [0, 1500, 3000];
+async function chatRecommend(message, opts = {}){
+  const wait = opts.wait || (ms => new Promise(r => setTimeout(r, ms)));
   const payload = `User request (Pangasinan, Philippines): ${message}`;
-  let firstErr;
-  for (const useTools of [true, false]){
+  let firstErr, attempt = 0;
+  for (const useTools of [true, false, false]){
+    if (attempt > 0) await wait(BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)]);
     try {
       return parseAgentJson(await callGemini(payload, useTools));
     } catch (e) {
       if (!RETRYABLE.includes(e.status)) throw e;
+      if (e.status === 429 || e.status === 503) e.message = 'AI is busy right now — try again in a moment.';
       firstErr = e;
+      attempt++;
     }
   }
   throw firstErr;

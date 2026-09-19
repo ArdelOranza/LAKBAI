@@ -25,6 +25,38 @@ test('parseAgentJson handles fences and prose', () => {
   const out = parseAgentJson(raw);
   assert.equal(out.intent, 'food');
 });
+test('chatRecommend backs off across 3 attempts then succeeds', async () => {
+  const { chatRecommend } = require('../agent.js');
+  const good = '{"intent":"food","answer":"a","candidates":[],"spotlight":null,"sources":[]}';
+  const realFetch = global.fetch;
+  let calls = 0;
+  const waits = [];
+  global.fetch = async () => {
+    calls++;
+    if (calls < 3) return { ok: false, status: calls === 1 ? 429 : 503 };
+    return { ok: true, json: async () => ({ candidates: [{ content: { parts: [{ text: good }] } }] }) };
+  };
+  try {
+    process.env.GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'test-key';
+    const out = await chatRecommend('x', { wait: async (ms) => waits.push(ms) });
+    assert.equal(out.intent, 'food');
+    assert.equal(calls, 3);
+    assert.deepEqual(waits, [1500, 3000]);
+  } finally {
+    global.fetch = realFetch;
+  }
+});
+test('chatRecommend gives friendly busy message when exhausted', async () => {
+  const { chatRecommend } = require('../agent.js');
+  const realFetch = global.fetch;
+  global.fetch = async () => ({ ok: false, status: 503 });
+  try {
+    process.env.GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'test-key';
+    await assert.rejects(chatRecommend('x', { wait: async () => {} }), /busy/);
+  } finally {
+    global.fetch = realFetch;
+  }
+});
 test('chatRecommend retries without tools on 502', async () => {
   const { chatRecommend } = require('../agent.js');
   const good = '{"intent":"food","answer":"a","candidates":[],"spotlight":null,"sources":[]}';
