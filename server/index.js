@@ -11,6 +11,20 @@ app.get('/api/ready', (req, res) => {
   if (!gemini || !mapbox) return res.status(503).json({ gemini, mapbox, error: 'Missing API key(s). Set GEMINI_API_KEY and VITE_MAPBOX_TOKEN in root .env.' });
   res.json({ gemini, mapbox });
 });
+const HOTLINES = [
+  { name: 'Pangasinan PDRRMO', number: '(075) 542-6802' },
+  { name: 'National Emergency', number: '911' }
+];
+app.get('/api/emergency', async (req, res) => {
+  try {
+    const proximity = req.query.proximity;
+    const [hospitals, police] = await Promise.all([
+      searchPlaces('hospital', proximity),
+      searchPlaces('police station', proximity)
+    ]);
+    res.json({ hospitals: hospitals.slice(0, 5), police: police.slice(0, 5), hotlines: HOTLINES });
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
 const { buildItinerary } = require('./itinerary.js');
 app.post('/api/itinerary', (req, res) => {
   const { places = [], hours = 4, startHour = 9 } = req.body || {};
