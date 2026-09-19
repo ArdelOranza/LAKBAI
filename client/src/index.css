@@ -1,0 +1,9 @@
+:root{
+  --primary:#EA580C; --secondary:#0891B2; --accent:#D97706;
+  --bg:#FFF7ED; --ink:#0F172A; --card:#FFFFFF; --border:#FCEAE1;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Plus Jakarta Sans",system-ui,sans-serif}
+button{cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
