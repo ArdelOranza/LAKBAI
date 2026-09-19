@@ -1,6 +1,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { searchPlaces, DEFAULT_CENTER } = require('../places.js');
+process.env.VITE_MAPBOX_TOKEN = process.env.VITE_MAPBOX_TOKEN || 'test-token';
 test('searchPlaces maps features with no bbox lock', async () => {
   const realFetch = global.fetch;
   let url = '';

@@ -1,14 +1,9 @@
-const PANGASINAN_BBOX = '119.7,15.7,120.7,16.5';
-const DEFAULT_CENTER = [120.23, 16.03];
-function inBox(lng, lat){
-  return lng >= 119.7 && lng <= 120.7 && lat >= 15.7 && lat <= 16.5;
-}
+const DEFAULT_CENTER = [121.77, 12.88];
 async function searchPlaces(q, proximity){
   const token = process.env.VITE_MAPBOX_TOKEN;
   if (!token) { const e = new Error('Missing VITE_MAPBOX_TOKEN'); e.status = 503; throw e; }
   const params = new URLSearchParams({
     q, language: 'en', limit: '8',
-    bbox: PANGASINAN_BBOX,
     proximity: proximity || DEFAULT_CENTER.join(','),
     access_token: token
   });
@@ -20,7 +15,7 @@ async function searchPlaces(q, proximity){
   for (const f of (data.features || [])){
     const id = f.properties && f.properties.mapbox_id;
     const [lng, lat] = (f.geometry && f.geometry.coordinates) || [];
-    if (!id || lng === undefined || !inBox(lng, lat) || seen.has(id)) continue;
+    if (!id || lng === undefined || lat === undefined || seen.has(id)) continue;
     seen.add(id);
     places.push({
       id, lng, lat,
@@ -31,4 +26,4 @@ async function searchPlaces(q, proximity){
   }
   return places;
 }
-module.exports = { PANGASINAN_BBOX, DEFAULT_CENTER, inBox, searchPlaces };
+module.exports = { DEFAULT_CENTER, searchPlaces };

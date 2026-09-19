@@ -1,31 +1,7 @@
 import { useEffect, useState } from 'react';
-import { itinerary, recommend } from './api.js';
+import { recommend } from './api.js';
 
 const BASE = import.meta.env.VITE_API_URL || '';
-
-export function ItineraryPanel({ selected }){
-  const [hours, setHours] = useState(4);
-  const [schedule, setSchedule] = useState([]);
-  const [planError, setPlanError] = useState('');
-  async function buildPlan(){
-    try {
-      const out = await itinerary(selected, Number(hours) || 4);
-      setSchedule(out.schedule || []);
-    } catch (e) {
-      setSchedule([]);
-      setPlanError(e.message);
-    }
-  }
-  return (
-    <section>
-      <h2>Itinerary ({selected.length} stops)</h2>
-      <input data-testid="hours-input" value={hours} onChange={e => setHours(e.target.value)} inputMode="numeric" aria-label="Available hours" />
-      <button data-testid="itinerary-build" onClick={buildPlan}>Build</button>
-      {planError && <p data-testid="notice">{planError}</p>}
-      <ol>{schedule.map(s => <li key={s.placeId} data-testid="itinerary-item">{s.name} {s.arrive}–{s.depart}</li>)}</ol>
-    </section>
-  );
-}
 
 export function NearbyButton({ onResults, onNotice }){
   function nearby(){
