@@ -1,10 +1,10 @@
 const { chatRecommend } = require('./agent.js');
-const { searchPlaces } = require('./places.js');
+const { searchPlaces, inBox } = require('./places.js');
 async function recommend(message, proximity, deps = {}) {
   const chatFn = deps.chatFn || chatRecommend;
   const searchFn = deps.searchFn || searchPlaces;
   const agent = await chatFn(message);
-  if (!agent.candidates.length) {
+  if (agent.intent === 'redirect' || !agent.candidates.length) {
     return { intent: agent.intent, answer: agent.answer, places: [], spotlight: null };
   }
   const seen = new Set();
@@ -12,11 +12,11 @@ async function recommend(message, proximity, deps = {}) {
   for (const c of agent.candidates.slice(0, 8)) {
     let hits;
     try {
-      hits = await searchFn(`${c.name} ${c.hint || ''}`, proximity);
+      hits = await searchFn(`${c.name} ${c.hint || ''} Pangasinan`, proximity);
     } catch {
       continue;
     }
-    const hit = hits.find(h => !seen.has(h.id));
+    const hit = hits.find(h => inBox(h.lng, h.lat) && !seen.has(h.id));
     if (!hit) continue;
     seen.add(hit.id);
     const grounded = agent.sources && agent.sources.length;
