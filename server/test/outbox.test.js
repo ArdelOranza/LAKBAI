@@ -8,16 +8,14 @@ function freshStorage(initial){
     removeItem: (k) => map.delete(k)
   };
 }
-test('stripForInsert drops local-only at field', () => {
-  delete require.cache[require.resolve('../../client/src/outbox.cjs')];
+test('stripForInsert drops local-only at field', async () => {
   global.localStorage = freshStorage();
-  const { stripForInsert } = require('../../client/src/outbox.cjs');
+  const { stripForInsert } = await import('../../client/src/outbox.js');
   assert.deepEqual(stripForInsert({ place_id: 'p', score: 5, text: 't', at: 123 }), { place_id: 'p', score: 5, text: 't' });
 });
-test('corrupt outbox reads as empty, takeAll clears', () => {
-  delete require.cache[require.resolve('../../client/src/outbox.cjs')];
+test('corrupt outbox reads as empty, takeAll clears', async () => {
   global.localStorage = freshStorage({ 'lakbai-review-outbox': 'not-json{{{' });
-  const { readOutbox, takeAll, queueReview } = require('../../client/src/outbox.cjs');
+  const { readOutbox, takeAll, queueReview } = await import('../../client/src/outbox.js');
   assert.deepEqual(readOutbox(), []);
   queueReview({ place_id: 'p' });
   assert.equal(takeAll().length, 1);

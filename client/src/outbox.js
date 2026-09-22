@@ -7,22 +7,21 @@ function readRaw(){
     return [];
   }
 }
-function readOutbox(){
+export function readOutbox(){
   return readRaw();
 }
-function queueReview(row){
+export function queueReview(row){
   const box = readRaw();
   box.push({ ...row, at: Date.now() });
   localStorage.setItem(KEY, JSON.stringify(box));
   return box;
 }
-function takeAll(){
+export function takeAll(){
   const box = readRaw();
   localStorage.removeItem(KEY);
   return box;
 }
-function stripForInsert(row){
+export function stripForInsert(row){
   const { at, ...cols } = row;
   return cols;
 }
-module.exports = { readOutbox, queueReview, takeAll, stripForInsert };
