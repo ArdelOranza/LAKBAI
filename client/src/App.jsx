@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import MapView from './MapView.jsx';
 import { recommend } from './api.js';
 import { NearbyButton, Reviews, EmergencyPanel } from './Panels.jsx';
+import { AuthProvider } from './AuthContext.jsx';
 
 const BASE = import.meta.env.VITE_API_URL || '';
 
@@ -44,6 +45,7 @@ export default function App(){
   }
 
   return (
+    <AuthProvider>
     <div data-testid="app">
       <h1>Lakbai</h1>
       {readyError && <p data-testid="notice">{readyError}</p>}
@@ -79,5 +81,6 @@ export default function App(){
       {places.map(p => <Reviews key={'r-' + p.id} place={p} />)}
       <EmergencyPanel />
     </div>
+    </AuthProvider>
   );
 }
