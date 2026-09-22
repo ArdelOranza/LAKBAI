@@ -124,6 +124,6 @@ async function callGeminiForPlan(sys, msg, opts = {}){
     const data = await r.json();
     return data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
   };
-  return runSteps(wait, [attempt, attempt]);
+  return runSteps(wait, [attempt, attempt, attempt]);
 }
 module.exports = { chatRecommend, parseAgentJson, callGeminiForPlan };
