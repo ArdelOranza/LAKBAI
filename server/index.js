@@ -37,6 +37,13 @@ app.post('/api/chat', async (req, res) => {
     res.json(await chatRecommend(req.body.message || ''));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
+const { planDay } = require('./plan.js');
+app.post('/api/plan', async (req, res) => {
+  try {
+    const { message = '', hours = 4, startHour = 9 } = req.body || {};
+    res.json(await planDay(message, Number(hours) || 4, Number(startHour) || 9));
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
 const { searchPlaces } = require('./places.js');
 app.get('/api/places', async (req, res) => {
   try {
