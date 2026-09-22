@@ -2,11 +2,15 @@ import { useEffect, useState } from 'react';
 import MapView from './MapView.jsx';
 import { recommend } from './api.js';
 import { NearbyButton, Reviews, EmergencyPanel } from './Panels.jsx';
-import { AuthProvider } from './AuthContext.jsx';
+import { AuthProvider, useAuth } from './AuthContext.jsx';
+import Saved from './Saved.jsx';
+import { logSearch } from './store.js';
 
 const BASE = import.meta.env.VITE_API_URL || '';
 
-export default function App(){
+function Shell(){
+  const { user } = useAuth();
+  const [tab, setTab] = useState('search');
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [places, setPlaces] = useState([]);
@@ -38,6 +42,7 @@ export default function App(){
     setStatus('Searching…');
     try {
       applyResults(await recommend(text));
+      logSearch(user, text);
     } catch (e) {
       setStatus('');
       setNotice(e.message);
@@ -45,9 +50,13 @@ export default function App(){
   }
 
   return (
-    <AuthProvider>
     <div data-testid="app">
       <h1>Lakbai</h1>
+      <nav>
+        <button data-testid="nav-search" onClick={() => setTab('search')}>Search</button>
+        <button data-testid="nav-saved" onClick={() => setTab('saved')}>Saved</button>
+      </nav>
+      {tab === 'saved' ? <Saved /> : (<>
       {readyError && <p data-testid="notice">{readyError}</p>}
       <section data-testid="chat">
         <ul>{messages.map((m, i) => <li key={i}><b>{m.role}:</b> {m.text}</li>)}</ul>
@@ -80,7 +89,10 @@ export default function App(){
       <NearbyButton onResults={applyResults} onNotice={setNotice} />
       {places.map(p => <Reviews key={'r-' + p.id} place={p} />)}
       <EmergencyPanel />
+      </>)}
     </div>
-    </AuthProvider>
   );
+}
+export default function App(){
+  return <AuthProvider><Shell /></AuthProvider>;
 }
