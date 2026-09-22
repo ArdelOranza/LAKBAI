@@ -37,6 +37,29 @@ test('plan generation retries once on 503', async () => {
     global.fetch = realFetch;
   }
 });
+test('plan falls back to deepseek when gemini is throttled', async () => {
+  const realFetch = global.fetch;
+  const urls = [];
+  const planJson = '{"title":"T","stops":[]}';
+  global.fetch = async (url) => {
+    urls.push(String(url));
+    if (String(url).includes('api.deepseek.com')) {
+      return { ok: true, json: async () => ({ choices: [{ message: { content: planJson } }] }) };
+    }
+    return { ok: false, status: 503 };
+  };
+  const hadKey = process.env.DEEPSEEK_API_KEY;
+  process.env.DEEPSEEK_API_KEY = 'test-key';
+  try {
+    process.env.GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'test-key';
+    const out = await planDay('food day', 4, 9, { searchFn: async () => [] });
+    assert.equal(out.title, 'T');
+    assert.ok(urls.some(u => u.includes('api.deepseek.com')));
+  } finally {
+    global.fetch = realFetch;
+    if (hadKey === undefined) delete process.env.DEEPSEEK_API_KEY;
+  }
+});
 test('plan prompt carries the time window', async () => {
   const realFetch = global.fetch;
   let body = '';

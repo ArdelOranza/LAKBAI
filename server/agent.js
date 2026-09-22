@@ -124,6 +124,27 @@ async function callGeminiForPlan(sys, msg, opts = {}){
     const data = await r.json();
     return data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
   };
-  return runSteps(wait, [attempt, attempt, attempt]);
+  const ds = async () => {
+    const key = process.env.DEEPSEEK_API_KEY;
+    if (!key) { const e = new Error('Missing DEEPSEEK_API_KEY'); e.status = 503; throw e; }
+    const r = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: sys },
+          { role: 'user', content: `Trip request: ${msg}` }
+        ],
+        response_format: { type: 'json_object' }
+      })
+    });
+    if (!r.ok) { const e = new Error('DeepSeek error ' + r.status); e.status = r.status || 502; throw e; }
+    const data = await r.json();
+    return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+  };
+  const steps = [attempt, attempt];
+  if (process.env.DEEPSEEK_API_KEY) steps.push(ds);
+  return runSteps(wait, steps);
 }
 module.exports = { chatRecommend, parseAgentJson, callGeminiForPlan, extractJson };
