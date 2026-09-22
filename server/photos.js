@@ -31,7 +31,7 @@ async function commons(fetcher, params){
     action: 'query', prop: 'pageimages', pithumbsize: '600',
     format: 'json', origin: '*', ...params
   });
-  const r = await fetcher(url);
+  const r = await fetcher(url, { headers: { 'User-Agent': 'Lakbai/1.0 (Pangasinan travel MVP; contact: lakbai-app)' } });
   if (!r.ok) return null;
   return r.json();
 }
