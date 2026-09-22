@@ -80,7 +80,9 @@ function Shell(){
           <li key={p.id} data-testid="place-card" className="place-card" style={{ animationDelay: `${i * 120}ms` }} onClick={() => setFocus(p)}>
             {p.photo && <a href={p.photoPage} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}><img src={p.photo} alt={'Photo of ' + p.name} loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }} /></a>}
             <b>{p.name}</b> <span>{(p.categories || []).join(', ')}</span>
+            {p.rating && <p data-testid="place-rating">★ {p.rating}{p.reviews ? ` (${p.reviews} reviews)` : ''}</p>}
             <p>{p.reason}</p>
+            {p.peopleSay && <p data-testid="place-voice"><i>Visitors say: {p.peopleSay}</i></p>}
             {p.description && <p data-testid="place-desc">{p.description}</p>}
             {p.festival && <p data-testid="place-festival">Festival: {p.festival}</p>}
             {p.fees && <p data-testid="place-fees">Fees: {p.fees}</p>}

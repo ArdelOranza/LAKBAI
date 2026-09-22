@@ -37,6 +37,14 @@ test('out-of-box candidates are dropped', async () => {
   const out = await recommend('food?', null, { chatFn: fakeChat, searchFn: fakeSearch });
   assert.deepEqual(out.places, []);
 });
+test('ratings and visitor voice pass through when grounded', async () => {
+  const { recommend } = require('../verify.js');
+  const fakeChat = async () => ({ intent: 'food', answer: 'a', candidates: [{ name: 'Cafe', reason: 'x', rating: '4.6', reviews: '1.2k', peopleSay: 'best halo-halo' }], spotlight: null, sources: ['https://s.com'] });
+  const fakeSearch = async () => [{ id: 'c1', name: 'Cafe', lng: 120.0, lat: 16.0, address: '', categories: [] }];
+  const out = await recommend('food?', null, { chatFn: fakeChat, searchFn: fakeSearch });
+  assert.equal(out.places[0].rating, '4.6');
+  assert.equal(out.places[0].peopleSay, 'best halo-halo');
+});
 test('duplicate hits are deduped', async () => {
   const { recommend } = require('../verify.js');
   const fakeChat = async () => ({ intent: 'food', answer: 'a', candidates: [{ name: 'Cafe', reason: 'x' }, { name: 'Cafe', reason: 'y' }], spotlight: null, sources: ['https://s.com'] });
