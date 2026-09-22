@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient.js';
-import { readOutbox, queueReview, takeAll, stripForInsert } from './outbox.cjs';
+import outbox from './outbox.cjs';
+const { readOutbox, queueReview, takeAll, stripForInsert } = outbox;
 export async function saveFavorite(user, place){
   if (!supabase || !user) return { error: 'login required' };
   return supabase.from('favorites').upsert({ user_id: user.id, place_id: place.id, name: place.name, lng: place.lng, lat: place.lat, photo: place.photo || null }, { onConflict: 'user_id,place_id' });
