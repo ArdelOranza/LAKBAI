@@ -1,15 +1,14 @@
 const { searchPlaces, inBox } = require('./places.js');
+const { extractJson } = require('./agent.js');
 function parsePlan(raw){
-  const m = String(raw).match(/\{[\s\S]*\}/);
-  if (!m) throw Object.assign(new Error('Could not parse plan JSON'), { status: 502 });
   let obj;
-  try { obj = JSON.parse(m[0]); } catch { throw Object.assign(new Error('Could not parse plan JSON'), { status: 502 }); }
+  try { obj = JSON.parse(extractJson(raw)); } catch { throw Object.assign(new Error('Could not parse plan JSON'), { status: 502 }); }
   if (!obj.title || !Array.isArray(obj.stops)) throw Object.assign(new Error('Could not parse plan JSON'), { status: 502 });
   return obj;
 }
 async function planDay(message, hours, startHour = 9, deps = {}){
-  const agentFn = deps.agentFn || (async (msg) => {
-    const sys = 'You plan a Pangasinan day trip. JSON only: {"title":"...","stops":[{"name":"exact place","hint":"town","arrive":"HH:MM","depart":"HH:MM","activities":["..."]}]}. Real places only, times inside the available window.';
+  const agentFn = deps.agentFn || (async (msg, h, s) => {
+    const sys = `You plan a Pangasinan day trip of ${h} hours starting ${s}:00. JSON only: {"title":"...","stops":[{"name":"exact place","hint":"town","arrive":"HH:MM","depart":"HH:MM","activities":["..."]}]}. Real places only, all times inside the ${h}-hour window starting ${s}:00.`;
     return parsePlan(await require('./agent.js').callGeminiForPlan(sys, msg));
   });
   const searchFn = deps.searchFn || searchPlaces;

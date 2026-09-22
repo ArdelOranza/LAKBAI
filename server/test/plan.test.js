@@ -37,3 +37,24 @@ test('plan generation retries once on 503', async () => {
     global.fetch = realFetch;
   }
 });
+test('plan prompt carries the time window', async () => {
+  const realFetch = global.fetch;
+  let body = '';
+  const planJson = '{"title":"T","stops":[]}';
+  global.fetch = async (url, opts) => {
+    body = opts.body;
+    return { ok: true, json: async () => ({ candidates: [{ content: { parts: [{ text: planJson }] } }] }) };
+  };
+  try {
+    process.env.GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'test-key';
+    await planDay('food day', 6, 8, { searchFn: async () => [] });
+    assert.ok(body.includes('6 hours') && body.includes('8:00'));
+  } finally {
+    global.fetch = realFetch;
+  }
+});
+test('parsePlan ignores trailing prose braces', () => {
+  const { parsePlan } = require('../plan.js');
+  const out = parsePlan('Here: {"title":"T","stops":[]} done }');
+  assert.equal(out.title, 'T');
+});

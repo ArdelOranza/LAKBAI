@@ -126,4 +126,4 @@ async function callGeminiForPlan(sys, msg, opts = {}){
   };
   return runSteps(wait, [attempt, attempt, attempt]);
 }
-module.exports = { chatRecommend, parseAgentJson, callGeminiForPlan };
+module.exports = { chatRecommend, parseAgentJson, callGeminiForPlan, extractJson };
