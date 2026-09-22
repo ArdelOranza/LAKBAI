@@ -18,6 +18,7 @@ function Shell(){
   const [spotlight, setSpotlight] = useState(null);
   const [status, setStatus] = useState('');
   const [focus, setFocus] = useState(null);
+  const [coords, setCoords] = useState('');
   const [notice, setNotice] = useState('');
   const [readyError, setReadyError] = useState('');
 
@@ -90,9 +91,9 @@ function Shell(){
           </li>
         ))}
       </ul>
-      <NearbyButton onResults={applyResults} onNotice={setNotice} />
+      <NearbyButton onResults={applyResults} onNotice={setNotice} onFix={setCoords} />
       {places.map(p => <Reviews key={'r-' + p.id} place={p} />)}
-      <EmergencyPanel />
+      <EmergencyPanel proximity={coords} />
       </>)}
     </div>
   );

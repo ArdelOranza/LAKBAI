@@ -35,10 +35,27 @@ async function commons(fetcher, params){
   if (!r.ok) return null;
   return r.json();
 }
+async function csePhoto(fetcher, name, hint){
+  const key = process.env.GEMINI_API_KEY;
+  const cx = process.env.GOOGLE_CSE_ID;
+  if (!key || !cx) return null;
+  const url = 'https://www.googleapis.com/customsearch/v1?' + new URLSearchParams({
+    key, cx, q: `${name} ${hint || ''} Pangasinan`.trim(),
+    searchType: 'image', num: '3', safe: 'active'
+  });
+  const r = await fetcher(url);
+  if (!r.ok) return null;
+  const data = await r.json();
+  const item = (data.items || [])[0];
+  if (!item || !item.link) return null;
+  return { src: item.link, page: (item.image && item.image.contextLink) || item.link };
+}
 async function findPhoto(name, hint, lng, lat, deps = {}){
   const fetcher = deps.fetch || fetch;
   const query = `${name} ${hint || ''} Pangasinan`.trim();
   try {
+    const cse = await csePhoto(fetcher, name, hint);
+    if (cse) return cse;
     const byName = await commons(fetcher, {
       generator: 'search', gsrsearch: query,
       gsrnamespace: '6', gsrlimit: '5'

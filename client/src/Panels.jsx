@@ -5,14 +5,18 @@ import { recommend } from './api.js';
 
 const BASE = import.meta.env.VITE_API_URL || '';
 
-export function NearbyButton({ onResults, onNotice }){
+export function NearbyButton({ onResults, onNotice, onFix }){
   function nearby(){
     if (!('geolocation' in navigator)) {
       onNotice('GPS unavailable — showing Pangasinan');
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      pos => recommend('nearby attractions and restaurants', `${pos.coords.longitude},${pos.coords.latitude}`).then(onResults).catch(e => onNotice(e.message)),
+      pos => {
+        const at = `${pos.coords.longitude},${pos.coords.latitude}`;
+        if (onFix) onFix(at);
+        recommend('nearby attractions and restaurants', at).then(onResults).catch(e => onNotice(e.message));
+      },
       () => onNotice('GPS unavailable — showing Pangasinan'),
       { timeout: 8000 }
     );
@@ -75,15 +79,18 @@ const FALLBACK_HOTLINES = [
   { name: 'Pangasinan PDRRMO', number: '(075) 542-6802' },
   { name: 'National Emergency', number: '911' }
 ];
-export function EmergencyPanel(){
+export function EmergencyPanel({ proximity }){
   const [emer, setEmer] = useState(null);
   const [emerError, setEmerError] = useState('');
+  const at = proximity || '120.23,16.03';
   useEffect(() => {
-    fetch(`${BASE}/api/emergency?proximity=120.23,16.03`)
+    setEmer(null);
+    setEmerError('');
+    fetch(`${BASE}/api/emergency?proximity=${encodeURIComponent(at)}`)
       .then(r => { if (!r.ok) throw new Error('emergency lookup failed'); return r.json(); })
       .then(setEmer)
       .catch(e => setEmerError(e.message));
-  }, []);
+  }, [at]);
   const hotlines = (emer && emer.hotlines && emer.hotlines.length) ? emer.hotlines : FALLBACK_HOTLINES;
   return (
     <section data-testid="emergency-panel">

@@ -22,6 +22,29 @@ test('findPhoto returns null when nothing relevant', async () => {
   const out = await findPhoto('Hundred Islands', 'Alaminos', 119.95, 16.21, { fetch: fake });
   assert.equal(out, null);
 });
+test('google image search wins when CSE is configured', async () => {
+  const calls = [];
+  const fake = async (url) => {
+    calls.push(String(url));
+    if (String(url).includes('customsearch')) {
+      return { ok: true, json: async () => ({ items: [{ link: 'http://g/patar.jpg', image: { contextLink: 'http://g/page' } }] }) };
+    }
+    throw new Error('wikimedia must not run');
+  };
+  const hadCx = process.env.GOOGLE_CSE_ID;
+  const hadKey = process.env.GEMINI_API_KEY;
+  process.env.GOOGLE_CSE_ID = 'test-cx';
+  process.env.GEMINI_API_KEY = 'test-key';
+  const { findPhoto } = require('../photos.js');
+  try {
+    const out = await findPhoto('Patar Beach', 'Bolinao', 119.79, 16.12, { fetch: fake });
+    assert.equal(out.src, 'http://g/patar.jpg');
+    assert.equal(calls.length, 1);
+  } finally {
+    if (hadCx === undefined) delete process.env.GOOGLE_CSE_ID; else process.env.GOOGLE_CSE_ID = hadCx;
+    if (hadKey === undefined) delete process.env.GEMINI_API_KEY;
+  }
+});
 test('findPhoto prefers name match over nearby', async () => {
   const calls = [];
   const fake = async (url) => {
