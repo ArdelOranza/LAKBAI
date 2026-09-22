@@ -9,6 +9,8 @@ test('migration creates tables with owner RLS', () => {
   }
   assert.ok(sql.includes('row level security'));
   assert.ok(sql.includes('auth.uid()'));
+  assert.ok(sql.includes('grant select, insert, update, delete on profiles, favorites, searches, plans to authenticated'));
+  assert.ok(sql.includes('unique(user_id, place_id)'));
 });
 test('missing service key throws 503, never leaks', () => {
   delete process.env.SUPABASE_SERVICE_KEY;

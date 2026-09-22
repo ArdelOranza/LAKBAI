@@ -1,5 +1,5 @@
 create table profiles (id uuid primary key references auth.users(id) on delete cascade, display_name text);
-create table favorites (id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade, place_id text not null, name text not null, lng double precision, lat double precision, photo text, created_at timestamptz default now());
+create table favorites (id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade, place_id text not null, name text not null, lng double precision, lat double precision, photo text, created_at timestamptz default now(), unique(user_id, place_id));
 create table reviews (id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade, place_id text not null, place_name text not null, score int check (score between 1 and 5), text text, created_at timestamptz default now());
 create table searches (id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade, query text not null, created_at timestamptz default now());
 create table plans (id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade, title text not null, schedule jsonb not null, created_at timestamptz default now());
@@ -16,3 +16,6 @@ create policy "own reviews modify" on reviews for update using (auth.uid() = use
 create policy "own reviews delete" on reviews for delete using (auth.uid() = user_id);
 create policy "own searches" on searches for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "own plans" on plans for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+grant select, insert, update, delete on profiles, favorites, searches, plans to authenticated;
+grant select on reviews to anon, authenticated;
+grant insert, update, delete on reviews to authenticated;

@@ -1,6 +1,5 @@
 import { supabase } from './supabaseClient.js';
-const outboxKey = 'lakbai-review-outbox';
-function readOutbox(){ try { const v = JSON.parse(localStorage.getItem(outboxKey) || '[]'); return Array.isArray(v) ? v : []; } catch { return []; } }
+import { readOutbox, queueReview, takeAll, stripForInsert } from './outbox.cjs';
 export async function saveFavorite(user, place){
   if (!supabase || !user) return { error: 'login required' };
   return supabase.from('favorites').upsert({ user_id: user.id, place_id: place.id, name: place.name, lng: place.lng, lat: place.lat, photo: place.photo || null }, { onConflict: 'user_id,place_id' });
@@ -12,14 +11,12 @@ export async function listFavorites(user){
 export async function postReview(user, place, score, text){
   const row = { place_id: place.id, place_name: place.name, score, text };
   if (!supabase || !user || !navigator.onLine) {
-    const box = readOutbox(); box.push({ ...row, at: Date.now() });
-    localStorage.setItem(outboxKey, JSON.stringify(box));
+    queueReview(row);
     return { queued: true };
   }
   const { error } = await supabase.from('reviews').insert({ ...row, user_id: user.id });
   if (error) {
-    const box = readOutbox(); box.push({ ...row, at: Date.now() });
-    localStorage.setItem(outboxKey, JSON.stringify(box));
+    queueReview(row);
     return { queued: true, error: error.message };
   }
   try { await flushOutbox(user); } catch { /* keep queue */ }
@@ -27,12 +24,11 @@ export async function postReview(user, place, score, text){
 }
 export async function flushOutbox(user){
   if (!supabase || !user) return;
-  const box = readOutbox();
+  const box = takeAll();
   for (const r of box) {
-    const { error } = await supabase.from('reviews').insert({ ...r, user_id: user.id });
-    if (error) return;
+    const { error } = await supabase.from('reviews').insert({ ...stripForInsert(r), user_id: user.id });
+    if (error) { queueReview(stripForInsert(r)); return; }
   }
-  localStorage.removeItem(outboxKey);
 }
 export async function logSearch(user, query){
   if (!supabase || !user || !query) return;

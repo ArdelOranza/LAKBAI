@@ -18,8 +18,8 @@ app-store packaging, push notifications.
 ## 2. Architecture
 ```
 client/ (Vite + React, full design-system styling)
-  AuthContext (Supabase session) -> Chat / Map+Cards / Saved / Profile
-  bottom nav: Search · Saved · Profile
+  AuthContext (Supabase session) -> Chat / Map+Cards / Saved(+account) / Plans
+  bottom nav: Search · Saved · Plans (account state + sign out live in Saved)
 server/ (Node + Express; existing Gemini/Mapbox/photos pipeline stays)
   + user id passthrough (Supabase JWT verified via service client)
   + POST /api/plan -> AI itinerary (places, arrival/departure, activities)
@@ -57,8 +57,8 @@ Client "Save plan" writes to `plans` (logged in) or localStorage (guest).
 
 ## 6. Polish (ui-ux-pro-max)
 Generate and persist Lakbai design system (design-system/lakbai/MASTER.md),
-restyle chat/map/cards/spotlight/emergency, bottom nav, Saved + Profile
-screens, empty/loading/error states. Tokens stay orange/teal/sand.
+restyle chat/map/cards/spotlight/emergency, bottom nav (Search · Saved ·
+Plans; account info + sign out in Saved), empty/loading/error states. Tokens stay orange/teal/sand.
 Checklist enforced: SVG icons, 4.5:1 contrast, visible focus,
 reduced-motion, 375/768/1024/1440.
 

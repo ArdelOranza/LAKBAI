@@ -6,10 +6,6 @@ function getService(){
   if (!cached) cached = { url, key };
   return cached;
 }
-async function getUserFromToken(token){
-  const { url, key } = getService();
-  const r = await fetch(`${url}/auth/v1/user`, { headers: { apikey: key, Authorization: 'Bearer ' + token } });
-  if (!r.ok) return null;
-  return r.json();
-}
-module.exports = { getService, getUserFromToken };
+// Writes are client-direct under RLS; the service client exists for
+// future server-side jobs (e.g. history logging).
+module.exports = { getService };

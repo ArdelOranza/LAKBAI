@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from './AuthContext.jsx';
+import { postReview, flushOutbox } from './store.js';
 import { recommend } from './api.js';
 
 const BASE = import.meta.env.VITE_API_URL || '';
@@ -37,13 +39,27 @@ export function useReviews(placeId){
 }
 
 export function Reviews({ place }){
+  const { user } = useAuth();
   const { reviews, add } = useReviews(place.id);
   const [score, setScore] = useState(5);
   const [text, setText] = useState('');
+  useEffect(() => {
+    if (!user) return;
+    try { flushOutbox(user).catch(() => {}); } catch {}
+    function onOnline(){ try { flushOutbox(user).catch(() => {}); } catch {} }
+    window.addEventListener('online', onOnline);
+    return () => window.removeEventListener('online', onOnline);
+  }, [user]);
+  async function submit(e){
+    e.preventDefault();
+    add(Number(score), text);
+    try { await postReview(user, place, Number(score), text); } catch {}
+    setText('');
+  }
   return (
     <section>
       <h4>Reviews: {place.name}</h4>
-      <form data-testid="review-form" onSubmit={e => { e.preventDefault(); add(Number(score), text); setText(''); }}>
+      <form data-testid="review-form" onSubmit={submit}>
         <select value={score} onChange={e => setScore(e.target.value)} aria-label="Score">
           {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
         </select>
