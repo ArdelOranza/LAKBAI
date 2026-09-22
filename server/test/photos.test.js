@@ -22,18 +22,32 @@ test('findPhoto returns null when nothing relevant', async () => {
   const out = await findPhoto('Hundred Islands', 'Alaminos', 119.95, 16.21, { fetch: fake });
   assert.equal(out, null);
 });
-test('findPhoto prefers nearby relevant over name search', async () => {
+test('findPhoto prefers name match over nearby', async () => {
   const calls = [];
   const fake = async (url) => {
     calls.push(String(url));
-    if (String(url).includes('geosearch')) {
+    if (String(url).includes('generator=search')) {
       return { ok: true, json: async () => ({ query: { pages: {
-        7: { title: 'File:Patar Beach, Bolinao.jpg', thumbnail: { source: 'http://x/geo.jpg' } }
+        7: { title: 'File:Patar Beach, Bolinao.jpg', thumbnail: { source: 'http://x/name.jpg' } }
       } } }) };
     }
-    throw new Error('name search must not run');
+    throw new Error('geosearch must not run');
+  };
+  const out = await findPhoto('Patar Beach', 'Bolinao', 119.79, 16.12, { fetch: fake });
+  assert.equal(out.src, 'http://x/name.jpg');
+  assert.equal(calls.length, 1);
+});
+test('findPhoto falls back to nearby when name misses', async () => {
+  const fake = async (url) => {
+    if (String(url).includes('generator=search')) {
+      return { ok: true, json: async () => ({ query: { pages: {
+        8: { title: 'File:Unrelated road.jpg', thumbnail: { source: 'http://x/no.jpg' } }
+      } } }) };
+    }
+    return { ok: true, json: async () => ({ query: { pages: {
+      9: { title: 'File:Patar Beach shoreline.jpg', thumbnail: { source: 'http://x/geo.jpg' } }
+    } } }) };
   };
   const out = await findPhoto('Patar Beach', 'Bolinao', 119.79, 16.12, { fetch: fake });
   assert.equal(out.src, 'http://x/geo.jpg');
-  assert.equal(calls.length, 1);
 });

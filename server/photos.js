@@ -37,22 +37,23 @@ async function commons(fetcher, params){
 }
 async function findPhoto(name, hint, lng, lat, deps = {}){
   const fetcher = deps.fetch || fetch;
+  const query = `${name} ${hint || ''} Pangasinan`.trim();
   try {
+    const byName = await commons(fetcher, {
+      generator: 'search', gsrsearch: query,
+      gsrnamespace: '6', gsrlimit: '5'
+    });
+    if (byName) {
+      const hit = pickPhoto(byName, name, hint);
+      if (hit) return hit;
+    }
     if (lng !== undefined && lat !== undefined) {
       const geo = await commons(fetcher, {
         generator: 'geosearch', ggscoord: `${lat}|${lng}`,
         ggsradius: '10000', ggslimit: '10', ggsnamespace: '6'
       });
-      if (geo) {
-        const hit = pickPhoto(geo, name, hint);
-        if (hit) return hit;
-      }
+      if (geo) return pickPhoto(geo, name, hint);
     }
-    const byName = await commons(fetcher, {
-      generator: 'search', gsrsearch: `${name} ${hint || ''} Pangasinan`.trim(),
-      gsrnamespace: '6', gsrlimit: '5'
-    });
-    if (byName) return pickPhoto(byName, name, hint);
     return null;
   } catch {
     return null;
