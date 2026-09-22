@@ -4,6 +4,7 @@ import { recommend } from './api.js';
 import { NearbyButton, Reviews, EmergencyPanel } from './Panels.jsx';
 import { AuthProvider, useAuth } from './AuthContext.jsx';
 import Saved from './Saved.jsx';
+import Plans from './Plans.jsx';
 import { logSearch } from './store.js';
 
 const BASE = import.meta.env.VITE_API_URL || '';
@@ -55,8 +56,9 @@ function Shell(){
       <nav>
         <button data-testid="nav-search" onClick={() => setTab('search')}>Search</button>
         <button data-testid="nav-saved" onClick={() => setTab('saved')}>Saved</button>
+        <button data-testid="nav-plans" onClick={() => setTab('plans')}>Plans</button>
       </nav>
-      {tab === 'saved' ? <Saved /> : (<>
+      {tab === 'saved' ? <Saved /> : tab === 'plans' ? <Plans /> : (<>
       {readyError && <p data-testid="notice">{readyError}</p>}
       <section data-testid="chat">
         <ul>{messages.map((m, i) => <li key={i}><b>{m.role}:</b> {m.text}</li>)}</ul>
