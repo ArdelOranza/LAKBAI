@@ -98,15 +98,32 @@ async function chatRecommend(message, opts = {}){
   }
   throw busyErr();
 }
-async function callGeminiForPlan(sys, msg){
-  const key = process.env.GEMINI_API_KEY;
-  if (!key) { const e = new Error('Missing GEMINI_API_KEY'); e.status = 503; throw e; }
-  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${PRIMARY_MODEL}:generateContent?key=${key}`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ system_instruction: { parts: [{ text: sys }] }, contents: [{ parts: [{ text: `Trip request: ${msg}` }] }], generationConfig: { responseMimeType: 'application/json' } })
-  });
-  if (!r.ok) { const e = new Error('Gemini error ' + r.status); e.status = r.status || 502; throw e; }
-  const data = await r.json();
-  return data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
+async function runSteps(wait, steps){
+  for (let i = 0; i < steps.length; i++){
+    if (i > 0) await wait(BACKOFF_MS[Math.min(i, BACKOFF_MS.length - 1)]);
+    try {
+      return await steps[i]();
+    } catch (e) {
+      if (!RETRYABLE.includes(e.status)) throw e;
+      if (i === steps.length - 1) throw busyErr();
+      if (e.status === 429 || e.status === 503) e.message = 'AI is busy right now — try again in a moment.';
+    }
+  }
+  throw busyErr();
+}
+async function callGeminiForPlan(sys, msg, opts = {}){
+  const wait = opts.wait || (ms => new Promise(r => setTimeout(r, ms)));
+  const attempt = async () => {
+    const key = process.env.GEMINI_API_KEY;
+    if (!key) { const e = new Error('Missing GEMINI_API_KEY'); e.status = 503; throw e; }
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${PRIMARY_MODEL}:generateContent?key=${key}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ system_instruction: { parts: [{ text: sys }] }, contents: [{ parts: [{ text: `Trip request: ${msg}` }] }], generationConfig: { responseMimeType: 'application/json' } })
+    });
+    if (!r.ok) { const e = new Error('Gemini error ' + r.status); e.status = r.status || 502; throw e; }
+    const data = await r.json();
+    return data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
+  };
+  return runSteps(wait, [attempt, attempt]);
 }
 module.exports = { chatRecommend, parseAgentJson, callGeminiForPlan };
