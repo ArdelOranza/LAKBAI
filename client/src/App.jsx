@@ -54,9 +54,9 @@ function Shell(){
     <div data-testid="app">
       <h1>Lakbai</h1>
       <nav>
-        <button data-testid="nav-search" onClick={() => setTab('search')}>Search</button>
-        <button data-testid="nav-saved" onClick={() => setTab('saved')}>Saved</button>
-        <button data-testid="nav-plans" onClick={() => setTab('plans')}>Plans</button>
+        <button data-testid="nav-search" aria-current={tab === 'search'} className={tab === 'search' ? 'active' : ''} onClick={() => setTab('search')}>Search</button>
+        <button data-testid="nav-saved" aria-current={tab === 'saved'} className={tab === 'saved' ? 'active' : ''} onClick={() => setTab('saved')}>Saved</button>
+        <button data-testid="nav-plans" aria-current={tab === 'plans'} className={tab === 'plans' ? 'active' : ''} onClick={() => setTab('plans')}>Plans</button>
       </nav>
       {tab === 'saved' ? <Saved /> : tab === 'plans' ? <Plans /> : (<>
       {readyError && <p data-testid="notice">{readyError}</p>}

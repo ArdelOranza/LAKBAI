@@ -1,13 +1,49 @@
 :root{
   --primary:#EA580C; --secondary:#0891B2; --accent:#D97706;
   --bg:#FFF7ED; --ink:#0F172A; --card:#FFFFFF; --border:#FCEAE1;
+  --muted:#FDF4F0; --muted-ink:#475569; --radius:14px;
+  --shadow:0 10px 24px -12px rgba(15,23,42,.25);
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Plus Jakarta Sans",system-ui,sans-serif}
-button{cursor:pointer}
-button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Plus Jakarta Sans",system-ui,sans-serif;line-height:1.5}
+#root{max-width:720px;margin:0 auto;padding:0 16px 96px}
+h1{font-size:28px;letter-spacing:-.5px;margin:20px 0 4px}
+h2{font-size:20px;margin:20px 0 8px}
+h3{font-size:17px;margin:12px 0 4px}
+h4{font-size:15px;margin:12px 0 4px}
+p{margin:8px 0}
+button{cursor:pointer;font:inherit;border:1px solid var(--border);background:var(--card);color:var(--ink);border-radius:999px;padding:8px 16px;transition:transform .15s ease,background .15s ease}
+button:hover{background:var(--muted)}
+button:active{transform:scale(.97)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+button[data-testid="chat-send"],button[data-testid="plan-build"],button[data-testid="itinerary-build"],button[data-testid="login-send"]{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
+button[data-testid="chat-send"]:hover,button[data-testid="plan-build"]:hover,button[data-testid="itinerary-build"]:hover,button[data-testid="login-send"]:hover{background:#C2410C}
+button:disabled{opacity:.55;cursor:not-allowed}
+input,select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;width:100%;max-width:420px}
+input::placeholder{color:var(--muted-ink)}
+a{color:var(--secondary)}
+a:hover{color:#0E7490}
+ul,ol{padding-left:20px}
+li{margin:6px 0}
 @keyframes card-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-.place-card{animation:card-in .45s ease both;background:var(--card);border:1px solid var(--border)}
+.place-card{animation:card-in .45s ease both;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);list-style:none;margin:12px 0;padding:14px;cursor:pointer}
+.place-card img{width:100%;height:auto;border-radius:10px;margin-bottom:8px;display:block}
+.place-card>span{color:var(--muted-ink);font-size:13px}
+article[data-testid="spotlight"]{background:linear-gradient(135deg,var(--card),var(--muted));border:1px solid var(--accent);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin:12px 0}
+article[data-testid="spotlight"] img{width:100%;height:auto;border-radius:10px;margin-bottom:8px;display:block}
+section[data-testid="emergency-panel"]{border:1px solid #FECACA;background:#FEF2F2;border-radius:var(--radius);padding:14px;margin:16px 0}
+nav{position:sticky;top:0;z-index:10;display:flex;gap:8px;background:var(--bg);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);padding:10px 0;margin:0 -16px;padding-inline:16px;border-bottom:1px solid var(--border)}
+nav button[aria-current="true"],nav button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
 @keyframes shimmer{0%{opacity:.45}50%{opacity:1}100%{opacity:.45}}
-.shimmer{animation:shimmer 1.2s ease-in-out infinite}
+.shimmer{animation:shimmer 1.2s ease-in-out infinite;color:var(--secondary);font-weight:600}
+p[data-testid="notice"]{background:var(--muted);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+form[data-testid="review-form"]{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+form[data-testid="review-form"] select{width:auto}
+@media (min-width:768px){
+  h1{font-size:34px}
+  #root{padding-inline:24px}
+}
+@media (min-width:1024px){
+  #root{max-width:880px}
+}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
