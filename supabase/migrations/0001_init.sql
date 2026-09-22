@@ -1,0 +1,18 @@
+create table profiles (id uuid primary key references auth.users(id) on delete cascade, display_name text);
+create table favorites (id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade, place_id text not null, name text not null, lng double precision, lat double precision, photo text, created_at timestamptz default now());
+create table reviews (id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade, place_id text not null, place_name text not null, score int check (score between 1 and 5), text text, created_at timestamptz default now());
+create table searches (id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade, query text not null, created_at timestamptz default now());
+create table plans (id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade, title text not null, schedule jsonb not null, created_at timestamptz default now());
+alter table profiles enable row level security;
+alter table favorites enable row level security;
+alter table reviews enable row level security;
+alter table searches enable row level security;
+alter table plans enable row level security;
+create policy "own profile" on profiles for all using (auth.uid() = id) with check (auth.uid() = id);
+create policy "own favorites" on favorites for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "public reviews read" on reviews for select using (true);
+create policy "own reviews write" on reviews for insert with check (auth.uid() = user_id);
+create policy "own reviews modify" on reviews for update using (auth.uid() = user_id);
+create policy "own reviews delete" on reviews for delete using (auth.uid() = user_id);
+create policy "own searches" on searches for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "own plans" on plans for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
