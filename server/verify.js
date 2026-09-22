@@ -7,7 +7,7 @@ async function recommend(message, proximity, deps = {}) {
   const chatFn = deps.chatFn || chatRecommend;
   const searchFn = deps.searchFn || searchPlaces;
   const agent = await chatFn(message);
-  if (agent.intent === 'redirect' || !agent.candidates.length) {
+  if (agent.intent === 'redirect' || agent.intent === 'refuse' || !agent.candidates.length) {
     return { intent: agent.intent, answer: agent.answer, places: [], spotlight: null };
   }
   const seen = new Set();
