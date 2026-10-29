@@ -18,35 +18,35 @@
 
 | Role | Hex | CSS Variable |
 |------|-----|--------------|
-| Primary | `#EA580C` | `--color-primary` |
-| On Primary | `#000000` | `--color-on-primary` |
-| Secondary | `#0891B2` | `--color-secondary` |
-| On Secondary | `#000000` | `--color-on-secondary` |
-| Accent/CTA | `#D97706` | `--color-accent` |
-| On Accent/CTA | `#000000` | `--color-on-accent` |
-| Background | `#FFF7ED` | `--color-background` |
-| Foreground | `#0F172A` | `--color-foreground` |
+| Primary | `#1667D9` | `--color-primary` |
+| On Primary | `#FFFFFF` | `--color-on-primary` |
+| Secondary | `#0A3D8F` | `--color-secondary` |
+| On Secondary | `#FFFFFF` | `--color-on-secondary` |
+| Accent/CTA | `#EA580C` | `--color-accent` |
+| On Accent/CTA | `#FFFFFF` | `--color-on-accent` |
+| Background | `#FFFFFF` | `--color-background` |
+| Foreground | `#0A2540` | `--color-foreground` |
 | Card | `#FFFFFF` | `--color-card` |
-| Card Foreground | `#0F172A` | `--color-card-foreground` |
-| Muted | `#FDF4F0` | `--color-muted` |
-| Muted Foreground | `#475569` | `--color-muted-foreground` |
-| Border | `#FCEAE1` | `--color-border` |
+| Card Foreground | `#0A2540` | `--color-card-foreground` |
+| Muted | `#EFF6FF` | `--color-muted` |
+| Muted Foreground | `#64748B` | `--color-muted-foreground` |
+| Border | `#E2E8F0` | `--color-border` |
 | Destructive | `#DC2626` | `--color-destructive` |
 | On Destructive | `#FFFFFF` | `--color-on-destructive` |
 | Ring | `#EA580C` | `--color-ring` |
 
-**Color Notes:** Adventure orange + map teal
+**Color Notes:** LakbAI blue — primary `#1667D9`, logo gradient `#2280E8 → #0A3D8F`, ink `#0A2540`, soft chip `#EFF6FF`, emergency/star accent `#EA580C`.
 
 ### Typography
 
-- **Heading Font:** Baloo 2
-- **Body Font:** Comic Neue
-- **Mood:** kids, education, playful, friendly, colorful, learning
-- **Google Fonts:** [Baloo 2 + Comic Neue](https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700&family=Comic+Neue:wght@300;400;700&display=swap)
+- **Heading Font:** Inter
+- **Body Font:** Inter
+- **Mood:** modern, trusted, travel, mobile-only (the app renders in a fixed ~430px phone column on every screen size — no desktop UI)
+- **Google Fonts:** [Inter](https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap)
 
 **CSS Import:**
 ```css
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700&family=Comic+Neue:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 ```
 
 ### Spacing Variables
@@ -79,10 +79,10 @@
 ```css
 /* Primary Button */
 .btn-primary {
-  background: #D97706;
+  background: #1667D9;
   color: white;
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 999px;
   font-weight: 600;
   transition: all 200ms ease;
   cursor: pointer;
@@ -96,10 +96,10 @@
 /* Secondary Button */
 .btn-secondary {
   background: transparent;
-  color: #EA580C;
-  border: 2px solid #EA580C;
+  color: #1667D9;
+  border: 2px solid #1667D9;
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 999px;
   font-weight: 600;
   transition: all 200ms ease;
   cursor: pointer;
@@ -110,9 +110,9 @@
 
 ```css
 .card {
-  background: #FFF7ED;
-  border-radius: 12px;
-  padding: 24px;
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 16px;
   box-shadow: var(--shadow-md);
   transition: all 200ms ease;
   cursor: pointer;
