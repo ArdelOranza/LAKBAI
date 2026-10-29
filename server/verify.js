@@ -3,10 +3,11 @@
 const { chatRecommend } = require('./agent.js');
 const { searchPlaces, inBox } = require('./places.js');
 const { findPhoto } = require('./photos.js');
-async function recommend(message, proximity, deps = {}) {
+async function recommend(message, proximity, prefs = [], deps = {}) {
   const chatFn = deps.chatFn || chatRecommend;
   const searchFn = deps.searchFn || searchPlaces;
-  const agent = await chatFn(message);
+  const prefLine = (prefs || []).length ? `\nUser preferences: ${prefs.join(', ')}.` : '';
+  const agent = await chatFn(message + prefLine);
   if (agent.intent === 'redirect' || agent.intent === 'refuse' || !agent.candidates.length) {
     return { intent: agent.intent, answer: agent.answer, places: [], spotlight: null };
   }

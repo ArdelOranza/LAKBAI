@@ -26,22 +26,30 @@ app.get('/api/emergency', async (req, res) => {
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 const { recommend } = require('./verify.js');
+const { cached } = require('./aiCache.js');
+const AI_TTL_MS = Number(process.env.AI_TTL_MS) || 15 * 60000;
 app.post('/api/recommend', async (req, res) => {
   try {
-    res.json(await recommend(req.body.message || '', req.body.proximity));
+    const message = req.body.message || '';
+    const prefs = Array.isArray(req.body.preferences) ? req.body.preferences : [];
+    const key = `r:${message}|${prefs.slice().sort().join(',')}`;
+    res.json(await cached(key, AI_TTL_MS, () => recommend(message, req.body.proximity, prefs)));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 const { chatRecommend } = require('./agent.js');
 app.post('/api/chat', async (req, res) => {
   try {
-    res.json(await chatRecommend(req.body.message || ''));
+    const message = req.body.message || '';
+    res.json(await cached(`c:${message}`, AI_TTL_MS, () => chatRecommend(message)));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 const { planDay } = require('./plan.js');
 app.post('/api/plan', async (req, res) => {
   try {
     const { message = '', hours = 4, startHour = 9 } = req.body || {};
-    res.json(await planDay(message, Number(hours) || 4, Number(startHour) || 9));
+    const h = Number(hours) || 4, s = Number(startHour) || 9;
+    const key = `p:${message}|${h}|${s}`;
+    res.json(await cached(key, AI_TTL_MS, () => planDay(message, h, s)));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 const { searchPlaces } = require('./places.js');
@@ -49,6 +57,14 @@ app.get('/api/places', async (req, res) => {
   try {
     const places = await searchPlaces(req.query.q || '', req.query.proximity);
     res.json({ places });
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+const { getWeather } = require('./weather.js');
+app.get('/api/weather', async (req, res) => {
+  try {
+    const lng = Number(req.query.lng), lat = Number(req.query.lat);
+    if (!Number.isFinite(lng) || !Number.isFinite(lat)) return res.status(400).json({ error: 'lng and lat are required numbers.' });
+    res.json(await cached(`wx:${lat.toFixed(3)},${lng.toFixed(3)}`, 10 * 60000, () => getWeather(lng, lat)));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 const PORT = process.env.PORT || 3001;
