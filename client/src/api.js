@@ -7,13 +7,8 @@ async function readError(r){
     return r.statusText || 'request failed';
   }
 }
-export async function recommend(message, proximity){
-  const r = await fetch(`${BASE}/api/recommend`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ message, proximity }) });
-  if (!r.ok) throw new Error(await readError(r));
-  return r.json();
-}
-export async function itinerary(places, hours){
-  const r = await fetch(`${BASE}/api/itinerary`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ places, hours }) });
+export async function recommend(message, proximity, prefs = []){
+  const r = await fetch(`${BASE}/api/recommend`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ message, proximity, prefs }) });
   if (!r.ok) throw new Error(await readError(r));
   return r.json();
 }
