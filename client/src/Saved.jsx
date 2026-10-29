@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from './AuthContext.jsx';
 import { listFavorites, listHistory, postReview, flushOutbox } from './store.js';
-import Login from './Login.jsx';
 export default function Saved(){
   const { user, loading, signOut } = useAuth();
   const [tab, setTab] = useState('favorites');
