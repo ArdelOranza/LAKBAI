@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
+    "icons": "node scripts/make-icons.mjs",
     "preview": "vite preview",
     "test": "vitest run"
   },
@@ -33,7 +34,9 @@
     "@vitejs/plugin-react": "^6.1.1",
     "happy-dom": "^21.0.4",
     "oxlint": "^1.81.0",
+    "sharp": "^0.35.5",
     "vite": "^8.3.0",
+    "vite-plugin-pwa": "^2.0.0",
     "vitest": "^5.0.5"
   }
 }
