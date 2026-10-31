@@ -84,3 +84,8 @@ export async function listHistory(user){
 export function localReviews(placeId){
   try { const v = JSON.parse(localStorage.getItem('lakbai-reviews:' + placeId) || '[]'); return Array.isArray(v) ? v : []; } catch { return []; }
 }
+export async function listPlaceReviews(name){
+  if (!supabase) return [];
+  const { data } = await supabase.from('reviews').select('*').eq('place_name', name).order('created_at', { ascending: false });
+  return data || [];
+}

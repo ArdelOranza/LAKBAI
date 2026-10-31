@@ -53,6 +53,12 @@ app.post('/api/plan', async (req, res) => {
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 const { searchPlaces } = require('./places.js');
+const { SPOTS } = require('./spots.js');
+app.get('/api/spots', async (req, res) => {
+  try {
+    res.json(await cached('spots:all', 24 * 60 * 60 * 1000, async () => ({ spots: SPOTS })));
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
 app.get('/api/places', async (req, res) => {
   try {
     const places = await searchPlaces(req.query.q || '', req.query.proximity);

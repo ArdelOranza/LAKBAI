@@ -78,7 +78,13 @@ li{margin:6px 0}
 /* map pins (mapcn markers are raw divs) */
 .userdot{width:16px;height:16px;border-radius:50%;background:var(--primary);border:3px solid #fff;box-shadow:0 0 0 6px rgba(22,103,217,.25);animation:pulse 2s ease-in-out infinite}
 .pin{width:22px;height:22px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--primary);border:3px solid #fff;box-shadow:var(--shadow)}
+.spot-pin{width:30px;height:30px;border-radius:50%;background:#fff;border:2px solid var(--primary);display:grid;placeItems:center;box-shadow:var(--shadow);transform:translateY(-2px)}
+.spot-pin.active{background:var(--primary);border-color:#fff}
+.spot-pin span{font-size:15px;transform:none}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.spot-sheet{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(430px,100vw);background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -8px 32px rgba(10,37,64,.25);z-index:60;max-height:82vh;padding-bottom:calc(8px + var(--safe-bottom));overflow:hidden}
+.grab-handle{width:44px;height:4px;border-radius:2px;background:#DDE4EF;margin:10px auto 6px}
+.sheet-scroll{max-height:82vh;overflow-y:auto}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 
 @theme inline {
