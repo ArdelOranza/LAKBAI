@@ -12,3 +12,8 @@ export async function recommend(message, proximity, prefs = []){
   if (!r.ok) throw new Error(await readError(r));
   return r.json();
 }
+export async function chat(message){
+  const r = await fetch(`${BASE}/api/chat`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ message }) });
+  if (!r.ok) throw new Error(await readError(r));
+  return r.json();
+}
