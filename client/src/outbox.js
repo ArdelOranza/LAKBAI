@@ -12,7 +12,13 @@ export function readOutbox(){
 }
 export function queueReview(row){
   const box = readRaw();
-  box.push({ ...row, at: Date.now() });
+  box.push({ kind:'review', ...row, at: Date.now() });
+  localStorage.setItem(KEY, JSON.stringify(box));
+  return box;
+}
+export function queueFavDelete(placeId){
+  const box = readRaw();
+  box.push({ kind:'favdelete', placeId });
   localStorage.setItem(KEY, JSON.stringify(box));
   return box;
 }
@@ -21,7 +27,13 @@ export function takeAll(){
   localStorage.removeItem(KEY);
   return box;
 }
+export function requeue(entries){
+  const box = readRaw();
+  const next = [...entries, ...box];
+  localStorage.setItem(KEY, JSON.stringify(next));
+  return next;
+}
 export function stripForInsert(row){
-  const { at, ...cols } = row;
+  const { at, kind, ...cols } = row;
   return cols;
 }

@@ -17,3 +17,13 @@ export async function chat(message){
   if (!r.ok) throw new Error(await readError(r));
   return r.json();
 }
+export async function itineraryFromSaved(names, hours = 8, startHour = 9){
+  const key = 'lakbai.plan:' + names.join('|');
+  const hit = sessionGet(key);
+  if (hit) return hit;
+  const r = await fetch(`${BASE}/api/plan`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ message: 'A day trip in Pangasinan visiting: ' + names.join(', '), hours, startHour }) });
+  if (!r.ok) throw new Error(await readError(r));
+  const plan = await r.json();
+  sessionSet(key, plan);
+  return plan;
+}
