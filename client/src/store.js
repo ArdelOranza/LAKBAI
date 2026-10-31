@@ -89,3 +89,23 @@ export async function listPlaceReviews(name){
   const { data } = await supabase.from('reviews').select('*').eq('place_name', name).order('created_at', { ascending: false });
   return data || [];
 }
+export async function listMyReviews(user){
+  if (!supabase || !user) return [];
+  const { data } = await supabase.from('reviews').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+  return data || [];
+}
+export async function updateReview(user, id, { score, text }){
+  if (!supabase || !user) return { error: 'login required' };
+  const { error } = await supabase.from('reviews').update({ score, text }).eq('id', id).eq('user_id', user.id);
+  return error ? { error: error.message } : {};
+}
+export async function deleteReview(user, id){
+  if (!supabase || !user) return { error: 'login required' };
+  const { error } = await supabase.from('reviews').delete().eq('id', id).eq('user_id', user.id);
+  return error ? { error: error.message } : {};
+}
+export async function saveProfile(user, { display_name, phone }){
+  if (!supabase || !user) return { error: 'login required' };
+  const { error } = await supabase.from('profiles').upsert({ id: user.id, display_name, phone });
+  return error ? { error: error.message } : {};
+}

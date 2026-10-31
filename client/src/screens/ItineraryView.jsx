@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../AuthContext.jsx';
 import { savePlan } from '../store.js';
+import { sessionSet } from '../sessionCache.js';
 import { driveMinutes, haversineKm } from '../geo.js';
 import { Chip, PrimaryBtn } from '../ui.jsx';
 
@@ -19,7 +20,12 @@ export default function ItineraryView({ plan, coords, pop, showToast }){
     let alive = true;
     fetch(`/api/weather?lng=${coords.lng}&lat=${coords.lat}`)
       .then(r => (r.ok ? r.json() : null))
-      .then(w => { if (alive && w && typeof w.tempC === 'number') setWeather(w); })
+      .then(w => {
+        if (alive && w && typeof w.tempC === 'number') {
+          setWeather(w);
+          sessionSet('lakbai.wx', w); // Itineraries list shows a temp chip only when this is cached
+        }
+      })
       .catch(() => { /* weather is a bonus card; hidden gracefully */ });
     return () => { alive = false; };
   }, [coords]); // eslint-disable-line react-hooks/exhaustive-deps
