@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { saveFavorite, removeFavorite, listFavorites, listPlaceReviews } from '../store.js';
 import { useAuth } from '../AuthContext.jsx';
-import { dateRange } from '../festival.js';
+import { dateRange, bannerDate } from '../festival.js';
 import { feeLabel } from '../filters.js';
 import { haversineKm, formatDistance } from '../geo.js';
 import { PhotoPlaceholder } from '../ui.jsx';
@@ -34,8 +34,9 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
   const [reviews, setReviews] = useState([]);
   const km = haversineKm(coords.lng, coords.lat, p.lng, p.lat);
   const photos = (p.photos && p.photos.length) ? p.photos : (p.photo ? [p.photo] : null);
-  const when = p.festival ? dateRange(p.festival)
-    : (p.starts instanceof Date ? editionText(p.starts, p.ends) : null);
+  const when = bannerDate(p)
+    || (p.festival ? dateRange(p.festival) : null)
+    || (p.starts instanceof Date ? editionText(p.starts, p.ends) : null);
 
   useEffect(() => {
     let alive = true;
@@ -163,7 +164,7 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
               )}
               {(p.dateLabel || when) && (
                 <span style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:11.5, color:'var(--muted-ink)' }}>
-                  <Clock size={13}/> {p.dateLabel || when}
+                  <Clock size={13}/> {when || p.dateLabel}
                 </span>
               )}
             </div>

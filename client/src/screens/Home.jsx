@@ -10,7 +10,7 @@ import { sessionGet, sessionSet } from '../sessionCache.js';
 import { haversineKm, formatDistance } from '../geo.js';
 import { saveFavorite } from '../store.js';
 import { useAuth } from '../AuthContext.jsx';
-import { dateRange } from '../festival.js';
+import { dateRange, bannerDate } from '../festival.js';
 import { upcomingFestivals, FESTIVALS } from '../festivals.js';
 import { feeLabel } from '../filters.js';
 import { PhotoPlaceholder } from '../ui.jsx';
@@ -89,7 +89,7 @@ export default function Home({ coords, push, showToast, setTab }){
   }
   // AI recommendation wins; the curated next festival is the fallback.
   const feature = event || (upcoming ? { ...upcoming, categories:['Festival','Cultural'] } : null);
-  const featureKicker = event ? dateRange(event.festival) : (upcoming && upcoming.dateLabel) || '';
+  const featureKicker = event ? dateRange(event.festival) : (bannerDate(upcoming) || (upcoming && upcoming.dateLabel) || '');
   const featureMeta = event ? (event.hint || event.address) : (upcoming && upcoming.town) || '';
   const featurePhoto = event
     ? event.photo
