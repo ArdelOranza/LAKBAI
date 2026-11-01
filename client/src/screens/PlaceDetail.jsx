@@ -19,6 +19,12 @@ const CAT_ICON = [
 ];
 const iconFor = text => (CAT_ICON.find(([re]) => re.test(text)) || [null, Sparkles])[1];
 const isFree = fees => fees === 0 || /free|none|no fee|₱?0\b/i.test(String(fees ?? ''));
+const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+function editionText(a, b){
+  const left = MONTHS[a.getMonth()] + ' ' + a.getDate();
+  if (!b || b.getTime() === a.getTime()) return left;
+  return left + ' – ' + MONTHS[b.getMonth()] + ' ' + b.getDate();
+}
 
 export default function PlaceDetail({ place, coords, user, pop, showToast }){
   const { user: authUser } = useAuth();
@@ -28,6 +34,8 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
   const [reviews, setReviews] = useState([]);
   const km = haversineKm(coords.lng, coords.lat, p.lng, p.lat);
   const photos = (p.photos && p.photos.length) ? p.photos : (p.photo ? [p.photo] : null);
+  const when = p.festival ? dateRange(p.festival)
+    : (p.starts instanceof Date ? editionText(p.starts, p.ends) : null);
 
   useEffect(() => {
     let alive = true;
@@ -85,9 +93,9 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
       </div>
 
       <div className="pane" style={{ marginTop:14, paddingBottom:28 }}>
-        {(p.festival && dateRange(p.festival)) && (
+        {when && (
           <span style={{ display:'inline-flex', alignItems:'center', background:'#E7F0FE', color:'var(--primary)', borderRadius:999, padding:'4px 11px', fontSize:10.5, fontWeight:800, letterSpacing:.6, textTransform:'uppercase', marginBottom:7 }}>
-            {dateRange(p.festival)}
+            {when}
           </span>
         )}
 
@@ -146,16 +154,16 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
           <p style={{ margin:'9px 0 0', fontSize:13, lineHeight:1.6, color:'#475569' }}>
             {p.description || p.reason || p.peopleSay || `A stop in Pangasinan — details coming from guides and visitor reviews.`}
           </p>
-          {(p.fees != null || p.festival) && (
+          {(p.fees != null || when) && (
             <div style={{ display:'flex', gap:16, marginTop:12, flexWrap:'wrap' }}>
               {p.fees != null && !isFree(p.fees) && (
                 <span style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:11.5, color:'var(--muted-ink)' }}>
                   <CircleParking size={13}/> {feeLabel(p.fees)}
                 </span>
               )}
-              {p.festival && (
+              {when && (
                 <span style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:11.5, color:'var(--muted-ink)' }}>
-                  <Clock size={13}/> {dateRange(p.festival) || p.festival}
+                  <Clock size={13}/> {when}
                 </span>
               )}
             </div>

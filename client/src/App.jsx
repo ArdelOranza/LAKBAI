@@ -13,6 +13,8 @@ import SavedTab from './screens/SavedTab.jsx';
 import ProfileTab from './screens/Profile.jsx';
 import ProfileEdit from './screens/ProfileEdit.jsx';
 import SearchResults from './screens/SearchResults.jsx';
+import Browse from './screens/Browse.jsx';
+import Events from './screens/Events.jsx';
 import PlaceDetail from './screens/PlaceDetail.jsx';
 import Itineraries from './screens/Itineraries.jsx';
 import MyReviews from './screens/MyReviews.jsx';
@@ -72,6 +74,8 @@ function Shell(){
   const screenProps = { coords, push, pop, showToast, setTab, user, signOut };
   let body;
   if (top?.name === 'search') body = <SearchResults query={top.query} {...screenProps}/>;
+  else if (top?.name === 'browse') body = <Browse kind={top.kind} {...screenProps}/>;
+  else if (top?.name === 'events') body = <Events {...screenProps}/>;
   else if (top?.name === 'detail') body = <PlaceDetail place={top.place} {...screenProps}/>;
   else if (top?.name === 'prefs-edit') body = <Preferences onBack={pop} onContinue={() => setStack([])}/>;
   else if (top?.name === 'profileEdit') body = <ProfileEdit {...screenProps}/>;

@@ -12,13 +12,14 @@ import { saveFavorite } from '../store.js';
 import { useAuth } from '../AuthContext.jsx';
 import { EmergencyPanel } from '../Panels.jsx';
 import { dateRange } from '../festival.js';
+import { feeLabel } from '../filters.js';
 import { PhotoPlaceholder } from '../ui.jsx';
 
 const QUICK = [
-  ['Beaches', Umbrella, 'beaches worth visiting'],
-  ['Restaurants', UtensilsCrossed, 'good restaurants'],
-  ['Local Food', Soup, 'local Pangasinan food to try'],
-  ['Events', CalendarDays, 'events and festivals this month'],
+  ['Beaches', Umbrella, { name:'browse', kind:'beaches' }],
+  ['Restaurants', UtensilsCrossed, { name:'browse', kind:'dining' }],
+  ['Local Food', Soup, { name:'browse', kind:'dining' }],
+  ['Events', CalendarDays, { name:'events' }],
 ];
 
 export default function Home({ coords, push, showToast, setTab }){
@@ -103,10 +104,10 @@ export default function Home({ coords, push, showToast, setTab }){
       </header>
 
       <div className="pane" style={{ display:'flex', justifyContent:'space-between', margin:'16px 0 4px' }}>
-        {QUICK.map(([label, Icon, q]) => (
-          <button key={label} data-testid={'quick-' + label.split(' ')[0].toLowerCase()} onClick={() => search(q)} style={{ background:'none', border:'none', display:'grid', justifyItems:'center', fontSize:11, padding:0, fontWeight:600 }}>
-            <span style={{ width:52, height:52, borderRadius:18, background:'#EFF6FF', display:'grid', placeItems:'center', color:'var(--primary)' }}><Icon size={21}/></span>
-            <span style={{ marginTop:6, color:'var(--ink)' }}>{label}</span>
+        {QUICK.map(([label, Icon, target]) => (
+          <button key={label} data-testid={'quick-' + label.split(' ')[0].toLowerCase()} onClick={() => push(target)} style={{ background:'none', border:'none', display:'grid', justifyItems:'center', fontSize:11, padding:0, fontWeight:600 }}>
+            <span style={{ width:56, height:56, borderRadius:'50%', background:'#fff', border:'1px solid #EDF1F7', boxShadow:'0 6px 14px -10px rgba(15,23,42,.45)', display:'grid', placeItems:'center', color:'var(--primary)' }}><Icon size={22}/></span>
+            <span style={{ marginTop:7, color:'var(--ink)' }}>{label}</span>
           </button>
         ))}
       </div>
@@ -120,21 +121,24 @@ export default function Home({ coords, push, showToast, setTab }){
               ? <img src={event.photo} alt="" style={{ width:'100%', height:190, objectFit:'cover' }}/>
               : <div style={{ height:190 }}><PhotoPlaceholder size={30}/></div>}
             <div style={{ position:'absolute', inset:'auto 0 0 0', background:'linear-gradient(transparent, rgba(10,37,64,.88))', color:'#fff', padding:16 }}>
-              <span style={{ fontSize:11, letterSpacing:1, opacity:.85, display:'inline-flex', alignItems:'center', gap:5 }}><CalendarDays size={12}/> {dateRange(event.festival)}</span>
+              <span style={{ fontSize:10.5, letterSpacing:1.1, opacity:.9, fontWeight:700 }}>{dateRange(event.festival)}</span>
               <h3 style={{ margin:'3px 0', fontSize:18 }}>{event.name}</h3>
-              <p style={{ fontSize:12, opacity:.9, display:'flex', alignItems:'center', gap:4, margin:0 }}><MapPin size={12}/> {event.hint || event.address}</p>
+              <p style={{ fontSize:12, opacity:.9, display:'flex', alignItems:'center', gap:4, margin:0 }}>
+                <MapPin size={12}/> {event.hint || event.address}
+                {event.fees != null && ' • ' + (/free/i.test(String(event.fees)) ? 'Free Admission' : feeLabel(event.fees))}
+              </p>
             </div>
             <span style={{ position:'absolute', right:14, top:'50%', width:34, height:34, borderRadius:'50%', background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center' }}><ArrowRight size={17}/></span>
           </article>
         )}
 
         <div data-testid="plan-cta" onClick={() => setTab('chat')} className="soft-card" style={{ margin:'16px 0', cursor:'pointer', borderRadius:18, padding:14 }}>
-          <span style={{ width:40, height:40, minWidth:40, borderRadius:14, background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center' }}><Sparkles size={19}/></span>
+          <span style={{ width:40, height:40, minWidth:40, borderRadius:'50%', background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center' }}><Sparkles size={19}/></span>
           <span style={{ flex:1 }}>
             <b style={{ fontSize:14 }}>Need a personalized plan?</b>
             <p style={{ margin:0, fontSize:12.5, color:'var(--muted-ink)' }}>Let LakbAI orchestrate your day in {place.split(',')[0]}</p>
           </span>
-          <span style={{ width:32, height:32, minWidth:32, borderRadius:'50%', background:'#fff', color:'var(--primary)', display:'grid', placeItems:'center' }}><ArrowRight size={16}/></span>
+          <span style={{ width:34, height:34, minWidth:34, borderRadius:'50%', background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center' }}><ArrowRight size={17}/></span>
         </div>
 
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline' }}>
@@ -144,7 +148,7 @@ export default function Home({ coords, push, showToast, setTab }){
 
         <div data-testid="recs" style={{ display:'flex', gap:12, overflowX:'auto', paddingBottom:8, scrollbarWidth:'none' }}>
           {recs.map(p => (
-            <article key={p.id} style={{ flex:'0 0 220px', borderRadius:18, background:'#fff', border:'1px solid #EDF1F7', overflow:'hidden', cursor:'pointer' }} onClick={() => push({ name:'detail', place:p })}>
+            <article key={p.id} style={{ flex:'0 0 220px', borderRadius:18, background:'#fff', border:'1px solid #EDF1F7', overflow:'hidden', cursor:'pointer', boxShadow:'0 10px 24px -20px rgba(15,23,42,.55)' }} onClick={() => push({ name:'detail', place:p })}>
               <div style={{ position:'relative', height:130 }}>
                 {p.photo
                   ? <img src={p.photo} alt="" loading="lazy" onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
@@ -158,11 +162,10 @@ export default function Home({ coords, push, showToast, setTab }){
                 )}
               </div>
               <div style={{ padding:'10px 12px 12px' }}>
-                <b style={{ fontSize:14 }}>{p.name}</b>
-                <p style={{ fontSize:11.5, color:'var(--muted-ink)', margin:'2px 0 0', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{p.reason}</p>
+                <b style={{ fontSize:14, display:'block', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</b>
                 {p.rating && (
-                  <p style={{ fontSize:11.5, margin:'5px 0 0', display:'inline-flex', alignItems:'center', gap:3, color:'var(--ink)' }}>
-                    <Star size={12} fill="var(--primary)" color="var(--primary)"/> {p.rating}{p.reviews ? ` (${p.reviews})` : ''}
+                  <p style={{ fontSize:11.5, margin:'5px 0 0', display:'inline-flex', alignItems:'center', gap:4, color:'var(--ink)', fontWeight:600 }}>
+                    <Star size={12} fill="var(--accent)" color="var(--accent)"/> {p.rating}{p.reviews ? <span style={{ fontWeight:400, color:'var(--muted-ink)' }}>({p.reviews})</span> : null}
                   </p>
                 )}
               </div>
