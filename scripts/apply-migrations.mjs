@@ -1,12 +1,15 @@
 // One-shot: apply supabase/migrations to the live DB via the supabase CLI pooler URL.
 // The CLI wraps each call in a prepared statement, so statements are executed one at a time.
-// Usage: node scripts/apply-migrations.mjs
+// Usage: SUPABASE_DB_PASSWORD=... node scripts/apply-migrations.mjs   (run from repo root)
+// (Migration already applied on 2026-11-01; kept as a reference/dev-only tool.)
 import { readFileSync, writeFileSync, rmSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-const DB_URL = 'postgresql://postgres.khtqzqewnogjwoyshyiq:Lakbai0909461@aws-1-eu-west-3.pooler.supabase.com:5432/postgres';
+const PW = process.env.SUPABASE_DB_PASSWORD;
+if (!PW) { console.error('set SUPABASE_DB_PASSWORD=<db password> first'); process.exit(1); }
+const DB_URL = `postgresql://postgres.khtqzqewnogjwoyshyiq:${encodeURIComponent(PW)}@aws-1-eu-west-3.pooler.supabase.com:5432/postgres`;
 const FILES = ['supabase/migrations/0001_init.sql', 'supabase/migrations/0002_user_prefs.sql'];
 
 const tmp = mkdtempSync(join(tmpdir(), 'lakbai-mig-'));
