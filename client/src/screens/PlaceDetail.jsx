@@ -136,7 +136,7 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
           <button
             data-testid="save-trip-btn"
             onClick={toggleSave}
-            style={{ flex:1, minHeight:46, borderRadius:999, border:'none', background:saved ? '#0F52B5' : 'var(--primary)', color:'#fff', fontWeight:600, fontSize:14, display:'inline-flex', alignItems:'center', justifyContent:'center', gap:7, boxShadow:'0 8px 20px -10px rgba(22,103,217,.6)' }}
+            style={{ flex:1, minHeight:46, borderRadius:999, border:'none', background:saved ? 'var(--primary-strong)' : 'var(--primary)', color:'#fff', fontWeight:600, fontSize:14, display:'inline-flex', alignItems:'center', justifyContent:'center', gap:7, boxShadow:'0 8px 20px -10px rgba(22,103,217,.6)' }}
           >
             {saved ? <CircleCheck size={17}/> : <CirclePlus size={17}/>} {saved ? 'Added to Trip' : 'Save to Trip'}
           </button>

@@ -6,8 +6,8 @@ import { planStatus, matchesFilter, STATUS_FILTERS } from '../planStatus.js';
 import { sessionGet } from '../sessionCache.js';
 
 const STATUS_STYLE = {
-  Upcoming: { background:'#E7F0FE', color:'#1667D9' },
-  Active: { background:'#E7F0FE', color:'#1667D9' },
+  Upcoming: { background:'#E7F0FE', color:'#0066FF' },
+  Active: { background:'#E7F0FE', color:'#0066FF' },
   Completed: { background:'#E8F7EE', color:'#15803D' },
 };
 

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAiActivity } from './useAiActivity.js';
 
 // Mostly white with blue drifting through, so chat text keeps its contrast.
-const GRADIENT = ['#FFFFFF', '#F4F9FF', '#CFE4FF', '#1667D9'];
+const GRADIENT = ['#FFFFFF', '#F4F9FF', '#CFE4FF', '#0066FF'];
 const SHOW_DELAY = 150;   // skip the effect entirely for near-instant cached answers
 const MIN_VISIBLE = 700;  // when it does show, keep it up long enough to read
 const FADE_MS = 380;

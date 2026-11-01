@@ -32,7 +32,7 @@ describe('mapThumb', () => {
   it('builds a Mapbox static map with a pin at the coords', () => {
     const url = mapThumb(119.869, 16.302, 'pk.test');
     expect(url).toContain('/styles/v1/mapbox/streets-v12/static/');
-    expect(url).toContain('pin-s+1667D9(119.869,16.302)');
+    expect(url).toContain('pin-s+0066FF(119.869,16.302)');
     expect(url).toContain('/600x340@2x');
     expect(url).toContain('access_token=pk.test');
   });
@@ -76,5 +76,14 @@ describe('cardFor', () => {
     expect(card.lng).toBeUndefined();
     expect(card.tags).toEqual([]);
     expect(card.id).toBe('mystery eatery');
+  });
+
+  it('keeps fees and festival only when the model stated them', () => {
+    const withFees = cardFor({ name: 'Patar Beach', fees: ' ₱60 eco fee ' }, SPOTS);
+    expect(withFees.fees).toBe('₱60 eco fee');
+    expect(withFees.festival).toBe('');
+
+    const withFestival = cardFor({ name: 'Patar Beach', festival: 'Binongey Festival' }, SPOTS);
+    expect(withFestival.festival).toBe('Binongey Festival');
   });
 });

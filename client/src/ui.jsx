@@ -1,4 +1,4 @@
-import { House, Map, MessageCircle, Bookmark, User, Check, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
+import { House, Map, MessageSquare, Backpack, UserRound, Check, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
 
 /** Neutral, icon-based stand-in for a missing photo. No gradients, no emoji. */
 export function PhotoPlaceholder({ label, size = 26, rounded = 0, style }){
@@ -27,7 +27,7 @@ export function Toast({ toast, onClose }){
 }
 
 const TAB_ITEMS = [
-  ['home', House], ['map', Map], ['chat', MessageCircle], ['saved', Bookmark], ['profile', User],
+  ['home', House], ['map', Map], ['chat', MessageSquare], ['saved', Backpack], ['profile', UserRound],
 ];
 export function TabBar({ tab, onTab }){
   return (

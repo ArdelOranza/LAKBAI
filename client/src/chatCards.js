@@ -38,7 +38,7 @@ function hasCoords(lng, lat){
 /** Mapbox static map centred on the place, so cards are never imageless. */
 export function mapThumb(lng, lat, token, { width = 600, height = 340 } = {}){
   if (!token || !hasCoords(lng, lat)) return null;
-  const pin = `pin-s+1667D9(${lng},${lat})`;
+  const pin = `pin-s+0066FF(${lng},${lat})`;
   return `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/${pin}/${lng},${lat},14.5,0/${width}x${height}@2x?access_token=${encodeURIComponent(token)}`;
 }
 
@@ -51,6 +51,9 @@ export function cardFor(candidate = {}, spots = []){
     hint: candidate.hint || spot?.town || '',
     description: candidate.description || spot?.blurb || '',
     rating: toNumber(candidate.rating),
+    // Only what the model actually returned: no invented opening hours or prices.
+    fees: String(candidate.fees || '').trim(),
+    festival: String(candidate.festival || '').trim(),
     tags: (spot?.categories || []).slice(0, 3),
     lng: spot?.lng,
     lat: spot?.lat,
