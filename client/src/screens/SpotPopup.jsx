@@ -7,6 +7,7 @@ import { useAuth } from '../AuthContext.jsx';
 import { saveFavorite, postReview, flushOutbox, listPlaceReviews, listFavorites, localReviews } from '../store.js';
 const _localReviews = localReviews; // kept for offline fallback when supabase absent
 import { haversineKm, formatDistance, driveMinutes } from '../geo.js';
+import { dragOffset, shouldDismiss } from '../sheetDrag.js';
 import { PrimaryBtn, PhotoPlaceholder } from '../ui.jsx';
 
 const VIBES = [
@@ -39,6 +40,10 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [dragY, setDragY] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const dragStart = useRef(null);
+  const dragYRef = useRef(0);
   const trackRef = useRef(null);
   const photos = (spot.photos && spot.photos.length) ? spot.photos : null;
   const count = photos ? photos.length : 3; // reserved placeholder dots
@@ -73,6 +78,29 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
     setSaved(true);
     showToast('Added to Trip');
   }
+  function setDrag(v){
+    dragYRef.current = v;
+    setDragY(v);
+  }
+  function grabDown(e){
+    dragStart.current = e.clientY;
+    setDragging(true);
+    setDrag(0);
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* older Safari */ }
+  }
+  function grabMove(e){
+    if (dragStart.current == null) return;
+    setDrag(dragOffset(dragStart.current, e.clientY));
+  }
+  function grabEnd(){
+    if (dragStart.current == null) return;
+    const dy = dragYRef.current;
+    dragStart.current = null;
+    setDragging(false);
+    if (shouldDismiss(dy)) { pop(); return; }
+    setDrag(0);
+    if (dy < 5) pop(); // a tap on the handle still closes the sheet
+  }
   async function submitReview(){
     if (!text.trim()) return;
     setBusy(true);
@@ -89,8 +117,27 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
   }
 
   return (
-    <aside className="spot-sheet" data-testid="spot-sheet" role="dialog" aria-label={spot.name}>
-      <button className="grab-btn" data-testid="close-spot" onClick={pop} aria-label="Close sheet"/>
+    <aside
+      className="spot-sheet"
+      data-testid="spot-sheet"
+      role="dialog"
+      aria-label={spot.name}
+      style={{
+        transform:`translate(-50%, ${dragY}px)`,
+        transition: dragging ? 'none' : 'transform .22s ease',
+      }}
+    >
+      <button
+        className="grab-btn"
+        data-testid="close-spot"
+        aria-label="Close sheet"
+        onPointerDown={grabDown}
+        onPointerMove={grabMove}
+        onPointerUp={grabEnd}
+        onPointerCancel={grabEnd}
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pop(); } }}
+        style={{ touchAction:'none', cursor:'grab' }}
+      />
 
       <div className="spot-scroll">
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:10, marginBottom:10 }}>
