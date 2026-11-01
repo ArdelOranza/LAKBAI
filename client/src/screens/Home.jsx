@@ -14,7 +14,7 @@ import { dateRange } from '../festival.js';
 import { upcomingFestivals, FESTIVALS } from '../festivals.js';
 import { feeLabel } from '../filters.js';
 import { PhotoPlaceholder } from '../ui.jsx';
-import PangasinanMap from '../PangasinanMap.jsx';
+// import PangasinanMap from '../PangasinanMap.jsx'; // parked with the map header
 
 const QUICK = [
   ['Beaches', Umbrella, { name:'browse', kind:'beaches' }],
@@ -96,7 +96,9 @@ export default function Home({ coords, push, showToast, setTab }){
     : ((upcoming && upcoming.photos) || []).find(u => !/seal\.png|Banner_Capitol/i.test(u)) || null;
   return (
     <main className="screen" style={{ flex:1, overflowY:'auto' }}>
-      <header className="pane" style={{ paddingTop:18 }}>
+      <header className="pane" style={{ paddingTop:20 }}>
+        {/* Map header (Pangasinan outline beside the title) — parked while the
+            home screen goes back to the plain header. Code kept for later.
         <div className="home-head">
           <PangasinanMap coords={coords}/>
           <div className="home-head-text">
@@ -105,6 +107,14 @@ export default function Home({ coords, push, showToast, setTab }){
           </div>
           <button className="chip home-emg" data-testid="emergency-pill" onClick={() => push({ name:'emergency' })}>Emergency</button>
         </div>
+        */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <h1 style={{ margin:0, fontSize:24 }}>Explore Pangasinan</h1>
+          <button className="chip" style={{ borderColor:'#FED7AA', color:'var(--accent)', fontWeight:600 }} data-testid="emergency-pill" onClick={() => push({ name:'emergency' })}>Emergency</button>
+        </div>
+        <p style={{ color:'var(--muted-ink)', fontSize:13.5, display:'flex', alignItems:'center', gap:5, marginTop:2 }}>
+          <MapPin size={14}/> {place}
+        </p>
         <div style={{ display:'flex', gap:8, background:'#fff', border:'1px solid #EDF1F7', borderRadius:999, padding:'6px 6px 6px 16px', alignItems:'center', boxShadow:'0 1px 2px rgba(15,23,42,.04)' }}>
           <Search size={17} color="#94A3B8"/>
           <input data-testid="home-search" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') search(query); }} placeholder="Search places, food, events…" style={{ border:'none', padding:'8px 0', background:'none' }}/>
