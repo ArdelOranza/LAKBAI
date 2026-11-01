@@ -128,6 +128,19 @@ li{margin:6px 0}
 .round-action:hover{background:#EFF2F7}
 .tag{font-size:10.5px;font-weight:600;color:var(--primary);background:#EFF6FF;border-radius:999px;padding:4px 10px}
 
+/* ── home event hero (matches the festival mockup) ─────────────────── */
+.event-hero{position:relative;margin-top:12px;aspect-ratio:1.55;border-radius:22px;overflow:hidden;cursor:pointer;background:#0A2540;box-shadow:0 20px 40px -30px rgba(10,37,64,.8)}
+.event-hero-photo{position:absolute;inset:0}
+.event-hero-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.event-hero-shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(5,17,30,.94) 0%,rgba(5,17,30,.62) 32%,rgba(5,17,30,.12) 62%,rgba(5,17,30,0) 100%)}
+.event-hero-body{position:absolute;left:18px;right:78px;bottom:17px;color:#fff}
+.event-hero-kicker{display:block;font-size:11.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;opacity:.92}
+.event-hero-title{margin:5px 0 0;font-size:27px;line-height:1.05;font-weight:800;letter-spacing:-.9px;color:#fff;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.event-hero-meta{margin:8px 0 0;display:flex;align-items:center;gap:5px;font-size:13px;font-weight:500;color:rgba(255,255,255,.94)}
+.event-hero-meta svg{flex:0 0 auto}
+.event-hero-meta span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.event-hero-go{position:absolute;right:16px;bottom:16px;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.24);backdrop-filter:blur(8px);color:#fff;display:grid;place-items:center}
+
 /* ── home header ───────────────────────────────────────────────────── */
 .home-head{display:flex;align-items:center;gap:11px;margin-bottom:13px}
 .pm-map{flex:0 0 64px;width:64px;height:60px;display:block}

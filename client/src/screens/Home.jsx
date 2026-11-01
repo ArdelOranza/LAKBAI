@@ -127,19 +127,21 @@ export default function Home({ coords, push, showToast, setTab }){
         {busy && !recs.length && <p className="shimmer" style={{ fontSize:14 }}>Finding hidden gems for you…</p>}
 
         {feature && (
-          <article data-testid="event-banner" style={{ position:'relative', borderRadius:20, overflow:'hidden', boxShadow:'0 10px 26px -18px rgba(15,23,42,.5)', cursor:'pointer', marginTop:12 }} onClick={() => push({ name:'detail', place:feature })}>
-            {featurePhoto
-              ? <img src={featurePhoto} alt="" loading="lazy" onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:190, objectFit:'cover' }}/>
-              : <div style={{ height:190 }}><PhotoPlaceholder size={30}/></div>}
-            <div style={{ position:'absolute', inset:'auto 0 0 0', background:'linear-gradient(transparent, rgba(10,37,64,.88))', color:'#fff', padding:16 }}>
-              <span style={{ fontSize:10.5, letterSpacing:1.1, opacity:.9, fontWeight:700 }}>{featureKicker}</span>
-              <h3 style={{ margin:'3px 0', fontSize:18 }}>{feature.name}</h3>
-              <p style={{ fontSize:12, opacity:.9, display:'flex', alignItems:'center', gap:4, margin:0 }}>
-                <MapPin size={12}/> {featureMeta}
-                {event && event.fees != null && ' • ' + (/free/i.test(String(event.fees)) ? 'Free Admission' : feeLabel(event.fees))}
+          <article className="event-hero" data-testid="event-banner" onClick={() => push({ name:'detail', place:feature })}>
+            <div className="event-hero-photo">
+              {featurePhoto
+                ? <img src={featurePhoto} alt="" loading="lazy" onError={e => { e.currentTarget.style.display='none'; }}/>
+                : <PhotoPlaceholder size={30}/>}
+            </div>
+            <div className="event-hero-shade"/>
+            <div className="event-hero-body">
+              <span className="event-hero-kicker">{featureKicker}</span>
+              <h3 className="event-hero-title">{feature.name}</h3>
+              <p className="event-hero-meta">
+                <MapPin size={14}/> <span>{featureMeta}{event && event.fees != null ? ' • ' + (/free/i.test(String(event.fees)) ? 'Free Admission' : feeLabel(event.fees)) : ''}</span>
               </p>
             </div>
-            <span style={{ position:'absolute', right:14, top:'50%', width:34, height:34, borderRadius:'50%', background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center' }}><ArrowRight size={17}/></span>
+            <span className="event-hero-go"><ArrowRight size={18}/></span>
           </article>
         )}
 
