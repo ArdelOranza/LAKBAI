@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { nextOccurrence, upcomingFestivals, thisMonthFestivals } from './festivals.js';
+import { FESTIVALS, nextOccurrence, upcomingFestivals, thisMonthFestivals } from './festivals.js';
 
 const make = (month, day, endMonth = month, endDay = day) => ({
   id: `f-${month}-${day}`, name: 'Fest', town: 'Bolinao',
@@ -58,5 +58,23 @@ describe('thisMonthFestivals', () => {
 
   it('empty when nothing falls in the month', () => {
     expect(thisMonthFestivals([make(12, 1)], new Date(2026, 10, 1, 9))).toEqual([]);
+  });
+});
+
+describe('FESTIVALS dataset', () => {
+  it('lists the 30 curated festivals with unique ids', () => {
+    expect(FESTIVALS).toHaveLength(30);
+    expect(new Set(FESTIVALS.map(f => f.id)).size).toBe(FESTIVALS.length);
+  });
+
+  it('every festival has a name, town, valid month and an end after its start', () => {
+    for (const f of FESTIVALS) {
+      expect(f.name).toBeTruthy();
+      expect(f.town).toBeTruthy();
+      expect(f.month).toBeGreaterThanOrEqual(1);
+      expect(f.month).toBeLessThanOrEqual(12);
+      const { starts, ends } = upcomingFestivals([f], new Date(2026, 0, 1))[0];
+      expect(ends >= starts).toBe(true);
+    }
   });
 });

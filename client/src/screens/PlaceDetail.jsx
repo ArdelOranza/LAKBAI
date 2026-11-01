@@ -152,23 +152,37 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
             )}
           </div>
           <p style={{ margin:'9px 0 0', fontSize:13, lineHeight:1.6, color:'#475569' }}>
-            {p.description || p.reason || p.peopleSay || `A stop in Pangasinan — details coming from guides and visitor reviews.`}
+            {p.blurb || p.description || p.reason || p.peopleSay || `A stop in Pangasinan — details coming from guides and visitor reviews.`}
           </p>
-          {(p.fees != null || when) && (
+          {(p.fees != null || when || p.dateLabel) && (
             <div style={{ display:'flex', gap:16, marginTop:12, flexWrap:'wrap' }}>
               {p.fees != null && !isFree(p.fees) && (
                 <span style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:11.5, color:'var(--muted-ink)' }}>
                   <CircleParking size={13}/> {feeLabel(p.fees)}
                 </span>
               )}
-              {when && (
+              {(p.dateLabel || when) && (
                 <span style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:11.5, color:'var(--muted-ink)' }}>
-                  <Clock size={13}/> {when}
+                  <Clock size={13}/> {p.dateLabel || when}
                 </span>
               )}
             </div>
           )}
         </section>
+
+        {(p.whatToDo || []).length > 0 && (
+          <section style={{ marginTop:16, border:'1px solid #EDF1F7', borderRadius:16, padding:14 }}>
+            <b style={{ fontSize:14.5 }}>What to Do</b>
+            <ul style={{ margin:'9px 0 0', paddingLeft:0, listStyle:'none', display:'grid', gap:8 }}>
+              {p.whatToDo.map(item => (
+                <li key={item} style={{ display:'flex', gap:8, fontSize:12.5, lineHeight:1.55, color:'#475569' }}>
+                  <CircleCheck size={14} style={{ flex:'0 0 14px', marginTop:2, color:'var(--primary)' }}/>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {(p.categories || []).length > 0 && (
           <section style={{ marginTop:16 }}>

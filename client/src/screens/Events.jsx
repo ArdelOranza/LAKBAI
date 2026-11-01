@@ -22,6 +22,8 @@ export default function Events({ coords, push, pop, showToast }){
   const rows = scope === 'This Month' ? thisMonthFestivals(FESTIVALS, now) : all;
   const featured = rows[0] || null;
   const soon = featured ? happeningSoon(featured, now) : false;
+  // Skip town seals and the generic provincial banner — they read as logos, not festival photos.
+  const bannerPhoto = ((featured && featured.photos) || []).find(u => !/seal\.png|Banner_Capitol/i.test(u)) || null;
 
   async function add(f, e){
     e.stopPropagation();
@@ -42,7 +44,18 @@ export default function Events({ coords, push, pop, showToast }){
             onClick={() => push({ name:'detail', place:{ ...featured, categories:['Festival','Cultural'] } })}
             style={{ position:'relative', marginTop:14, borderRadius:18, overflow:'hidden', cursor:'pointer', boxShadow:'0 10px 26px -18px rgba(15,23,42,.5)' }}
           >
-            <div style={{ height:168 }}><PhotoPlaceholder size={30}/></div>
+            <div style={{ position:'relative', height:168, background:'#EDF1F7' }}>
+              <PhotoPlaceholder size={30}/>
+              {bannerPhoto && (
+                <img
+                  src={bannerPhoto}
+                  alt=""
+                  loading="lazy"
+                  onError={e => { e.currentTarget.style.display = 'none'; }}
+                  style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }}
+                />
+              )}
+            </div>
             {soon && (
               <span style={{ position:'absolute', left:12, top:12, display:'inline-flex', alignItems:'center', gap:5, background:'#fff', color:'#DC2626', borderRadius:999, padding:'4px 10px', fontSize:10, fontWeight:800, letterSpacing:.6 }}>
                 <Radio size={10}/> HAPPENING SOON
@@ -84,7 +97,7 @@ export default function Events({ coords, push, pop, showToast }){
             >
               <div style={{ width:52, height:52, minWidth:52, borderRadius:12, background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center', alignContent:'center', lineHeight:1 }}>
                 <span style={{ fontSize:9.5, fontWeight:700, letterSpacing:.8 }}>{MONTHS[f.starts.getMonth()]}</span>
-                <b style={{ fontSize:19, fontWeight:800, marginTop:2 }}>{f.starts.getDate()}</b>
+                {!f.vague && <b style={{ fontSize:19, fontWeight:800, marginTop:2 }}>{f.starts.getDate()}</b>}
               </div>
 
               <div style={{ flex:1, minWidth:0 }}>
