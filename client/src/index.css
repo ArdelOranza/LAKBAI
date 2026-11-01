@@ -117,7 +117,7 @@ li{margin:6px 0}
 .spot-pin:hover{background:#fff}
 .spot-pin.active{background:var(--primary);color:#fff;border-color:#fff}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
-.spot-sheet{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(430px,100vw);background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -12px 40px rgba(10,37,64,.22);z-index:30;max-height:88vh;display:flex;flex-direction:column;padding-bottom:calc(78px + var(--safe-bottom));overflow:hidden}
+.spot-sheet{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(430px,100vw);background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -12px 40px rgba(10,37,64,.22);z-index:30;max-height:64vh;display:flex;flex-direction:column;padding-bottom:calc(78px + var(--safe-bottom));overflow:hidden}
 .grab-btn{background:none;border:none;border-radius:0;width:100%;height:22px;padding:0;margin:0;display:grid;place-items:center;flex:0 0 22px}
 .grab-btn::before{content:"";width:44px;height:4px;border-radius:2px;background:#DDE4EF;display:block}
 .grab-btn:hover{background:none}

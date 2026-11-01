@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   Waves, UtensilsCrossed, Mountain, Landmark, Sparkles, Car, Camera, Maximize2,
-  Star, MapPin, Navigation, CirclePlus, CircleCheck, Send,
+  Star, MapPin, Navigation, CirclePlus, CircleCheck, ArrowRight,
 } from 'lucide-react';
 import { useAuth } from '../AuthContext.jsx';
-import { saveFavorite, postReview, flushOutbox, listPlaceReviews, listFavorites, localReviews } from '../store.js';
-const _localReviews = localReviews; // kept for offline fallback when supabase absent
+import { saveFavorite, listFavorites } from '../store.js';
 import { haversineKm, formatDistance, driveMinutes } from '../geo.js';
 import { dragOffset, shouldDismiss } from '../sheetDrag.js';
 import { PrimaryBtn, PhotoPlaceholder } from '../ui.jsx';
@@ -23,22 +22,10 @@ function vibeFor(spot){
   return hit ? { label: hit[1], Icon: hit[2] } : { label: 'Hidden Gem', Icon: Sparkles };
 }
 
-function StarRow({ score }){
-  return (
-    <span style={{ display:'inline-flex', gap:1.5, color:'var(--primary)' }} aria-label={`${score} out of 5 stars`}>
-      {[1,2,3,4,5].map(n => <Star key={n} size={12} fill={n <= score ? 'currentColor' : 'none'} strokeWidth={1.8}/>)}
-    </span>
-  );
-}
-
 export default function SpotPopup({ spot, coords, pop, push, showToast, user, setTab }){
   const { user: authUser } = useAuth();
   const u = user || authUser;
   const [slide, setSlide] = useState(0);
-  const [reviews, setReviews] = useState([]);
-  const [score, setScore] = useState(5);
-  const [text, setText] = useState('');
-  const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
   const [dragY, setDragY] = useState(0);
   const [dragging, setDragging] = useState(false);
@@ -52,20 +39,13 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
   const vibe = vibeFor(spot);
 
   useEffect(() => {
-    listPlaceReviews(spot.name)
-      .then(setReviews)
-      .catch(() => setReviews(_localReviews(spot.id)));
-  }, [spot.name]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
     let alive = true;
     listFavorites(u).then(r => { if (alive) setSaved((r.data || []).some(f => f.place_id === spot.id)); });
     return () => { alive = false; };
   }, [spot.id, u?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const avg = reviews.length ? reviews.reduce((a, r) => a + r.score, 0) / reviews.length : null;
-  const rating = typeof spot.rating === 'number' ? spot.rating : avg;
-  const reviewCount = typeof spot.reviews === 'number' ? spot.reviews : reviews.length;
+  const rating = typeof spot.rating === 'number' ? spot.rating : null;
+  const reviewCount = typeof spot.reviews === 'number' ? spot.reviews : 0;
 
   function goTo(i){
     setSlide(i);
@@ -101,21 +81,6 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
     setDrag(0);
     if (dy < 5) pop(); // a tap on the handle still closes the sheet
   }
-  async function submitReview(){
-    if (!text.trim()) return;
-    setBusy(true);
-    const res = await postReview(u, spot, score, text.trim());
-    if (res.queued) {
-      setReviews(r => [{ id:'local-' + Date.now(), score, text:text.trim(), created_at:new Date().toISOString() }, ...r]); // optimistic, syncs via outbox later
-      showToast('Review saved on device — syncs when online');
-    } else {
-      showToast('Thanks for reviewing!');
-      flushOutbox(u).catch(() => {});
-    }
-    setText('');
-    setBusy(false);
-  }
-
   return (
     <aside
       className="spot-sheet"
@@ -152,7 +117,7 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
         </div>
 
         <div style={{ position:'relative', borderRadius:16, overflow:'hidden', background:'#EDF1F7' }}>
-          <div ref={trackRef} onScroll={e => { const i = Math.round(e.currentTarget.scrollLeft / Math.max(1, e.currentTarget.clientWidth)); if (i !== slide) setSlide(i); }} style={{ display:'flex', overflowX:'auto', scrollSnapType:'x mandatory', height:158, scrollbarWidth:'none' }}>
+          <div ref={trackRef} onScroll={e => { const i = Math.round(e.currentTarget.scrollLeft / Math.max(1, e.currentTarget.clientWidth)); if (i !== slide) setSlide(i); }} style={{ display:'flex', overflowX:'auto', scrollSnapType:'x mandatory', height:112, scrollbarWidth:'none' }}>
             {(photos || [0, 1, 2]).map((src, i) => (
               <div key={i} style={{ flex:'0 0 100%', scrollSnapAlign:'center', position:'relative' }}>
                 {photos
@@ -183,8 +148,8 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
           )}
         </div>
 
-        <div style={{ display:'flex', alignItems:'flex-start', gap:10, marginTop:12 }}>
-          <h3 style={{ margin:0, flex:1, minWidth:0, fontSize:20, fontWeight:800, letterSpacing:'-.5px', lineHeight:1.25 }}>{spot.name}</h3>
+        <div style={{ display:'flex', alignItems:'flex-start', gap:10, marginTop:8 }}>
+          <h3 style={{ margin:0, flex:1, minWidth:0, fontSize:18, fontWeight:800, letterSpacing:'-.5px', lineHeight:1.25 }}>{spot.name}</h3>
           {rating != null && (
             <div style={{ textAlign:'right', flex:'0 0 auto', paddingTop:2 }}>
               <span style={{ display:'inline-flex', alignItems:'center', gap:4, background:'#F7F9FC', border:'1px solid #EDF1F7', borderRadius:999, padding:'3px 9px', fontSize:12.5, fontWeight:700 }}>
@@ -200,11 +165,11 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
           <span>{spot.address || [spot.town, 'Pangasinan'].filter(Boolean).join(', ')}</span>
         </p>
 
-        <p style={{ margin:'9px 0 0', fontSize:13, lineHeight:1.55, color:'#475569' }}>
+        <p style={{ margin:'6px 0 0', fontSize:12.5, lineHeight:1.5, color:'#475569', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>
           {spot.blurb || `A curated ${(spot.categories || ['local'])[0].toLowerCase()} stop in ${spot.town || 'Pangasinan'} — save it and let LakbAI sequence your day around it.`}
         </p>
 
-        <div style={{ margin:'14px 0 4px' }}>
+        <div style={{ margin:'10px 0 2px' }}>
           {saved ? (
             <div style={{ display:'grid', gap:8 }}>
               <button className="primary-btn" data-testid="spot-save" disabled style={{ background:'var(--primary)', opacity:1 }}>
@@ -234,41 +199,18 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
           )}
         </div>
 
-        <div style={{ display:'flex', gap:6, flexWrap:'wrap', margin:'12px 0 2px' }}>
+        <div style={{ display:'flex', gap:6, flexWrap:'wrap', margin:'8px 0 0' }}>
           {(spot.categories || []).map(c => <span key={c} className="tag">{c}</span>)}
         </div>
 
-        <div style={{ borderTop:'1px solid #EDF1F7', margin:'14px 0 0', paddingTop:12 }}>
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
-            <b style={{ fontSize:13.5 }}>Reviews</b>
-            {reviews.length > 0 && <span style={{ fontSize:11, color:'var(--muted-ink)' }}>{reviews.length} from travelers</span>}
-          </div>
-
-          <div style={{ display:'grid', gap:8 }}>
-            {reviews.length ? reviews.map(r => (
-              <div key={r.id} style={{ background:'#F7F9FC', border:'1px solid #EDF1F7', borderRadius:12, padding:'9px 11px' }}>
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:12 }}>
-                  <StarRow score={r.score}/>
-                  <span style={{ color:'var(--muted-ink)', fontSize:10.5 }}>{r.created_at ? new Date(r.created_at).toLocaleDateString() : 'just now'}</span>
-                </div>
-                {r.text && <p style={{ fontSize:12.5, margin:'5px 0 0', color:'#475569' }}>{r.text}</p>}
-              </div>
-            )) : <p style={{ fontSize:12.5, color:'var(--muted-ink)', margin:0 }}>No reviews yet — be the first!</p>}
-          </div>
-
-          <div data-testid="review-form" style={{ marginTop:10, border:'1px solid #EDF1F7', borderRadius:14, padding:11 }}>
-            <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-              <label style={{ fontSize:11.5, fontWeight:600, color:'var(--muted-ink)' }}>Your score</label>
-              <select data-testid="review-score" value={score} onChange={e => setScore(Number(e.target.value))} style={{ width:96, padding:'7px 9px', borderRadius:10, fontSize:12.5 }}>
-                {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n} ★</option>)}
-              </select>
-            </div>
-            <textarea data-testid="review-text" rows={2} value={text} onChange={e => setText(e.target.value)} placeholder="Share what it was like…" style={{ marginTop:8, fontSize:13 }}/>
-            <button data-testid="review-send" className="primary-btn" disabled={busy || !text.trim()} onClick={submitReview} style={{ marginTop:8, minHeight:40, fontSize:13 }}>
-              <Send size={14}/> {busy ? 'Posting…' : 'Post Review'}
-            </button>
-          </div>
-        </div>
+        <button
+          data-testid="spot-details"
+          onClick={() => { pop(); push({ name: 'detail', place: spot }); }}
+          style={{ marginTop:10, width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, background:'#F7F9FC', border:'1px solid #EDF1F7', borderRadius:12, padding:'11px 13px', fontSize:12.5, fontWeight:600, color:'var(--ink)' }}
+        >
+          <span>Reviews, hours &amp; full details</span>
+          <ArrowRight size={15} color="var(--primary)"/>
+        </button>
       </div>
     </aside>
   );
