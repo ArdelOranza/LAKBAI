@@ -16,8 +16,11 @@ const reducedMotion = () =>
  * Fluid Kawarp wash behind the app while any AI request is in flight.
  * Lives in the shell, driven by the shared activity counter, so every AI
  * feature (chat, recommendations, itinerary generation) lights it up.
+ *
+ * `always` keeps it alive for as long as the host screen is mounted (the chat
+ * screen does this) instead of flashing for the length of one request.
  */
-export default function AiBackdrop(){
+export default function AiBackdrop({ always = false }){
   const active = useAiActivity();
   const canvasRef = useRef(null);
   const kawarpRef = useRef(null);
@@ -25,6 +28,7 @@ export default function AiBackdrop(){
   const hideTimer = useRef(null);
   const printedAt = useRef(0);
   const [visible, setVisible] = useState(false);
+  const want = always || active;
 
   useEffect(() => {
     let cancelled = false;
@@ -38,8 +42,11 @@ export default function AiBackdrop(){
       try { k.stop(); k.dispose(); } catch { /* already gone */ }
     };
 
-    if (active) {
+    if (want) {
       if (reducedMotion()) return undefined;
+      // A fade-out interrupted by a new request leaves the instance alive;
+      // bring it back instead of waiting for a dispose that never runs.
+      if (kawarpRef.current) { setVisible(true); return undefined; }
       showTimer.current = setTimeout(async () => {
         if (cancelled || kawarpRef.current || !canvasRef.current) return;
         try {
@@ -60,7 +67,7 @@ export default function AiBackdrop(){
           printedAt.current = Date.now();
           setVisible(true);
         } catch { /* no WebGL: the backdrop stays silent, AI features keep working */ }
-      }, SHOW_DELAY);
+      }, always ? 0 : SHOW_DELAY);
     } else {
       const shownFor = Date.now() - printedAt.current;
       hideTimer.current = setTimeout(() => {
@@ -74,7 +81,7 @@ export default function AiBackdrop(){
       clearTimeout(showTimer.current);
       clearTimeout(hideTimer.current);
     };
-  }, [active]);
+  }, [want, always]);
 
   useEffect(() => {
     const onResize = () => { try { kawarpRef.current && kawarpRef.current.resize(); } catch { /* ignore */ } };
@@ -98,7 +105,7 @@ export default function AiBackdrop(){
       }}
     >
       <canvas ref={canvasRef} style={{ display:'block', width:'100%', height:'100%' }}/>
-      <div style={{ position:'absolute', inset:0, background:'rgba(255,255,255,.5)' }}/>
+      <div style={{ position:'absolute', inset:0, background:'rgba(255,255,255,.42)' }}/>
     </div>
   );
 }

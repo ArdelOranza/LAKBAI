@@ -184,7 +184,7 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
 
   return (
     <main className="chat-screen">
-      <AiBackdrop/>
+      <AiBackdrop always/>
 
       <div className="chat-layer">
         <header className="chat-head">
