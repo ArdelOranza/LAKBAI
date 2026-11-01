@@ -16,6 +16,7 @@ import SearchResults from './screens/SearchResults.jsx';
 import Browse from './screens/Browse.jsx';
 import Events from './screens/Events.jsx';
 import PlaceDetail from './screens/PlaceDetail.jsx';
+import Emergency from './screens/Emergency.jsx';
 import Itineraries from './screens/Itineraries.jsx';
 import MyReviews from './screens/MyReviews.jsx';
 import ItineraryView from './screens/ItineraryView.jsx';
@@ -77,6 +78,7 @@ function Shell(){
   else if (top?.name === 'browse') body = <Browse kind={top.kind} {...screenProps}/>;
   else if (top?.name === 'events') body = <Events {...screenProps}/>;
   else if (top?.name === 'detail') body = <PlaceDetail place={top.place} {...screenProps}/>;
+  else if (top?.name === 'emergency') body = <Emergency {...screenProps}/>;
   else if (top?.name === 'prefs-edit') body = <Preferences onBack={pop} onContinue={() => setStack([])}/>;
   else if (top?.name === 'profileEdit') body = <ProfileEdit {...screenProps}/>;
   else if (top?.name === 'itineraries') body = <Itineraries {...screenProps}/>;

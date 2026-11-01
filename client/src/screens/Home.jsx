@@ -10,7 +10,6 @@ import { sessionGet, sessionSet } from '../sessionCache.js';
 import { haversineKm, formatDistance } from '../geo.js';
 import { saveFavorite } from '../store.js';
 import { useAuth } from '../AuthContext.jsx';
-import { EmergencyPanel } from '../Panels.jsx';
 import { dateRange } from '../festival.js';
 import { upcomingFestivals, FESTIVALS } from '../festivals.js';
 import { feeLabel } from '../filters.js';
@@ -33,7 +32,6 @@ export default function Home({ coords, push, showToast, setTab }){
   // Fallback banner: the next festival from the curated dataset, so the card is
   // never empty when no recommendation happens to carry a festival string.
   const [upcoming] = useState(() => upcomingFestivals(FESTIVALS, new Date())[0] || null);
-  const [showEmerg, setShowEmerg] = useState(false);
   const [listening, setListening] = useState(false);
 
   useEffect(() => { // reverse geocode the location line; silent failure keeps the fallback
@@ -100,7 +98,7 @@ export default function Home({ coords, push, showToast, setTab }){
       <header className="pane" style={{ paddingTop:20 }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <h1 style={{ margin:0, fontSize:24 }}>Explore Pangasinan</h1>
-          <button className="chip" style={{ borderColor:'#FED7AA', color:'var(--accent)', fontWeight:600 }} data-testid="emergency-pill" onClick={() => setShowEmerg(s => !s)}>Emergency</button>
+          <button className="chip" style={{ borderColor:'#FFD6C2', color:'var(--ink)', fontWeight:700 }} data-testid="emergency-pill" onClick={() => push({ name:'emergency' })}>Emergency</button>
         </div>
         <p style={{ color:'var(--muted-ink)', fontSize:13.5, display:'flex', alignItems:'center', gap:5, marginTop:2 }}>
           <MapPin size={14}/> {place}
@@ -185,7 +183,6 @@ export default function Home({ coords, push, showToast, setTab }){
           {!recs.length && !busy && <p style={{ color:'var(--muted-ink)', fontSize:14 }}>Recommendations will appear here once you search or ask LakbAI.</p>}
         </div>
       </div>
-      {showEmerg && <EmergencyPanel proximity={`${coords.lng},${coords.lat}`} onClose={() => setShowEmerg(false)}/>}
     </main>
   );
 }

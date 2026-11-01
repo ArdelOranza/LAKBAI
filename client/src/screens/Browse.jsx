@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ChevronDown, Plus, MapPin, Star } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Plus, MapPin, Star, Check } from 'lucide-react';
 import { useAuth } from '../AuthContext.jsx';
 import { fetchSpots } from '../spots.js';
 import { saveFavorite } from '../store.js';
@@ -22,6 +22,7 @@ export default function Browse({ kind = 'beaches', coords, push, pop, showToast 
   const [town, setTown] = useState(null);
   const [facet, setFacet] = useState('All');
   const [busy, setBusy] = useState(true);
+  const [townOpen, setTownOpen] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -50,22 +51,41 @@ export default function Browse({ kind = 'beaches', coords, push, pop, showToast 
       <div className="pane" style={{ paddingTop:16 }}>
         <button className="icon-btn" data-testid="back-btn" onClick={pop} aria-label="Back"><ArrowLeft size={18}/></button>
 
-        <div style={{ marginTop:14 }}>
-          <label style={{ position:'relative', display:'inline-flex', alignItems:'center', gap:4, cursor:'pointer' }}>
-            <span style={{ fontSize:22, fontWeight:800, letterSpacing:'-.6px' }}>{copy.verb} in {town || 'Pangasinan'}</span>
-            <ChevronDown size={18} style={{ color:'var(--primary)' }}/>
-            <select
-              data-testid="browse-town"
-              aria-label="Choose a town"
-              value={town || ''}
-              onChange={e => { setTown(e.target.value); setFacet('All'); }}
-              style={{ position:'absolute', inset:0, width:'100%', height:'100%', opacity:0, border:'none', background:'none', padding:0 }}
-            >
-              {towns.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
-          </label>
-          <p style={{ margin:'2px 0 0', fontSize:12.5, color:'var(--muted-ink)' }}>{copy.sub}</p>
+        <div className="town-wrap">
+          <button
+            type="button"
+            className="town-trigger"
+            data-testid="browse-town"
+            aria-haspopup="listbox"
+            aria-expanded={townOpen}
+            onClick={() => setTownOpen(o => !o)}
+          >
+            <span>{copy.verb} in {town || 'Pangasinan'}</span>
+            <ChevronDown size={18} className={townOpen ? 'up' : ''}/>
+          </button>
+
+          {townOpen && (
+            <>
+              <button type="button" className="town-scrim" aria-label="Close town list" onClick={() => setTownOpen(false)}/>
+              <div className="town-pop" role="listbox" aria-label="Choose a town">
+                {towns.map(t => (
+                  <button
+                    key={t}
+                    type="button"
+                    role="option"
+                    aria-selected={t === town}
+                    className={'town-opt' + (t === town ? ' on' : '')}
+                    onClick={() => { setTown(t); setFacet('All'); setTownOpen(false); }}
+                  >
+                    <span>{t}</span>
+                    {t === town && <Check size={15}/>}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
+        <p style={{ margin:'2px 0 0', fontSize:12.5, color:'var(--muted-ink)' }}>{copy.sub}</p>
 
         <div style={{ display:'flex', gap:8, overflowX:'auto', scrollbarWidth:'none', margin:'14px 0 4px' }}>
           {facets.map(f => (
@@ -96,7 +116,7 @@ export default function Browse({ kind = 'beaches', coords, push, pop, showToast 
                 : <PhotoPlaceholder size={22}/>}
               {typeof p.rating === 'number' && (
                 <span style={{ position:'absolute', left:6, top:6, display:'inline-flex', alignItems:'center', gap:3, background:'#fff', borderRadius:999, padding:'2px 7px', fontSize:10, fontWeight:700 }}>
-                  <Star size={10} fill="var(--accent)" color="var(--accent)"/> {p.rating.toFixed(1)}
+                  <Star size={10} fill="var(--primary)" color="var(--primary)"/> {p.rating.toFixed(1)}
                 </span>
               )}
             </div>

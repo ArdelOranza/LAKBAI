@@ -41,8 +41,8 @@ export function TabBar({ tab, onTab }){
   );
 }
 
-export function Chip({ active, onClick, children, testid }){
-  return <button type="button" data-testid={testid} className={'chip' + (active ? ' active' : '')} onClick={onClick}>{children}</button>;
+export function Chip({ active, onClick, children, testid, flat }){
+  return <button type="button" data-testid={testid} className={'chip' + (flat ? ' chip-flat' : '') + (active ? ' active' : '')} onClick={onClick}>{children}</button>;
 }
 export function PrimaryBtn({ children, onClick, wide, disabled, testid }){
   return <button data-testid={testid} className={'primary-btn' + (wide ? ' wide' : '')} onClick={onClick} disabled={disabled}>{children}</button>;
