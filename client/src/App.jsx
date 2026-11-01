@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AuthProvider, useAuth } from './AuthContext.jsx';
 import { Toast, TabBar } from './ui.jsx';
+import AiBackdrop from './AiBackdrop.jsx';
 import { readLocalPrefs } from './prefs.js';
 import Splash from './screens/Splash.jsx';
 import SignUp from './screens/SignUp.jsx';
@@ -91,7 +92,12 @@ function Shell(){
   return (
     <div data-testid="app" style={{ display:'flex', flexDirection:'column', height:'100%', overflow:'hidden' }}>
       <Toast toast={toast} onClose={() => setToast(null)} />
-      {body}
+      <div style={{ position:'relative', flex:1, minHeight:0, display:'flex', flexDirection:'column' }}>
+        <AiBackdrop/>
+        <div style={{ position:'relative', zIndex:1, flex:1, minHeight:0, display:'flex', flexDirection:'column' }}>
+          {body}
+        </div>
+      </div>
       {!stack.length && <TabBar tab={tab} onTab={t => { setStack([]); setTab(t); }} />}
     </div>
   );
