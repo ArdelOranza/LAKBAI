@@ -68,6 +68,10 @@ li{margin:6px 0}
 .primary-btn:hover{background:var(--primary-strong)}
 .chip{border-radius:999px;border:1px solid var(--border);padding:9px 15px;font-size:14px;background:#fff;color:var(--ink)}
 .chip.active{background:var(--chip-on);border-color:var(--chip-on);color:#fff}
+/* map overlay chips: one line each, no flex squeeze that wrapped "Within 5 km" into a blob */
+.map-chips{position:absolute;top:62px;left:12px;right:12px;z-index:5;display:flex;align-items:center;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.map-chips::-webkit-scrollbar{display:none}
+.map-chips .chip{flex:0 0 auto;white-space:nowrap;padding:6px 12px;font-size:12.5px;line-height:1.25}
 /* floating pill nav — icons only, no labels */
 .tabbar{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(14px + var(--safe-bottom));z-index:40;width:calc(100% - 40px);max-width:390px;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border:1px solid #EDF1F7;border-radius:999px;padding:7px 12px;box-shadow:0 16px 32px -14px rgba(15,23,42,.28),0 2px 8px rgba(15,23,42,.06)}
 .tabbar button{background:none;border:none;display:grid;place-items:center;color:#94A3B8;padding:0;border-radius:999px;width:44px;height:44px}

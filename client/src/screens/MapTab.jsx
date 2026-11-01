@@ -95,7 +95,7 @@ export default function MapTab({ coords, push, showToast, user, setTab }){
         <span style={{ color:'var(--muted-ink)', fontSize:14 }}>Search places, food, events…</span>
       </div>
 
-      <div style={{ position:'absolute', top:62, left:12, right:12, zIndex:5, display:'flex', gap:8, overflowX:'auto', paddingBottom:4, scrollbarWidth:'none' }}>
+      <div className="map-chips">
         {RADII.map(([km, label]) => <Chip key={km} active={radius === km} onClick={() => setRadius(km)} testid={'radius-' + km}>{label}</Chip>)}
         {FILTERS.map(([f, Icon]) => (
           <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>
