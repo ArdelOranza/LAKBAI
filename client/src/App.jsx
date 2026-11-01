@@ -11,6 +11,7 @@ import MapTab from './screens/MapTab.jsx';
 import ChatTab from './screens/ChatTab.jsx';
 import SavedTab from './screens/SavedTab.jsx';
 import ProfileTab from './screens/Profile.jsx';
+import ProfileEdit from './screens/ProfileEdit.jsx';
 import SearchResults from './screens/SearchResults.jsx';
 import PlaceDetail from './screens/PlaceDetail.jsx';
 import Itineraries from './screens/Itineraries.jsx';
@@ -72,7 +73,8 @@ function Shell(){
   let body;
   if (top?.name === 'search') body = <SearchResults query={top.query} {...screenProps}/>;
   else if (top?.name === 'detail') body = <PlaceDetail place={top.place} {...screenProps}/>;
-  else if (top?.name === 'prefs-edit') return prefsOnce(() => setStack([]));
+  else if (top?.name === 'prefs-edit') body = <Preferences onBack={pop} onContinue={() => setStack([])}/>;
+  else if (top?.name === 'profileEdit') body = <ProfileEdit {...screenProps}/>;
   else if (top?.name === 'itineraries') body = <Itineraries {...screenProps}/>;
   else if (top?.name === 'myReviews') body = <MyReviews {...screenProps}/>;
   else if (top?.name === 'itinerary') body = <ItineraryView plan={top.plan} {...screenProps}/>;
@@ -83,10 +85,10 @@ function Shell(){
   else body = <ProfileTab {...screenProps}/>;
 
   return (
-    <div data-testid="app" style={{ display:'flex', flexDirection:'column', minHeight:'100dvh' }}>
+    <div data-testid="app" style={{ display:'flex', flexDirection:'column', height:'100%', overflow:'hidden' }}>
       <Toast toast={toast} onClose={() => setToast(null)} />
       {body}
-      <TabBar tab={tab} onTab={t => { setStack([]); setTab(t); }} />
+      {!stack.length && <TabBar tab={tab} onTab={t => { setStack([]); setTab(t); }} />}
     </div>
   );
 }

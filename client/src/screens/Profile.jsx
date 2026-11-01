@@ -1,79 +1,88 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../AuthContext.jsx';
-import { listPlans, listMyReviews, saveProfile } from '../store.js';
+import { listPlans, listMyReviews } from '../store.js';
 import { loadPrefs } from '../prefs.js';
-import { Chip } from '../ui.jsx';
+import { Route, MessageSquare, Bookmark, SlidersHorizontal, ChevronRight, LogOut } from 'lucide-react';
 
-const initialsOf = email => {
-  const base = String(email || '').split('@')[0];
-  return (base.slice(0, 2) || 'L').toUpperCase();
+const initialsOf = (name, email) => {
+  const src = String(name || '').trim() || String(email || '').split('@')[0];
+  const parts = src.split(/[\s._-]+/).filter(Boolean);
+  return ((parts[0]?.[0] || 'L') + (parts[1]?.[0] || '')).toUpperCase();
 };
 
-export default function Profile({ push, setTab, user, signOut, showToast }){
+export default function Profile({ push, setTab, user, signOut }){
   const { user: authUser } = useAuth();
   const u = user || authUser;
   const email = u?.email || '';
   const [plans, setPlans] = useState([]);
   const [reviews, setReviews] = useState([]);
-  const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [prefs, setPrefs] = useState([]);
-  const [busy, setBusy] = useState(false);
   useEffect(() => {
     listPlans(u).then(r => setPlans(r.data || []));
     listMyReviews(u).then(setReviews);
-    loadPrefs(u).then(p => { setPrefs(p.preferences || []); setName(p.display_name || ''); setPhone(p.phone || ''); });
+    loadPrefs(u).then(p => { setName(p.display_name || ''); setPhone(p.phone || ''); });
   }, [u?.id]); // eslint-disable-line react-hooks/exhaustive-deps
-  async function submitProfile(){
-    setBusy(true);
-    const res = await saveProfile(u, { display_name: name.trim() || null, phone: phone.trim() || null });
-    setBusy(false);
-    if (res.error) { showToast(res.error, 'error'); return; }
-    setEditing(false);
-  }
+
+  const displayName = name || email.split('@')[0] || 'Traveler';
+
   return (
-    <main style={{ flex:1, overflowY:'auto', paddingBottom:8 }}>
-      <div className="pane" style={{ paddingTop:24, textAlign:'center' }}>
-        <div style={{ width:74, height:74, margin:'0 auto 10px', borderRadius:'50%', background:'linear-gradient(135deg,#2280E8,#0A3D8F)', color:'#fff', display:'grid', placeItems:'center', fontSize:24, fontWeight:800 }}>{initialsOf(email)}</div>
-        {editing ? (
-          <div data-testid="profile-edit">
-            <input data-testid="profile-name" value={name} onChange={e => setName(e.target.value)} placeholder="Display name" style={{ marginBottom:8 }}/>
-            <input data-testid="profile-phone" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+63 …" style={{ marginBottom:10 }}/>
-            <div><button data-testid="profile-save" className="chip active" style={{ padding:'10px 22px', color:'#fff' }} onClick={submitProfile} disabled={busy}>Save</button></div>
+    <main className="screen" style={{ flex:1, overflowY:'auto' }}>
+      <div className="pane" style={{ paddingTop:28 }}>
+        <div style={{ display:'flex', alignItems:'flex-start', gap:16 }}>
+          <div aria-hidden="true" style={{ width:86, height:86, minWidth:86, borderRadius:'50%', background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center', fontSize:26, fontWeight:800, letterSpacing:.5 }}>
+            {initialsOf(name, email)}
           </div>
-        ) : (
-          <>
-            <h1 style={{ margin:0 }}>{name || email.split('@')[0]}</h1>
-            <p style={{ color:'var(--muted-ink)', fontSize:13, margin:'2px 0 0' }}>{email}{phone ? ' · 📱 ' + phone : ''}</p>
-            <button className="chip" data-testid="profile-edit-btn" onClick={() => setEditing(true)}>✏️ Edit</button>
-          </>
-        )}
-        <div style={{ display:'flex', gap:10, marginTop:16 }}>
-          <div style={{ flex:1, background:'var(--chip)', borderRadius:16, padding:12 }} data-testid="stat-plans">
-            <b style={{ fontSize:20, color:'var(--primary)' }}>{plans.length}</b>
-            <p style={{ fontSize:11, color:'var(--muted-ink)', margin:0 }}>Trips Planned</p>
-          </div>
-          <div style={{ flex:1, background:'var(--chip)', borderRadius:16, padding:12 }} data-testid="stat-reviews">
-            <b style={{ fontSize:20, color:'var(--primary)' }}>{reviews.length}</b>
-            <p style={{ fontSize:11, color:'var(--muted-ink)', margin:0 }}>Reviews Written</p>
+          <div style={{ flex:1, minWidth:0, paddingTop:4 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+              <h2 style={{ margin:0, fontSize:19, letterSpacing:'-.2px', fontWeight:800, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{displayName}</h2>
+              <button data-testid="profile-edit-btn" onClick={() => push({ name:'profileEdit' })} style={{ flex:'0 0 auto', background:'#EFF6FF', color:'var(--primary)', border:'none', borderRadius:999, padding:'5px 13px', fontSize:12, fontWeight:600 }}>Edit</button>
+            </div>
+            <p style={{ margin:'3px 0 0', fontSize:13, color:'var(--muted-ink)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{email}</p>
+            <p style={{ margin:'2px 0 0', fontSize:13, color:'var(--muted-ink)' }}>{phone || 'Add a contact number'}</p>
           </div>
         </div>
-      </div>
-      <div className="pane" style={{ display:'grid', gap:8, marginTop:16 }}>
-        <button className="chip" data-testid="menu-itineraries" style={{ textAlign:'left' }} onClick={() => push({ name:'itineraries' })}>🗂 Saved Itineraries <span style={{ float:'right', color:'var(--muted-ink)' }}>›</span></button>
-        <button className="chip" data-testid="menu-interests" style={{ textAlign:'left' }} onClick={() => push({ name:'prefs-edit' })}>✦ Edit Interests <span style={{ float:'right', color:'var(--muted-ink)' }}>›</span></button>
-        <button className="chip" data-testid="menu-reviews" style={{ textAlign:'left' }} onClick={() => push({ name:'myReviews' })}>📝 My Reviews <span style={{ float:'right', color:'var(--muted-ink)' }}>›</span></button>
-        <button data-testid="logout-btn" style={{ marginTop:8, background:'#fff', border:'1px solid #FCA5A5', color:'#DC2626', fontWeight:600 }} onClick={async () => { await signOut(); setTab('home'); }}>Log Out</button>
-      </div>
-      {prefs.length ? (
-        <div className="pane" style={{ marginTop:14 }}>
-          <p style={{ fontSize:11, letterSpacing:1, color:'var(--muted-ink)' }}>YOUR TRAVEL VIBE</p>
-          <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
-            {prefs.slice(0, 8).map(t => <Chip key={t}>{t}</Chip>)}
+
+        <div style={{ display:'flex', gap:12, marginTop:20 }}>
+          <div className="stat-card" data-testid="stat-plans">
+            <span className="si"><Route size={17}/></span>
+            <b>{plans.length}</b>
+            <span>Trips Planned</span>
+          </div>
+          <div className="stat-card" data-testid="stat-reviews">
+            <span className="si"><MessageSquare size={17}/></span>
+            <b>{reviews.length}</b>
+            <span>Reviews Written</span>
           </div>
         </div>
-      ) : null}
+
+        <div style={{ display:'grid', gap:10, marginTop:22 }}>
+          <button className="menu-row" data-testid="menu-itineraries" onClick={() => push({ name:'itineraries' })}>
+            <span className="mi"><Bookmark size={18}/></span>
+            Saved Itineraries
+            <span className="chev"><ChevronRight size={18}/></span>
+          </button>
+          <button className="menu-row" data-testid="menu-interests" onClick={() => push({ name:'prefs-edit' })}>
+            <span className="mi"><SlidersHorizontal size={18}/></span>
+            Travel Preferences
+            <span className="chev"><ChevronRight size={18}/></span>
+          </button>
+          <button className="menu-row" data-testid="menu-reviews" onClick={() => push({ name:'myReviews' })}>
+            <span className="mi"><MessageSquare size={18}/></span>
+            My Reviews
+            <span className="chev"><ChevronRight size={18}/></span>
+          </button>
+        </div>
+
+        <button
+          data-testid="logout-btn"
+          onClick={async () => { await signOut(); setTab('home'); }}
+          style={{ width:'100%', marginTop:22, background:'#FEF2F2', border:'1px solid #FEE2E2', color:'#DC2626', fontWeight:600, fontSize:14, borderRadius:14, padding:'14px 16px', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}
+        >
+          <LogOut size={17}/>
+          Log Out
+        </button>
+      </div>
     </main>
   );
 }

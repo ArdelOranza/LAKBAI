@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import { Send, Sparkles } from 'lucide-react';
 import { chat } from '../api.js';
 import Logo from '../logo.jsx';
 
-const WELCOME = { role:'ai', text:"Hi! I'm LakbAI 🌊 : Explore Pangasinan with a smile. Ask for beaches, food, festivals—or let me plan your whole around trip! I can spotlight secret spots and unique adventures whenever you're ready." };
+const WELCOME = { id:'welcome', role:'ai', text:"Hi! I'm LakbAI. Explore Pangasinan with a smile — ask for beaches, food, festivals, or let me plan your whole trip. I can spotlight secret spots and unique adventures whenever you're ready." };
 let uid = 0;
-const nid = () => ++uid;
+const nid = () => 'm' + (++uid);
 
 export default function ChatTab({ user, showToast }){
   const [msgs, setMsgs] = useState([WELCOME]);
@@ -39,12 +40,14 @@ export default function ChatTab({ user, showToast }){
         <Logo size={36}/>
         <div>
           <b style={{ fontSize:15 }}>LakbAI Travel Assistant</b>
-          <p style={{ fontSize:11, color:'var(--muted-ink)', margin:0 }}>{user ? 'Plan smarter, travel better' : 'Sign in to save itineraries'}</p>
+          <p style={{ fontSize:11, color:'var(--muted-ink)', margin:0, display:'flex', alignItems:'center', gap:4 }}>
+            <Sparkles size={11} color="var(--primary)"/> {user ? 'Plan smarter, travel better' : 'Sign in to save itineraries'}
+          </p>
         </div>
       </div>
       <div ref={listRef} data-testid="chat-log" style={{ flex:1, overflowY:'auto', padding:'14px 16px', display:'flex', flexDirection:'column', gap:12 }}>
         {msgs.map(m => m.loading ? (
-          <div key={m.id} style={{ alignSelf:'flex-start', background:'#fff', borderRadius:'16px 16px 16px 4px', border:'1px solid var(--border)', padding:'10px 14px', fontSize:13 }}>
+          <div key={m.id} style={{ alignSelf:'flex-start', background:'#fff', borderRadius:'16px 16px 16px 4px', border:'1px solid #EDF1F7', padding:'10px 14px', fontSize:13 }}>
             <span className="shimmer">Searching places…</span>
           </div>
         ) : (
@@ -56,14 +59,16 @@ export default function ChatTab({ user, showToast }){
             lineHeight:1.45,
             ...(m.role === 'user'
               ? { background:'var(--primary)', color:'#fff', borderRadius:'16px 16px 4px 16px', padding:'10px 14px' }
-              : { background:'#fff', border:'1px solid var(--border)', borderRadius:'16px 16px 16px 4px', padding:'12px 14px' }),
+              : { background:'#fff', border:'1px solid #EDF1F7', borderRadius:'16px 16px 16px 4px', padding:'12px 14px' }),
           }}>{m.text}</div>
         ))}
       </div>
-      <div className="pane" style={{ position:'sticky', bottom:12, paddingBottom:12 }}>
-        <div style={{ display:'flex', gap:8, background:'#fff', border:'1px solid var(--border)', borderRadius:999, padding:'8px 8px 8px 16px', alignItems:'center', boxShadow:'var(--shadow)' }}>
-          <input data-testid="chat-input" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') send(); }} placeholder="Where would you like to explore today?" style={{ border:'none', padding:2, background:'none' }}/>
-          <button data-testid="chat-send" onClick={send} disabled={busy} style={{ width:40, height:40, borderRadius:'50%', background:'var(--primary)', color:'#fff', border:'none', flex:'0 0 40px', padding:0 }} aria-label="Send">➤</button>
+      <div className="pane" style={{ paddingBottom:96 }}>
+        <div style={{ display:'flex', gap:8, background:'#fff', border:'1px solid #EDF1F7', borderRadius:999, padding:'6px 6px 6px 16px', alignItems:'center', boxShadow:'0 8px 22px -16px rgba(15,23,42,.4)' }}>
+          <input data-testid="chat-input" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') send(); }} placeholder="Where would you like to explore today?" style={{ border:'none', padding:'8px 0', background:'none' }}/>
+          <button data-testid="chat-send" onClick={send} disabled={busy} aria-label="Send" style={{ width:38, height:38, flex:'0 0 38px', borderRadius:'50%', background:'var(--primary)', color:'#fff', border:'none', padding:0, display:'grid', placeItems:'center' }}>
+            <Send size={16}/>
+          </button>
         </div>
       </div>
     </main>

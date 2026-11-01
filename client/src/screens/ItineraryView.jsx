@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
+import { ArrowLeft, Check, CalendarDays, Pencil, MapPin, CloudSun, Sparkles, Car, Ticket } from 'lucide-react';
 import { useAuth } from '../AuthContext.jsx';
 import { savePlan } from '../store.js';
 import { sessionSet } from '../sessionCache.js';
 import { driveMinutes, haversineKm } from '../geo.js';
-import { Chip, PrimaryBtn } from '../ui.jsx';
+import { Chip, PrimaryBtn, PhotoPlaceholder } from '../ui.jsx';
 
 const CITY = 'Bolinao, Pangasinan';
 
@@ -36,25 +37,36 @@ export default function ItineraryView({ plan, coords, pop, showToast }){
   }
   return (
     <main style={{ flex:1, overflowY:'auto' }}>
-      <div className="pane" style={{ display:'flex', justifyContent:'space-between', alignItems:'center', paddingTop:20 }}>
-        <button data-testid="back-btn" onClick={pop} aria-label="Back" style={{ width:38, height:38, borderRadius:'50%', border:'1px solid var(--border)' }}>←</button>
-        <Chip testid="save-plan" active={saved} onClick={saved ? undefined : saveItinerary}>{saved ? '✓ Saved' : 'Save Itinerary'}</Chip>
+      <div className="pane" style={{ display:'flex', justifyContent:'space-between', alignItems:'center', paddingTop:16 }}>
+        <button className="icon-btn" data-testid="back-btn" onClick={pop} aria-label="Back"><ArrowLeft size={18}/></button>
+        <Chip testid="save-plan" active={saved} onClick={saved ? undefined : saveItinerary}>
+          {saved ? <span style={{ display:'inline-flex', alignItems:'center', gap:5 }}><Check size={14}/> Saved</span> : 'Save Itinerary'}
+        </Chip>
       </div>
-      <div className="pane" style={{ marginTop:10 }}>
-        <span className="chip" style={{ fontSize:11 }}>📅 Day 1</span>
+
+      <div className="pane" style={{ marginTop:14 }}>
+        <span className="chip" style={{ fontSize:10.5, padding:'3px 10px', display:'inline-flex', alignItems:'center', gap:5 }}>
+          <CalendarDays size={12}/> Day 1
+        </span>
         {editing ? (
           <input data-testid="plan-title-input" value={title} autoFocus onChange={e => setTitle(e.target.value)} onBlur={() => setEditing(false)} onKeyDown={e => { if (e.key === 'Enter') setEditing(false); }} style={{ marginTop:8, maxWidth:320 }}/>
         ) : (
-          <h1 style={{ margin:'6px 0 0' }} data-testid="plan-title">{title} <button data-testid="edit-title" onClick={() => setEditing(true)} style={{ background:'none', border:'none', padding:4 }} aria-label="Edit title">✏️</button></h1>
+          <h1 style={{ margin:'8px 0 0', fontSize:25, letterSpacing:'-.7px', display:'flex', alignItems:'center', gap:6 }} data-testid="plan-title">
+            {title}
+            <button data-testid="edit-title" onClick={() => setEditing(true)} aria-label="Edit title" style={{ background:'none', border:'none', padding:4, color:'var(--muted-ink)', display:'grid', placeItems:'center' }}><Pencil size={15}/></button>
+          </h1>
         )}
-        <p style={{ color:'var(--muted-ink)', fontSize:13, marginTop:4 }}>📍 {CITY} • 1 Day × {stops.length} Stops</p>
+        <p style={{ color:'var(--muted-ink)', fontSize:12.5, marginTop:4, display:'flex', alignItems:'center', gap:5 }}>
+          <MapPin size={13}/> {CITY} · 1 Day × {stops.length} Stops
+        </p>
         {weather && (
-          <div style={{ background:'var(--chip)', borderRadius:16, padding:'10px 14px', marginTop:8, display:'flex', gap:10, alignItems:'center' }}>
-            <span style={{ fontSize:20 }}>⛅</span>
-            <span style={{ fontSize:13 }}><b>{weather.tempC}°C</b> · {weather.condition} — a good day for this route.</span>
+          <div className="soft-card" style={{ marginTop:10, borderRadius:14 }}>
+            <span style={{ width:34, height:34, minWidth:34, borderRadius:11, background:'#fff', color:'var(--primary)', display:'grid', placeItems:'center' }}><CloudSun size={18}/></span>
+            <span style={{ fontSize:12.5 }}><b>{weather.tempC}°C</b> · {weather.condition} — a good day for this route.</span>
           </div>
         )}
       </div>
+
       <div className="pane" style={{ display:'grid', gap:12, marginTop:16 }}>
         {stops.map((s, i) => {
           const prev = stops[i - 1];
@@ -63,30 +75,35 @@ export default function ItineraryView({ plan, coords, pop, showToast }){
           const km = prevFav && prevFav.lng != null && mineFav && mineFav.lng != null ? haversineKm(prevFav.lng, prevFav.lat, mineFav.lng, mineFav.lat) : null;
           const drive = km != null ? driveMinutes(km) : null;
           return (
-            <article key={s.placeId || s.name || i} data-testid="itin-row" style={{ border:'1px solid var(--border)', borderRadius:18, background:'#fff', overflow:'hidden' }}>
-              <div style={{ position:'relative', height:120, background:'linear-gradient(135deg,#2280E8,#0A3D8F)' }}>
-                {mineFav && mineFav.photo && <img src={mineFav.photo} alt="" onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>}
-                <span style={{ position:'absolute', left:10, top:10, background:'rgba(255,255,255,.92)', borderRadius:12, padding:'3px 10px', fontWeight:800 }}>{String(i + 1).padStart(2, '0')}</span>
+            <article key={s.placeId || s.name || i} data-testid="itin-row" style={{ border:'1px solid #EDF1F7', borderRadius:18, background:'#fff', overflow:'hidden' }}>
+              <div style={{ position:'relative', height:120 }}>
+                {mineFav && mineFav.photo
+                  ? <img src={mineFav.photo} alt="" onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+                  : <PhotoPlaceholder size={26}/>}
+                <span style={{ position:'absolute', left:10, top:10, background:'rgba(255,255,255,.94)', borderRadius:10, padding:'3px 10px', fontWeight:800, fontSize:12, color:'var(--ink)' }}>{String(i + 1).padStart(2, '0')}</span>
                 <div style={{ position:'absolute', left:10, bottom:10, display:'flex', gap:6 }}>
-                  {!(p.inputNames || []).includes(s.name) && <span className="chip" style={{ fontSize:10, padding:'2px 8px', background:'var(--primary)', color:'#fff', border:'none' }}>✦ AI Added</span>}
-                  {s.arrive && s.depart && <span className="chip" style={{ fontSize:10, padding:'2px 8px', background:'var(--primary)', color:'#fff', border:'none' }}>{s.arrive} – {s.depart}</span>}
+                  {!(p.inputNames || []).includes(s.name) && (
+                    <span className="chip" style={{ fontSize:10, padding:'3px 9px', background:'var(--primary)', color:'#fff', border:'none', display:'inline-flex', alignItems:'center', gap:4 }}><Sparkles size={11}/> AI Added</span>
+                  )}
+                  {s.arrive && s.depart && <span className="chip" style={{ fontSize:10, padding:'3px 9px', background:'rgba(15,23,42,.7)', color:'#fff', border:'none' }}>{s.arrive} – {s.depart}</span>}
                 </div>
               </div>
-              <div style={{ padding:'10px 12px' }}>
-                <b>{s.name}</b>
-                <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginTop:4 }}>
-                  {drive && <span className="chip" style={{ fontSize:11, padding:'3px 10px' }}>🚗 {drive} min drive</span>}
-                  {s.fees && <span className="chip" style={{ fontSize:11, padding:'3px 10px' }}>🎟 {s.fees}</span>}
+              <div style={{ padding:'10px 12px 12px' }}>
+                <b style={{ fontSize:14 }}>{s.name}</b>
+                <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginTop:5 }}>
+                  {drive && <span className="chip" style={{ fontSize:11, padding:'3px 10px', display:'inline-flex', alignItems:'center', gap:4 }}><Car size={12}/> {drive} min drive</span>}
+                  {s.fees && <span className="chip" style={{ fontSize:11, padding:'3px 10px', display:'inline-flex', alignItems:'center', gap:4 }}><Ticket size={12}/> {s.fees}</span>}
                 </div>
-                {(s.activities || []).length > 0 && <p style={{ fontSize:12, color:'var(--muted-ink)', margin:'6px 0 0' }}>{s.activities.join(' · ')}</p>}
+                {(s.activities || []).length > 0 && <p style={{ fontSize:12, color:'var(--muted-ink)', margin:'7px 0 0' }}>{s.activities.join(' · ')}</p>}
               </div>
             </article>
           );
         })}
         {!stops.length && <p style={{ color:'var(--muted-ink)' }}>No stops in this plan.</p>}
       </div>
+
       {!saved && (
-        <div className="pane" style={{ marginTop:16, paddingBottom:16 }} data-testid="save-footer">
+        <div className="pane" style={{ marginTop:16, paddingBottom:24 }} data-testid="save-footer">
           <PrimaryBtn onClick={saveItinerary}>Save Itinerary</PrimaryBtn>
         </div>
       )}

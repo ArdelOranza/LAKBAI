@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Siren, X, Cross, Shield, Phone } from 'lucide-react';
 import { useAuth } from './AuthContext.jsx';
 import { postReview, flushOutbox } from './store.js';
 import { recommend } from './api.js';
@@ -79,7 +80,7 @@ const FALLBACK_HOTLINES = [
   { name: 'Pangasinan PDRRMO', number: '(075) 542-6802' },
   { name: 'National Emergency', number: '911' }
 ];
-export function EmergencyPanel({ proximity }){
+export function EmergencyPanel({ proximity, onClose }){
   const [emer, setEmer] = useState(null);
   const [emerError, setEmerError] = useState('');
   const at = proximity || '120.23,16.03';
@@ -92,16 +93,37 @@ export function EmergencyPanel({ proximity }){
       .catch(e => setEmerError(e.message));
   }, [at]);
   const hotlines = (emer && emer.hotlines && emer.hotlines.length) ? emer.hotlines : FALLBACK_HOTLINES;
+  const group = (title, Icon, rows) => (
+    <div style={{ marginTop:12 }}>
+      <div className="label" style={{ margin:'0 0 6px', display:'flex', alignItems:'center', gap:5 }}><Icon size={12}/> {title}</div>
+      {rows.length ? (
+        <div style={{ display:'grid', gap:6 }}>
+          {rows.map(r => (
+            <div key={r.id || r.name} style={{ background:'#F7F9FC', border:'1px solid #EDF1F7', borderRadius:12, padding:'9px 12px' }}>
+              <b style={{ fontSize:12.5, display:'block' }}>{r.name}</b>
+              <span style={{ fontSize:11, color:'var(--muted-ink)' }}>{r.address || r.number || r.n}</span>
+            </div>
+          ))}
+        </div>
+      ) : <p style={{ fontSize:11.5, color:'var(--muted-ink)', margin:0 }}>None listed nearby.</p>}
+    </div>
+  );
   return (
-    <section data-testid="emergency-panel">
-      <h2>Emergency</h2>
-      {emerError && <p data-testid="notice">{emerError} — showing hotlines.</p>}
-      <h3>Hospitals</h3>
-      <ul>{((emer && emer.hospitals) || []).map(h => <li key={h.id}>{h.name} — {h.address}</li>)}</ul>
-      <h3>Police</h3>
-      <ul>{((emer && emer.police) || []).map(p => <li key={p.id}>{p.name} — {p.address}</li>)}</ul>
-      <h3>Hotlines</h3>
-      <ul>{hotlines.map(h => <li key={h.name}>{h.name}: {h.number}</li>)}</ul>
-    </section>
+    <aside
+      data-testid="emergency-panel"
+      role="dialog"
+      aria-label="Emergency"
+      style={{ position:'fixed', left:'50%', transform:'translateX(-50%)', width:'min(406px, calc(100vw - 24px))', bottom:'calc(96px + var(--safe-bottom))', zIndex:30, background:'#fff', border:'1px solid #FEE2E2', borderRadius:20, padding:16, boxShadow:'0 24px 48px -24px rgba(15,23,42,.45)', maxHeight:'62vh', overflowY:'auto' }}
+    >
+      <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+        <span style={{ width:32, height:32, borderRadius:'50%', background:'#FEF2F2', color:'#DC2626', display:'grid', placeItems:'center' }}><Siren size={16}/></span>
+        <b style={{ flex:1, fontSize:15, color:'#DC2626' }}>Emergency</b>
+        {onClose && <button className="icon-btn" onClick={onClose} aria-label="Close"><X size={15}/></button>}
+      </div>
+      {emerError && <p data-testid="notice" style={{ fontSize:11.5, color:'var(--muted-ink)', margin:'8px 0 0' }}>Live lookup unavailable — showing saved hotlines.</p>}
+      {group('Hospitals', Cross, (emer && emer.hospitals) || [])}
+      {group('Police', Shield, (emer && emer.police) || [])}
+      {group('Hotlines', Phone, hotlines)}
+    </aside>
   );
 }

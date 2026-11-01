@@ -1,4 +1,8 @@
 import { useEffect, useState } from 'react';
+import {
+  MapPin, Search, Mic, Umbrella, UtensilsCrossed, Soup, CalendarDays,
+  Sparkles, ArrowRight, Plus, Star,
+} from 'lucide-react';
 import { recommend } from '../api.js';
 import { FALLBACK_CENTER } from '../App.jsx';
 import { readLocalPrefs } from '../prefs.js';
@@ -8,9 +12,14 @@ import { saveFavorite } from '../store.js';
 import { useAuth } from '../AuthContext.jsx';
 import { EmergencyPanel } from '../Panels.jsx';
 import { dateRange } from '../festival.js';
-import Logo from '../logo.jsx';
+import { PhotoPlaceholder } from '../ui.jsx';
 
-const QUICK = [['Beaches','🏖','beaches worth visiting'],['Restaurants','🍽','good restaurants'],['Local Food','🥘','local Pangasinan food to try'],['Events','📅','events and festivals this month']];
+const QUICK = [
+  ['Beaches', Umbrella, 'beaches worth visiting'],
+  ['Restaurants', UtensilsCrossed, 'good restaurants'],
+  ['Local Food', Soup, 'local Pangasinan food to try'],
+  ['Events', CalendarDays, 'events and festivals this month'],
+];
 
 export default function Home({ coords, push, showToast, setTab }){
   const { user } = useAuth();
@@ -75,74 +84,94 @@ export default function Home({ coords, push, showToast, setTab }){
     showToast(res.error ? 'Sign in to save' : 'Added to Saved', res.error ? 'error' : 'ok');
   }
   return (
-    <div style={{ paddingBottom:12 }}>
+    <main className="screen" style={{ flex:1, overflowY:'auto' }}>
       <header className="pane" style={{ paddingTop:20 }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-          <h1 style={{ margin:0 }}>Explore Pangasinan</h1>
+          <h1 style={{ margin:0, fontSize:24 }}>Explore Pangasinan</h1>
           <button className="chip" style={{ borderColor:'#FED7AA', color:'var(--accent)', fontWeight:600 }} data-testid="emergency-pill" onClick={() => setShowEmerg(s => !s)}>Emergency</button>
         </div>
-        <p style={{ color:'var(--muted-ink)', fontSize:14 }}>📍 {place}</p>
-        <div style={{ display:'flex', gap:8, background:'#fff', border:'1px solid var(--border)', borderRadius:999, padding:'8px 8px 8px 16px', alignItems:'center' }}>
-          <span>🔍</span>
-          <input data-testid="home-search" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') search(query); }} placeholder="Search places, food, events…" style={{ border:'none', padding:4, background:'none' }}/>
-          <button className="chip" data-testid="mic-btn" onClick={mic} style={{ opacity: listening ? .5 : 1, padding:'8px 10px' }}>🎙</button>
+        <p style={{ color:'var(--muted-ink)', fontSize:13.5, display:'flex', alignItems:'center', gap:5, marginTop:2 }}>
+          <MapPin size={14}/> {place}
+        </p>
+        <div style={{ display:'flex', gap:8, background:'#fff', border:'1px solid #EDF1F7', borderRadius:999, padding:'6px 6px 6px 16px', alignItems:'center', boxShadow:'0 1px 2px rgba(15,23,42,.04)' }}>
+          <Search size={17} color="#94A3B8"/>
+          <input data-testid="home-search" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') search(query); }} placeholder="Search places, food, events…" style={{ border:'none', padding:'8px 0', background:'none' }}/>
+          <button data-testid="mic-btn" onClick={mic} aria-label="Voice search" style={{ width:36, height:36, flex:'0 0 36px', borderRadius:'50%', background:'#EFF6FF', border:'none', color:'var(--primary)', display:'grid', placeItems:'center', padding:0, opacity: listening ? .5 : 1 }}>
+            <Mic size={16}/>
+          </button>
         </div>
       </header>
-      <div className="pane" style={{ display:'flex', justifyContent:'space-between', margin:'14px 0' }}>
-        {QUICK.map(([label, icon, q]) => (
-          <button key={label} data-testid={'quick-' + label.split(' ')[0].toLowerCase()} onClick={() => search(q)} style={{ background:'none', border:'none', display:'grid', justifyItems:'center', fontSize:11, padding:0 }}>
-            <span style={{ width:52, height:52, borderRadius:18, background:'var(--chip)', display:'grid', placeItems:'center', fontSize:22, color:'var(--primary)' }}>{icon}</span>
-            <span style={{ marginTop:6 }}>{label}</span>
+
+      <div className="pane" style={{ display:'flex', justifyContent:'space-between', margin:'16px 0 4px' }}>
+        {QUICK.map(([label, Icon, q]) => (
+          <button key={label} data-testid={'quick-' + label.split(' ')[0].toLowerCase()} onClick={() => search(q)} style={{ background:'none', border:'none', display:'grid', justifyItems:'center', fontSize:11, padding:0, fontWeight:600 }}>
+            <span style={{ width:52, height:52, borderRadius:18, background:'#EFF6FF', display:'grid', placeItems:'center', color:'var(--primary)' }}><Icon size={21}/></span>
+            <span style={{ marginTop:6, color:'var(--ink)' }}>{label}</span>
           </button>
         ))}
       </div>
+
       <div className="pane">
         {busy && !recs.length && <p className="shimmer" style={{ fontSize:14 }}>Finding hidden gems for you…</p>}
+
         {event && (
-          <article data-testid="event-banner" style={{ position:'relative', borderRadius:22, overflow:'hidden', boxShadow:'var(--shadow)', cursor:'pointer' }} onClick={() => push({ name:'detail', place:event })}>
+          <article data-testid="event-banner" style={{ position:'relative', borderRadius:20, overflow:'hidden', boxShadow:'0 10px 26px -18px rgba(15,23,42,.5)', cursor:'pointer', marginTop:12 }} onClick={() => push({ name:'detail', place:event })}>
             {event.photo
-              ? <img src={event.photo} alt="" style={{ width:'100%', height:200, objectFit:'cover' }}/>
-              : <div aria-hidden="true" style={{ width:'100%', height:200, background:'linear-gradient(135deg,#2280E8,#0A3D8F)' }}/>}
-            <div style={{ position:'absolute', inset:'auto 0 0 0', background:'linear-gradient(transparent, rgba(10,37,64,.85))', color:'#fff', padding:16 }}>
-              <span style={{ fontSize:11, letterSpacing:1, opacity:.85 }}>{dateRange(event.festival)}</span>
-              <h3 style={{ margin:'2px 0' }}>{event.name}</h3>
-              <p style={{ fontSize:12, opacity:.9 }}>📍 {event.hint || event.address}</p>
+              ? <img src={event.photo} alt="" style={{ width:'100%', height:190, objectFit:'cover' }}/>
+              : <div style={{ height:190 }}><PhotoPlaceholder size={30}/></div>}
+            <div style={{ position:'absolute', inset:'auto 0 0 0', background:'linear-gradient(transparent, rgba(10,37,64,.88))', color:'#fff', padding:16 }}>
+              <span style={{ fontSize:11, letterSpacing:1, opacity:.85, display:'inline-flex', alignItems:'center', gap:5 }}><CalendarDays size={12}/> {dateRange(event.festival)}</span>
+              <h3 style={{ margin:'3px 0', fontSize:18 }}>{event.name}</h3>
+              <p style={{ fontSize:12, opacity:.9, display:'flex', alignItems:'center', gap:4, margin:0 }}><MapPin size={12}/> {event.hint || event.address}</p>
             </div>
-            <span style={{ position:'absolute', right:14, top:'50%', width:34, height:34, borderRadius:'50%', background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center' }}>→</span>
+            <span style={{ position:'absolute', right:14, top:'50%', width:34, height:34, borderRadius:'50%', background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center' }}><ArrowRight size={17}/></span>
           </article>
         )}
-        <div data-testid="plan-cta" onClick={() => setTab('chat')} style={{ background:'var(--chip)', borderRadius:18, padding:14, margin:'16px 0', display:'flex', alignItems:'center', gap:12, cursor:'pointer' }}>
-          <span style={{ width:40, height:40, borderRadius:14, background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center' }}>✦</span>
+
+        <div data-testid="plan-cta" onClick={() => setTab('chat')} className="soft-card" style={{ margin:'16px 0', cursor:'pointer', borderRadius:18, padding:14 }}>
+          <span style={{ width:40, height:40, minWidth:40, borderRadius:14, background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center' }}><Sparkles size={19}/></span>
           <span style={{ flex:1 }}>
-            <b>Need a personalized plan?</b>
-            <p style={{ margin:0, fontSize:13, color:'var(--muted-ink)' }}>Let LakbAI orchestrate your day in {place.split(',')[0]}</p>
+            <b style={{ fontSize:14 }}>Need a personalized plan?</b>
+            <p style={{ margin:0, fontSize:12.5, color:'var(--muted-ink)' }}>Let LakbAI orchestrate your day in {place.split(',')[0]}</p>
           </span>
-          <span style={{ width:34, height:34, borderRadius:'50%', background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center' }}>→</span>
+          <span style={{ width:32, height:32, minWidth:32, borderRadius:'50%', background:'#fff', color:'var(--primary)', display:'grid', placeItems:'center' }}><ArrowRight size={16}/></span>
         </div>
+
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline' }}>
-          <h2>Recommended for You</h2>
-          <a href="#" onClick={e => { e.preventDefault(); search('best places to visit'); }} style={{ fontSize:13 }}>See All →</a>
+          <h2 style={{ fontSize:18 }}>Recommended for You</h2>
+          <button onClick={() => search('best places to visit')} style={{ background:'none', border:'none', padding:0, fontSize:12.5, color:'var(--primary)', fontWeight:600, display:'inline-flex', alignItems:'center', gap:3 }}>See All <ArrowRight size={13}/></button>
         </div>
-        <div data-testid="recs" style={{ display:'flex', gap:12, overflowX:'auto', paddingBottom:8 }}>
+
+        <div data-testid="recs" style={{ display:'flex', gap:12, overflowX:'auto', paddingBottom:8, scrollbarWidth:'none' }}>
           {recs.map(p => (
-            <article key={p.id} style={{ flex:'0 0 220px', borderRadius:18, background:'#fff', border:'1px solid var(--border)', overflow:'hidden', cursor:'pointer' }} onClick={() => push({ name:'detail', place:p })}>
-              <div style={{ position:'relative', height:130, background:'linear-gradient(135deg,#2280E8,#0A3D8F)' }}>
-                {p.photo && <img src={p.photo} alt="" loading="lazy" onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>}
-                <span className="chip" style={{ position:'absolute', left:8, top:8, fontSize:11 }}>{(p.categories && p.categories[0]) || 'Pangasinan'}</span>
-                <button className="chip" data-testid={'fav-' + p.id} onClick={e => { e.stopPropagation(); fav(p); }} style={{ position:'absolute', right:8, top:8, width:30, height:30, padding:0, borderRadius:'50%', background:'var(--primary)', color:'#fff', border:'none' }}>+</button>
-                {haversineKm(coords.lng, coords.lat, p.lng, p.lat) != null && <span style={{ position:'absolute', left:8, bottom:8, fontSize:11, color:'#fff' }}>📍 {formatDistance(haversineKm(coords.lng, coords.lat, p.lng, p.lat))}</span>}
+            <article key={p.id} style={{ flex:'0 0 220px', borderRadius:18, background:'#fff', border:'1px solid #EDF1F7', overflow:'hidden', cursor:'pointer' }} onClick={() => push({ name:'detail', place:p })}>
+              <div style={{ position:'relative', height:130 }}>
+                {p.photo
+                  ? <img src={p.photo} alt="" loading="lazy" onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+                  : <PhotoPlaceholder size={26}/>}
+                <span className="chip" style={{ position:'absolute', left:8, top:8, fontSize:10.5, padding:'3px 9px' }}>{(p.categories && p.categories[0]) || 'Pangasinan'}</span>
+                <button className="chip" data-testid={'fav-' + p.id} aria-label={'Save ' + p.name} onClick={e => { e.stopPropagation(); fav(p); }} style={{ position:'absolute', right:8, top:8, width:30, height:30, padding:0, borderRadius:'50%', background:'var(--primary)', color:'#fff', border:'none', display:'grid', placeItems:'center' }}><Plus size={15}/></button>
+                {haversineKm(coords.lng, coords.lat, p.lng, p.lat) != null && (
+                  <span style={{ position:'absolute', left:8, bottom:8, fontSize:10.5, color:'#fff', background:'rgba(15,23,42,.55)', borderRadius:999, padding:'2px 8px', display:'inline-flex', alignItems:'center', gap:3 }}>
+                    <MapPin size={11}/> {formatDistance(haversineKm(coords.lng, coords.lat, p.lng, p.lat))}
+                  </span>
+                )}
               </div>
-              <div style={{ padding:10 }}>
-                <b>{p.name}</b>
-                <p style={{ fontSize:12, color:'var(--muted-ink)', margin:'2px 0 0' }}>{p.reason}</p>
-                {p.rating && <p style={{ fontSize:12 }}>★ {p.rating}{p.reviews ? ` (${p.reviews})` : ''}</p>}
+              <div style={{ padding:'10px 12px 12px' }}>
+                <b style={{ fontSize:14 }}>{p.name}</b>
+                <p style={{ fontSize:11.5, color:'var(--muted-ink)', margin:'2px 0 0', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{p.reason}</p>
+                {p.rating && (
+                  <p style={{ fontSize:11.5, margin:'5px 0 0', display:'inline-flex', alignItems:'center', gap:3, color:'var(--ink)' }}>
+                    <Star size={12} fill="var(--primary)" color="var(--primary)"/> {p.rating}{p.reviews ? ` (${p.reviews})` : ''}
+                  </p>
+                )}
               </div>
             </article>
           ))}
           {!recs.length && !busy && <p style={{ color:'var(--muted-ink)', fontSize:14 }}>Recommendations will appear here once you search or ask LakbAI.</p>}
         </div>
       </div>
-      {showEmerg && <EmergencyPanel proximity={`${coords.lng},${coords.lat}`} />}
-    </div>
+      {showEmerg && <EmergencyPanel proximity={`${coords.lng},${coords.lat}`} onClose={() => setShowEmerg(false)}/>}
+    </main>
   );
 }

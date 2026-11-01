@@ -1,18 +1,29 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Search, Umbrella, UtensilsCrossed, Landmark, MapPin } from 'lucide-react';
 import { recommend } from '../api.js';
 import { readLocalPrefs } from '../prefs.js';
 import { sessionGet, sessionSet } from '../sessionCache.js';
 import { matches } from '../filters.js';
 import { fetchSpots } from '../spots.js';
-import { Map, MapControls, MapMarker } from '@/components/ui/map';
+import { Map, MapMarker, MarkerContent } from '@/components/ui/map';
 import { Chip } from '../ui.jsx';
 import SpotPopup from './SpotPopup.jsx';
 
 const RADII = [[1,'1 km'],[5,'Within 5 km'],[10,'10 km']];
-const FILTERS = ['All','Beaches','Food','Events'];
-const EMOJI = { Beaches:'🏖', Food:'🍽', Events:'📅' };
+const FILTERS = [
+  ['All', MapPin],
+  ['Beaches', Umbrella],
+  ['Food', UtensilsCrossed],
+  ['Events', Landmark],
+];
 
-export default function MapTab({ coords, push, showToast, setTab, user, pop }){
+function iconFor(spot){
+  if (spot.categories.includes('Food')) return UtensilsCrossed;
+  if (spot.categories.includes('Beach')) return Umbrella;
+  return Landmark;
+}
+
+export default function MapTab({ coords, push, showToast, user, setTab }){
   const [radius, setRadius] = useState(5);
   const [filter, setFilter] = useState('All');
   const [places, setPlaces] = useState(sessionGet('lakbai.rec.nearby:5') || []);
@@ -47,40 +58,57 @@ export default function MapTab({ coords, push, showToast, setTab, user, pop }){
   }, [spots, filter]);
 
   return (
-    <div style={{ position:'relative', flex:1, display:'flex', flexDirection:'column' }}>
+    <div style={{ position:'relative', flex:1, minHeight:0, display:'flex', flexDirection:'column' }}>
       <Map
         center={[coords.lng, coords.lat]}
         zoom={radius === 1 ? 13 : radius === 5 ? 11.5 : 10.5}
+        theme="light"
         className="absolute inset-0"
       >
-        <MapControls showLocate />
         <MapMarker longitude={coords.lng} latitude={coords.lat}>
-          <div className="userdot" title="You are here"/>
+          <MarkerContent><div className="userdot" title="You are here"/></MarkerContent>
         </MapMarker>
         {filtered.map(p => (
           <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} onClick={() => push({ name:'detail', place:p })}>
-            <div className="pin" title={p.name}/>
+            <MarkerContent>
+              <div className="spot-pin" title={p.name}><MapPin size={16}/></div>
+            </MarkerContent>
           </MapMarker>
         ))}
-        {filteredSpots.map(s => (
-          <MapMarker key={'spot-' + s.id} longitude={s.lng} latitude={s.lat} onClick={() => setSelectedSpot(s)}>
-            <button className={'spot-pin' + (selectedSpot && selectedSpot.id === s.id ? ' active' : '')} title={s.name} aria-label={s.name}>
-              <span aria-hidden="true">{s.categories.includes('Food') ? '🍽' : s.categories.includes('Beach') ? '🏖' : '📍'}</span>
-            </button>
-          </MapMarker>
-        ))}
+        {filteredSpots.map(s => {
+          const Icon = iconFor(s);
+          const active = selectedSpot && selectedSpot.id === s.id;
+          return (
+            <MapMarker key={'spot-' + s.id} longitude={s.lng} latitude={s.lat} onClick={() => setSelectedSpot(s)}>
+              <MarkerContent>
+                <button className={'spot-pin' + (active ? ' active' : '')} title={s.name} aria-label={s.name}>
+                  <Icon size={16}/>
+                </button>
+              </MarkerContent>
+            </MapMarker>
+          );
+        })}
       </Map>
-      <div style={{ position:'absolute', top:12, left:12, right:12, zIndex:5, background:'rgba(255,255,255,.95)', borderRadius:999, padding:'10px 16px', boxShadow:'var(--shadow)', cursor:'pointer' }} onClick={() => push({ name:'search', query:'' })}>
-        🔍 <span style={{ color:'var(--muted-ink)', fontSize:14 }}>Search places, food, events…</span>
+
+      <div style={{ position:'absolute', top:12, left:12, right:12, zIndex:5, background:'rgba(255,255,255,.97)', borderRadius:999, padding:'11px 16px', boxShadow:'0 10px 24px -14px rgba(15,23,42,.3)', display:'flex', alignItems:'center', gap:8, cursor:'pointer' }} onClick={() => push({ name:'search', query:'' })}>
+        <Search size={17} color="var(--muted-ink)"/>
+        <span style={{ color:'var(--muted-ink)', fontSize:14 }}>Search places, food, events…</span>
       </div>
-      <div style={{ position:'absolute', top:60, left:12, right:12, zIndex:5, display:'flex', gap:8, overflowX:'auto', paddingBottom:4 }}>
+
+      <div style={{ position:'absolute', top:62, left:12, right:12, zIndex:5, display:'flex', gap:8, overflowX:'auto', paddingBottom:4, scrollbarWidth:'none' }}>
         {RADII.map(([km, label]) => <Chip key={km} active={radius === km} onClick={() => setRadius(km)} testid={'radius-' + km}>{label}</Chip>)}
-        {FILTERS.map(f => <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>{EMOJI[f] ? EMOJI[f] + ' ' + f : f}</Chip>)}
+        {FILTERS.map(([f, Icon]) => (
+          <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>
+            <span style={{ display:'inline-flex', alignItems:'center', gap:6 }}><Icon size={14}/>{f}</span>
+          </Chip>
+        ))}
       </div>
-      {busy && <div style={{ position:'absolute', top:104, left:12, zIndex:5 }}><span className="shimmer chip">Loading nearby…</span></div>}
-      {!busy && !filtered.length && !filteredSpots.length && <div style={{ position:'absolute', top:104, left:12, right:12, zIndex:5 }}><span className="chip" style={{ background:'#fff' }}>No stops here yet — widen the radius.</span></div>}
-      {!busy && !filtered.length && filteredSpots.length && <div style={{ position:'absolute', top:104, left:12, zIndex:5 }}><span className="chip" style={{ background:'#fff' }}>{filteredSpots.length} curated{filter === 'All' ? '' : ' ' + filter.toLowerCase()} pins</span></div>}
-      {selectedSpot && <SpotPopup spot={selectedSpot} coords={coords} pop={() => setSelectedSpot(null)} showToast={showToast} user={user} />}
+
+      {busy && <div style={{ position:'absolute', top:110, left:12, zIndex:5 }}><span className="shimmer chip" style={{ background:'#fff' }}>Loading nearby…</span></div>}
+      {!busy && !filtered.length && !filteredSpots.length && <div style={{ position:'absolute', top:110, left:12, right:12, zIndex:5 }}><span className="chip" style={{ background:'#fff' }}>No stops here yet — widen the radius.</span></div>}
+      {!busy && !filtered.length && filteredSpots.length > 0 && <div style={{ position:'absolute', top:110, left:12, zIndex:5 }}><span className="chip" style={{ background:'#fff' }}>{filteredSpots.length} curated{filter === 'All' ? '' : ' ' + filter.toLowerCase()} spots</span></div>}
+
+      {selectedSpot && <SpotPopup spot={selectedSpot} coords={coords} pop={() => setSelectedSpot(null)} push={push} setTab={setTab} showToast={showToast} user={user} />}
     </div>
   );
 }
