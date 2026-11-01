@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { FESTIVALS, nextOccurrence, upcomingFestivals, thisMonthFestivals } from './festivals.js';
+import { FESTIVALS, nextOccurrence, upcomingFestivals, thisMonthFestivals, monthOrNextFestivals } from './festivals.js';
 
 const make = (month, day, endMonth = month, endDay = day) => ({
   id: `f-${month}-${day}`, name: 'Fest', town: 'Bolinao',
@@ -61,6 +61,36 @@ describe('thisMonthFestivals', () => {
   });
 });
 
+describe('monthOrNextFestivals', () => {
+  it('returns the month list when the month has festivals', () => {
+    const list = [make(12, 1, 12, 9), make(1, 5)];
+    const out = monthOrNextFestivals(list, new Date(2026, 11, 5, 9));
+    expect(out.fallback).toBe(false);
+    expect(out.rows).toHaveLength(1);
+    expect(out.rows[0].month).toBe(12);
+  });
+
+  it('falls back to the single next festival when the month is empty', () => {
+    const list = [make(1, 5), make(12, 1)];
+    const out = monthOrNextFestivals(list, new Date(2026, 10, 1, 9));
+    expect(out.fallback).toBe(true);
+    expect(out.rows).toHaveLength(1);
+    expect(out.rows[0].month).toBe(12);
+  });
+
+  it('has nothing to fall back to when the list is empty', () => {
+    const out = monthOrNextFestivals([], new Date(2026, 10, 1, 9));
+    expect(out).toEqual({ fallback: false, rows: [] });
+  });
+
+  it('November in the real dataset falls back to Galicayo in December', () => {
+    const out = monthOrNextFestivals(FESTIVALS, new Date(2026, 10, 1, 9));
+    expect(out.fallback).toBe(true);
+    expect(out.rows).toHaveLength(1);
+    expect(out.rows[0].id).toBe('galicayo-festival');
+  });
+});
+
 describe('FESTIVALS dataset', () => {
   it('lists the 30 curated festivals with unique ids', () => {
     expect(FESTIVALS).toHaveLength(30);
@@ -75,6 +105,17 @@ describe('FESTIVALS dataset', () => {
       expect(f.month).toBeLessThanOrEqual(12);
       const { starts, ends } = upcomingFestivals([f], new Date(2026, 0, 1))[0];
       expect(ends >= starts).toBe(true);
+    }
+  });
+
+  it('every bundled photo path points at a real file in public/', async () => {
+    const { existsSync } = await import('node:fs');
+    const { fileURLToPath } = await import('node:url');
+    const bundled = FESTIVALS.flatMap(f => f.photos || []).filter(u => u.startsWith('/'));
+    expect(bundled.length).toBeGreaterThan(0);
+    for (const u of bundled) {
+      const file = fileURLToPath(new URL('../public' + u, import.meta.url));
+      expect(existsSync(file), u).toBe(true);
     }
   });
 });

@@ -2,11 +2,12 @@ import { useMemo, useState } from 'react';
 import { ArrowLeft, Plus, MapPin, Radio } from 'lucide-react';
 import { useAuth } from '../AuthContext.jsx';
 import { saveFavorite } from '../store.js';
-import { upcomingFestivals, thisMonthFestivals, FESTIVALS } from '../festivals.js';
+import { upcomingFestivals, monthOrNextFestivals, FESTIVALS } from '../festivals.js';
 import { haversineKm, formatDistance } from '../geo.js';
 import { PhotoPlaceholder } from '../ui.jsx';
 
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const DAY = 24 * 60 * 60 * 1000;
 
 function happeningSoon(f, now){
@@ -19,7 +20,8 @@ export default function Events({ coords, push, pop, showToast }){
   const [scope, setScope] = useState('All');
 
   const all = useMemo(() => upcomingFestivals(FESTIVALS, now), [now]);
-  const rows = scope === 'This Month' ? thisMonthFestivals(FESTIVALS, now) : all;
+  const month = useMemo(() => monthOrNextFestivals(FESTIVALS, now), [now]);
+  const rows = scope === 'This Month' ? month.rows : all;
   const featured = rows[0] || null;
   const soon = featured ? happeningSoon(featured, now) : false;
   // Skip town seals and the generic provincial banner — they read as logos, not festival photos.
@@ -78,12 +80,18 @@ export default function Events({ coords, push, pop, showToast }){
             >{s}</button>
           ))}
         </div>
+
+        {scope === 'This Month' && month.fallback && featured && (
+          <p data-testid="events-month-note" style={{ margin:'8px 0 0', fontSize:11.5, lineHeight:1.5, color:'var(--muted-ink)' }}>
+            No festival in {MONTH_NAMES[now.getMonth()]} — showing the next one.
+          </p>
+        )}
       </div>
 
       <div data-testid="events-list" style={{ display:'grid', gap:10, padding:'12px 20px 24px' }}>
         {!rows.length && (
           <p data-testid="events-empty" style={{ fontSize:13.5, color:'var(--muted-ink)', margin:0 }}>
-            No festivals this month — switch to All to see what’s coming up.
+            No festivals to show right now.
           </p>
         )}
         {rows.map(f => {

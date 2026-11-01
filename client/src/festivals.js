@@ -396,7 +396,8 @@ export const FESTIVALS = [
       "Watch street dancing of the apparition and the nighttime Grand Lantern Parade.",
       'Savour tupig and patupat at the Festival of Pangasinan Cuisine.',
     ],
-    photos: ['https://www.pangasinan.gov.ph/wp-content/uploads/2023/06/manaoag-seal.png'],
+    photos: ['/festivals/galicayo-festival.jpg'],
+    photoCredit: 'AnakNgPangasinan, CC0, Wikimedia Commons',
     source: 'https://www.pangasinan.gov.ph/city-municipalities/manaoag/',
     lng: 120.502, lat: 16.03167,
   },
@@ -469,4 +470,15 @@ export function thisMonthFestivals(list = FESTIVALS, from = new Date()){
   const monthStart = new Date(from.getFullYear(), from.getMonth(), 1);
   const monthEnd = endOfDay(new Date(from.getFullYear(), from.getMonth() + 1, 0));
   return upcomingFestivals(list, from).filter(f => f.starts <= monthEnd && f.ends >= monthStart);
+}
+
+/**
+ * What the "This Month" scope should show: the month's editions, or — when the
+ * month has none — the single next festival, flagged so the UI can say so.
+ */
+export function monthOrNextFestivals(list = FESTIVALS, from = new Date()){
+  const month = thisMonthFestivals(list, from);
+  if (month.length) return { fallback: false, rows: month };
+  const next = upcomingFestivals(list, from).slice(0, 1);
+  return { fallback: next.length > 0, rows: next };
 }
