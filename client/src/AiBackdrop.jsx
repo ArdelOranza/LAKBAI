@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAiActivity } from './useAiActivity.js';
 
-// White → pale blue → primary → deep blue, so the motion reads as light moving
-// across a white page rather than a dark banner.
-const GRADIENT = ['#FFFFFF', '#EAF2FF', '#1667D9', '#0A3D8F'];
+// Mostly white with blue drifting through, so chat text keeps its contrast.
+const GRADIENT = ['#FFFFFF', '#F4F9FF', '#CFE4FF', '#1667D9'];
 const SHOW_DELAY = 150;   // skip the effect entirely for near-instant cached answers
 const MIN_VISIBLE = 700;  // when it does show, keep it up long enough to read
 const FADE_MS = 380;
@@ -99,7 +98,7 @@ export default function AiBackdrop(){
       }}
     >
       <canvas ref={canvasRef} style={{ display:'block', width:'100%', height:'100%' }}/>
-      <div style={{ position:'absolute', inset:0, background:'rgba(255,255,255,.45)' }}/>
+      <div style={{ position:'absolute', inset:0, background:'rgba(255,255,255,.5)' }}/>
     </div>
   );
 }
