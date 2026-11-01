@@ -128,6 +128,25 @@ li{margin:6px 0}
 .round-action:hover{background:#EFF2F7}
 .tag{font-size:10.5px;font-weight:600;color:var(--primary);background:#EFF6FF;border-radius:999px;padding:4px 10px}
 
+/* ── home header ───────────────────────────────────────────────────── */
+.home-head{display:flex;align-items:center;gap:11px;margin-bottom:13px}
+.pm-map{flex:0 0 64px;width:64px;height:60px;display:block}
+.pm-shape{fill:#DCE7F6;stroke:#fff;stroke-width:2.2;stroke-linejoin:round}
+.pm-shape.on{fill:var(--primary)}
+.pm-pin-halo{fill:#fff}
+.pm-pin-dot{fill:var(--primary)}
+.home-head-text{flex:1;min-width:0}
+.home-head-text h1{margin:0;font-size:20.5px;letter-spacing:-.7px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-place{margin:3px 0 0;font-size:12.5px;color:var(--muted-ink);display:flex;align-items:center;gap:4px;min-width:0}
+.home-place svg{flex:0 0 auto}
+.home-place span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.home-emg{flex:0 0 auto;border-color:#FFD6C2;color:var(--ink);font-weight:700;font-size:10.5px;line-height:1;padding:6px 9px;letter-spacing:.1px}
+@media (max-width:380px){
+  .pm-map{flex-basis:54px;width:54px;height:51px}
+  .home-head-text h1{font-size:18.5px}
+  .home-emg{font-size:9.5px;padding:5px 7px}
+}
+
 /* ── emergency ─────────────────────────────────────────────────────── */
 .emg-dial{display:flex;align-items:center;gap:13px;width:100%;min-height:64px;margin-top:18px;padding:11px 16px 11px 12px;border-radius:18px;background:#DC2626;color:#fff;text-decoration:none}
 .emg-dial:hover{background:#C11F1F;color:#fff}
