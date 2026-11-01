@@ -61,10 +61,24 @@ async function signIn(){
 async function seed(uid, userHeaders){
   const results = [];
   const tryIt = async (label, fn) => { try { await fn(); results.push('OK   ' + label); } catch (e) { results.push('SKIP ' + label + ' → ' + e.message.slice(0, 160)); } };
-  await tryIt('profile : preferences', () => rest('profiles', 'POST', { id: uid, display_name: 'Debug Tester', phone: '+63 999 000 0001', preferences: PREFS }, userHeaders, '?on_conflict=id'));
-  for (const f of FAVS) await tryIt('favorite: ' + f.name, () => rest('favorites', 'POST', { user_id: uid, ...f }, userHeaders, '?on_conflict=user_id,place_id'));
-  await tryIt('review  : Patar Beach', () => rest('reviews', 'POST', { user_id: uid, place_id: 'patar-beach-bolinao', place_name: 'Patar Beach', score: 5, text: 'Debug sample review — crisp water, best at dusk.' }, userHeaders));
-  await tryIt('plan    : Debug Sample Day Trip', () => rest('plans', 'POST', { user_id: uid, ...PLAN }, userHeaders));
+  // Re-running is safe: every row below is matched before it is inserted.
+  const exists = async (table, qs, headers) => ((await rest(table, 'GET', null, headers, qs + '&select=id&limit=1')) || []).length > 0;
+  await tryIt('profile : preferences', async () => {
+    if (await exists('profiles', `?id=eq.${uid}`, userHeaders)) return;
+    await rest('profiles', 'POST', { id: uid, display_name: 'Debug Tester', phone: '+63 999 000 0001', preferences: PREFS }, userHeaders);
+  });
+  for (const f of FAVS) await tryIt('favorite: ' + f.name, async () => {
+    if (await exists('favorites', `?user_id=eq.${uid}&place_id=eq.${f.place_id}`, userHeaders)) return;
+    await rest('favorites', 'POST', { user_id: uid, ...f }, userHeaders);
+  });
+  await tryIt('review  : Patar Beach', async () => {
+    if (await exists('reviews', `?user_id=eq.${uid}&place_id=eq.patar-beach-bolinao`, userHeaders)) return;
+    await rest('reviews', 'POST', { user_id: uid, place_id: 'patar-beach-bolinao', place_name: 'Patar Beach', score: 5, text: 'Debug sample review — crisp water, best at dusk.' }, userHeaders);
+  });
+  await tryIt('plan    : Debug Sample Day Trip', async () => {
+    if (await exists('plans', `?user_id=eq.${uid}&title=eq.${encodeURIComponent(PLAN.title)}`, userHeaders)) return;
+    await rest('plans', 'POST', { user_id: uid, ...PLAN }, userHeaders);
+  });
   results.forEach(l => console.log(l));
 }
 
