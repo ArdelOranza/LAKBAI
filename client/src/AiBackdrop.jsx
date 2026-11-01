@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAiActivity } from './useAiActivity.js';
 
-// Brand wash: primary blue → deep blue → Pangasinan sunset.
-const GRADIENT = ['#1667D9', '#0A3D8F', '#EA580C'];
+// White → pale blue → primary → deep blue, so the motion reads as light moving
+// across a white page rather than a dark banner.
+const GRADIENT = ['#FFFFFF', '#EAF2FF', '#1667D9', '#0A3D8F'];
 const SHOW_DELAY = 150;   // skip the effect entirely for near-instant cached answers
 const MIN_VISIBLE = 700;  // when it does show, keep it up long enough to read
 const FADE_MS = 380;
@@ -46,12 +47,12 @@ export default function AiBackdrop(){
           const { Kawarp } = await import('@kawarp/core');
           if (cancelled || !canvasRef.current) return;
           const k = new Kawarp(canvasRef.current, {
-            warpIntensity: 0.85,
+            warpIntensity: 0.9,
             blurPasses: 6,
-            animationSpeed: 1.0,
-            saturation: 1.4,
-            tintColor: [0.04, 0.15, 0.35],
-            tintIntensity: 0.18,
+            animationSpeed: 1.3,
+            saturation: 1.25,
+            tintColor: [0.06, 0.22, 0.45],
+            tintIntensity: 0.12,
             scale: 1.05,
           });
           k.loadGradient(GRADIENT, 135);
@@ -98,7 +99,7 @@ export default function AiBackdrop(){
       }}
     >
       <canvas ref={canvasRef} style={{ display:'block', width:'100%', height:'100%' }}/>
-      <div style={{ position:'absolute', inset:0, background:'rgba(255,255,255,.62)' }}/>
+      <div style={{ position:'absolute', inset:0, background:'rgba(255,255,255,.45)' }}/>
     </div>
   );
 }
