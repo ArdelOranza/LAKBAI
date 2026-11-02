@@ -22,7 +22,7 @@ async function aiFetch(url, init){
 }
 
 export async function recommend(message, proximity, prefs = []){
-  const r = await aiFetch(`${BASE}/api/recommend`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ message, proximity, prefs }) });
+  const r = await aiFetch(`${BASE}/api/recommend`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ message, proximity, preferences: prefs }) });
   if (!r.ok) throw new Error(await readError(r));
   return r.json();
 }

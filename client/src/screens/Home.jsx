@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   MapPin, Search, Mic, Umbrella, UtensilsCrossed, Soup, CalendarDays,
   Sparkles, ArrowRight, Plus, Star,
@@ -34,11 +34,17 @@ export default function Home({ coords, push, showToast, setTab }){
   // never empty when no recommendation happens to carry a festival string.
   const [upcoming] = useState(() => upcomingFestivals(FESTIVALS, new Date())[0] || null);
   const [listening, setListening] = useState(false);
+  // Last resolved label + the fix it belongs to. Keeping these out of state is
+  // what stops the location line blinking back to "Pangasinan" on every GPS tick.
+  const placeRef = useRef({ key: '', label: '' });
 
-  useEffect(() => { // reverse geocode the location line; silent failure keeps the fallback
-    let alive = true;
+  useEffect(() => { // reverse geocode once per ~100 m; never blank the label mid-lookup
     const fallback = coords === FALLBACK_CENTER ? 'Bolinao, Pangasinan' : 'Pangasinan';
-    setPlace(fallback);
+    const key = coords.lng.toFixed(3) + ',' + coords.lat.toFixed(3);
+    if (placeRef.current.key === key) return undefined;
+    placeRef.current.key = key;
+    if (!placeRef.current.label) setPlace(fallback); // first paint only
+    let alive = true;
     (async () => {
       try {
         const token = import.meta.env.VITE_MAPBOX_TOKEN;
@@ -47,26 +53,49 @@ export default function Home({ coords, push, showToast, setTab }){
         if (!r.ok) return;
         const data = await r.json();
         const name = data.features && data.features[0] && data.features[0].text;
-        if (alive && name) setPlace(name + ', Pangasinan');
-      } catch { /* keep fallback label */ }
+        if (!alive || !name) return;
+        const label = name + ', Pangasinan';
+        if (label === placeRef.current.label) return;
+        placeRef.current.label = label;
+        setPlace(label);
+      } catch { /* keep the last good label */ }
     })();
     return () => { alive = false; };
   }, [coords]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ~1 km bucket: a jittering GPS fix does not refetch, a real move does.
+  const locKey = coords === FALLBACK_CENTER ? 'fallback' : coords.lng.toFixed(2) + ',' + coords.lat.toFixed(2);
+
   useEffect(() => {
     const cached = sessionGet('lakbai.rec.home');
-    if (cached && cached.length) { setRecs(cached); setEvent(cached.find(p => p.festival && dateRange(p.festival)) || null); return; }
-    setBusy(true);
-    recommend('top attractions, events and hidden gems', `${coords.lng},${coords.lat}`, readLocalPrefs())
-      .then(out => {
-        const ps = out.places || [];
-        setRecs(ps);
-        sessionSet('lakbai.rec.home', ps);
-        setEvent(ps.find(p => p.festival && dateRange(p.festival)) || null);
-      })
-      .catch(e => showToast('Could not load recommendations', 'error', e.message))
-      .finally(() => setBusy(false));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    const at = sessionGet('lakbai.rec.homeAt');
+    const far = !at || haversineKm(at.lng, at.lat, coords.lng, coords.lat) > 8;
+    if (cached && cached.length && !far) {
+      setRecs(cached);
+      setEvent(cached.find(p => p.festival && dateRange(p.festival)) || null);
+      setBusy(false);
+      return undefined;
+    }
+    let alive = true;
+    // Give the first real GPS fix a moment, so the plan is built for where the
+    // user actually is instead of the province fallback centre.
+    const wait = coords === FALLBACK_CENTER ? 2500 : 0;
+    const timer = setTimeout(() => {
+      setBusy(true);
+      recommend('top attractions, events and hidden gems', `${coords.lng},${coords.lat}`, readLocalPrefs())
+        .then(out => {
+          if (!alive) return;
+          const ps = out.places || [];
+          setRecs(ps);
+          sessionSet('lakbai.rec.home', ps);
+          sessionSet('lakbai.rec.homeAt', { lng: coords.lng, lat: coords.lat });
+          setEvent(ps.find(p => p.festival && dateRange(p.festival)) || null);
+        })
+        .catch(e => { if (alive) showToast('Could not load recommendations', 'error', e.message); })
+        .finally(() => { if (alive) setBusy(false); });
+    }, wait);
+    return () => { alive = false; clearTimeout(timer); };
+  }, [locKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function search(text){
     const q = String(text || '').trim();
