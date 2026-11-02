@@ -2,8 +2,9 @@
 // Purpose: protect the Gemini/DeepSeek quota (Review Focus #2) — when the AI
 // provider 429s/503s, serve a slightly stale cached answer instead of burning
 // retries. Values are stored newest-at-end; prune keeps the map bounded.
+//change ai cache to 300
 const STORE = new Map(); // key -> { value, at, ttl }
-const MAX = 200;
+const MAX = 300;
 
 async function cached(key, ttl, loader){
   const hit = STORE.get(key);
