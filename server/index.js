@@ -33,8 +33,11 @@ app.post('/api/recommend', async (req, res) => {
     const message = req.body.message || '';
     const prefs = Array.isArray(req.body.preferences) ? req.body.preferences
       : Array.isArray(req.body.prefs) ? req.body.prefs : [];
-    const key = `r:${message}|${prefs.slice().sort().join(',')}`;
-    res.json(await cached(key, AI_TTL_MS, () => recommend(message, req.body.proximity, prefs)));
+    const proximity = String(req.body.proximity || '');
+    const p = proximity.split(',').map(Number);
+    const proxKey = p.length === 2 && p.every(Number.isFinite) ? p[0].toFixed(2) + ',' + p[1].toFixed(2) : '';
+    const key = `r:${message}|${proxKey}|${prefs.slice().sort().join(',')}`;
+    res.json(await cached(key, AI_TTL_MS, () => recommend(message, proximity, prefs)));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 const { chatRecommend } = require('./agent.js');

@@ -3,11 +3,15 @@
 const { chatRecommend } = require('./agent.js');
 const { searchPlaces, inBox } = require('./places.js');
 const { findPhoto } = require('./photos.js');
+const { locationLine: defaultLocationLine, parseProximity, haversineKm } = require('./location.js');
 async function recommend(message, proximity, prefs = [], deps = {}) {
   const chatFn = deps.chatFn || chatRecommend;
   const searchFn = deps.searchFn || searchPlaces;
+  const locFn = deps.locationLine || defaultLocationLine;
   const prefLine = (prefs || []).length ? `\nUser preferences: ${prefs.join(', ')}.` : '';
-  const agent = await chatFn(message + prefLine);
+  let locLine = '';
+  try { locLine = await locFn(proximity); } catch { /* no location beats a wrong one */ }
+  const agent = await chatFn(message + locLine + prefLine);
   if (agent.intent === 'redirect' || agent.intent === 'refuse' || !agent.candidates.length) {
     return { intent: agent.intent, answer: agent.answer, places: [], spotlight: null };
   }
@@ -28,6 +32,8 @@ async function recommend(message, proximity, prefs = [], deps = {}) {
     places.push({ ...hit, hint: c.hint || '', reason: c.reason || '', rating: c.rating || '', reviews: c.reviews || '', peopleSay: c.peopleSay || '', description: c.description || '', festival: c.festival || '', fees: c.fees || '', sources: grounded ? agent.sources : [mapLink], sourceKind: grounded ? 'article' : 'map' });
     if (places.length >= 8) break;
   }
+  const here = parseProximity(proximity);
+  if (here) places.sort((a, b) => haversineKm(here.lng, here.lat, a.lng, a.lat) - haversineKm(here.lng, here.lat, b.lng, b.lat));
   let spotlight = null;
   if (agent.spotlight) {
     spotlight = places.find(p => p.name.toLowerCase().includes(agent.spotlight.name.toLowerCase().split(' ')[0])) || null;

@@ -52,3 +52,24 @@ test('duplicate hits are deduped', async () => {
   const out = await recommend('food?', null, [], { chatFn: fakeChat, searchFn: fakeSearch });
   assert.equal(out.places.length, 1);
 });
+test('the traveler location is appended to the AI request', async () => {
+  const { recommend } = require('../verify.js');
+  let seen = '';
+  const fakeChat = async (msg) => { seen = msg; return { intent: 'discover', answer: 'a', candidates: [], spotlight: null, sources: [] }; };
+  await recommend('top spots', '120.333,16.043', ['Beaches'], {
+    chatFn: fakeChat,
+    searchFn: async () => [],
+    locationLine: async () => '\nThe traveler is currently in Dagupan City, Pangasinan.'
+  });
+  assert.match(seen, /Dagupan City/);
+  assert.match(seen, /Beaches/);
+});
+test('places are ordered by distance from the traveler', async () => {
+  const { recommend } = require('../verify.js');
+  const fakeChat = async () => ({ intent: 'discover', answer: 'a', candidates: [{ name: 'Far', reason: 'x' }, { name: 'Near', reason: 'y' }], spotlight: null, sources: ['https://s.com'] });
+  const fakeSearch = async (q) => q.startsWith('Far')
+    ? [{ id: 'f1', name: 'Far', lng: 119.79, lat: 16.12, address: '', categories: [] }]
+    : [{ id: 'n1', name: 'Near', lng: 120.34, lat: 16.04, address: '', categories: [] }];
+  const out = await recommend('food?', '120.333,16.043', [], { chatFn: fakeChat, searchFn: fakeSearch, locationLine: async () => '' });
+  assert.deepEqual(out.places.map(p => p.name), ['Near', 'Far']);
+});

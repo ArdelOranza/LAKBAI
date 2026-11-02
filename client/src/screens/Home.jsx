@@ -23,11 +23,15 @@ const QUICK = [
   ['Events', CalendarDays, { name:'events' }],
 ];
 
+// v2: the recommendation set now depends on where the traveler is.
+const REC_KEY = 'lakbai.rec.home.v2';
+const REC_AT_KEY = 'lakbai.rec.homeAt.v2';
+
 export default function Home({ coords, push, showToast, setTab }){
   const { user } = useAuth();
   const [place, setPlace] = useState('Pangasinan');
   const [query, setQuery] = useState('');
-  const [recs, setRecs] = useState(sessionGet('lakbai.rec.home') || []);
+  const [recs, setRecs] = useState(sessionGet(REC_KEY) || []);
   const [busy, setBusy] = useState(false);
   const [event, setEvent] = useState(null);
   // Fallback banner: the next festival from the curated dataset, so the card is
@@ -67,8 +71,8 @@ export default function Home({ coords, push, showToast, setTab }){
   const locKey = coords === FALLBACK_CENTER ? 'fallback' : coords.lng.toFixed(2) + ',' + coords.lat.toFixed(2);
 
   useEffect(() => {
-    const cached = sessionGet('lakbai.rec.home');
-    const at = sessionGet('lakbai.rec.homeAt');
+    const cached = sessionGet(REC_KEY);
+    const at = sessionGet(REC_AT_KEY);
     const far = !at || haversineKm(at.lng, at.lat, coords.lng, coords.lat) > 8;
     if (cached && cached.length && !far) {
       setRecs(cached);
@@ -87,8 +91,8 @@ export default function Home({ coords, push, showToast, setTab }){
           if (!alive) return;
           const ps = out.places || [];
           setRecs(ps);
-          sessionSet('lakbai.rec.home', ps);
-          sessionSet('lakbai.rec.homeAt', { lng: coords.lng, lat: coords.lat });
+          sessionSet(REC_KEY, ps);
+          sessionSet(REC_AT_KEY, { lng: coords.lng, lat: coords.lat });
           setEvent(ps.find(p => p.festival && dateRange(p.festival)) || null);
         })
         .catch(e => { if (alive) showToast('Could not load recommendations', 'error', e.message); })
