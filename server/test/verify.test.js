@@ -73,3 +73,12 @@ test('places are ordered by distance from the traveler', async () => {
   const out = await recommend('food?', '120.333,16.043', [], { chatFn: fakeChat, searchFn: fakeSearch, locationLine: async () => '' });
   assert.deepEqual(out.places.map(p => p.name), ['Near', 'Far']);
 });
+test('a hospital candidate is dropped from the results', async () => {
+  const { recommend } = require('../verify.js');
+  const fakeChat = async () => ({ intent: 'discover', answer: 'a', candidates: [{ name: 'Pangasinan Provincial Hospital', reason: 'x' }, { name: 'Dagupan City Museum', reason: 'y' }], spotlight: null, sources: ['https://s.com'] });
+  const fakeSearch = async (q) => q.startsWith('Pangasinan Provincial')
+    ? [{ id: 'h1', name: 'Pangasinan Provincial Hospital', lng: 120.34, lat: 15.93, address: '', categories: ['health services', 'hospital'] }]
+    : [{ id: 'm1', name: 'Dagupan City Museum', lng: 120.34, lat: 16.04, address: '', categories: ['museum'] }];
+  const out = await recommend('top attractions', '120.333,16.043', [], { chatFn: fakeChat, searchFn: fakeSearch, locationLine: async () => '' });
+  assert.deepEqual(out.places.map(p => p.name), ['Dagupan City Museum']);
+});

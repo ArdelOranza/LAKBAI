@@ -4,6 +4,7 @@ const { chatRecommend } = require('./agent.js');
 const { searchPlaces, inBox } = require('./places.js');
 const { findPhoto } = require('./photos.js');
 const { locationLine: defaultLocationLine, parseProximity, haversineKm } = require('./location.js');
+const { isAttraction, attractionLine } = require('./attractions.js');
 async function recommend(message, proximity, prefs = [], deps = {}) {
   const chatFn = deps.chatFn || chatRecommend;
   const searchFn = deps.searchFn || searchPlaces;
@@ -11,7 +12,7 @@ async function recommend(message, proximity, prefs = [], deps = {}) {
   const prefLine = (prefs || []).length ? `\nUser preferences: ${prefs.join(', ')}.` : '';
   let locLine = '';
   try { locLine = await locFn(proximity); } catch { /* no location beats a wrong one */ }
-  const agent = await chatFn(message + locLine + prefLine);
+  const agent = await chatFn(message + attractionLine(message) + locLine + prefLine);
   if (agent.intent === 'redirect' || agent.intent === 'refuse' || !agent.candidates.length) {
     return { intent: agent.intent, answer: agent.answer, places: [], spotlight: null };
   }
@@ -24,7 +25,7 @@ async function recommend(message, proximity, prefs = [], deps = {}) {
     } catch {
       continue;
     }
-    const hit = hits.find(h => inBox(h.lng, h.lat) && !seen.has(h.id));
+    const hit = hits.find(h => inBox(h.lng, h.lat) && !seen.has(h.id) && isAttraction(h, agent.intent));
     if (!hit) continue;
     seen.add(hit.id);
     const grounded = agent.sources && agent.sources.length;
