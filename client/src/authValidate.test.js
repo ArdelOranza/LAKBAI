@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateSignup, validateLogin } from './authValidate.js';
+import { validateSignup, validateLogin, needsEmailConfirmation } from './authValidate.js';
 describe('validateSignup', () => {
   it('rejects bad email, short password, mismatched confirm', () => {
     expect(validateSignup({ email:'nope', password:'12345678', confirm:'12345678' })).toEqual({ ok:false, field:'email', message:'Enter a valid email address.' });
@@ -15,5 +15,14 @@ describe('validateLogin', () => {
     expect(validateLogin({ email:'', password:'x' }).ok).toBe(false);
     expect(validateLogin({ email:'a@b.com', password:'' }).ok).toBe(false);
     expect(validateLogin({ email:'a@b.com', password:'x' }).ok).toBe(true);
+  });
+});
+describe('needsEmailConfirmation', () => {
+  it('spots the unconfirmed-account error so the screen can offer a resend', () => {
+    expect(needsEmailConfirmation('Email not confirmed')).toBe(true);
+    expect(needsEmailConfirmation('email_not_confirmed')).toBe(true);
+    expect(needsEmailConfirmation('Invalid login credentials')).toBe(false);
+    expect(needsEmailConfirmation('')).toBe(false);
+    expect(needsEmailConfirmation(undefined)).toBe(false);
   });
 });

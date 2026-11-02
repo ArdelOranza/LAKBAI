@@ -1,23 +1,140 @@
+/**
+ * LakbAI logo mark – extracted from the official brand SVG.
+ *
+ * The icon is composed of three parts:
+ *  1. Rounded-corner "A" arch body (blue gradient)
+ *  2. A short vertical stem line above the arch opening
+ *  3. A downward-pointing chevron tip below the arch
+ *
+ * Props:
+ *  size        – rendered width/height in px (default 40)
+ *  withWordmark – render the icon + "LakbAI" wordmark side-by-side
+ */
 export default function Logo({ size = 40, withWordmark = false }){
-  const id = withWordmark ? 'lgw' : 'lg';
+  // Unique gradient IDs so multiple Logo instances on the same page
+  // don't share the same <defs> node and clash.
+  const uid = withWordmark ? 'lgw' : 'lg';
+  const bodyId = `${uid}_b`;
+  const tipId  = `${uid}_t`;
+
   const mark = (
-    <svg width={size} height={size} viewBox="0 0 120 120" aria-hidden="true">
+    <svg
+      width={size}
+      height={Math.round(size * 1.07)}   // natural aspect 45 × 48
+      viewBox="0 0 45 48"
+      fill="none"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <defs>
-        <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#2280E8"/><stop offset="1" stopColor="#0A3D8F"/>
+        {/* Body gradient — deep blue, top-to-bottom */}
+        <linearGradient id={bodyId} x1="22.5" y1="0" x2="22.5" y2="35" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#0065D0"/>
+          <stop offset="1" stopColor="#00336A"/>
+        </linearGradient>
+
+        {/* Chevron-tip gradient */}
+        <linearGradient id={tipId} x1="22.5" y1="26.25" x2="22.5" y2="48" gradientUnits="userSpaceOnUse">
+          <stop offset="0.216" stopColor="#0063CD"/>
+          <stop offset="1" stopColor="#417395"/>
         </linearGradient>
       </defs>
-      <rect width="120" height="120" rx="34" fill={`url(#${id})`}/>
-      <path fill="#fff" d="M36 104 C35 86 45 27 49 21 Q51 18 60 18 Q69 18 71 21 C75 27 85 86 84 104 L68 104 C68 96 70 62 66 54 Q65 51 60 51 Q55 51 54 54 C50 62 52 96 52 104 Z"/>
-      <rect x="53" y="30" width="14" height="26" rx="7" fill="#1667D9"/>
+
+      {/*
+        ── 1. Arch body ──────────────────────────────────────────────
+        Sourced from paint1_linear path (left panel), re-centred to
+        a 0-based 45-wide viewBox.  Original coords were centred at
+        x=123 inside the 333×277 mockup; we shift by –100.5 so the
+        arch starts at x=0.
+      */}
+      <path
+        fill={`url(#${bodyId})`}
+        d="
+          M37 0 H8
+          C5.2 0 3.8 0 2.73.545
+          C1.79 1.024 1.024 1.789.545 2.73
+          C0 3.8 0 5.2 0 8
+          V28.645
+          C0 29.904 0 30.534.113 31.056
+          C.527 32.974 2.026 34.473 3.944 34.887
+          C4.466 35 5.096 35 6.355 35
+          C6.588 35 6.705 35 6.81 34.982
+          C7.19 34.917 7.519 34.68 7.701 34.339
+          C7.751 34.246 7.788 34.135 7.862 33.914
+          L16.588 7.735
+          C16.916 6.752 17.08 6.26 17.384 5.896
+          C17.653 5.575 17.997 5.327 18.387 5.173
+          C18.828 5 19.346 5 20.383 5
+          H24.617
+          C25.654 5 26.172 5 26.613 5.173
+          C27.003 5.327 27.347 5.575 27.616 5.896
+          C27.92 6.26 28.084 6.752 28.412 7.735
+          L37.138 33.914
+          C37.212 34.135 37.249 34.246 37.299 34.339
+          C37.481 34.68 37.81 34.917 38.19 34.982
+          C38.295 35 38.412 35 38.645 35
+          C39.904 35 40.534 35 41.056 34.887
+          C42.974 34.473 44.473 32.974 44.887 31.056
+          C45 30.534 45 29.904 45 28.645
+          V8
+          C45 5.2 45 3.8 44.455 2.73
+          C43.976 1.789 43.211 1.024 42.27.545
+          C41.2 0 39.8 0 37 0 Z
+        "
+      />
+
+      {/*
+        ── 2. Stem line ──────────────────────────────────────────────
+        Original: (123, 149.5)→(123, 154.5)  in the arch interior.
+        In the arch the "mouth" opening is at y≈15–20 of our viewBox.
+        We place the stem at x=22.5 (centre), y=14.5–19.5.
+      */}
+      <line
+        x1="22.5" y1="14.5"
+        x2="22.5" y2="19.5"
+        stroke="#0065D0"
+        strokeWidth="5"
+        strokeLinecap="round"
+      />
+
+      {/*
+        ── 3. Chevron / tip ─────────────────────────────────────────
+        Original centre x=123, y range 160.75–182.
+        Shifted by –100.5 → centre x=22.5, y range 26.25–47.5 in
+        a viewBox that starts from 0.
+      */}
+      <path
+        fill={`url(#${tipId})`}
+        d="
+          M15.394 41.85
+          L20.69  30.595
+          C21.268 29.368 21.557 28.754 21.954 28.561
+          C22.299 28.394 22.701 28.394 23.046 28.561
+          C23.443 28.754 23.732 29.368 24.31  30.595
+          L29.606 41.85
+          C30.473 43.693 30.907 44.615 30.742 45.095
+          C30.6   45.509 30.251 45.818 29.823 45.911
+          C29.328 46.017 28.464 45.477 26.736 44.398
+          L23.56  42.412
+          C23.175 42.172 22.983 42.052 22.777 42.005
+          C22.595 41.964 22.405 41.964 22.223 42.005
+          C22.017 42.052 21.825 42.172 21.44  42.412
+          L18.264 44.398
+          C16.536 45.477 15.672 46.017 15.177 45.911
+          C14.749 45.818 14.4   45.509 14.258 45.095
+          C14.093 44.615 14.527 43.693 15.394 41.85 Z
+        "
+      />
     </svg>
   );
+
   if (!withWordmark) return mark;
+
   return (
     <div style={{ display:'flex', alignItems:'center', gap:12 }}>
       {mark}
       <div>
-        <div style={{ fontWeight:800, fontSize:size*0.72, color:'var(--ink)', lineHeight:1 }}>LakbAI</div>
+        <div style={{ fontWeight:800, fontSize:size * 0.72, color:'var(--ink)', lineHeight:1 }}>LakbAI</div>
         <div style={{ fontSize:11, color:'var(--muted-ink)', marginTop:2 }}>Lakbai, smarter, not harder.</div>
       </div>
     </div>

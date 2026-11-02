@@ -84,6 +84,12 @@ export default function Home({ coords, push, showToast, setTab }){
     // Give the first real GPS fix a moment, so the plan is built for where the
     // user actually is instead of the province fallback centre.
     const wait = coords === FALLBACK_CENTER ? 2500 : 0;
+    // No usable cache for this spot (first visit, or the traveler moved): drop
+    // the previous town's picks straight away so they cannot read as this
+    // town's recommendations while the new request is in flight.
+    setRecs([]);
+    setEvent(null);
+    setBusy(true);
     const timer = setTimeout(() => {
       setBusy(true);
       recommend('top attractions, events and hidden gems', `${coords.lng},${coords.lat}`, readLocalPrefs())

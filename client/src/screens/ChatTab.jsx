@@ -11,7 +11,7 @@ import { saveFavorite } from '../store.js';
 import { haversineKm, formatDistance, driveMinutes } from '../geo.js';
 import { PhotoPlaceholder } from '../ui.jsx';
 import Logo from '../logo.jsx';
-import AiBackdrop from '../AiBackdrop.jsx';
+// import AiBackdrop from '../AiBackdrop.jsx'; // parked: the chat background stays plain
 
 const WELCOME = { id:'welcome', role:'ai', text:"Hi! I'm LakbAI. Explore Pangasinan with a smile — ask for beaches, food, festivals, or let me plan your whole trip. I can spotlight secret spots and unique adventures whenever you're ready." };
 const STARTERS = [
@@ -184,8 +184,6 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
 
   return (
     <main className="chat-screen">
-      <AiBackdrop always/>
-
       <div className="chat-layer">
         <header className="chat-head">
           <button type="button" className="icon-btn" aria-label="Back to Home" onClick={() => setTab?.('home')}>
