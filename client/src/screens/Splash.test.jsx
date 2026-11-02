@@ -7,16 +7,20 @@ describe('Splash', () => {
 
   it('uses the Hundred Islands photo as the full-bleed backdrop', () => {
     expect(html).toContain('src="/intro-hundred-islands.jpg"');
-    expect(html).toContain('Hundred Islands National Park');
-    expect(html).toContain('class="intro-photo"');
+    expect(html).toContain('Hundred Islands, Alaminos, Pangasinan');
   });
 
-  it('offers Google and email sign-in paths', () => {
+  it('keeps the original onboarding layout', () => {
+    expect(html).toContain('data-testid="get-started"');
+    expect(html).toContain('Get Started');
+    expect(html).toContain('Log In');
+    expect(html).toContain('Lakbai, smarter, not harder.');
+  });
+
+  it('adds the Google sign-in option above the existing buttons', () => {
     expect(html).toContain('data-testid="google-signin"');
     expect(html).toContain('Continue with Google');
-    expect(html).toContain('data-testid="get-started"');
-    expect(html).toContain('Continue with email');
-    expect(html).toContain('Log in');
+    expect(html.indexOf('Continue with Google')).toBeLessThan(html.indexOf('Get Started'));
   });
 
   it('draws the four-colour Google mark inline', () => {
@@ -28,6 +32,5 @@ describe('Splash', () => {
 
   it('has no leftover placeholder hero art', () => {
     expect(html).not.toContain('/hero.svg');
-    expect(html).not.toContain('Get Started');
   });
 });

@@ -413,8 +413,3 @@ li{margin:6px 0}
     @apply bg-transparent! dark:invert;
   }
 }
-/* Intro hero: the Hundred Islands photo, with a barely-there push-in. */
-.intro-photo{transform-origin:50% 56%;animation:intro-drift 28s ease-in-out infinite alternate;will-change:transform}
-@keyframes intro-drift{from{transform:scale(1.015)}to{transform:scale(1.085)}}
-@media (prefers-reduced-motion:reduce){.intro-photo{animation:none}}
-
