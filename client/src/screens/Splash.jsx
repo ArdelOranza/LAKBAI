@@ -18,7 +18,7 @@ export default function Splash({ onGetStarted, onLogIn }){
         decoding="async"
         style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }}
       />
-      <div aria-hidden="true" style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(255,255,255,.05) 35%, rgba(255,255,255,.97) 88%)' }}/>
+      <div aria-hidden="true" style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(255,255,255,0) 42%, rgba(255,255,255,.28) 58%, rgba(255,255,255,.8) 70%, rgba(255,255,255,.98) 88%, #FFFFFF 100%)' }}/>
       <div style={{ position:'relative', padding:'0 24px 40px' }}>
         <div style={{ display:'grid', placeItems:'center', marginBottom:28 }}><Logo size={64} withWordmark/></div>
 
