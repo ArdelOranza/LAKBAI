@@ -17,6 +17,12 @@ describe('Splash', () => {
     expect(html).toContain('Lakbai, smarter, not harder.');
   });
 
+  it('uses the supplied wordmark image as the text logo', () => {
+    expect(html).toContain('src="/lakbai-wordmark.png"');
+    expect(html).toContain('alt="LakbAI"');
+    expect(html).not.toContain('>LakbAI<');
+  });
+
   it('adds the Google sign-in option above the existing buttons', () => {
     expect(html).toContain('data-testid="google-signin"');
     expect(html).toContain('Continue with Google');

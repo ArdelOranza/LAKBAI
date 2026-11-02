@@ -20,7 +20,13 @@ export default function Splash({ onGetStarted, onLogIn }){
       />
       <div aria-hidden="true" style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(255,255,255,0) 42%, rgba(255,255,255,.28) 58%, rgba(255,255,255,.8) 70%, rgba(255,255,255,.98) 88%, #FFFFFF 100%)' }}/>
       <div style={{ position:'relative', padding:'0 24px 40px' }}>
-        <div style={{ display:'grid', placeItems:'center', marginBottom:28 }}><Logo size={64} withWordmark/></div>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:12, marginBottom:28 }}>
+          <Logo size={64}/>
+          <div>
+            <img src="/lakbai-wordmark.png" alt="LakbAI" style={{ display:'block', height:38, width:'auto' }}/>
+            <div style={{ fontSize:11, color:'var(--muted-ink)', marginTop:3 }}>Lakbai, smarter, not harder.</div>
+          </div>
+        </div>
 
         <button
           type="button"
