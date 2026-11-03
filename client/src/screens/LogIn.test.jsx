@@ -7,6 +7,12 @@ describe('LogIn', () => {
     const html = renderToString(<LogIn onAuthed={() => {}} onSwitchToSignup={() => {}} notice="Check your email to confirm your account, then log in." />);
     expect(html).toContain('data-testid="login-notice"');
     expect(html).toContain('Check your email to confirm your account');
+    expect(html).toContain('data-testid="resend-confirm"');
+  });
+
+  it('pre-fills the email handed over from Sign Up so Resend works', () => {
+    const html = renderToString(<LogIn onAuthed={() => {}} onSwitchToSignup={() => {}} notice="Confirm it." defaultEmail="traveler@example.com" />);
+    expect(html).toContain('traveler@example.com');
   });
 
   it('has no notice when arriving straight from the intro', () => {

@@ -14,7 +14,10 @@ export function AuthProvider({ children }){
   }, []);
   async function signUp(email, password){
     if (!supabase) return { error: 'Auth not configured — add Supabase keys to .env.' };
-    const { data, error } = await supabase.auth.signUp({ email: String(email).trim(), password });
+    // Point the confirmation link at the deployment the person signed up on,
+    // not whatever Site URL the Supabase project happens to have configured.
+    const emailRedirectTo = typeof window !== 'undefined' ? window.location.origin : undefined;
+    const { data, error } = await supabase.auth.signUp({ email: String(email).trim(), password, options: { emailRedirectTo } });
     if (error) return { error: String(error.message || error) };
     return data.session ? {} : { needsConfirm: true, detail: 'Check your email to confirm your account, then log in.' };
   }
@@ -25,7 +28,8 @@ export function AuthProvider({ children }){
   }
   async function resendConfirmation(email){
     if (!supabase) return { error: 'Auth not configured — add Supabase keys to .env.' };
-    const { error } = await supabase.auth.resend({ type: 'signup', email: String(email).trim() });
+    const emailRedirectTo = typeof window !== 'undefined' ? window.location.origin : undefined;
+    const { error } = await supabase.auth.resend({ type: 'signup', email: String(email).trim(), options: { emailRedirectTo } });
     return error ? { error: String(error.message || error) } : { detail: 'Confirmation email sent again. Check your inbox and spam folder.' };
   }
   async function resetPassword(email){

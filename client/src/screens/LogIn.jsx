@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, Mail, MailCheck, RefreshCw } from 'lucide-react';
 import { useAuth } from '../AuthContext.jsx';
 import { validateLogin, needsEmailConfirmation } from '../authValidate.js';
 import Logo from '../logo.jsx';
@@ -8,12 +8,13 @@ import { PrimaryBtn } from '../ui.jsx';
 const LABEL = { display:'block', fontSize:12, fontWeight:600, margin:'16px 0 6px' };
 const CARD = { background:'#FFFFFF', borderRadius:'28px 28px 0 0', padding:'28px 24px 32px', marginTop:'-24px' };
 
-export default function LogIn({ onAuthed, onSwitchToSignup, notice }){
+export default function LogIn({ onAuthed, onSwitchToSignup, notice, defaultEmail }){
   const { signInWithPassword, resetPassword, resendConfirmation } = useAuth();
-  const [form, setForm] = useState({ email:'', password:'' });
+  const [form, setForm] = useState({ email: defaultEmail || '', password:'' });
   const [show, setShow] = useState(false);
   const [err, setErr] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [resent, setResent] = useState(false);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
   async function submit(){
     const v = validateLogin(form);
@@ -25,10 +26,12 @@ export default function LogIn({ onAuthed, onSwitchToSignup, notice }){
     else onAuthed('login');
   }
   async function resend(){
+    if (!form.email) { setErr({ field:null, message:'Enter your email address first.' }); return; }
     setBusy(true);
     const res = await resendConfirmation(form.email);
     setBusy(false);
-    setErr({ field:null, message: res.error || res.detail });
+    if (res.error) setErr({ field:null, message:res.error });
+    else { setErr(null); setResent(true); }
   }
   async function forgot(){
     const v = validateLogin({ email: form.email, password: 'x' });
@@ -37,6 +40,10 @@ export default function LogIn({ onAuthed, onSwitchToSignup, notice }){
     const res = await resetPassword(form.email);
     setErr(res.error ? { field:null, message:res.error } : { field:null, message:res.detail || 'Check your email.' });
   }
+  // Supabase will not let an unconfirmed account log in. Instead of dumping the
+  // raw "Email not confirmed" string, keep the resend action right here.
+  const confirmNeeded = Boolean(notice) || resent || needsEmailConfirmation(err && err.message);
+  const otherErr = err && !needsEmailConfirmation(err.message) ? err.message : null;
   return (
     <main style={{ flex:1, overflowY:'auto', background:'#F7FAFF' }}>
       <div style={{ display:'grid', placeItems:'center', padding:'44px 0 28px' }}><Logo size={72}/></div>
@@ -53,19 +60,24 @@ export default function LogIn({ onAuthed, onSwitchToSignup, notice }){
         <div style={{ textAlign:'right', marginTop:8 }}>
           <button type="button" style={{ background:'none', border:'none', color:'var(--primary)', fontSize:13, fontWeight:600, padding:0 }} onClick={forgot} data-testid="forgot-link">Forgot Password?</button>
         </div>
-        {notice && !err && <p data-testid="login-notice" style={{ color:'var(--primary)', fontSize:13, margin:'12px 0 0' }}>{notice}</p>}
-        {err && <p data-testid="login-error" style={{ color:'var(--accent)', fontSize:13, margin:'12px 0 0' }}>{err.message}</p>}
-        {err && needsEmailConfirmation(err.message) && (
-          <button
-            type="button"
-            data-testid="resend-confirm"
-            disabled={busy}
-            onClick={resend}
-            style={{ background:'none', border:'none', color:'var(--primary)', fontSize:13, fontWeight:600, padding:0, marginTop:8 }}
-          >
-            Resend confirmation email
-          </button>
+
+        {confirmNeeded && (
+          <div className={'auth-note' + (resent ? ' ok' : '')} data-testid="login-notice" role="status" aria-live="polite">
+            <span className="auth-note-ico">{resent ? <MailCheck size={17}/> : <Mail size={17}/>}</span>
+            <div className="auth-note-body">
+              <b>{resent ? 'Confirmation email sent' : 'Confirm your email first'}</b>
+              <p>{resent
+                ? 'Open the new link we just sent, then log in.'
+                : (notice || 'This account is not confirmed yet. Open the link we emailed you, or send it again.')}</p>
+              <button type="button" className="auth-note-btn" data-testid="resend-confirm" onClick={resend} disabled={busy}>
+                <RefreshCw size={13}/> {resent ? 'Send it again' : 'Resend email'}
+              </button>
+            </div>
+          </div>
         )}
+
+        {otherErr && <p data-testid="login-error" className="auth-err">{otherErr}</p>}
+
         <div style={{ marginTop:18 }}><PrimaryBtn testid="login-send" disabled={busy} onClick={submit}>Log In <ArrowRight size={17}/></PrimaryBtn></div>
         <p style={{ textAlign:'center', marginTop:16, fontSize:14 }}>
           Don't have an account? <b><a href="#" onClick={e => { e.preventDefault(); onSwitchToSignup(); }}>Sign Up</a></b>

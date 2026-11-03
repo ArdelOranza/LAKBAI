@@ -109,6 +109,18 @@ li{margin:6px 0}
 .toast .tick{flex:0 0 30px;height:30px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center}
 .toast.error .tick{background:var(--accent)}
 .toast button{background:none;border:none;padding:2px;color:var(--muted-ink)}
+/* email-verification notice on Log In */
+.auth-note{display:flex;align-items:flex-start;gap:12px;background:#F4F8FF;border:1px solid #DBEAFE;border-radius:18px;padding:14px;margin-top:16px}
+.auth-note.ok{background:#F1FBF4;border-color:#BBF7D0}
+.auth-note-ico{flex:0 0 34px;height:34px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center}
+.auth-note.ok .auth-note-ico{background:#16A34A}
+.auth-note-body{flex:1;min-width:0}
+.auth-note-body b{display:block;font-size:13.5px;line-height:1.35;color:var(--ink)}
+.auth-note-body p{margin:4px 0 0;font-size:12.5px;line-height:1.45;color:var(--muted-ink)}
+.auth-note-btn{margin-top:10px;display:inline-flex;align-items:center;gap:6px;border:1px solid #DBEAFE;background:#fff;color:var(--primary);border-radius:999px;padding:7px 12px;font-size:12px;font-weight:600}
+.auth-note-btn:hover{background:#EFF6FF}
+.auth-note-btn:disabled{opacity:.55}
+.auth-err{margin:14px 0 0;color:var(--accent);font-size:13px;line-height:1.4;text-align:center}
 @keyframes shimmer{0%{opacity:.45}50%{opacity:1}100%{opacity:.45}}
 .shimmer{animation:shimmer 1.2s ease-in-out infinite;color:var(--primary);font-weight:600}
 /* map pins (rendered through mapcn MarkerContent) */

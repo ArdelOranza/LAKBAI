@@ -22,7 +22,7 @@ export default function SignUp({ onAuthed, onSwitchToLogin }){
     const res = await signUp(form.email, form.password);
     setBusy(false);
     if (res.error) setErr({ field:null, message:res.error, detail:res.detail });
-    else onAuthed(res.needsConfirm ? 'confirm' : 'signup', res.detail);
+    else onAuthed(res.needsConfirm ? 'confirm' : 'signup', res.detail, form.email);
   }
   const EyeToggle = ({ k }) => <button type="button" className="icon-btn" onClick={() => setShow(s => ({ ...s, [k]: !s[k] }))} aria-label={'Toggle ' + k}>{show[k] ? <EyeOff size={16}/> : <Eye size={16}/>}</button>;
   const field = (k, label, type, eye) => (

@@ -32,7 +32,7 @@ function Shell(){
   const [tab, setTab] = useState('home');
   const [stack, setStack] = useState([]);
   const [authStage, setAuthStage] = useState(null);   // 'signup' | 'login' override while no session yet
-  const [authNotice, setAuthNotice] = useState(null); // "confirm your email" hand-off from Sign Up
+  const [authNotice, setAuthNotice] = useState(null); // { text, email } hand-off from Sign Up
   const [prefsStage, setPrefsStage] = useState(false); // onboarding overlay after first signup
   const [toast, setToast] = useState(null);
   const [coords, setCoords] = useState(FALLBACK_CENTER);
@@ -66,14 +66,18 @@ function Shell(){
 
   if (!user){
     if (prefsStage) return prefsOnce(() => setStack([]));
-    if (authStage === 'signup') return <SignUp onAuthed={(stage, detail) => {
+    if (authStage === 'signup') return <SignUp onAuthed={(stage, detail, email) => {
       // Supabase needs the signup email confirmed before the first login. Send
-      // the traveler to Log In with the reason instead of dropping them back on
-      // the intro with no explanation.
-      if (stage === 'confirm') { setAuthNotice(detail || 'Check your email to confirm your account, then log in.'); setAuthStage('login'); return; }
+      // the traveler to Log In with the reason (and their email, so "Resend"
+      // works straight away) instead of dropping them back on the intro.
+      if (stage === 'confirm') {
+        setAuthNotice({ text: detail || 'Check your email to confirm your account, then log in.', email: email || '' });
+        setAuthStage('login');
+        return;
+      }
       setAuthStage(null);
     }} onSwitchToLogin={() => setAuthStage('login')} />;
-    if (authStage === 'login') return <LogIn notice={authNotice} onAuthed={() => { setAuthNotice(null); setAuthStage(null); }} onSwitchToSignup={() => setAuthStage('signup')} />;
+    if (authStage === 'login') return <LogIn notice={authNotice?.text} defaultEmail={authNotice?.email} onAuthed={() => { setAuthNotice(null); setAuthStage(null); }} onSwitchToSignup={() => setAuthStage('signup')} />;
     return <Splash onGetStarted={() => setAuthStage('signup')} onLogIn={() => setAuthStage('login')} />;
   }
   if (prefsStage) return prefsOnce(() => setStack([]));
