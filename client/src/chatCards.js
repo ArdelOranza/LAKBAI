@@ -45,6 +45,8 @@ export function mapThumb(lng, lat, token, { width = 600, height = 340 } = {}){
 /** Normalised card data for one AI candidate. */
 export function cardFor(candidate = {}, spots = []){
   const spot = matchSpot(candidate.name, spots);
+  const lng = spot?.lng ?? candidate.lng;
+  const lat = spot?.lat ?? candidate.lat;
   return {
     id: spot?.id || normalizeName(candidate.name),
     name: candidate.name || spot?.name || 'Unknown place',
@@ -54,9 +56,9 @@ export function cardFor(candidate = {}, spots = []){
     // Only what the model actually returned: no invented opening hours or prices.
     fees: String(candidate.fees || '').trim(),
     festival: String(candidate.festival || '').trim(),
-    tags: (spot?.categories || []).slice(0, 3),
-    lng: spot?.lng,
-    lat: spot?.lat,
+    tags: (spot?.categories || candidate.categories || []).slice(0, 3),
+    lng,
+    lat,
     photo: (spot?.photos && spot.photos[0]) || null,
     spot,
   };

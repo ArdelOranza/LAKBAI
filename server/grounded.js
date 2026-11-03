@@ -8,6 +8,7 @@
 // agent.js is untouched — this reuses its exported callGeminiForPlan(sys, msg),
 // which talks to Gemini without the google_search tool, then DeepSeek.
 const { callGeminiForPlan, extractJson } = require('./agent.js');
+const { callGroq } = require('./groq.js');
 const {
   datasetInfo, allEntries, search, withCoords, reasonFor, intentOf, NO_MATCH,
 } = require('./dataset.js');
@@ -18,11 +19,44 @@ const MAX_RECORDS = 8;
 const MAX_INDEX = 60;
 const MAX_CANDIDATES = 6;
 
+// The primary model's free-tier quota can run out mid-day. agent.js is not
+// touched, so this is an extra attempt on the lite model before we fall back to
+// the deterministic dataset answer.
+const LITE_MODEL = 'gemini-flash-lite-latest';
+async function callLite(system, payload){
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) throw Object.assign(new Error('Missing GEMINI_API_KEY'), { status: 503 });
+  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${LITE_MODEL}:generateContent?key=${key}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: system }] },
+      contents: [{ parts: [{ text: payload }] }],
+      generationConfig: { responseMimeType: 'application/json' },
+    }),
+  });
+  if (!r.ok) throw Object.assign(new Error('Gemini lite error ' + r.status), { status: r.status || 502 });
+  const data = await r.json();
+  return data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
+}
+async function askModel(system, payload){
+  // Gemini primary → Gemini lite → Groq. Each step is independent, so a dead
+  // quota or a 402 never stops the answer.
+  try { return await callGeminiForPlan(system, payload); } catch { /* next */ }
+  try { return await callLite(system, payload); } catch { /* next */ }
+  return callGroq(system, payload);
+}
+
 const SYSTEM = `You are LakbAI, a Pangasinan (Philippines) travel guide. Answer ONLY from the RECORDS and INDEX in the user message — that list is the verified, complete truth. Never invent a place, rating, hours, price or review, and never use outside knowledge about a place. Copy every candidate name character-for-character from a RECORDS or INDEX line. If nothing in the list answers the request, return candidates: [] and say so in one short sentence. Respond with JSON only: {"intent":"discover|food|event|nearby|emergency|plan|redirect|refuse","answer":"short markdown","candidates":[{"name":"exact name from the list","reason":"one grounded why, using only facts from the list","peopleSay":"quote from the record, else empty"}],"spotlight":null,"sources":[]}. Max ${MAX_CANDIDATES} candidates, best first.`;
 
 function keyOf(name){
   return String(name || '').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
+
+const clip = (text, max) => {
+  const s = String(text || '');
+  return s.length > max ? s.slice(0, max - 1).trimEnd() + '…' : s;
+};
 
 function recordLine(entry, i){
   const bits = [entry.name];
@@ -30,11 +64,14 @@ function recordLine(entry, i){
   if (entry.categories.length) bits.push(entry.categories.join('/'));
   if (entry.rating) bits.push(`${entry.rating}★${entry.reviews ? ` (${entry.reviews} reviews)` : ''}`);
   if (entry.hours) bits.push(`hours: ${entry.hours}`);
-  if (entry.price) bits.push(`price: ${entry.price}`);
+  if (entry.feesDetail || entry.price) bits.push(`fees: ${entry.feesDetail || entry.price}`);
   if (entry.phone) bits.push(`phone: ${entry.phone}`);
+  if (entry.address) bits.push(`address: ${clip(entry.address, 160)}`);
   let line = `${i + 1}. ${bits.join(' | ')}`;
+  if (entry.description) line += `\n   about: ${clip(entry.description, 700)}`;
+  if (entry.activities.length) line += `\n   do: ${clip(entry.activities.join('; '), 400)}`;
   if (entry.quotes[0]) line += `\n   review: "${entry.quotes[0]}"`;
-  if (entry.description) line += `\n   about: ${entry.description}`;
+  if (entry.sourceUrls.length) line += `\n   source: ${entry.sourceUrls[0]}`;
   return line;
 }
 
@@ -111,7 +148,7 @@ function hydrate(candidates, entries){
 }
 
 async function ask(message, proximity, deps = {}){
-  const askFn = deps.askFn || callGeminiForPlan;
+  const askFn = deps.askFn || askModel;
   const { text } = buildContext(message, proximity);
   const raw = await askFn(SYSTEM, text);
   const parsed = parseGrounded(raw);
@@ -130,6 +167,7 @@ async function groundedChat(message, proximity, deps = {}){
     // No verified row backs the reply, so the model's prose is not trusted.
     return { intent, answer: NO_MATCH, candidates: [], spotlight: null, sources: [], source: 'dataset+ai' };
   }
+  await withCoords(picked.map(p => p.entry), proximity);
   const answer = parsed.answer || `Here is what I found in the Pangasinan list:\n${picked.map(p => `- **${p.entry.name}**`).join('\n')}`;
   const spotName = parsed.spotlight && keyOf(parsed.spotlight.name);
   const spot = (spotName && picked.find(p => keyOf(p.entry.name) === spotName)) || picked[0];
@@ -147,6 +185,9 @@ async function groundedChat(message, proximity, deps = {}){
       description: entry.description,
       festival: entry.festival,
       fees: entry.price,
+      lng: entry.lng,
+      lat: entry.lat,
+      categories: entry.categories,
     })),
     spotlight: parsed.spotlight ? { name: spot.entry.name, reason: spot.reason } : null,
     sources: picked.map(p => p.entry.mapsUrl).filter(Boolean),
@@ -198,4 +239,4 @@ async function groundedRecommend(message, proximity, prefs = [], deps = {}){
   };
 }
 
-module.exports = { groundedChat, groundedRecommend, buildContext, hydrate, parseGrounded, SYSTEM };
+module.exports = { groundedChat, groundedRecommend, buildContext, hydrate, parseGrounded, SYSTEM, callLite };

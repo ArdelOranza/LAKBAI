@@ -32,6 +32,11 @@ const { groundedChat, groundedRecommend } = require('./grounded.js');
 const AI_TTL_MS = Number(process.env.AI_TTL_MS) || 15 * 60000;
 // LAKBAI_AI=off → answer straight from the dataset with no model call at all.
 const USE_AI = String(process.env.LAKBAI_AI || '').toLowerCase() !== 'off';
+// When the model quota is out, stop retrying on every message: serve dataset
+// answers for a few minutes instead of paying the backoff on each request.
+let aiDownUntil = 0;
+const AI_COOLDOWN_MS = 5 * 60000;
+const aiUsable = () => USE_AI && Date.now() > aiDownUntil;
 app.post('/api/recommend', async (req, res) => {
   try {
     const message = req.body.message || '';
@@ -45,9 +50,9 @@ app.post('/api/recommend', async (req, res) => {
     // it is unavailable, answer straight from the dataset — and do not cache
     // that fallback, so a transient model hiccup is not served for 15 minutes.
     if (datasetInfo().ready) {
-      if (USE_AI) {
+      if (aiUsable()) {
         try { return res.json(await cached(key, AI_TTL_MS, () => groundedRecommend(message, proximity, prefs))); }
-        catch (e) { console.warn('grounded recommend failed:', e.message); }
+        catch (e) { aiDownUntil = Date.now() + AI_COOLDOWN_MS; console.warn('grounded recommend failed:', e.message); }
       }
       return res.json(await localRecommend(message, proximity, prefs));
     }
@@ -60,9 +65,9 @@ app.post('/api/chat', async (req, res) => {
     const message = req.body.message || '';
     const proximity = String(req.body.proximity || '');
     if (datasetInfo().ready) {
-      if (USE_AI) {
+      if (aiUsable()) {
         try { return res.json(await cached(`d:${message}|${proximity}`, AI_TTL_MS, () => groundedChat(message, proximity))); }
-        catch (e) { console.warn('grounded chat failed:', e.message); }
+        catch (e) { aiDownUntil = Date.now() + AI_COOLDOWN_MS; console.warn('grounded chat failed:', e.message); }
       }
       return res.json(await localChat(message, proximity));
     }

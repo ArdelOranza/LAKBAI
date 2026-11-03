@@ -37,6 +37,43 @@ test('a restaurants-only file is treated as food without a category field', () =
   assert.ok(entry.intents.includes('food'));
 });
 
+test('the tourist-spot file shape is understood, coordinates included', () => {
+  const entry = normalize({
+    id: 'bayambang-02',
+    official_name: 'Archdiocesan Shrine and Parish of St. Vincent Ferrer (Bayambang Church)',
+    municipality_or_city: 'Bayambang',
+    exact_location_address: 'RF54+F9V, Roxas Street, Poblacion, Bayambang, 2423 Pangasinan',
+    detailed_description: 'A 400-year-old brick church.',
+    entrance_and_venue_fees: { admission_fee: 'Free admission', parking_fee: 'Free on-site parking' },
+    what_to_do_activities: ['Attend Holy Mass', 'Perform Visita Iglesia'],
+    ratings_and_reviews: {
+      overall_rating: 4.5,
+      total_review_count: 73,
+      verified_reviews: [{ quote: 'Beautiful old church.' }],
+    },
+    verified_source_urls: ['https://seepangasinan.com/places/st-vincent-ferrer-parish-church/'],
+    verified_image_urls: ['https://seepangasinan.com/a.jpg'],
+  }, 0, 'tourist_spots');
+  assert.equal(entry.name, 'Archdiocesan Shrine and Parish of St. Vincent Ferrer (Bayambang Church)');
+  assert.equal(entry.town, 'Bayambang');
+  assert.equal(entry.rating, '4.5');
+  assert.equal(entry.reviews, '73');
+  assert.equal(entry.price, 'Free admission');
+  assert.match(entry.feesDetail, /Parking Fee: Free on-site parking/);
+  assert.deepEqual(entry.activities, ['Attend Holy Mass', 'Perform Visita Iglesia']);
+  assert.equal(entry.quotes[0], 'Beautiful old church.');
+  assert.equal(entry.sourceUrls.length, 1);
+  assert.equal(entry.photos.length, 1);
+  assert.ok(Math.abs(entry.lat - 15.8087) < 0.02, 'decoded latitude');
+  assert.ok(Math.abs(entry.lng - 120.4559) < 0.02, 'decoded longitude');
+});
+
+test('a short plus code in an unknown town is left without coordinates', () => {
+  const entry = normalize({ name: 'Somewhere', municipality: 'Atlantis', exact_location_address: 'RF54+F9V, Atlantis' }, 0, 'tourist_spots');
+  assert.equal(entry.lat, null);
+  assert.equal(entry.lng, null);
+});
+
 test('search matches the town and the dish, not the whole province', () => {
   const dagupan = search('where can I eat in Dagupan', '120.341,16.043');
   assert.equal(dagupan[0].name, "Conrad's Dagupan");
