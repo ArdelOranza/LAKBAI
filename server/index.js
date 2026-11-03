@@ -28,7 +28,10 @@ app.get('/api/emergency', async (req, res) => {
 const { recommend } = require('./verify.js');
 const { cached } = require('./aiCache.js');
 const { datasetInfo, localChat, localRecommend } = require('./dataset.js');
+const { groundedChat, groundedRecommend } = require('./grounded.js');
 const AI_TTL_MS = Number(process.env.AI_TTL_MS) || 15 * 60000;
+// LAKBAI_AI=off → answer straight from the dataset with no model call at all.
+const USE_AI = String(process.env.LAKBAI_AI || '').toLowerCase() !== 'off';
 app.post('/api/recommend', async (req, res) => {
   try {
     const message = req.body.message || '';
@@ -38,9 +41,16 @@ app.post('/api/recommend', async (req, res) => {
     const p = proximity.split(',').map(Number);
     const proxKey = p.length === 2 && p.every(Number.isFinite) ? p[0].toFixed(2) + ',' + p[1].toFixed(2) : '';
     const key = `r:${message}|${proxKey}|${prefs.slice().sort().join(',')}`;
-    // Installed dataset wins: no AI call, nothing invented. Without one, the
-    // original grounded AI path runs unchanged.
-    if (datasetInfo().ready) return res.json(await cached(key, AI_TTL_MS, () => localRecommend(message, proximity, prefs)));
+    // Installed dataset wins: the AI may only reference those verified rows. If
+    // it is unavailable, answer straight from the dataset — and do not cache
+    // that fallback, so a transient model hiccup is not served for 15 minutes.
+    if (datasetInfo().ready) {
+      if (USE_AI) {
+        try { return res.json(await cached(key, AI_TTL_MS, () => groundedRecommend(message, proximity, prefs))); }
+        catch (e) { console.warn('grounded recommend failed:', e.message); }
+      }
+      return res.json(await localRecommend(message, proximity, prefs));
+    }
     res.json(await cached(key, AI_TTL_MS, () => recommend(message, proximity, prefs)));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
@@ -49,7 +59,13 @@ app.post('/api/chat', async (req, res) => {
   try {
     const message = req.body.message || '';
     const proximity = String(req.body.proximity || '');
-    if (datasetInfo().ready) return res.json(await cached(`d:${message}|${proximity}`, AI_TTL_MS, () => localChat(message, proximity)));
+    if (datasetInfo().ready) {
+      if (USE_AI) {
+        try { return res.json(await cached(`d:${message}|${proximity}`, AI_TTL_MS, () => groundedChat(message, proximity))); }
+        catch (e) { console.warn('grounded chat failed:', e.message); }
+      }
+      return res.json(await localChat(message, proximity));
+    }
     res.json(await cached(`c:${message}`, AI_TTL_MS, () => chatRecommend(message)));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });

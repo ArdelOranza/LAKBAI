@@ -2,10 +2,16 @@
 
 Drop the verified Pangasinan file here as **`places.json`**.
 
-As soon as that file exists, `/api/chat` and `/api/recommend` answer from it
-instead of the Google-grounded Gemini call — no AI tokens, no invented places.
-Remove the file (or set `LAKBAI_DATA` to another path) and the AI path comes
-back unchanged.
+As soon as that file exists, `/api/chat` and `/api/recommend` stop searching the
+web. The rows in this file — plus the curated attractions in `server/spots.js` —
+are handed to the AI as its only source of truth, and every place it names is
+matched back to a row before it reaches the app. A name that is not in the file
+is dropped, so it cannot invent a place, rating, hours or price. `agent.js` and
+its Google-search path are untouched; they simply stop being used.
+
+If the AI is unavailable, the server answers from the file directly instead of
+erroring. Set `LAKBAI_AI=off` to skip the model entirely and always use the
+direct answer (zero cost).
 
 ## Accepted shapes
 

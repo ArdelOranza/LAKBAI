@@ -1,9 +1,9 @@
-// Local Pangasinan dataset search.
+// Local Pangasinan dataset.
 //
-// When a dataset file is installed, /api/chat and /api/recommend answer from it
-// instead of the Google-grounded Gemini call: every card comes from the JSON, so
-// nothing is invented and no AI tokens are spent. agent.js is untouched — it
-// stays the fallback whenever no dataset is installed.
+// This file is the retriever and the safety net: grounded.js hands the matching
+// rows to the AI as its only source of truth, and these same helpers answer
+// directly when the AI is unavailable (or when LAKBAI_AI=off). agent.js is
+// untouched — it stays the fallback whenever no dataset is installed.
 //
 // Drop a file at server/data/places.json (or set LAKBAI_DATA=/abs/path.json).
 // Any array of objects works; the normaliser below accepts the common field
@@ -13,6 +13,7 @@ const path = require('path');
 const { searchPlaces, inBox } = require('./places.js');
 const { haversineKm, parseProximity } = require('./location.js');
 const { isAttraction } = require('./attractions.js');
+const { SPOTS } = require('./spots.js');
 
 const DATA_DIR = path.join(__dirname, 'data');
 
@@ -173,6 +174,22 @@ function datasetInfo(){
   return { ready: entries.length > 0, file: cache.file, count: entries.length };
 }
 
+// The curated attraction list already lives in spots.js; when the dataset is
+// active it is folded in so the AI references places *and* restaurants.
+let spotCache = null;
+function spotEntries(){
+  if (!spotCache){
+    spotCache = SPOTS
+      .map((s, i) => normalize({ ...s, description: s.blurb, town: s.town }, `spot-${i}`, 'spots'))
+      .filter(Boolean);
+  }
+  return spotCache;
+}
+
+function allEntries(){
+  return [...readEntries(), ...spotEntries()];
+}
+
 const STOP = new Set(['the', 'and', 'for', 'with', 'you', 'your', 'are', 'can', 'how', 'what', 'where', 'when', 'who', 'why', 'any', 'some', 'best', 'good', 'great', 'top', 'please', 'want', 'need', 'looking', 'find', 'show', 'give', 'recommend', 'suggest', 'near', 'around', 'close', 'about', 'there', 'here', 'this', 'that', 'from', 'have', 'has', 'get', 'try', 'place', 'places', 'spot', 'spots', 'trip', 'pangasinan', 'philippines', 'me', 'my', 'i', 'a', 'an', 'in', 'at', 'to', 'of', 'is', 'it', 'on', 'or', 'do', 'go', 'be']);
 
 function tokens(message){
@@ -217,7 +234,7 @@ function distanceKm(entry, here){
 
 /** Ranked dataset entries for a free-text request. */
 function search(message, proximity, limit = 6){
-  const entries = readEntries();
+  const entries = allEntries();
   if (!entries.length) return [];
   const intent = intentOf(message);
   const toks = tokens(message);
@@ -354,6 +371,9 @@ async function localRecommend(message, proximity, prefs = []){
 
 module.exports = {
   datasetInfo,
+  allEntries,
+  withCoords,
+  reasonFor,
   localChat,
   localRecommend,
   search,

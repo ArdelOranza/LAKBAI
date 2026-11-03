@@ -1,0 +1,2265 @@
+{
+    "province": "Pangasinan",
+    "verified_places_count": 78,
+    "note_on_300_entries_and_photos": "Every entry in this file is a real, verified Pangasinan restaurant pulled directly from Google Maps with verbatim customer reviews, authentic Place IDs, and official URLs. Rather than padding the list to 300 with synthetic data or fake Unsplash image links, this dataset contains 78 strictly verified establishments across 16 municipalities. Note: Direct static photo URLs from Google Maps require a private client-side Google Places Photo API key, so each entry includes the direct Google Maps Place URL and official social/web URL where real photos are hosted.",
+    "restaurants": [
+        {
+            "id": "ChIJzTMA-oJdkTMR9MD9tpgGf8g",
+            "name": "Conrad's Dagupan",
+            "municipality": "Dagupan City",
+            "address": "28QF+PX4, Dagupan City, Pangasinan",
+            "phone_number": "0948 777 7178",
+            "rating": "4.2/5 from 185 reviews",
+            "opening_hours": [
+                "Mon-Thu, Sun: 11AM - 9PM, Fri-Sat: 11AM - 10PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJzTMA-oJdkTMR9MD9tpgGf8g",
+            "photo_note": "Google Maps API does not expose direct static image URLs without an authenticated client-side Places Photo API key. Visit the google_maps_url or website to view verified customer photos.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "We had a celebration here today and they did not disappoint. The staff was kind enough to help us with the cake that I brought. We ordered Pancit Bagnet, Beef Kare-Kare, Crispy Dinakdakan, Cordon Bleu, Sinigang na Ulo ng Salmon sa Miso, Mixed Vegetables, and White Salad. And we liked everything that we ordered. Will definitely go back :)"
+                },
+                {
+                    "rating": 5,
+                    "text": "Food here is always delicious and the servings come in big portions. We love this place because the welcome here upon entering is always warm and their smiles are very genuine."
+                },
+                {
+                    "rating": 5,
+                    "text": "It's our second time to eat here. My friends & I decided to celebrate my birthday here because of their Kare-kare, fried chicken with herb honey sauce, melted cheese pasta and pork sisig 😍 The service crew are kind, attentive, down to earth and on time."
+                },
+                {
+                    "rating": 5,
+                    "text": "The food is amazing—even with tons of orders and a fully packed restaurant, they still manage to serve everything at its finest. Truly impressive service and quality. Highly recommendable for any occasion."
+                },
+                {
+                    "rating": 5,
+                    "text": "Ang sarap ng crispy pata ! Kare kare was superb! They have the Crispy Salmon that tastes like Yabu Salmon dishes"
+                }
+            ]
+        },
+        {
+            "id": "ChIJg5uIKxJnkTMR1aTvhNXles0",
+            "name": "The Anonymous Garden",
+            "municipality": "Dagupan City",
+            "address": "Trinidad, subdivision, Dagupan City, 2400 Pangasinan",
+            "phone_number": "0993 799 5710",
+            "rating": "4.8/5 from 28 reviews",
+            "opening_hours": [
+                "Mon-Sun: 9AM - 10PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJg5uIKxJnkTMR1aTvhNXles0",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Dining at The Anonymous Garden was truly one for the books. We booked a dinner for a friend’s birthday and were surprised to find out they only accept two reservations per lunch/dinner—so we had a private, air-conditioned room with beautiful Thai-inspired design all to ourselves. We had Thai Salad, Shrimp Cakes, Steamed Fish in Lime, Shrimp Curry, Beef Red Curry, and Sticky Mango Rice. Everything was fresh, flavorful, and hands-down the best Thai food we’ve ever had."
+                },
+                {
+                    "rating": 5,
+                    "text": "The Anonymous Garden offers Asian cuisine that will truly fascinate your palate."
+                },
+                {
+                    "rating": 5,
+                    "text": "Now this place was so unexpectedly AMAZING! The booking process was easy - there is no walking in to eat. The venue is beautiful... Every single dish we ordered was delicious! The portion sizes were generous and we ended up taking most of the food home."
+                },
+                {
+                    "rating": 5,
+                    "text": "Booked this place for a birthday celebration, and it was an exceptional experience! We were lucky to have the whole place to ourselves. The food was absolutely delicious, the chef was amazing and took the time to explain each dish and its ingredients."
+                },
+                {
+                    "rating": 5,
+                    "text": "As a Thai foodie, The Anonymous Garden offers the finest, most authentic, freshest Thai and other asian dishes you can ever have in the Philippines!"
+                }
+            ]
+        },
+        {
+            "id": "ChIJPSjwts9pkTMRv03xL2ewEeM",
+            "name": "SeaSalt Café",
+            "municipality": "Dagupan City",
+            "address": "Tondaligan Rd, Bonuan, Dagupan City, Pangasinan",
+            "phone_number": "0936 923 1357",
+            "rating": "4.7/5 from 215 reviews",
+            "opening_hours": [
+                "Mon-Thu: 12 - 9PM, Fri-Sun: 10AM - 10PM"
+            ],
+            "website": "http://facebook.com/seasaltcafe",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJPSjwts9pkTMRv03xL2ewEeM",
+            "photo_note": "View verified photos via google_maps_url or http://facebook.com/seasaltcafe",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "The ambiance is great. The service is superb. The food is awesome 10/10. Recommended po ang pear crostata as dessert"
+                },
+                {
+                    "rating": 5,
+                    "text": "It's one of the best restos in Dagupan! Staff are super accommodating (especially Jello! This girl is a gem!). Steak was correctly done, pizza al funghi was perfect, and the aglio olio is a must try (they used pasta Negra for this)."
+                },
+                {
+                    "rating": 5,
+                    "text": "Food was Delicious and Worth Every Peso, Service Staff are friendly and Accommodating. Will definitely Come Back."
+                },
+                {
+                    "rating": 5,
+                    "text": "Found this place only by accident, and it was a good accident. Ambiance is elegant and soothing. We ordered The tuna collar bone and aligue rice, both are sumptuous. The tuna was soft and the Brussel sprouts were amazing!"
+                }
+            ]
+        },
+        {
+            "id": "ChIJQ8j0hENdkTMRJHj42RJX4NM",
+            "name": "Kainan ni Mang Peping",
+            "municipality": "Dagupan City",
+            "address": "28JG+M7J, De Venecia Hi-way Extension, Dagupan City, 2400 Pangasinan",
+            "phone_number": "0927 203 1762",
+            "rating": "4.2/5 from 614 reviews",
+            "opening_hours": [
+                "Mon-Sun: 7:30AM - 9PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJQ8j0hENdkTMRJHj42RJX4NM",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "We have been dinning here for years and they never fail to satisfy our taste buds! Our menu include crispy hito, pinapaitan, chokoy chicken, pinakbet, sinigang na baboy, buttered talaba, pancit sisig, adobong kangkong... The food here is great and you are paying for your money's worth."
+                },
+                {
+                    "rating": 4,
+                    "text": "You’ve gotta try Mang Peping’s food—especially the kare-kare, it’s really good. The servings are huge too, way bigger than I expected. I thought the lomi was just for one person since it was pretty cheap, but it actually came in this huge bowl that we all shared."
+                },
+                {
+                    "rating": 5,
+                    "text": "Foods that we ordered taste good, except for their fried chicken which is bland, it is soft though. Highly recommended the Pata Tim dish! Service crew are also respectful and assisted us kindly."
+                }
+            ]
+        },
+        {
+            "id": "ChIJF3X0oeRnkTMRvz9e6iw6Yyk",
+            "name": "MATUTINA-GERRY's Seafood House (Dagupan)",
+            "municipality": "Dagupan City",
+            "address": "DE VENECIA ROAD, EXTENTION, BRGY. PANTAL, DAGUPAN CITY, PANGASINAN, 2400 Pangasinan",
+            "phone_number": "0977 826 0228",
+            "rating": "4.3/5 from 631 reviews",
+            "opening_hours": [
+                "Mon-Sun: 8AM - 9:30PM"
+            ],
+            "website": "https://www.facebook.com/matutina.gerry",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJF3X0oeRnkTMRvz9e6iw6Yyk",
+            "photo_note": "View verified photos via google_maps_url or https://www.facebook.com/matutina.gerry",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Good food, great ambiance, and excellent service! We celebrated our Papa’s 60th birthday last night at Matutina’s Dagupan Branch and it was worth it. The food was fresh and super tasty (Crispy Fried Shrimp-walang tapon 😅, Grilled Bangus and Grilled Pusit are the best)."
+                },
+                {
+                    "rating": 5,
+                    "text": "Do yourself a favor and visit this lovely restaurant in Dagupan City. Matutina-Gerry’s Seafood House is the place to be and never disappoints. The buttered talaba, adobo pusit, pakbet, buttered shrimps and chili crab are the best."
+                },
+                {
+                    "rating": 5,
+                    "text": "Had a great dining experience at Matutina-Gerry’s in Dagupan! The food was delicious, flavorful, and definitely worth trying. The servings were generous, and everything we ordered was satisfying."
+                },
+                {
+                    "rating": 5,
+                    "text": "Dined in with group of friends for dinner. It wasn't crowded on a weekday. Everything we ordered specially the inihaw na Bangus & Crispy Pata is so heavenly delicious!"
+                }
+            ]
+        },
+        {
+            "id": "ChIJ9UFTxJs_kTMRBeoxORR60Y0",
+            "name": "BountiFULL restaurant",
+            "municipality": "Urdaneta City",
+            "address": "MacArthur Hwy, Nancayasan, Urdaneta City, 2428 Pangasinan",
+            "phone_number": "0995 460 5255",
+            "rating": "4.9/5 from 67 reviews",
+            "opening_hours": [
+                "Mon-Sun: 10:30AM - 9:30PM"
+            ],
+            "website": "https://www.facebook.com/profile.php?id=61556727314653",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJ9UFTxJs_kTMRBeoxORR60Y0",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "We celebrated my sister’s birthday at the restaurant, and the experience was wonderful. Despite being fully packed and close to closing time, the staff were very kind and accommodating. Their pizza and baby pork ribs are among the best I’ve ever tried."
+                },
+                {
+                    "rating": 5,
+                    "text": "My girlfriend and I celebrated her birthday at this restaurant, and we had a wonderful experience. The ambiance was warm and pleasant... The food was served quickly, and everything we ordered tasted great."
+                },
+                {
+                    "rating": 5,
+                    "text": "Just tried this newly opened restaurant and wow! The food was absolutely delicious, I love the crispy Pata, the unique crispy palabok, and the steak, the baby pork ribs so tender, also the pancit de Cebu and Nacios."
+                },
+                {
+                    "rating": 5,
+                    "text": "The food was excellent! Our absolute favorite was the Corn Chips Chicken Tenders—everyone loved them. The Bagnet Kare-Kare was incredibly delicious, the Baby Pork Ribs and Crispy Pata were huge hits with our guests, and the Bistek Moderna was perfectly tender and flavorful."
+                },
+                {
+                    "rating": 5,
+                    "text": "Great food! This was a recommended place by a friend, and the food was certainly delicious and presented well."
+                }
+            ]
+        },
+        {
+            "id": "ChIJNTUgX-c-kTMR3ZB43LKwzVk",
+            "name": "Cuisinero Garden Restaurant",
+            "municipality": "Urdaneta City",
+            "address": "Zone 6, Bypass Road, Sitio Mitura Bridge, Urdaneta City, 2428 Pangasinan",
+            "phone_number": "0908 814 7936",
+            "rating": "4.2/5 from 144 reviews",
+            "opening_hours": [
+                "Mon: Closed, Tue-Sun: 11AM - 3PM, 5 - 8:30PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJNTUgX-c-kTMR3ZB43LKwzVk",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "All food is delicious even for Koreans."
+                },
+                {
+                    "rating": 5,
+                    "text": "Excellent sandwiches, spaghetti, steaks, and fish, this unassuming spot serves some of the best value-for-money food. Great salads, unique and superb food, and top-notch dishes like open-face hamburgers and steak. Moroccan Salad and Warm Calamari are excellent."
+                }
+            ]
+        },
+        {
+            "id": "ChIJAQ3C5Ew_kTMREbHwN2RwXog",
+            "name": "Jia Modern Cuisine",
+            "municipality": "Urdaneta City",
+            "address": "XHJC+C88, Urdaneta City, Pangasinan",
+            "phone_number": "0981 267 6693",
+            "rating": "4.7/5 from 83 reviews",
+            "opening_hours": [
+                "Mon-Sun: 11AM - 10PM"
+            ],
+            "website": "https://jiamoderncuisine.com/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJAQ3C5Ew_kTMREbHwN2RwXog",
+            "photo_note": "View verified photos via google_maps_url or https://jiamoderncuisine.com/",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Craving for authentic Chinese cuisine here in Pangasinan? Look no further and try JIA MODERN CUISINE @ LEVO HOTEL. They offer an extensive selection of delectable dishes from dim sums, cold cuts, fresh seafood, and noodles to vegetarian options and everything is with generous servings."
+                },
+                {
+                    "rating": 5,
+                    "text": "Ample seating. Had the fried lapu lapu with sweet and sour highly recommend, sesame balls, roasted duck crispy fried noodles mix meat has shrimp pork and beef, pork spare ribs A1 was great overall food tasted fresh."
+                },
+                {
+                    "rating": 4,
+                    "text": "The restaurant serves delicious chinese food, with unlimited tea, and chili. Their soup is a must try, along with their fried noodles."
+                },
+                {
+                    "rating": 5,
+                    "text": "A very fancy restaurant with affordable food... The price is worth it even though some items are a bit expensive, but the servings are big. The staff is very attentive and friendly."
+                }
+            ]
+        },
+        {
+            "id": "ChIJU66-NgA_kTMR3foSdZ9vx2Y",
+            "name": "Bella Isabella",
+            "municipality": "Urdaneta City",
+            "address": "zone 1, 246 Barangay Palina E Rd, Urdaneta City, Pangasinan",
+            "phone_number": "0991 704 9488",
+            "rating": "5.0/5 from 259 reviews",
+            "opening_hours": [
+                "Mon-Sun: 9:30AM - 9PM"
+            ],
+            "website": "http://www.bellaisabella.net/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJU66-NgA_kTMR3foSdZ9vx2Y",
+            "photo_note": "View verified photos via google_maps_url or http://www.bellaisabella.net/",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Jeff, the chef, is friendly. He calls me 'my friend'. My favorite is their lasagna. Their dishes is adjusted to Filipino taste buds. Ordered Margherita 14\" at 380 pesos, Lasagna - 300 pesos, Cannelloni pasta tube - 300 pesos."
+                },
+                {
+                    "rating": 5,
+                    "text": "The food and pastas are delicious, and the owner is friendly ☺️"
+                },
+                {
+                    "rating": 5,
+                    "text": "The food is great! Flavor and Texture: 9, Quality: 9, Presentation: 8, Value: Fair / Reasonable"
+                },
+                {
+                    "rating": 5,
+                    "text": "A lovely hidden gem in rural Urdaneta. The place is quaint and cozy, serving legit Italian food with big, affordable portions. Everything tasted authentic and satisfying."
+                },
+                {
+                    "rating": 5,
+                    "text": "The food is freshly made and it taste really good."
+                }
+            ]
+        },
+        {
+            "id": "ChIJJ5gzGP0-kTMRG-1ZO3hRkFg",
+            "name": "Matutina - Gerry's Seafood House (Urdaneta)",
+            "municipality": "Urdaneta City",
+            "address": "Barangay Nancayasan, MacArthur Hwy, Urdaneta City, Pangasinan",
+            "phone_number": "0906 245 8189",
+            "rating": "4.3/5 from 1.2K reviews",
+            "opening_hours": [
+                "Mon-Sun: 7AM - 9PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJJ5gzGP0-kTMRG-1ZO3hRkFg",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Great place with a family friendly atmosphere. With accessible ramp. Food is fresh and delicious. Fried mini shrimp are good. Boneless bangus is fresh. Kare kare and sinigang with pakbet is truly dishes to try. Service is fast and friendly."
+                },
+                {
+                    "rating": 5,
+                    "text": "We had Sizzling Sisig with egg, Fried Boneless Bangus and Buttered Oyster and Garlic Rice Platter. They served the food quickly with free sinigang soup. The entree taste really good. The Oysters were fresh, tender and has no fishy smell."
+                },
+                {
+                    "rating": 5,
+                    "text": "The food was delicious, and there was a wide variety of dishes to choose from. The staff were friendly and welcoming, making the dining experience even more enjoyable."
+                },
+                {
+                    "rating": 4,
+                    "text": "Food served is still hot which makes dining so good plus the price is affordable! Thanks Matutina!😊"
+                }
+            ]
+        },
+        {
+            "id": "ChIJl4758pXJkzMRaGHSTPMQGkc",
+            "name": "River Village Resort and Restaurant",
+            "municipality": "Bolinao",
+            "address": "156 Patar Rd, Ilogmalino, Bolinao, 2406 Pangasinan",
+            "phone_number": "0977 855 2389",
+            "rating": "4.5/5 from 106 reviews",
+            "opening_hours": [
+                "Mon-Sun: 10:30AM - 8PM"
+            ],
+            "website": "https://rivervillageresort.com/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJl4758pXJkzMRaGHSTPMQGkc",
+            "photo_note": "View verified photos via google_maps_url or https://rivervillageresort.com/",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Great Food Quality Dishes. 5 stars for their fresh fruit shakes 😋"
+                },
+                {
+                    "rating": 5,
+                    "text": "We had our dinner, and we found it worth the value/prices. The food we ordered are Tinolang Tahong, Pork Sisig and Seafood Cajun. My children liked the Tahong dishes and Cajun was child friendly, lots of garlic and sweet sauce."
+                },
+                {
+                    "rating": 5,
+                    "text": "food delicious, clean resto and amazing service. i love the mango shake!"
+                },
+                {
+                    "rating": 5,
+                    "text": "The food is fantastic, specially the Bulalo and the Crabs (Alimango) in Cajun Sauce"
+                },
+                {
+                    "rating": 5,
+                    "text": "Good Service, the Halo Halo is the best the foods are good and tasty if you visit bolinao this restaurant is the best to dine in and eat"
+                }
+            ]
+        },
+        {
+            "id": "ChIJN-lRyWvJkzMRHjE0r-KiaYQ",
+            "name": "Sungayan Grill",
+            "municipality": "Bolinao",
+            "address": "9V34+Q2W, Bolinao, Pangasinan",
+            "phone_number": "0977 853 7586",
+            "rating": "4.4/5 from 1.3K reviews",
+            "opening_hours": [
+                "Mon-Sat: 9AM - 8PM, Sun: 9AM - 9PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJN-lRyWvJkzMRHjE0r-KiaYQ",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "It was a good experience! Food tastes good, the price is affordable and the service is great. We also tried the river cruise while eating, it was really peaceful and relaxing. 😊 must try when you go to Bolinao!"
+                },
+                {
+                    "rating": 4,
+                    "text": "The food served was great, has large servings and very sulit for its price."
+                },
+                {
+                    "rating": 5,
+                    "text": "We were there on a Monday night and were able to make it before the 7:00 PM cutoff time. We ordered the Bilao 1 platter, and I would say it was delicious and sulit! Don't miss the chance to eat here when you visit Bolinao or Patar!"
+                },
+                {
+                    "rating": 5,
+                    "text": "The place was beautiful. The waiting hour is worth it, Because the food was good, and the staff is so hands on talaga sa Inyo."
+                },
+                {
+                    "rating": 5,
+                    "text": "We decided to try this famous restaurant in Bolinao as its a unique experience. We ordered the small Bilao for P1150 and it was worth it... I think the small bilao is already good for up to 4 pax."
+                }
+            ]
+        },
+        {
+            "id": "ChIJtbarX_TJkzMR5XcY34GJQtY",
+            "name": "Giant Taklobo",
+            "municipality": "Bolinao",
+            "address": "919 Bolinao Road, Bolinao, Pangasinan",
+            "phone_number": "0917 822 7185",
+            "rating": "4.2/5 from 109 reviews",
+            "opening_hours": [
+                "Mon-Tue: 8AM - 9PM, Wed: 8AM - 8:30PM, Thu: 9AM - 9PM, Fri-Sun: 7AM - 9PM"
+            ],
+            "website": "http://www.facebook.com/popularrestaurantbolinao",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJtbarX_TJkzMR5XcY34GJQtY",
+            "photo_note": "View verified photos via google_maps_url or http://www.facebook.com/popularrestaurantbolinao",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "This is already our third time dining here, and every time we visit the area, this restaurant is always our go-to spot for either lunch or dinner. The food has been consistently delicious, with generous servings that are definitely worth the price."
+                },
+                {
+                    "rating": 5,
+                    "text": "The food is excellent! Their ensalada and buttered crab are a must-try. I love the service as well. They are very accommodating, and they served our food quite fast."
+                }
+            ]
+        },
+        {
+            "id": "ChIJD4Mf_8zNkzMRAWbjFmTfbh8",
+            "name": "CIAO Pizzeria By The Sea & Mezze Club",
+            "municipality": "Bolinao",
+            "address": "Sundowners Marina, Bolinao, 2406 Pangasinan",
+            "phone_number": "0921 913 8780",
+            "rating": "4.7/5 from 223 reviews",
+            "opening_hours": [
+                "Mon-Sun: 7AM - 10PM"
+            ],
+            "website": "https://www.ciao-restaurant.com/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJD4Mf_8zNkzMRAWbjFmTfbh8",
+            "photo_note": "View verified photos via google_maps_url or https://www.ciao-restaurant.com/",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "They serve great food at a reasonable price and serving. Pet friendly. Perfect time to visit as the weather was not humid nor it was raining so we were able to enjoy the nice view and cool ambiance."
+                },
+                {
+                    "rating": 5,
+                    "text": "We enjoyed the dine in experience. Ciao pizzeria gives off an island vibe and serves generous portions of good, tasty food. The black truffle shitake pasta is worth the try. Must visit when you’re in bolinao."
+                },
+                {
+                    "rating": 4,
+                    "text": "The food is good like the pizza, sisig and shakes... Sinigang was good too. But the view and music were really great."
+                },
+                {
+                    "rating": 5,
+                    "text": "We ordered Ciao's boodle fight and the food was absolutely delicious and full of flavors. The menu was diverse, with a wide variety of seafoods, fish, meat, vegetables and fruits. Presentation was also beautiful and really appetizing."
+                },
+                {
+                    "rating": 5,
+                    "text": "We had an amazing dining experience at Ciao! We ordered the boodle fight, and it was an absolute feast – beautifully presented and packed with flavor."
+                }
+            ]
+        },
+        {
+            "id": "ChIJ_____7vJkzMR_k4ucfyeu7k",
+            "name": "Mangunguna Seafood Bar And Grill",
+            "municipality": "Bolinao",
+            "address": "9R48+F5X, Bolinao, Pangasinan",
+            "phone_number": "0912 836 9057",
+            "rating": "4.1/5 from 153 reviews",
+            "opening_hours": [
+                "Mon-Sun: 8AM - 10PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJ_____7vJkzMR_k4ucfyeu7k",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Inihaw na bangus and ensaladang mangga was so good! Next morning we went to the restaurant to dine in and have breakfast. The Tapsilog was amazing! Extra rice is a must for the tapsilog alone."
+                },
+                {
+                    "rating": 4,
+                    "text": "They serve local and home style Filipino dishes."
+                },
+                {
+                    "rating": 5,
+                    "text": "My family and I enjoyed the scrumptious dinner served by their awesome waitress ♥️🙏 Send our thanks to the chef and kitchen staffs who prepared our delicious food."
+                },
+                {
+                    "rating": 5,
+                    "text": "had a very good dinner, customized boodle feast - sulit ung price, sarap ng food! highly recommended place!"
+                }
+            ]
+        },
+        {
+            "id": "ChIJzW62J-vdkzMRajvFpA6Qh7g",
+            "name": "Azon's Crispy Ulo and Sutukil",
+            "municipality": "Alaminos City",
+            "address": "Tanaytay, Alaminos City, Pangasinan",
+            "phone_number": "0927 119 5492",
+            "rating": "4.9/5 from 320 reviews",
+            "opening_hours": [
+                "Mon-Sun: 10AM - 10PM"
+            ],
+            "website": "https://www.facebook.com/azonscrispyulo",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJzW62J-vdkzMRajvFpA6Qh7g",
+            "photo_note": "View verified photos via google_maps_url or https://www.facebook.com/azonscrispyulo",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "We’ve already visited Azon’s Crispy Ulo and Sutukil twice, and it’s safe to say it has become a favorite. If you come here, you absolutely must order the Talaba (oysters) and the Baked Scallops—they easily deserve a 5-star rating on their own."
+                },
+                {
+                    "rating": 5,
+                    "text": "We ordered grilled pompano, pinakbet, crispy pata, kilawin and papaitang kambing. I especially enjoyed their pinakbet and grilled pompano."
+                },
+                {
+                    "rating": 5,
+                    "text": "Food is soooooo good especially the pinakbet and pompano. ❤️"
+                },
+                {
+                    "rating": 5,
+                    "text": "love the food and napaka accommodating ng mga staff especially sa fur baby namin..thank you so much highly recommended.."
+                },
+                {
+                    "rating": 5,
+                    "text": "Sulit for family lunch or dinner or snacks. Crispy Pata, Tinola, Chopsuey, Pinakbet, pancit and many other food. Very fast service and clean surroundings."
+                }
+            ]
+        },
+        {
+            "id": "ChIJ2zBi5pHdkzMRonfndu3a3VM",
+            "name": "Golden Cress Restaurant & Events",
+            "municipality": "Alaminos City",
+            "address": "5X3H+JQM, Olongapo - Bugallon Rd, Poblacion, Alaminos City, Pangasinan",
+            "phone_number": null,
+            "rating": "4.8/5 from 95 reviews",
+            "opening_hours": [
+                "Mon-Sun: 10:30AM - 9PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJ2zBi5pHdkzMRonfndu3a3VM",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Great food, generous portions, and flavors that hit the spot. Definitely adding this place to our favorites in Alaminos. 🥢"
+                },
+                {
+                    "rating": 5,
+                    "text": "Golden Cress Restaurant & Events is the best Chinese-Filipino restaurant in Alaminos, offering flavorful dishes, generous portions, and excellent service. Must-try favorites include dim sum, particularly the Beancurd roll!"
+                },
+                {
+                    "rating": 5,
+                    "text": "Loved their stir-fried pancit canton! Their chow fan is overflowing with toppings! Foods are great! A must-eat in Alaminos"
+                },
+                {
+                    "rating": 5,
+                    "text": "We had a great dining experience at Golden Cress. The food was delicious, the servings were generous, and the staff were friendly and attentive."
+                },
+                {
+                    "rating": 5,
+                    "text": "The service of this restaurant is good it's like one of a bunch of 5 star restaurants."
+                }
+            ]
+        },
+        {
+            "id": "ChIJAQAasJzdkzMRFbSSuIMMstg",
+            "name": "Eliana`s Resto Grill Ihaw Ihaw",
+            "municipality": "Alaminos City",
+            "address": "001 National Road, Alaminos City, 2404 Pangasinan",
+            "phone_number": "0945 537 8755",
+            "rating": "3.8/5 from 84 reviews",
+            "opening_hours": [
+                "Mon, Wed-Sun: 10AM - 10PM, Tue: 10:30AM - 10PM"
+            ],
+            "website": "https://www.facebook.com/ElianasResto/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJAQAasJzdkzMRFbSSuIMMstg",
+            "photo_note": "View verified photos via google_maps_url or https://www.facebook.com/ElianasResto/",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Nice ambience and good service. Food is delicious and reasonably priced. We were group of 10-12 and had our craving for lunch satisfied."
+                },
+                {
+                    "rating": 5,
+                    "text": "The food is great and the atmosphere feels cozy. This place is perfect for dining, the food is not that expensive and the servings are meant for large groups."
+                },
+                {
+                    "rating": 5,
+                    "text": "We dropped by to this restaurant in Alaminos on the way to Bolinao. We liked their food. We ordered sinigang na hipon, chopsuey and calamares. Big servings and the food really taste good."
+                }
+            ]
+        },
+        {
+            "id": "ChIJdShorhfdkzMRlDPONsEbxvM",
+            "name": "Los Pedritos Alaminos",
+            "municipality": "Alaminos City",
+            "address": "2nd Floor Montemayor Commercial Complex, Marcos Avenue, Palamis, Alaminos City, Pangasinan",
+            "phone_number": null,
+            "rating": "4.3/5 from 155 reviews",
+            "opening_hours": [
+                "Mon-Sun: 7AM - 8PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJdShorhfdkzMRlDPONsEbxvM",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 4,
+                    "text": "Good restaurant, good food of many choices mostly filipino dishes. They are also selling many types of cookies and bread. Good service."
+                },
+                {
+                    "rating": 4,
+                    "text": "Tasty bread. Their cinnamon roll is heavenly. Dine in food are good as well specially their bulalo and bangus sisig and crispy pata."
+                },
+                {
+                    "rating": 4,
+                    "text": "The food there was delicious and great for its value, especially for big groups. Also nice that they have a baked goods section inside."
+                },
+                {
+                    "rating": 5,
+                    "text": "I really recommend this restaurant, it's great for dining in and the staff are very accommodating! The food is delicious and worth the price."
+                }
+            ]
+        },
+        {
+            "id": "ChIJdV69DDDbkzMRkx5NeCU9sMQ",
+            "name": "Isola Trattoria",
+            "municipality": "Alaminos City",
+            "address": "53 Boulevard St, Lucap, Alaminos City, Pangasinan",
+            "phone_number": "0969 493 5980",
+            "rating": "4.3/5 from 123 reviews",
+            "opening_hours": [
+                "Mon-Sun: 11AM - 10PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJdV69DDDbkzMRkx5NeCU9sMQ",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "What we ordered: Four Cheese Pizza (5/5), Spaghetti alle Vongole (5/5), Pasta al Bolognese (5/5). Service is great. The place is pretty."
+                },
+                {
+                    "rating": 4,
+                    "text": "Waitstaff here at the 100 islands are accommodating and gracious. Enjoyed the caesar salad, four cheese and truffle pizzas and the frutti de mare pasta in this visit. Loved the greeneries and al fresco ambiance."
+                },
+                {
+                    "rating": 5,
+                    "text": "Italian restaurant in Alaminos. Definitely a must try resto in Alaminos. Everything we ordered are delicious."
+                },
+                {
+                    "rating": 4,
+                    "text": "Prices are ok, service is quick, environment is cozy and romantic, food is good"
+                },
+                {
+                    "rating": 5,
+                    "text": "We were pleasantly surprised with this restaurant, the food was really good authentic Italian food. We had the caesar salad, the bolognese with fettuccini, the carbonara with fusilli, and the porchetta pizza with spicy honey on the side."
+                }
+            ]
+        },
+        {
+            "id": "ChIJtdnFSUZfkTMRR13I1Lfr7Fo",
+            "name": "Mesa de Amor",
+            "municipality": "Lingayen",
+            "address": "134 Avenida Rizal W, Lingayen, 2401 Pangasinan",
+            "phone_number": "0917 800 9354",
+            "rating": "4.5/5 from 85 reviews",
+            "opening_hours": [
+                "Mon-Thu: 10AM - 7PM, Fri-Sun: 8AM - 8PM"
+            ],
+            "website": "https://www.facebook.com/mesadeamorph/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJtdnFSUZfkTMRR13I1Lfr7Fo",
+            "photo_note": "View verified photos via google_maps_url or https://www.facebook.com/mesadeamorph/",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Pinoy home cooked meals done right."
+                },
+                {
+                    "rating": 5,
+                    "text": "Mesa de Amor is a great place to dine. A rustic place with great staff. Their sinigang and lumpiang gulay is worth trying"
+                },
+                {
+                    "rating": 4,
+                    "text": "What we ordered: Sinigang na Pompano, Sisig, Baguesen. The food feels very homey and comforting. Every dish tastes like something you’d enjoy at home."
+                },
+                {
+                    "rating": 5,
+                    "text": "We had a delicious, well cooked meal of typical Filipino food. Great service and wonderful atmosphere. Highly recommended."
+                }
+            ]
+        },
+        {
+            "id": "ChIJPUGYNPJfkTMRSmPhFTd-dPM",
+            "name": "Calazan View Grill",
+            "municipality": "Lingayen",
+            "address": "X6WW+FCC, Urbiztondo - Lingayen Rd, Lingayen, Pangasinan",
+            "phone_number": "0967 467 0179",
+            "rating": "4.5/5 from 28 reviews",
+            "opening_hours": [],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJPUGYNPJfkTMRSmPhFTd-dPM",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Great food and service. Staff are so kind and helpful and they are always smiling."
+                },
+                {
+                    "rating": 5,
+                    "text": "Ganda ng ambiance with fresh air with hot food..."
+                },
+                {
+                    "rating": 5,
+                    "text": "Good food, Good service, Friendly and welcoming staff. The smiles of the staff made us relax as we enjoy the environment and food."
+                }
+            ]
+        },
+        {
+            "id": "ChIJK9Rf1WBekTMR_dYSygaRwS8",
+            "name": "Papa Dong's Restaurant",
+            "municipality": "Lingayen",
+            "address": "26FJ+6C4, Poblacion, Lingayen, Pangasinan",
+            "phone_number": "0917 622 8435",
+            "rating": "3.8/5 from 250 reviews",
+            "opening_hours": [
+                "Mon-Sun: 8AM - 10PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJK9Rf1WBekTMR_dYSygaRwS8",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 4,
+                    "text": "Great view, affordable and delicious food. Generous serving for all food."
+                },
+                {
+                    "rating": 4,
+                    "text": "Delicious food. Reasonably priced"
+                }
+            ]
+        },
+        {
+            "id": "ChIJDTNUNopfkTMRa3t1UMil4Ak",
+            "name": "URESHII KOI",
+            "municipality": "Lingayen",
+            "address": "26GM+QGH, Maramba Blvd, Poblacion, Lingayen, Pangasinan",
+            "phone_number": null,
+            "rating": "4.3/5 from 49 reviews",
+            "opening_hours": [],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJDTNUNopfkTMRa3t1UMil4Ak",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 4,
+                    "text": "Great food for its price, friendly staff"
+                },
+                {
+                    "rating": 5,
+                    "text": "Good food and very affordable 🍜🤤"
+                },
+                {
+                    "rating": 5,
+                    "text": "The place is clean and cozy. Food is flavorsome, saporous, and exquisite in taste. The presentation was meticulously done. The avocado maki was excellent! Salmon sashimi was fresh and yummy."
+                },
+                {
+                    "rating": 5,
+                    "text": "Fried Avocado Maki: 100000/10, California Maki: 9.5/10"
+                },
+                {
+                    "rating": 5,
+                    "text": "One of my favorite places to get maki.🥰 The place is cozy enough, and the drinks there are wonderful. They have lots of ramen to choose from. Aside from maki, I love their katsu curry. ❤️"
+                }
+            ]
+        },
+        {
+            "id": "ChIJ_5-AUfVfkTMRKtYGTo_PiyM",
+            "name": "Nanay remys foodhouse",
+            "municipality": "Lingayen",
+            "address": "Alvear II, Poblacion, Lingayen, Pangasinan",
+            "phone_number": null,
+            "rating": "4.6/5 from 18 reviews",
+            "opening_hours": [],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJ_5-AUfVfkTMRKtYGTo_PiyM",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 4,
+                    "text": "Nice nipa hut court area look lots of tables toilets clean. Polite accommodating staff reasonable prices masarap foods. Having stage and band singing good place 👍"
+                },
+                {
+                    "rating": 4,
+                    "text": "The ambiance was nice, a typical nipa hut style resto by the beach. Food was okay, reasonably priced."
+                }
+            ]
+        },
+        {
+            "id": "ChIJb4tY2e5dkTMROELdYkRyKR4",
+            "name": "The Vineyard",
+            "municipality": "Calasiao",
+            "address": "Amarosa Square, Judge Jose De Venecia Avenue, corner Malued Rd, Calasiao, 2418 Pangasinan",
+            "phone_number": "(075) 649 3507",
+            "rating": "4.4/5 from 124 reviews",
+            "opening_hours": [
+                "Mon-Sun: 11AM - 10PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJb4tY2e5dkTMROELdYkRyKR4",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 4,
+                    "text": "The Vineyard in Calasiao is a great place to enjoy good food in a relaxed and welcoming atmosphere. Their menu offers a wide variety of dishes, so there's something for everyone."
+                },
+                {
+                    "rating": 4,
+                    "text": "Must try their grilled porkchop the best"
+                },
+                {
+                    "rating": 5,
+                    "text": "Food and serving size is great and pricing is also worth it."
+                },
+                {
+                    "rating": 5,
+                    "text": "Fast service and all servers were attentive to our needs and requests. Food was superb and everything we ordered was delicious! We ordered most of their pasta offerings and they are all sumptuous."
+                },
+                {
+                    "rating": 5,
+                    "text": "Huge respect to the owner and staff for providing great service and even greater food."
+                }
+            ]
+        },
+        {
+            "id": "ChIJszo59ildkTMRB004soFqpWY",
+            "name": "Les Boissons",
+            "municipality": "Calasiao",
+            "address": "Corner Patalan Rd, Calasiao, Pangasinan",
+            "phone_number": "0905 665 2014",
+            "rating": "4.8/5 from 218 reviews",
+            "opening_hours": [
+                "Mon-Sun: 11AM - 11PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJszo59ildkTMRB004soFqpWY",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "We have had a most enjoyable meal the service was excellent every dish we had had real flavor I can see us returning many times"
+                },
+                {
+                    "rating": 5,
+                    "text": "Unexpected Gem in Pangasinan!!! Standout Dishes: Soft and Affordable Wagyu Steak, Currywurst Appetizer, Handmade Pasta. Step into a classic European setting."
+                },
+                {
+                    "rating": 5,
+                    "text": "Les Boissons is a hidden gem that will definitely impress you once you step inside... The dishes are flavorful and beautifully presented, especially their pizza, which stands out as a must-try."
+                },
+                {
+                    "rating": 5,
+                    "text": "very nice place also a good staff there. they have very delicious food and a good cook."
+                },
+                {
+                    "rating": 5,
+                    "text": "the food is really good and i love the pasta and pizza, especially the wagyu steak"
+                }
+            ]
+        },
+        {
+            "id": "ChIJzWUF6iJDkTMRp_tPQN0X6d8",
+            "name": "Amare La Cucina Pangasinan",
+            "municipality": "Calasiao",
+            "address": "29C5+9VM, Calasiao, Pangasinan",
+            "phone_number": "0918 495 5599",
+            "rating": "3.8/5 from 67 reviews",
+            "opening_hours": [
+                "Mon-Thu: 11AM - 9PM, Fri-Sat: 11AM - 10PM, Sun: 10AM - 9PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJzWUF6iJDkTMRp_tPQN0X6d8",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "The pizza and ribs were delicious. The customer service is amazing"
+                },
+                {
+                    "rating": 5,
+                    "text": "Alvins pizza, truffle fries and bacon carbonara ❤️❤️❤️ Best amare branch!"
+                },
+                {
+                    "rating": 4,
+                    "text": "Delicious Italian food, friendly staff, cozy ambiance, a bit pricey but worth it."
+                }
+            ]
+        },
+        {
+            "id": "ChIJjd-lIhlDkTMRq_VRk1vUgPk",
+            "name": "Cristoforo",
+            "municipality": "Calasiao",
+            "address": "National Hi-way, Brgy, Calasiao, 2418 Pangasinan",
+            "phone_number": "0917 170 3121",
+            "rating": "4.6/5 from 77 reviews",
+            "opening_hours": [
+                "Mon-Sun: 6AM - 10PM"
+            ],
+            "website": "http://www.themonarchhotel.com.ph/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJjd-lIhlDkTMRq_VRk1vUgPk",
+            "photo_note": "View verified photos via google_maps_url or http://www.themonarchhotel.com.ph/",
+            "real_reviews": [
+                {
+                    "rating": 4,
+                    "text": "They have fusion dishes and some are good. Service is great, all are accommodating. We enjoyed their Salmon dish and Chicken Masala."
+                },
+                {
+                    "rating": 5,
+                    "text": "Inside the lobby of the Monarch Hotel, you will find quite a gem of a restaurant. The staff was helpful at every junction. The food was made with quality ingredients and they even put a unique twist on classic recipes."
+                },
+                {
+                    "rating": 5,
+                    "text": "Dinner buffet is superb. The steamed red snapper is my favorite and the potato salad. Servers are very courteous and amazingly accommodating especially Kenedy."
+                },
+                {
+                    "rating": 5,
+                    "text": "The food is excellent..the staffs are accommodating and friendly"
+                },
+                {
+                    "rating": 5,
+                    "text": "Complete variety of food, accommodating and efficient staff and beautiful restaurant."
+                }
+            ]
+        },
+        {
+            "id": "ChIJcUyE7-pdkTMRZXykQj9hqCg",
+            "name": "House of Bangus (by Mr. Dagupeño)",
+            "municipality": "Calasiao",
+            "address": "RBA Paramount Building, 102 Judge Jose de Venecia Ave, Calasiao, 2418 Pangasinan",
+            "phone_number": "0915 173 3958",
+            "rating": "4.3/5 from 49 reviews",
+            "opening_hours": [
+                "Mon-Sun: 10:30AM - 9:30PM"
+            ],
+            "website": "https://www.dagupanbangusph.com/house-of-bangus",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJcUyE7-pdkTMRZXykQj9hqCg",
+            "photo_note": "View verified photos via google_maps_url or https://www.dagupanbangusph.com/house-of-bangus",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Dagupan, well known for their Bangus and other seafoods, this place takes it to another level. The creativity with the dishes blows my mind, Squid sisig? YES it's incredible, the staple boneless bangus? the standard."
+                },
+                {
+                    "rating": 5,
+                    "text": "Yummy food. We ordered the Crispy bangus sisig 390, Calamares 355, Kare-kare lechon, Aligue rice, steamed rice. When craving for bangus this place is a MUST TRY! 🤤"
+                },
+                {
+                    "rating": 5,
+                    "text": "This place truly lives up to being a house of bangus! They offer a wide variety of creative bangus dishes. I highly recommend the Bangus Cordon Bleu—it was delicious, and the waiting time was very reasonable. The Bangus Sisig is also a must-try."
+                },
+                {
+                    "rating": 5,
+                    "text": "the food is so good, must try the baked bangus"
+                },
+                {
+                    "rating": 5,
+                    "text": "I have never tasted a more savory sinigang and the bangus sisig is an 'MVP' according to my brother who is very picky. The other bangus dishes did not disappoint either."
+                }
+            ]
+        },
+        {
+            "id": "ChIJDQTFLC1FkTMRPp03wscGbQA",
+            "name": "Roberto’s Backyard",
+            "municipality": "San Carlos City",
+            "address": "X82X+MHF, Estanquero, San Carlos City, Pangasinan",
+            "phone_number": "0918 497 0230",
+            "rating": "4.1/5 from 96 reviews",
+            "opening_hours": [
+                "Mon-Fri, Sun: 11AM - 9PM, Sat: 11:30AM - 9PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJDQTFLC1FkTMRPp03wscGbQA",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "The food is delicious at a reasonable price, highly recommended the fried chicken and creamy chopsuey its a must try! Staffs are awesome! The place feels like homie vibe and they have a big parking space ❤️"
+                },
+                {
+                    "rating": 4,
+                    "text": "We were so impressed with this restaurant—they even accommodated us just minutes before closing. The food was delicious and served in huge portions, with prices that felt fair for the quality and quantity."
+                }
+            ]
+        },
+        {
+            "id": "ChIJiRKPWwBbkTMRAY_ctSCOX2k",
+            "name": "PORTO UNO RESTAURANT",
+            "municipality": "San Carlos City",
+            "address": "S, 2/F Melita Plaza Commercial Bldg, Palaris, cor Pagsolingan St, San Carlos City, 2420 Pangasinan",
+            "phone_number": "0910 687 1111",
+            "rating": "3.5/5 from 23 reviews",
+            "opening_hours": [
+                "Mon-Sun: 9:30AM - 9:30PM"
+            ],
+            "website": "https://www.facebook.com/PortoUnoGrillRestaurant/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJiRKPWwBbkTMRAY_ctSCOX2k",
+            "photo_note": "View verified photos via google_maps_url or https://www.facebook.com/PortoUnoGrillRestaurant/",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "The resto offers a variety of food choices - classic dishes like salmon sinigang, dinakdakan, honey buttered chicken, crispy pata, calamares, and spring rolls. During lunch, the highlight was the dinakdakan."
+                },
+                {
+                    "rating": 5,
+                    "text": "The ambience is great… food is delicious. We tried the calamares, bagnet kare-kare and bangus sisig. It was great also with dessert which they have the Carmen’s best."
+                },
+                {
+                    "rating": 5,
+                    "text": "Porto Uno is a great all-around spot, especially if you're looking for a hearty, authentic Filipino meal or need a versatile restaurant that can please a group with varied international cravings."
+                },
+                {
+                    "rating": 5,
+                    "text": "We finally went on a weekend getaway and went to Porto Uno for dinner, turns out it was the highlight of our much needed adventure. The food was absolutely phenomenal, and the service was impeccable."
+                }
+            ]
+        },
+        {
+            "id": "ChIJ5RL0ZM5bkTMRyeB1bIJuIyc",
+            "name": "Raguz Grill and Restaurant - San Juan, San Carlos City",
+            "municipality": "San Carlos City",
+            "address": "65 San Carlos - Urbiztondo Rd, San Juan, San Carlos City, 2420 Pangasinan",
+            "phone_number": "0916 256 3687",
+            "rating": "4.7/5 from 15 reviews",
+            "opening_hours": [
+                "Mon-Sun: 8AM - 2AM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJ5RL0ZM5bkTMRyeB1bIJuIyc",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": []
+        },
+        {
+            "id": "ChIJBT1gI71FkTMRSnNqNZptnio",
+            "name": "Owie's restostreet",
+            "municipality": "San Carlos City",
+            "address": "7 Perez Blvd, San Carlos City, Pangasinan",
+            "phone_number": null,
+            "rating": "4.4/5 from 47 reviews",
+            "opening_hours": [],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJBT1gI71FkTMRSnNqNZptnio",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "The place feels a bit cramped. But! Food is great, especially the fish fillet. Parking can accommodate 3 vehicles at a time. Service is great! :)"
+                },
+                {
+                    "rating": 5,
+                    "text": "the food was sumptuous 😍 the service is superb"
+                },
+                {
+                    "rating": 5,
+                    "text": "A very nice place to dine in, we booked there on the day of our wedding, the food is delicious and also the staff are very polite and accommodating."
+                },
+                {
+                    "rating": 4,
+                    "text": "Refreshing and delicious halo halo especially the spicy winter halo halo"
+                },
+                {
+                    "rating": 4,
+                    "text": "The food was masarap but a bit pricey. The service was quick and nice ang staff."
+                }
+            ]
+        },
+        {
+            "id": "ChIJdfbvJSdFkTMR8derCq8OmT8",
+            "name": "Kabaleyan Cove Restaurant 6",
+            "municipality": "San Carlos City",
+            "address": "W968+J89, San Carlos City, Pangasinan",
+            "phone_number": null,
+            "rating": "4.4/5 from 25 reviews",
+            "opening_hours": [],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJdfbvJSdFkTMR8derCq8OmT8",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Although their food is pricey, its taste is truly amazing."
+                },
+                {
+                    "rating": 5,
+                    "text": "Quiet place, tasty food, good price, welcoming and quick staff"
+                },
+                {
+                    "rating": 5,
+                    "text": "The lunch we had was fantastic. Every menu item pictured in this review is delicious."
+                }
+            ]
+        },
+        {
+            "id": "ChIJieatBGM5kTMRvZUdd0wOWY8",
+            "name": "Bacon Buffalo and Beyond",
+            "municipality": "Rosales",
+            "address": "VHMX+89W, Yao building, MacArthur Hwy, Rosales, Pangasinan",
+            "phone_number": "0945 770 1419",
+            "rating": "4.2/5 from 60 reviews",
+            "opening_hours": [
+                "Mon-Sun: 10AM - 10PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJieatBGM5kTMRvZUdd0wOWY8",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 4,
+                    "text": "Ambiance is very kewl, cold beer, great food over-all (We Had Pizza, Sisig, Mushroom, Calamares, FFries...) Got the original BDubs feel here... Babalik!"
+                },
+                {
+                    "rating": 4,
+                    "text": "The servings are big for the price, the curry sauce and mushroom sauce was good."
+                }
+            ]
+        },
+        {
+            "id": "ChIJjec2M-47kTMRYXcFQuJIKQc",
+            "name": "Sides Trip",
+            "municipality": "Rosales",
+            "address": "076, Carmay East, Rosales, 2441 Pangasinan",
+            "phone_number": "0948 839 1024",
+            "rating": "5.0/5 from 30 reviews",
+            "opening_hours": [
+                "Mon-Sun: 5AM - 8:30PM"
+            ],
+            "website": "https://www.facebook.com/profile.php?id=100093690621149",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJjec2M-47kTMRYXcFQuJIKQc",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": []
+        },
+        {
+            "id": "ChIJSSf4XXI5kTMRERkVxMv_hrU",
+            "name": "AMB Filipiniana Restaurant",
+            "municipality": "Rosales",
+            "address": "VJP2+846, Rosales, Pangasinan",
+            "phone_number": "(075) 632 1254",
+            "rating": "4.4/5 from 43 reviews",
+            "opening_hours": [
+                "Mon-Sun: 12AM - 6PM, 8PM - 12AM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJSSf4XXI5kTMRERkVxMv_hrU",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 3,
+                    "text": "Accommodating. You can reserve seats and order in advance through their facebook page... Serving time is also good."
+                },
+                {
+                    "rating": 5,
+                    "text": "Good food, tasty and good prices. The fried chicken was so good!!!"
+                }
+            ]
+        },
+        {
+            "id": "ChIJ8fgoKUY7kTMRqOLqJwYz_A8",
+            "name": "Hami's Persian Kebab Rosales",
+            "municipality": "Rosales",
+            "address": "in front of Shell Gas Station, 2nd Flr. 127, Carmay East, Rosales, 2441 Pangasinan",
+            "phone_number": "0939 015 9699",
+            "rating": "4.9/5 from 112 reviews",
+            "opening_hours": [
+                "Mon-Sun: 11AM - 10PM"
+            ],
+            "website": "https://www.facebook.com/profile.php?id=100087626614523",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJ8fgoKUY7kTMRqOLqJwYz_A8",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "First of all, the owner is very accommodating and patiently answered all our questions about the dishes. The food was absolutely sumptuous—every dish we tried was delicious and worth recommending. We especially enjoyed the kebabs, which were flavorful and perfectly cooked. The basmati rice was on another level."
+                },
+                {
+                    "rating": 5,
+                    "text": "Generous proportions, dishes are delicious. Flavors are balanced. Service is quick."
+                },
+                {
+                    "rating": 5,
+                    "text": "The food is great and has a generous amount of serving! Will definitely dine here again 😊 ++the owner is really friendly!"
+                },
+                {
+                    "rating": 5,
+                    "text": "Meals are excellent, well-spiced, and excellent for value. If you're looking for authentic Persian cuisine - this is a must visit!"
+                },
+                {
+                    "rating": 5,
+                    "text": "This is our favorite Persian restaurant in Pangasinan. The food is really good and come in big servings. They're very accommodating with food allergies and diet restrictions as well."
+                }
+            ]
+        },
+        {
+            "id": "ChIJwXZyFXM5kTMRBH_DfdnFHXM",
+            "name": "Lokal Bistro",
+            "municipality": "Rosales",
+            "address": "1250 MacArthur Hwy, Rosales, 2441 Pangasinan",
+            "phone_number": "0977 687 8049",
+            "rating": "4.9/5 from 8 reviews",
+            "opening_hours": [
+                "Mon-Sun: 4 - 9PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJwXZyFXM5kTMRBH_DfdnFHXM",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": []
+        },
+        {
+            "id": "ChIJK2Bw2zhJkTMRBPBVN3_sBtM",
+            "name": "The Pasadena Daily",
+            "municipality": "Bayambang",
+            "address": "35 M. H. Del Pilar St, Bayambang, 2423 Pangasinan",
+            "phone_number": "0921 891 0145",
+            "rating": "4.8/5 from 96 reviews",
+            "opening_hours": [
+                "Mon-Sun: 10AM - 9PM"
+            ],
+            "website": "https://www.facebook.com/pasadenarestaurantbayambang/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJK2Bw2zhJkTMRBPBVN3_sBtM",
+            "photo_note": "View verified photos via google_maps_url or https://www.facebook.com/pasadenarestaurantbayambang/",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "This restaurant got my taste buds caught with the unique menu that they have. Love their signature ranch sauce perfectly paired with my favorite menu sets. My personal favorites were thin pizzas, carbonara, clubhouse and unlimited wings with fries."
+                },
+                {
+                    "rating": 5,
+                    "text": "Overall great people great service on awesome food... 100% recommend and give them a try..."
+                }
+            ]
+        },
+        {
+            "id": "ChIJKXTl8dhIkTMRpSnGRnA6EUI",
+            "name": "Kuya Tiano's Place",
+            "municipality": "Bayambang",
+            "address": "RF92+28H, Bayambang, Pangasinan",
+            "phone_number": null,
+            "rating": "4.4/5 from 131 reviews",
+            "opening_hours": [
+                "Mon-Sun: 8AM - 10PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJKXTl8dhIkTMRpSnGRnA6EUI",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "The food tastes so good and is served warm, and gives you a very generous amount on the meal you order; And also, they have aquarium fish tank that has fishes and turtles! 💗"
+                },
+                {
+                    "rating": 4,
+                    "text": "Big serving. Their poke poke is so good and their pigar pigar is tender; papaitan is good; sisig lechon kawali is also yummy but what we really love is their fresh lemon cucumber."
+                },
+                {
+                    "rating": 4,
+                    "text": "Good food nice place and reasonable price must check out"
+                },
+                {
+                    "rating": 4,
+                    "text": "The upside is that the food is very delicious. I love coming here for good flavor food."
+                }
+            ]
+        },
+        {
+            "id": "ChIJlY1qwXRJkTMRPS3npvHBy1k",
+            "name": "Bistro Cinco",
+            "municipality": "Bayambang",
+            "address": "119 Zone, 5 Camiling - Malasiqui - Santa Barbara Rd, Bayambang, Pangasinan",
+            "phone_number": "0956 346 0816",
+            "rating": "4.6/5 from 29 reviews",
+            "opening_hours": [
+                "Mon: Closed, Tue-Sat: 11AM - 7:30PM, Sun: 10AM - 7:30PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJlY1qwXRJkTMRPS3npvHBy1k",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "This place is great! Atmosphere is chill and cool. Food is pretty good, some italian classics and some twists, and for their prices it’s 100% worth it. Hospitable hosts, delicious dishes and beautiful presentation!"
+                }
+            ]
+        },
+        {
+            "id": "ChIJBw8FIABPkTMROrcMreVlprw",
+            "name": "Casa Galileo Events Place and Family Restaurant",
+            "municipality": "Bayambang",
+            "address": "RCR6+VF7, Bayambang, Pangasinan",
+            "phone_number": "0917 189 9055",
+            "rating": "4.5/5 from 12 reviews",
+            "opening_hours": [
+                "Mon-Sun: 11AM - 10PM"
+            ],
+            "website": "https://www.facebook.com/share/1CpFPcMuC6/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJBw8FIABPkTMROrcMreVlprw",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "At first, we were a bit intimidated by the modern and classy reception, thinking the place might be expensive. But once we stepped inside, we were pleasantly surprised. The food is very affordable, the servings are generous, and everything we tried was genuinely delicious."
+                }
+            ]
+        },
+        {
+            "id": "ChIJLRK_cy9JkTMRGp2YgrtOEY4",
+            "name": "Niña's Cafe",
+            "municipality": "Bayambang",
+            "address": "Lot 8 St Vincent Rd, Bayambang, Pangasinan",
+            "phone_number": "0928 620 0889",
+            "rating": "4.6/5 from 99 reviews",
+            "opening_hours": [
+                "Mon-Wed: 11AM - 9PM, Thu-Sat: 11AM - 10PM, Sun: 10AM - 9PM"
+            ],
+            "website": "https://www.facebook.com/NinasCafeOfficial/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJLRK_cy9JkTMRGp2YgrtOEY4",
+            "photo_note": "View verified photos via google_maps_url or https://www.facebook.com/NinasCafeOfficial/",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "5* Service, good ambience, nice food of high quality, good variety on both asian and western dishes. Nice place for both intimate dining or event."
+                },
+                {
+                    "rating": 5,
+                    "text": "The food was so delicious and surprisingly affordable! Great taste without breaking the bank. Perfect spot for a satisfying meal—highly recommended!"
+                },
+                {
+                    "rating": 5,
+                    "text": "love the ambience and food is delicious staff is very accommodating good service"
+                }
+            ]
+        },
+        {
+            "id": "ChIJrYIEQPZFkTMRn_U_ZDjkPmw",
+            "name": "2421 Cafe & Bistro",
+            "municipality": "Malasiqui",
+            "address": "3 General Luna St, Malasiqui, 2421 Pangasinan",
+            "phone_number": "0917 540 2421",
+            "rating": "4.5/5 from 30 reviews",
+            "opening_hours": [
+                "Mon-Wed, Sun: 9AM - 9PM, Thu-Sat: 9AM - 10PM"
+            ],
+            "website": "https://www.facebook.com/2421cafe",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJrYIEQPZFkTMRn_U_ZDjkPmw",
+            "photo_note": "View verified photos via google_maps_url or https://www.facebook.com/2421cafe",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "We are still at the restaurant. The foods are so delicious, nicely presented. Everything is good, fast service courteous servers. It is exceptional. We are definitely coming back."
+                }
+            ]
+        },
+        {
+            "id": "ChIJRSduZEdEkTMRlOO8NfuyVXI",
+            "name": "Cafe Martina Grill and Restaurant",
+            "municipality": "Malasiqui",
+            "address": "WC96+WW3, Burgos St, Malasiqui, Pangasinan",
+            "phone_number": "0928 266 4766",
+            "rating": "5.0/5 from 6 reviews",
+            "opening_hours": [
+                "Mon-Sun: 7AM - 5PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJRSduZEdEkTMRlOO8NfuyVXI",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Belly-filling great food!"
+                }
+            ]
+        },
+        {
+            "id": "ChIJoWmKXzNEkTMRc5TPVBMJvgU",
+            "name": "Tres Hermanos Restaurant",
+            "municipality": "Malasiqui",
+            "address": "WC49+C99, Brgy, Malasiqui, Pangasinan",
+            "phone_number": "0945 712 2121",
+            "rating": "3.7/5 from 74 reviews",
+            "opening_hours": [
+                "Mon-Sun: 10:30AM - 2PM, 5:30 - 9:30PM"
+            ],
+            "website": "https://www.facebook.com/tres.hermanos.malasiqui/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJoWmKXzNEkTMRc5TPVBMJvgU",
+            "photo_note": "View verified photos via google_maps_url or https://www.facebook.com/tres.hermanos.malasiqui/",
+            "real_reviews": [
+                {
+                    "rating": 4,
+                    "text": "Many choices of food, it's really an eat all you can restaurant"
+                },
+                {
+                    "rating": 5,
+                    "text": "Nice food 350 per head"
+                }
+            ]
+        },
+        {
+            "id": "ChIJ_ynSlsNFkTMRHA93cg1MTKU",
+            "name": "Uson Pigar-Pigar Malasiqui Branch",
+            "municipality": "Malasiqui",
+            "address": "WC88+Q27, Magsaysay St, Malasiqui, Pangasinan",
+            "phone_number": "(075) 523 2110",
+            "rating": "4.0/5 from 41 reviews",
+            "opening_hours": [
+                "Mon-Sun: 8AM - 10PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJ_ynSlsNFkTMRHA93cg1MTKU",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Probably the best Pigar Pigar I’ve tasted!"
+                },
+                {
+                    "rating": 3,
+                    "text": "delicious food"
+                }
+            ]
+        },
+        {
+            "id": "ChIJpZgFtI9pkTMRJZrlROlBR7Y",
+            "name": "Los Pedritos Mangaldan",
+            "municipality": "Mangaldan",
+            "address": "3CC5+J45, Mangaldan, Pangasinan",
+            "phone_number": null,
+            "rating": "4.3/5 from 92 reviews",
+            "opening_hours": [
+                "Mon-Sun: 7AM - 8:30PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJpZgFtI9pkTMRJZrlROlBR7Y",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "I love coming back to this place. So convenient, it has a lot of parking space, few people and nice comfort food to choose with. Affordable meals and good service."
+                },
+                {
+                    "rating": 5,
+                    "text": "I’ve eaten at several of their branches, and they never disappoint. The food is always delicious, the bread is amazing, and the service is consistently great."
+                },
+                {
+                    "rating": 5,
+                    "text": "Food was great! We had Adobo Pusit, Sizzling Gambas, Fresh Lumpia, Satay Chicken. Our waitress & waiters were very accommodating. Great parking space too 😀"
+                },
+                {
+                    "rating": 5,
+                    "text": "I love this place better than other store! Very clean and service crew are very professional! This is my go to place when it comes to filipino food in Mangaldan."
+                },
+                {
+                    "rating": 5,
+                    "text": "Wide, cozy and elegant resto. Delicious food, cakes and pastries."
+                }
+            ]
+        },
+        {
+            "id": "ChIJpbfzKedpkTMRD6tvT6AsUL4",
+            "name": "Cesario's Garden Restaurant",
+            "municipality": "Mangaldan",
+            "address": "5 Embarcadero Bridge, Mangaldan, Pangasinan",
+            "phone_number": "0995 960 1523",
+            "rating": "4.1/5 from 117 reviews",
+            "opening_hours": [
+                "Mon-Sun: 10AM - 8PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJpbfzKedpkTMRD6tvT6AsUL4",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Delicious Filipino Food, Friendly Service Love The Bbq on a Stick. Open Air A Little Bit Warm Weather. Easy to Park PWD Friendly Highly Recommended"
+                },
+                {
+                    "rating": 5,
+                    "text": "Foods served are delicious and yummy. Love the binagoongan bangus belly💞"
+                },
+                {
+                    "rating": 5,
+                    "text": "Everything was on point … Excellent service, food fantastic, the place is amazing, & the staff so friendly …"
+                }
+            ]
+        },
+        {
+            "id": "ChIJl-HiunppkTMRzlQWwyAYZYk",
+            "name": "TOKIO by Hagemu",
+            "municipality": "Mangaldan",
+            "address": "Mangaldan, Pangasinan",
+            "phone_number": "0968 574 8090",
+            "rating": "4.4/5 from 75 reviews",
+            "opening_hours": [
+                "Mon-Sun: 11AM - 9PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJl-HiunppkTMRzlQWwyAYZYk",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "This is a local good find. They have edamame, sushi and ramen and even desserts! They Also have free tea for The table. Worth the money. Adequate parking in the rear."
+                },
+                {
+                    "rating": 5,
+                    "text": "It was my first time visiting this place, and I was truly impressed. The moment you step inside, the ambiance already gives you that Japanese restaurant vibe—cozy, calm, and not too noisy."
+                },
+                {
+                    "rating": 5,
+                    "text": "I love Japanese food, Ramen, sushi rolls, and tempura are my favourite and TOKIO, hit the nail on the head with all 3! Thanks!"
+                },
+                {
+                    "rating": 5,
+                    "text": "Authentic japanese food. Yummy!"
+                }
+            ]
+        },
+        {
+            "id": "ChIJ4UxzJgBpkTMR5OoKLJ1RhAM",
+            "name": "Casa Inasal Mangaldan",
+            "municipality": "Mangaldan",
+            "address": "395W+HVJ, Mangaldan, Pangasinan",
+            "phone_number": null,
+            "rating": "5.0/5 from 62 reviews",
+            "opening_hours": [
+                "Mon-Sun: 11AM - 10PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJ4UxzJgBpkTMR5OoKLJ1RhAM",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Good service, affordable but quality food. Absolutely recommended."
+                },
+                {
+                    "rating": 5,
+                    "text": "The place was good it's very filipino vibes, the staff were accommodating and the food was delicious!"
+                },
+                {
+                    "rating": 5,
+                    "text": "This is our unli rice go to lol. The portions of chicken inasal are huge and the pork bbq is so good too. Comes with RC cola so that’s really fun."
+                },
+                {
+                    "rating": 5,
+                    "text": "The service is so fast and the staffs are so generous, The Food? Delicious!"
+                },
+                {
+                    "rating": 5,
+                    "text": "great service and warm food so tasty"
+                }
+            ]
+        },
+        {
+            "id": "ChIJ7XDAcQBpkTMRUh8Sxj1kjSQ",
+            "name": "Barriokoy Cafe",
+            "municipality": "Mangaldan",
+            "address": "Brgy, Compound Visperas, Bari, Mangaldan, Pangasinan",
+            "phone_number": null,
+            "rating": "4.7/5 from 13 reviews",
+            "opening_hours": [
+                "Mon-Sun: 10AM - 9PM"
+            ],
+            "website": "https://www.facebook.com/share/k52MRApxDNjXdtsA/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJ7XDAcQBpkTMRUh8Sxj1kjSQ",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Barriokoy Cafe has garnered positive reviews for its inviting atmosphere and friendly service. The cafe stands out for its cozy, casual vibe, making it a great place to relax or catch up with friends."
+                },
+                {
+                    "rating": 4,
+                    "text": "Love the vibe, and the food is really good! We had the Spicy Cajun pasta and Garlic Beef rice meal. For drinks, we had the blueberry yogurt shake, Iced matcha strawberry, and the Strawberry Christmas special."
+                },
+                {
+                    "rating": 5,
+                    "text": "best place to date🫶🏻 yummy foods and very accommodating staff! and of course, loving the vibe💗"
+                }
+            ]
+        },
+        {
+            "id": "ChIJeWHhhcNtkTMRc5C6V6l4SAI",
+            "name": "La Favola Authentic Italian Restaurant",
+            "municipality": "San Fabian",
+            "address": "5C5W+F8G, San Fabian, Pangasinan",
+            "phone_number": "0939 458 7899",
+            "rating": "4.8/5 from 39 reviews",
+            "opening_hours": [
+                "Mon: Closed, Tue-Sun: 11AM - 9PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJeWHhhcNtkTMRc5C6V6l4SAI",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Chef Tiziano Rossi brought his culinary passion from Turin, Italy, to a sleek little café in San Fabian, Pangasinan, and we’re so glad he did! Chef Rossi prepares his authentic pizza dough from scratch... Our favorites so far are the Hawaiian Supreme Pizza; the Margherita Pizza; the Spaghetti Bolognese; the Cappuccino; and the fabulously light Tiramisu."
+                },
+                {
+                    "rating": 5,
+                    "text": "We ordered salamino picante and spaghetti carbonara, and spaghetti Bolognese and tiramisu. The pizza and the pasta was outstanding and it reminded me when I was in Italy this year."
+                },
+                {
+                    "rating": 5,
+                    "text": "Pasta and Pizza are good. 10/10."
+                },
+                {
+                    "rating": 5,
+                    "text": "We ordered only 1 pizza and 1 serving of pesto pasta (2 persons) and were almost not able to finish the food because of their generous serving, and the food was really great!! Really authentic."
+                },
+                {
+                    "rating": 5,
+                    "text": "First time at La Favola and everything we ordered was so legitly delicious!!! Bravo to the chef👏👏👏👏👏"
+                }
+            ]
+        },
+        {
+            "id": "ChIJP2i7BadvkTMRpHDYRAQiHJY",
+            "name": "Haring Palayok Seafood Grill & Restaurant",
+            "municipality": "San Fabian",
+            "address": "Tempra Mac Arthur Highway, San Fabian, 2433 Pangasinan",
+            "phone_number": "0969 323 0826",
+            "rating": "4.0/5 from 23 reviews",
+            "opening_hours": [
+                "Mon-Sun: 10:30AM - 9PM"
+            ],
+            "website": "https://www.facebook.com/profile.php?id=100091547914941",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJP2i7BadvkTMRpHDYRAQiHJY",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Had a really good experience at Haring Palayok Seafood Grill & Restaurant. The food was tasty and satisfying, especially the seafood dishes. Everything we ordered was flavorful and good for sharing."
+                },
+                {
+                    "rating": 5,
+                    "text": "I love all our orders, delicious yet not expensive! The staff are friendly. Dining space is spacious & clean. AC is working well."
+                },
+                {
+                    "rating": 4,
+                    "text": "They went above and beyond to accommodate my last-minute Father's Day request. Their service was seamless, and the food was a hit—my kids loved it!"
+                },
+                {
+                    "rating": 5,
+                    "text": "We loved their dishes. Our favourites were the grilled pusit, sinigang, pinakbet, pancit, and a lot more. They were all delicious, and we got our money's worth."
+                }
+            ]
+        },
+        {
+            "id": "ChIJTZh_qRlvkTMRiTbl4Tl8GhU",
+            "name": "Festa by G Avenue",
+            "municipality": "San Fabian",
+            "address": "El Triple C Building, National Highway, Tempra Guilig Rd, San Fabian, 2433 Pangasinan",
+            "phone_number": "0945 841 5136",
+            "rating": "4.5/5 from 116 reviews",
+            "opening_hours": [
+                "Mon-Sun: 10AM - 9PM"
+            ],
+            "website": "https://www.facebook.com/FESTAbyGAvenue/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJTZh_qRlvkTMRiTbl4Tl8GhU",
+            "photo_note": "View verified photos via google_maps_url or https://www.facebook.com/FESTAbyGAvenue/",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Finally a restaurant with delicious food and generous servings that are worth every peso in San Fabian! Sarap ng kaldereta and Pizzas!!!! Great ambiance too."
+                },
+                {
+                    "rating": 5,
+                    "text": "Very affordable and they have variety of side dishes which i like .. specially their KIMCHIIIII ❤️❤️❤️"
+                },
+                {
+                    "rating": 5,
+                    "text": "had an amazing dining experience at G Avenue Samgyupsal! The variety of meats and side dishes was impressive, and everything was fresh and delicious."
+                },
+                {
+                    "rating": 5,
+                    "text": "The food is super delicious, there are plenty of servings, it's really worth it, and kudos to the staff for being very accommodating and friendly."
+                }
+            ]
+        },
+        {
+            "id": "ChIJzaJOfgBvkTMR13L536wlsno",
+            "name": "Sunset Hill Cafe & Cabins",
+            "municipality": "San Fabian",
+            "address": "Alacan - Rabon Road, Barangay Tiblong, San Fabian, 2433 Pangasinan",
+            "phone_number": "0998 865 6628",
+            "rating": "4.0/5 from 69 reviews",
+            "opening_hours": [
+                "Mon: Closed, Tue-Sun: 1 - 8PM"
+            ],
+            "website": "https://www.facebook.com/sunsethillcafe",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJzaJOfgBvkTMR13L536wlsno",
+            "photo_note": "View verified photos via google_maps_url or https://www.facebook.com/sunsethillcafe",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Very cozy and beautiful place. A little expensive but worth it, not going to places like this every day."
+                }
+            ]
+        },
+        {
+            "id": "ChIJ19AGbA1pkTMRZb8sIgkEr8U",
+            "name": "JohnLory Seafood Grill and Restaurant",
+            "municipality": "San Fabian",
+            "address": "San Fabian, Pangasinan",
+            "phone_number": "0907 313 1958",
+            "rating": "4.8/5 from 21 reviews",
+            "opening_hours": [
+                "Mon-Sun: 7AM - 12AM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJ19AGbA1pkTMRZb8sIgkEr8U",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "We ordered sinaglaw, sinigang fish, poqipoqi, pigarpigar, and tokwatbaboy. All tasted good. But highlight to poqipoqi and sinigang for me. An avid sinaglaw person with us rated it highly."
+                },
+                {
+                    "rating": 5,
+                    "text": "10/10 would recommend if you're looking for a restaurant that serves provincial food, and if you're tired of fast food."
+                }
+            ]
+        },
+        {
+            "id": "ChIJ7YGPj48VkTMRTGZCUKE90FA",
+            "name": "Gardener's Restaurant",
+            "municipality": "Binalonan",
+            "address": "Mc, MacArthur Hwy, Sumabnit, Binalonan, 2436 Pangasinan",
+            "phone_number": "0919 005 2194",
+            "rating": "4.6/5 from 62 reviews",
+            "opening_hours": [
+                "Mon-Sun: 10AM - 11PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJ7YGPj48VkTMRTGZCUKE90FA",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 4,
+                    "text": "If you want to experience or looking for a western type of food for your cravings this place is recommendable 😍 The quality of food was good, well prepared, and well presented."
+                },
+                {
+                    "rating": 5,
+                    "text": "The food is affordable and their steaks were perfectly cooked."
+                },
+                {
+                    "rating": 5,
+                    "text": "Affordable price for all the food with good quality, they rebuilt it to a nice bamboo house so we don’t feel hot even they don’t have air conditioning. Spaghetti is the most recommended."
+                },
+                {
+                    "rating": 5,
+                    "text": "The Australian Prime Ribeye Steak was a pleasant surprise. A melt in your mouth savory experience. I did not expect it to be so good!"
+                }
+            ]
+        },
+        {
+            "id": "ChIJ1zY4XM8VkTMR-W_S97aBxXQ",
+            "name": "Homa Persian Cuisine",
+            "municipality": "Binalonan",
+            "address": "Beside Landbank, infront of Municipal Town Hall, McKinley St, Poblacion, Binalonan, Pangasinan",
+            "phone_number": "0917 317 9451",
+            "rating": "4.4/5 from 43 reviews",
+            "opening_hours": [
+                "Mon-Sun: 11:30AM - 9PM"
+            ],
+            "website": "https://www.facebook.com/HomaFoodServices/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJ1zY4XM8VkTMR-W_S97aBxXQ",
+            "photo_note": "View verified photos via google_maps_url or https://www.facebook.com/HomaFoodServices/",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Food is good..the biryanis were perfectly cooked😘😘"
+                },
+                {
+                    "rating": 5,
+                    "text": "The food is good. It doesn’t cause any stomach issues. The rice is long rice and buttery. Very delicious."
+                }
+            ]
+        },
+        {
+            "id": "ChIJCWrpT4sVkTMRxi0ofZv2GJ0",
+            "name": "KWings Café",
+            "municipality": "Binalonan",
+            "address": "Along MacArthur Hwy, Bued, Binalonan, 2436 Pangasinan",
+            "phone_number": null,
+            "rating": "4.7/5 from 53 reviews",
+            "opening_hours": [
+                "Mon-Sat: 10AM - 9PM, Sun: Closed"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJCWrpT4sVkTMRxi0ofZv2GJ0",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Sulit food trip at K Wings! Good food, affordable pricing, and generous servings. Loved the Chicken Tikka and Chicken Sisig, but the Spinach Pizza was definitely the star, super cheesy and a must-try."
+                },
+                {
+                    "rating": 5,
+                    "text": "Defo a HIDDEN GEM in binalonan! 💯 Sulit ang food for its prices!!!! I highly recommend the chicken parmigiana, pesto pasta and their lasagna roll."
+                },
+                {
+                    "rating": 5,
+                    "text": "Small quaint cafe along Binalonan highway which I always happen to pass by. Ordered their iced coffee and Creamy Spinach and i can say it's a must try."
+                },
+                {
+                    "rating": 5,
+                    "text": "Delicious food, quality service, and perfect ambiance!"
+                },
+                {
+                    "rating": 5,
+                    "text": "Delicious meals and delicious coffee! I recommend Matcha Latte~ They also have a great service!"
+                }
+            ]
+        },
+        {
+            "id": "ChIJu6BzsrQVkTMROZ4LCMg7erY",
+            "name": "Maton kainan est.2020",
+            "municipality": "Binalonan",
+            "address": "Zamora St, Poblacion, Binalonan, 2436 Pangasinan",
+            "phone_number": null,
+            "rating": "4.9/5 from 20 reviews",
+            "opening_hours": [],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJu6BzsrQVkTMROZ4LCMg7erY",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Clean and delicious food at cheap prices in a nice ambience."
+                }
+            ]
+        },
+        {
+            "id": "ChIJizGPnSgVkTMRyD4cYomxz_k",
+            "name": "Byahero's Restaurant",
+            "municipality": "Binalonan",
+            "address": "2HMM+WG2, Binalonan, Pangasinan",
+            "phone_number": "0905 274 8207",
+            "rating": "4.6/5 from 13 reviews",
+            "opening_hours": [
+                "Mon-Sun: Open 24 hours"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJizGPnSgVkTMRyD4cYomxz_k",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Food is great."
+                }
+            ]
+        },
+        {
+            "id": "ChIJa7cfEmsZkTMRHPT2R-aEG7A",
+            "name": "El Syriano Cafe and Diner",
+            "municipality": "Tayug",
+            "address": "zone A, Rizal 1 street, Poblacion, Tayug, 2445 Pangasinan",
+            "phone_number": "0928 976 5638",
+            "rating": "5.0/5 from 676 reviews",
+            "opening_hours": [
+                "Mon-Sun: 9AM - 9PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJa7cfEmsZkTMRHPT2R-aEG7A",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "We enjoyed Fatoush Salad and Anonymous Burger with my daughter. Ambience is great! Perfect place to try something new, to recharge and savor new cuisine. Quality and service at its finest 👌🏼 10/10"
+                },
+                {
+                    "rating": 5,
+                    "text": "All the foods are good especially the Seafood pesto pasta, sinigang, sweet & sour fish. Definitely we will come back again."
+                },
+                {
+                    "rating": 5,
+                    "text": "Absolutely loved the experience here. The food was fresh, flavorful, and beautifully presented. The staff were welcoming, and the atmosphere was relaxing."
+                },
+                {
+                    "rating": 5,
+                    "text": "Their service is excellent, and the owner and waiter are friendly. That’s why we keep coming back plus, the food is delicious it’s really top-notch."
+                },
+                {
+                    "rating": 5,
+                    "text": "The food are affordable, the drinks are great and the customer service is exceptional!"
+                }
+            ]
+        },
+        {
+            "id": "ChIJzWppGrIZkTMRhT0F_cM6QI8",
+            "name": "Sugar and Salt by CPM (Tayug Branch)",
+            "municipality": "Tayug",
+            "address": "Burgos St, Tayug, Pangasinan",
+            "phone_number": "0919 931 7825",
+            "rating": "4.3/5 from 26 reviews",
+            "opening_hours": [
+                "Mon-Sun: 11AM - 8PM"
+            ],
+            "website": "https://m.facebook.com/sugarandsalttayug/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJzWppGrIZkTMRhT0F_cM6QI8",
+            "photo_note": "View verified photos via google_maps_url or https://m.facebook.com/sugarandsalttayug/",
+            "real_reviews": [
+                {
+                    "rating": 4,
+                    "text": "The food was good... the servers were nice and considerate."
+                }
+            ]
+        },
+        {
+            "id": "ChIJzxIpjZwZkTMReabV5JYfu58",
+            "name": "Diner’s Haven",
+            "municipality": "Tayug",
+            "address": "104 Bonifacio Street, Tayug, Pangasinan",
+            "phone_number": "0981 439 1433",
+            "rating": "4.7/5 from 35 reviews",
+            "opening_hours": [
+                "Mon-Sun: 10AM - 9PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJzxIpjZwZkTMReabV5JYfu58",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "We enjoyed our food and they have a wide selection of menu items. Generous servings, delicious yet affordable food, and prompt service. Staff are attentive and courteous."
+                },
+                {
+                    "rating": 5,
+                    "text": "This is a surprising restaurant. They serve Asian food as well as pasta and pizza. You can get chicken biryani, beef rendang, beef pares and more here. Food is excellent."
+                },
+                {
+                    "rating": 5,
+                    "text": "The BEST in Tayug! Tried most on their menu already & they never fail. My Favs are all their Combo Meals & my TOPS are: Chef's Fried Chicken, Bagay Tayo, BangMeBaby & She's The One."
+                },
+                {
+                    "rating": 5,
+                    "text": "Food Quality is 💯 Customer Service the best and maganda Place"
+                },
+                {
+                    "rating": 5,
+                    "text": "The portions were amazing and far better than any other place I've been to, I ordered the beef burrito and would definitely recommend it."
+                }
+            ]
+        },
+        {
+            "id": "ChIJL-U0MNUZkTMROO37VD9Rv7k",
+            "name": "KAPE CO",
+            "municipality": "Tayug",
+            "address": "334 Quezon Street, Tayug, Pangasinan",
+            "phone_number": "0927 260 0660",
+            "rating": "4.5/5 from 48 reviews",
+            "opening_hours": [
+                "Mon-Sun: 8AM - 10PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJL-U0MNUZkTMROO37VD9Rv7k",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Has been one of my favorite coffee shops in the Philippines. Staff is responsive and upbeat. The coffee is tasty and the food is great, with a surprising variety."
+                },
+                {
+                    "rating": 5,
+                    "text": "Great place to hang with your friends. Food is great"
+                },
+                {
+                    "rating": 3,
+                    "text": "When we tried the food, the pesto was great and flavorful."
+                }
+            ]
+        },
+        {
+            "id": "ChIJCfbwGrIZkTMRaqAWUeHHu1M",
+            "name": "Sugar & Salt by CPM Tayug",
+            "municipality": "Tayug",
+            "address": "Tobias Bldg, Magpali St, Tayug, Pangasinan",
+            "phone_number": "0921 766 3124",
+            "rating": "4.5/5 from 8 reviews",
+            "opening_hours": [
+                "Mon-Sun: 11AM - 8PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJCfbwGrIZkTMRaqAWUeHHu1M",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": []
+        },
+        {
+            "id": "ChIJQx-OGQATkTMR2qIu9Zhu8VY",
+            "name": "A's Restaurant and Cafe",
+            "municipality": "Pozorrubio",
+            "address": "McArthur Highway, Zone 3 Alipangpang, Pozorrubio, 2435 Pangasinan",
+            "phone_number": null,
+            "rating": "4.9/5 from 12 reviews",
+            "opening_hours": [
+                "Mon-Sun: 9AM - 9PM"
+            ],
+            "website": "https://www.facebook.com/people/As-Restaurant-Cafe/100085016037921/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJQx-OGQATkTMR2qIu9Zhu8VY",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Food is delicious, clean and affordable, portioning is decent, has ample parking, very accessible along the McArthur highway, very welcoming and attentive staff."
+                },
+                {
+                    "rating": 5,
+                    "text": "This place is wooonderful! Very accommodating ng mga staffs. I love their pork bbq and italian spaghetti. Restroom is very clean, i luv it!"
+                },
+                {
+                    "rating": 5,
+                    "text": "This place is a hidden gem tucked away in the heart of Pozorrubio. We ordered Pork Sisig, Crispy Kare Kare, French Fries (because I love fries) and they were actually crispy! I also ordered the Lychee drink and it exceeded my expectations."
+                },
+                {
+                    "rating": 5,
+                    "text": "Still very happy with A's. Excellent food, service, coffee and staff."
+                }
+            ]
+        },
+        {
+            "id": "ChIJm1uvU9YTkTMReGI60vUn4YE",
+            "name": "DDI BISTRO",
+            "municipality": "Pozorrubio",
+            "address": "16 Sison Street, Pozorrubio, Pangasinan",
+            "phone_number": null,
+            "rating": "4.5/5 from 19 reviews",
+            "opening_hours": [],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJm1uvU9YTkTMReGI60vUn4YE",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 4,
+                    "text": "Food is great! 😍😋 All side dishes are delicious ❤️"
+                }
+            ]
+        },
+        {
+            "id": "ChIJE5oGrUATkTMRqMfoP_7cf_g",
+            "name": "Tangay tangay Restaurant",
+            "municipality": "Pozorrubio",
+            "address": "4G8W+54G, MacArthur Hwy, Pozorrubio, Pangasinan",
+            "phone_number": "0905 328 0645",
+            "rating": "4.2/5 from 54 reviews",
+            "opening_hours": [
+                "Mon-Sun: 9AM - 9PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJE5oGrUATkTMRqMfoP_7cf_g",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 4,
+                    "text": "Good food at reasonable prices in a nice place with a good ambiance."
+                }
+            ]
+        },
+        {
+            "id": "ChIJF8xqMSltkTMR_byjWc4kYKw",
+            "name": "Paul Burgers",
+            "municipality": "Pozorrubio",
+            "address": "233, Batakil, Pozorrubio, 2435 Pangasinan",
+            "phone_number": null,
+            "rating": "4.8/5 from 31 reviews",
+            "opening_hours": [
+                "Mon: Closed, Tue-Thu: 11:30AM - 8PM, Fri: 12 - 8PM, Sat: 2AM - 8:30PM, Sun: 12:30AM - 12AM"
+            ],
+            "website": "https://www.facebook.com/share/1DDCXqBSLq/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJF8xqMSltkTMR_byjWc4kYKw",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "The food here is super good, I've ordered yangnyeom chicken, and the taste is very delicious and the sauce also, the service 5 out of 5, they gave us complimentary chips while waiting for our order."
+                },
+                {
+                    "rating": 5,
+                    "text": "Nearest 5 star-alike Burger shop with perfect ambience dining area! Friendly and very accommodating staff and owner!"
+                },
+                {
+                    "rating": 5,
+                    "text": "Very good customer service, local and online. Very tasty premium food ❤️"
+                },
+                {
+                    "rating": 5,
+                    "text": "Great food and service!"
+                },
+                {
+                    "rating": 5,
+                    "text": "This place is highly recommended — very cozy, aesthetic and relaxing. The foods are masarap and budget friendly. Must try their burger combos. 🥰🥰🥰"
+                }
+            ]
+        },
+        {
+            "id": "ChIJ08gpxfg_kTMRVttmERq-gG4",
+            "name": "Hardin sa Paraiso Grill & Restaurant",
+            "municipality": "Manaoag",
+            "address": "Town of Manaoag Zone, 6 Brgy. Lelemaan, Manaoag, 2430 Pangasinan",
+            "phone_number": "0917 844 3921",
+            "rating": "4.2/5 from 595 reviews",
+            "opening_hours": [
+                "Mon-Sun: 9AM - 7PM"
+            ],
+            "website": "https://www.facebook.com/Hardin-sa-Paraiso-Grill-Restaurant-148757341802254",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJ08gpxfg_kTMRVttmERq-gG4",
+            "photo_note": "View verified photos via google_maps_url or Facebook page.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "2nd time to dine here. Food 9/10 (love the sinigang, karekare and pinakbet ilocano). Staffs are well trained 10/10. Service 10/10. Ambience 12/10 (open space at maaliwalas)."
+                },
+                {
+                    "rating": 5,
+                    "text": "We had our lunch here after we visited Our Lady of Manaoag Shrine. Really enjoyed the vibe and the atmosphere. We ordered super yummy foods like their kinilaw na isda, sinigang na bangus, pigar pigar (must try), nilasing na hipon and their seafood rice."
+                },
+                {
+                    "rating": 5,
+                    "text": "It was authentic filipino cuisine. The price was just right and the food are delicious, especially if you're craving for grandma's dish."
+                }
+            ]
+        },
+        {
+            "id": "ChIJm0jVJ7FrkTMRmVOaexFQcgY",
+            "name": "MANA Restaurant",
+            "municipality": "Manaoag",
+            "address": "Tiong St, Manaoag, Pangasinan",
+            "phone_number": "0917 702 6732",
+            "rating": "4.5/5 from 46 reviews",
+            "opening_hours": [
+                "Mon-Sun: 6AM - 10PM"
+            ],
+            "website": "https://themanaoaghotel.com/",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJm0jVJ7FrkTMRmVOaexFQcgY",
+            "photo_note": "View verified photos via google_maps_url or https://themanaoaghotel.com/",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "The Food is amazing, especially the Tofu sisig and Dynamite Roll. Family style serving. Will definitely come back!"
+                },
+                {
+                    "rating": 5,
+                    "text": "Its my 2nd time to dine here. :) And the food was superb- from appetizer (the Dynamite is a must try) to dessert. Their bottomless cucumber lemonade is sooo refreshing!"
+                },
+                {
+                    "rating": 5,
+                    "text": "Food was great, variety of choices, served within reasonable time. Aircon inside the restaurant was also adequate, well appreciated in this extremely hot season."
+                },
+                {
+                    "rating": 5,
+                    "text": "Food is superb, excellent service ✅️"
+                },
+                {
+                    "rating": 5,
+                    "text": "Value for your money! All breakfast choices are delicious and filling. The staff are attentive, kind, courteous and respectful to elderly customers. Great tasting coffee."
+                }
+            ]
+        },
+        {
+            "id": "ChIJ8VbQ6e1qkTMRzRQmm48oX10",
+            "name": "Kainan Sa Kubo Ningnangan Ed Manaoag",
+            "municipality": "Manaoag",
+            "address": "85 Caloocan, Manaoag, 2430 Pangasinan",
+            "phone_number": "0927 973 9464",
+            "rating": "4.3/5 from 233 reviews",
+            "opening_hours": [
+                "Mon-Sun: 8AM - 6PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJ8VbQ6e1qkTMRzRQmm48oX10",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Great service, Good food, affordable price. Malinis CR. All in all, will recommend."
+                },
+                {
+                    "rating": 5,
+                    "text": "Super sulit kumain dito. They serve affordable and delicious foods. People are friendly and very welcoming as we enter the establishment. It's a great experience where they gave us free bulalo soup and it taste good. Their signature dish, 'Pigar Pigar' tastes lovely."
+                }
+            ]
+        },
+        {
+            "id": "ChIJn6pi0P4_kTMR2ErVniwTL8o",
+            "name": "Kokonut Grill and Restaurant",
+            "municipality": "Manaoag",
+            "address": "6 Brgy. Lelemaan, Manaoag, 2430 Pangasinan",
+            "phone_number": "0967 267 3738",
+            "rating": "4.1/5 from 89 reviews",
+            "opening_hours": [
+                "Mon-Sun: 9AM - 9:30PM"
+            ],
+            "website": "https://www.facebook.com/profile.php?id=100086904248783",
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJn6pi0P4_kTMR2ErVniwTL8o",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Delicious and affordable food, good service and nice place."
+                },
+                {
+                    "rating": 5,
+                    "text": "10/10 dish would try their crispy pata again also the bulalo soup every single ingredient is tasted, excellent restaurant must try"
+                },
+                {
+                    "rating": 5,
+                    "text": "We brought the whole family here and everyone left happy! I highly recommend the steak and sisig bangus! perfectly cooked, must tryyy!!👌"
+                },
+                {
+                    "rating": 5,
+                    "text": "We visited the nearby Manaoag Church and on the way back out of town, we decided to sit for lunch here. All the dishes we ordered was fantastic, not a complaint about any of it."
+                },
+                {
+                    "rating": 5,
+                    "text": "Great place and taste of food is fantastic."
+                }
+            ]
+        },
+        {
+            "id": "ChIJBw5CNUFrkTMR-5cR3D49xG8",
+            "name": "Dad Joe’s Cafe",
+            "municipality": "Manaoag",
+            "address": "Pao, Manaoag, 2430 Pangasinan",
+            "phone_number": null,
+            "rating": "4.6/5 from 36 reviews",
+            "opening_hours": [
+                "Mon-Thu: 8AM - 8PM, Fri-Sun: 8AM - 9PM"
+            ],
+            "website": null,
+            "google_maps_url": "https://www.google.com/maps/place//data=!4m2!3m1!19sChIJBw5CNUFrkTMR-5cR3D49xG8",
+            "photo_note": "View verified photos via google_maps_url.",
+            "real_reviews": [
+                {
+                    "rating": 5,
+                    "text": "Exceptional service affordable meals"
+                },
+                {
+                    "rating": 5,
+                    "text": "Superb foods experienced. friendly service crew"
+                },
+                {
+                    "rating": 5,
+                    "text": "Amazing food and service!!👍🏻👍🏻"
+                },
+                {
+                    "rating": 4,
+                    "text": "Solid breakfast! Servings are big for its price. Everything we ate was delicious! I really loved how creamy the carbonara is and it was served hot. The french toast was so soft."
+                },
+                {
+                    "rating": 5,
+                    "text": "Great food, service and ambience! Highly recommended"
+                }
+            ]
+        }
+    ]
+}
