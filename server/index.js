@@ -27,6 +27,7 @@ app.get('/api/emergency', async (req, res) => {
 });
 const { recommend } = require('./verify.js');
 const { cached } = require('./aiCache.js');
+const { datasetInfo, localChat, localRecommend } = require('./dataset.js');
 const AI_TTL_MS = Number(process.env.AI_TTL_MS) || 15 * 60000;
 app.post('/api/recommend', async (req, res) => {
   try {
@@ -37,6 +38,9 @@ app.post('/api/recommend', async (req, res) => {
     const p = proximity.split(',').map(Number);
     const proxKey = p.length === 2 && p.every(Number.isFinite) ? p[0].toFixed(2) + ',' + p[1].toFixed(2) : '';
     const key = `r:${message}|${proxKey}|${prefs.slice().sort().join(',')}`;
+    // Installed dataset wins: no AI call, nothing invented. Without one, the
+    // original grounded AI path runs unchanged.
+    if (datasetInfo().ready) return res.json(await cached(key, AI_TTL_MS, () => localRecommend(message, proximity, prefs)));
     res.json(await cached(key, AI_TTL_MS, () => recommend(message, proximity, prefs)));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
@@ -44,6 +48,8 @@ const { chatRecommend } = require('./agent.js');
 app.post('/api/chat', async (req, res) => {
   try {
     const message = req.body.message || '';
+    const proximity = String(req.body.proximity || '');
+    if (datasetInfo().ready) return res.json(await cached(`d:${message}|${proximity}`, AI_TTL_MS, () => localChat(message, proximity)));
     res.json(await cached(`c:${message}`, AI_TTL_MS, () => chatRecommend(message)));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });

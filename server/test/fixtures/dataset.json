@@ -1,0 +1,45 @@
+{
+  "province": "Pangasinan",
+  "places": [
+    {
+      "id": "conrads",
+      "name": "Conrad's Dagupan",
+      "municipality": "Dagupan City",
+      "address": "28QF+PX4, Dagupan City, Pangasinan",
+      "rating": "4.2/5 from 185 reviews",
+      "categories": ["restaurant", "food"],
+      "google_maps_url": "https://www.google.com/maps/place/Conrads+Dagupan",
+      "opening_hours": ["Mon-Thu, Sun: 11AM - 9PM, Fri-Sat: 11AM - 10PM"],
+      "lat": 16.043,
+      "lng": 120.341,
+      "real_reviews": [{ "rating": 5, "text": "Pancit Bagnet and Beef Kare-Kare were excellent." }]
+    },
+    {
+      "id": "tondaligan",
+      "name": "Tondaligan Beach Park",
+      "municipality": "Dagupan City",
+      "rating": 4.4,
+      "reviews": 1200,
+      "categories": ["beach", "park"],
+      "lat": 16.06,
+      "lng": 120.32
+    },
+    {
+      "id": "manaoag",
+      "name": "Minor Basilica of Our Lady of the Rosary of Manaoag",
+      "municipality": "Manaoag",
+      "categories": ["church", "place of worship"],
+      "rating": "4.8/5 from 2100 reviews",
+      "lat": 16.043,
+      "lng": 120.489
+    },
+    {
+      "id": "hospital",
+      "name": "Pangasinan Provincial Hospital",
+      "municipality": "San Carlos City",
+      "categories": ["hospital", "health"],
+      "lat": 15.928,
+      "lng": 120.348
+    }
+  ]
+}

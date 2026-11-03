@@ -143,7 +143,7 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
     setMsgs(m => [...m, { id:nid(), role:'user', text:q, at:Date.now() }, { id:nid(), role:'ai', loading:true }]);
     setBusy(true);
     try {
-      const out = await chat(q);
+      const out = await chat(q, coords ? `${coords.lng},${coords.lat}` : '');
       const candidates = out.candidates || [];
       const cards = candidates.slice(0, 1).map(c => cardFor(c, spots));
       const more = candidates.slice(1, 6).map(c => c.name + (c.hint ? ' — ' + c.hint : ''));
