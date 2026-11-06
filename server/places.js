@@ -15,7 +15,7 @@ async function searchPlaces(q, proximity){
     proximity: proximity || DEFAULT_CENTER.join(','),
     access_token: token
   });
-  const r = await fetch('https://api.mapbox.com/search/searchbox/v1/forward?' + params);
+  const r = await fetch('https://api.mapbox.com/search/searchbox/v1/forward?' + params, { signal: AbortSignal.timeout(10000) });
   if (!r.ok) { const e = new Error('Mapbox error ' + r.status); e.status = 502; throw e; }
   const data = await r.json();
   const seen = new Set();

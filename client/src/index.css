@@ -130,7 +130,7 @@ li{margin:6px 0}
 .shimmer{animation:shimmer 1.2s ease-in-out infinite;color:var(--primary);font-weight:600}
 /* map pins (rendered through mapcn MarkerContent) — small name pills instead of icons */
 .userdot{width:18px;height:18px;border-radius:50%;background:var(--primary);border:3px solid #fff;box-shadow:0 0 0 6px rgba(0,102,255,.22);animation:pulse 2s ease-in-out infinite}
-.spot-pin{max-width:128px;height:24px;border-radius:999px;background:#fff;border:1.5px solid var(--primary);display:inline-flex;align-items:center;padding:0 9px;box-shadow:0 4px 10px rgba(15,23,42,.22);color:var(--ink);font-size:10.5px;font-weight:700;letter-spacing:-.1px;line-height:1;white-space:nowrap;overflow:hidden}
+.spot-pin{max-width:100px;height:24px;border-radius:999px;background:#fff;border:1.5px solid var(--primary);display:inline-flex;align-items:center;padding:0 8px;box-shadow:0 4px 10px rgba(15,23,42,.22);color:var(--ink);font-size:10px;font-weight:700;letter-spacing:-.1px;line-height:1;white-space:nowrap;overflow:hidden}
 .spot-pin span{overflow:hidden;text-overflow:ellipsis}
 .spot-pin:hover{background:#EFF6FF}
 .spot-pin.active{background:var(--primary);color:#fff}

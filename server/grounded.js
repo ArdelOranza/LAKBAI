@@ -61,12 +61,22 @@ async function askModel(system, payload){
   // quota or a 402 never stops the answer. Failures are logged (without keys)
   // so a 429/quota failure is diagnosable; the last error is surfaced when
   // every provider has failed, never swallowed into an empty 502.
+  // Empty strings are failures too: a provider that returns no candidate
+  // content must fall through to the next provider, not throw a bare 502.
   let lastError = null;
-  try { return await callGeminiForPlan(system, payload); }
+  const withTimeout = (p, label) => Promise.race([
+    p,
+    new Promise((_, reject) => setTimeout(
+      () => reject(Object.assign(new Error(label + ' timed out after 30s'), { status: 504 })),
+      30000
+    )),
+  ]);
+  const nonempty = (r, label) => { if (typeof r !== 'string' || !r.trim()) throw Object.assign(new Error(label + ' returned empty'), { status: 502 }); return r; };
+  try { return nonempty(await withTimeout(callGeminiForPlan(system, payload), 'Gemini primary'), 'Gemini primary'); }
   catch (e) { lastError = e; console.warn('gemini primary unavailable:', e.message); }
-  try { return await callLite(system, payload); }
+  try { return nonempty(await callLite(system, payload), 'Gemini lite'); }
   catch (e) { lastError = e; console.warn('gemini lite unavailable:', e.message); }
-  try { return await callGroq(system, payload); }
+  try { return nonempty(await callGroq(system, payload), 'Groq'); }
   catch (e) { lastError = e; console.warn('groq unavailable:', e.message); }
   throw lastError || Object.assign(new Error('All model providers unavailable'), { status: 502 });
 }
@@ -157,14 +167,24 @@ function hydrate(candidates, entries){
   for (const c of candidates){
     const k = keyOf(c && c.name);
     if (!k) continue;
+    // Exact match, or a whole-phrase boundary match (never a bare substring:
+    // a model-invented "Cafe" must not hydrate to some "...Farm & Cafe").
     const entry = byKey.get(k)
-      || entries.find(e => keyOf(e.name).includes(k) || k.includes(keyOf(e.name)));
+      || entries.find(e => {
+        const ek = keyOf(e.name);
+        if (ek === k) return true;
+        const short = k.length <= ek.length ? k : ek;
+        if (short.length < 8) return false;
+        return (' ' + ek + ' ').includes(' ' + k + ' ') || (' ' + k + ' ').includes(' ' + ek + ' ');
+      });
     if (!entry || seen.has(entry.id)) continue;
     seen.add(entry.id);
+    // Reasons and quotes come from the row, never from the model — a model
+    // reason can contain an invented rating, price, or quote verbatim.
     picked.push({
       entry,
-      reason: String(c.reason || '').trim() || reasonFor(entry),
-      peopleSay: String(c.peopleSay || '').trim(),
+      reason: reasonFor(entry),
+      peopleSay: entry.quotes[0] || '',
     });
     if (picked.length >= MAX_CANDIDATES) break;
   }
@@ -206,10 +226,33 @@ function groundAnswer(answer, intent, entries){
     if (n < 10) continue; // list markers and small counts are too noisy to police
     if (!factNumbers.some(f => Math.abs(f - n) < 0.001)) return fallback;
   }
+  // 1b. money amounts are attribute-bound: a price must appear in a fee
+  //     field, not merely anywhere in the rows (e.g. a parking count).
+  const feeText = entries.map(e => `${e.price || ''} ${e.feesDetail || ''}`).join(' ');
+  const feeNumbers = numbersIn(feeText);
+  const moneyAmounts = [...text.matchAll(/(?:₱|PHP|P\s|\$)\s*[\d,]+(?:\.\d+)?/gi)].map(m => Number(m[0].replace(/[^0-9.]/g, '') || 'NaN'));
+  for (const a of moneyAmounts){
+    if (Number.isFinite(a) && !feeNumbers.some(f => Math.abs(f - a) < 0.001)) return fallback;
+  }
+  // 1c. hours claims (AM/PM) must be written in the rows' hours field.
+  const hasHourWords = /\d{1,2}(?::\d{2})?\s*(?:AM|PM)/i.test(text);
+  if (hasHourWords){
+    const hourWords = (entries.map(e => e.hours).join(' ') || '').toUpperCase();
+    const mentions = [...text.matchAll(/\d{1,2}(?::\d{2})?\s*(?:AM|PM)/gi)].map(m => m[0].toUpperCase().replace(/\s+/g, ' '));
+    if (!hourWords || !mentions.every(m => hourWords.includes(m))) return fallback;
+  }
+  // 1d. links: any URL in the prose must be one the rows actually carry.
+  const urls = [...text.matchAll(/https?:\/\/[^\s"')\]]+/gi)].map(m => m[0]);
+  if (urls.length){
+    const allowed = keyOf(facts) + ' ' + keyOf(entries.map(e => [...(e.sourceUrls || []), e.mapsUrl || ''].join(' ')).join(' '));
+    if (urls.some(u => !allowed.includes(keyOf(u)))) return fallback;
+  }
   // 2. a named place (anything ending in Beach / Falls / Church / Resort …)
-  //    must be written somewhere in the rows, not recalled from elsewhere
+  //    must be written somewhere in the rows, not recalled from elsewhere.
+  //    Town-shaped runs ("Baguio City") are checked the same way.
+  const CITY_WORD = /\b(city|municipality|province)\b/i;
   for (const run of capitalizedRuns(text)){
-    if (!PLACE_WORD.test(run)) continue;
+    if (!PLACE_WORD.test(run) && !CITY_WORD.test(run)) continue;
     const k = keyOf(run);
     if (!k) continue;
     if (!factsKey.includes(k)) return fallback;
@@ -237,7 +280,12 @@ async function groundedChat(message, proximity, deps = {}){
     // No verified row backs the reply, so the model's prose is not trusted.
     return { intent, answer: NO_MATCH, candidates: [], spotlight: null, sources: [], source: 'dataset+ai' };
   }
-  await withCoords(picked.map(p => p.entry), proximity);
+  // withCoords returns clones — apply the geocoded coordinates back to the
+  // picked rows (127/241 rows have no lat/lng in the files).
+  const placed = await withCoords(picked.map(p => p.entry), proximity);
+  for (let i = 0; i < picked.length; i++){
+    if (placed[i]){ picked[i].entry.lat = placed[i].lat; picked[i].entry.lng = placed[i].lng; }
+  }
   const answer = groundAnswer(parsed.answer, intent, picked.map(p => p.entry));
   const spotName = parsed.spotlight && keyOf(parsed.spotlight.name);
   const spot = (spotName && picked.find(p => keyOf(p.entry.name) === spotName)) || picked[0];

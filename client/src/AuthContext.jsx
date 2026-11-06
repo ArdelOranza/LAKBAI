@@ -8,6 +8,19 @@ function isRecoveryHash(){
   try { return window.location.hash.includes('type=recovery'); } catch { return false; }
 }
 
+// Map backend provider strings to copy a traveler can act on. Anything unknown
+// falls through untouched so real errors are never hidden.
+function friendlyAuthError(message){
+  const m = String(message || '');
+  if (/invalid login credentials/i.test(m)) return 'Invalid email or password.';
+  if (/auth session missing/i.test(m)) return 'This link has expired or was already used. Request a new one.';
+  if (/failed to fetch|network error|load failed/i.test(m)) return 'Network error — check your connection and try again.';
+  if (/rate limit|too many/i.test(m)) return 'Too many tries — wait a minute and try again.';
+  if (/user already registered/i.test(m)) return 'An account with this email already exists — try logging in.';
+  if (/email not confirmed|email_not_confirmed/i.test(m)) return 'Confirm your email first, then log in.';
+  return m;
+}
+
 // Strip auth params (?code= / #access_token=...) once the SDK has exchanged them
 // so a refresh or back-button doesn't re-trigger sign-in/recovery.
 function cleanAuthUrl(){
@@ -39,7 +52,12 @@ export function AuthProvider({ children }){
 
   useEffect(() => {
     if (!supabase) { setLoading(false); return; }
+    // If getSession() never settles (hung network/captive portal), don't leave a
+    // permanent blank screen — land on Splash after 8s.
+    const bootTimer = setTimeout(() => setLoading(false), 8000);
+    const clearBoot = () => clearTimeout(bootTimer);
     const apply = (session, event) => {
+      clearBoot();
       // Latest auth event wins; bump seq so a late getSession snapshot
       // (checked below) knows an event already landed.
       const seq = ++seqRef.current;
@@ -86,14 +104,11 @@ export function AuthProvider({ children }){
       .catch(() => { setLoading(false); })
       .finally(() => setLoading(l => l && false));
 
-    // Hash-fragment recovery links fire before/without a state event in some
-    // flows; detect them directly as a backstop. Check again after the
-    // initial exchange too, but only adopt it if a recovery session exists
-    // (getSession/onAuthStateChange may set the user we then promote).
-    if (isRecoveryHash()) {
-      recoveryRef.current = true; setRecovery(true);
-    }
-    return () => sub.subscription.unsubscribe();
+    // Recovery-session promotion already happened in the getSession handler
+    // above (and in PASSWORD_RECOVERY). A hash alone proves nothing — an
+    // expired or reused link must fall through to the normal screens, not
+    // trap the traveler on a password form with no session.
+    return () => { clearBoot(); sub.subscription.unsubscribe(); };
   }, []);
   async function signUp(email, password){
     if (!supabase) return { error: 'Auth not configured — add Supabase keys to .env.' };
@@ -101,13 +116,13 @@ export function AuthProvider({ children }){
     // not whatever Site URL the Supabase project happens to have configured.
     const emailRedirectTo = typeof window !== 'undefined' ? window.location.origin : undefined;
     const { data, error } = await supabase.auth.signUp({ email: String(email).trim(), password, options: { emailRedirectTo } });
-    if (error) return { error: String(error.message || error) };
+    if (error) return { error: friendlyAuthError(String(error.message || error)) };
     return data.session ? {} : { needsConfirm: true, detail: 'Check your email to confirm your account, then log in.' };
   }
   async function signInWithPassword(email, password){
     if (!supabase) return { error: 'Auth not configured — add Supabase keys to .env.' };
     const { error } = await supabase.auth.signInWithPassword({ email: String(email).trim(), password });
-    return error ? { error: String(error.message || error) } : {};
+    return error ? { error: friendlyAuthError(String(error.message || error)) } : {};
   }
   // Full-page redirect to Google, then back to the app. Supabase picks the
   // session out of the return URL, so onAuthStateChange signs the traveler in.
@@ -118,32 +133,32 @@ export function AuthProvider({ children }){
       provider: 'google',
       options: { redirectTo, queryParams: { prompt: 'select_account' } },
     });
-    return error ? { error: String(error.message || error) } : {};
+    return error ? { error: friendlyAuthError(String(error.message || error)) } : {};
   }
   async function resendConfirmation(email){
     if (!supabase) return { error: 'Auth not configured — add Supabase keys to .env.' };
     const emailRedirectTo = typeof window !== 'undefined' ? window.location.origin : undefined;
     const { error } = await supabase.auth.resend({ type: 'signup', email: String(email).trim(), options: { emailRedirectTo } });
-    return error ? { error: String(error.message || error) } : { detail: 'Confirmation email sent again. Check your inbox and spam folder.' };
+    return error ? { error: friendlyAuthError(String(error.message || error)) } : { detail: 'Confirmation email sent again. Check your inbox and spam folder.' };
   }
   async function resetPassword(email){
     if (!supabase) return { error: 'Auth not configured — add Supabase keys to .env.' };
     const { error } = await supabase.auth.resetPasswordForEmail(String(email).trim(), { redirectTo: window.location.origin });
-    return error ? { error: String(error.message || error) } : { detail: 'Password reset link sent. Check your email.' };
+    return error ? { error: friendlyAuthError(String(error.message || error)) } : { detail: 'Password reset link sent. Check your email.' };
   }
   async function updatePassword(password){
     if (!supabase) return { error: 'Auth not configured — add Supabase keys to .env.' };
     if (String(password || '').length < 8) return { error: 'Password must be at least 8 characters.' };
     try {
       const { error } = await supabase.auth.updateUser({ password });
-      if (error) return { error: String(error.message || error) };
+      if (error) return { error: friendlyAuthError(String(error.message || error)) };
       // Recovery token consumed — drop the session so we don't end up signed
       // in through the reset link, and surface the login screen instead.
       try { await supabase.auth.signOut(); } catch { /* best effort */ }
       recoveryRef.current = false; setRecovery(false); setUser(null);
       cleanAuthUrl();
       return {};
-    } catch (e) { return { error: String(e?.message || e) }; }
+    } catch (e) { return { error: friendlyAuthError(String(e?.message || e)) }; }
   }
   function clearRecovery(){
     recoveryRef.current = false; setRecovery(false);

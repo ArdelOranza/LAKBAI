@@ -65,6 +65,42 @@ const TOWN_CENTERS = {
   rosales: { lat: 15.9526, lng: 120.6346 },
   villasis: { lat: 15.9000, lng: 120.5889 },
   'san quintin': { lat: 15.9844, lng: 120.5900 },
+  // Western & coastal towns (from the 150-spot file) — anchors so a short
+  // plus code can be decoded for every mapped town, not just the 12 above.
+  'alaminos city': { lat: 16.1540, lng: 119.9760 },
+  bolinao: { lat: 16.3850, lng: 119.9060 },
+  burgos: { lat: 15.9970, lng: 119.8260 },
+  dasol: { lat: 16.0260, lng: 119.9230 },
+  anda: { lat: 16.2930, lng: 119.7780 },
+  agno: { lat: 16.1250, lng: 119.8060 },
+  bani: { lat: 16.1920, lng: 119.8640 },
+  mabini: { lat: 16.1160, lng: 119.9400 },
+  sual: { lat: 16.0280, lng: 120.1030 },
+  manaoag: { lat: 16.0490, lng: 120.4890 },
+  lingayen: { lat: 16.0170, lng: 120.2320 },
+  'dagupan city': { lat: 16.0440, lng: 120.3330 },
+  calasiao: { lat: 16.0440, lng: 120.2790 },
+  'san fabian': { lat: 16.2000, lng: 120.3470 },
+  binmaley: { lat: 16.0250, lng: 120.1950 },
+  bugallon: { lat: 16.1660, lng: 120.1770 },
+  aguilar: { lat: 16.2120, lng: 120.1300 },
+  mangatarem: { lat: 15.7900, lng: 120.2900 },
+  infanta: { lat: 15.8270, lng: 119.9140 },
+  urbiztondo: { lat: 15.8020, lng: 119.9730 },
+  labrador: { lat: 15.7880, lng: 120.1370 },
+  'san jacinto': { lat: 16.1070, lng: 120.3230 },
+  'santa barbara': { lat: 15.9640, lng: 120.3980 },
+  malasiqui: { lat: 15.9040, lng: 120.3590 },
+  mapandan: { lat: 16.0270, lng: 120.4540 },
+  binalonan: { lat: 16.0610, lng: 120.5610 },
+  pozorrubio: { lat: 16.1180, lng: 120.5520 },
+  laoac: { lat: 16.0360, lng: 120.5280 },
+  bautista: { lat: 16.0430, lng: 120.5200 },
+  alcala: { lat: 16.0360, lng: 120.5380 },
+  'santo tomas': { lat: 16.0060, lng: 120.6380 },
+  asingan: { lat: 16.0120, lng: 120.6580 },
+  'san manuel': { lat: 16.0550, lng: 120.6650 },
+  mangaldan: { lat: 16.0630, lng: 120.3440 },
 };
 
 let townCenters = null;
@@ -110,7 +146,16 @@ const feeLabel = k => k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()
 /** Fees arrive as a string or a big object of named rates. */
 function feeText(fees){
   if (!fees) return { short: '', detail: '' };
-  if (typeof fees !== 'object') return { short: str(fees), detail: str(fees) };
+  // String fees (the 150-file's fee_in_venue paragraph): short = the first
+  // money-bearing sentence, detail = full prose. The whole paragraph must
+  // never be the displayed price.
+  if (typeof fees !== 'object'){
+    const s = str(fees);
+    const parts = s.split(/(?<=[.!?])\s+|;/).map(x => x.trim()).filter(Boolean);
+    const money = parts.find(x => /(₱|PHP|P\s?\d|peso)/i.test(x));
+    const short = (money || parts[0] || s).trim().slice(0, 160);
+    return { short, detail: s };
+  }
   // Flatten one level of nesting (e.g. { fees: { admission: '100' } }) and
   // drop nested objects deeper than that. A value under a "note/notes" key is
   // never the displayed price — it is prose, not a rate.
@@ -209,8 +254,8 @@ function listOf(v){
 }
 
 const INTENT_WORDS = {
-  food: /\b(eat|food|restaurant|kainan|kain|meal|lunch|dinner|breakfast|brunch|coffee|cafe|dish|seafood|grill|sisig|pizza|burger|pasta|milk tea|dessert|pancit|bagnet|bangus)\b/i,
-  event: /\b(festival|fiesta|event|celebration|parade|carnival|fair)\b/i,
+  food: /\b(eat|food|restaurants?|kainan|kain|meals?|lunch|dinner|breakfast|brunch|coffee|cafes?|dishes|seafood|grills?|sisig|pizza|burger|pasta|milk tea|desserts?|pancit|bagnet|bangus)\b/i,
+  event: /\b(festivals?|fiestas?|events?|celebrations?|parades?|carnivals?|fairs?)\b/i,
   nearby: /\b(near|nearby|around|close|malapit|walking distance)\b/i,
   emergency: /\b(hospital|emergency|ambulance|police|fire|accident|injured|medical|clinic)\b/i,
   plan: /\b(plan|itinerary|day trip|schedule)\b/i,
@@ -220,7 +265,7 @@ const CATEGORY_HINTS = {
   food: /\b(foods?|restaurants?|cafes|coffee|eateries|grills?|bars?|bakeries|desserts?|kitchens?|dining|seafood|carinderia|panciteria)\b/i,
   beach: /\b(beaches|beach|islands|island|coves|cove|coast|shore|sandbar)\b/i,
   nature: /\b(falls|waterfall|spring|cave|river|mountain|forest|park|eco|garden|lake)\b/i,
-  culture: /\b(church|basilica|shrine|museum|heritage|historical|landmark|festival)\b/i,
+  culture: /\b(church|basilica|shrine|cathedral|parish|religious|pilgrimage|museum|heritage|historical|landmark|festival)\b/i,
   stay: /\b(hotels?|resorts?|inns?|transient|lodges?|hostels?|villas?)\b/i,
   event: /\b(festivals?|fiestas?|events?)\b/i,
 };
@@ -241,7 +286,9 @@ function requestedKinds(message){
 }
 
 function intentsFor(entry){
-  const text = `${entry.name} ${entry.categories.join(' ')} ${entry.description}`;
+  // Intents from name + categories only — a description that merely mentions
+  // another kind ("coffee shop") must not tag the entry as food.
+  const text = `${entry.name} ${entry.categories.join(' ')}`;
   return Object.entries(CATEGORY_HINTS).filter(([, re]) => re.test(text)).map(([k]) => k);
 }
 
@@ -348,7 +395,33 @@ function allEntries(){
     seen.add(key);
     out.push(entry);
   }
-  return out;
+  // Same place listed twice under slightly different names (pangasinan-150
+  // vs spots.json): the same pin (within 50m) + same town ⇒ one row. Keep the
+  // one with the higher review count. (A wider radius would wrongly merge
+  // genuinely distinct nearby places, e.g. neighbouring eateries.)
+  const byTown = new Map();
+  for (const e of out){
+    const k = String(e.town || '').toLowerCase();
+    if (!byTown.has(k)) byTown.set(k, []);
+    byTown.get(k).push(e);
+  }
+  const dup = new Set();
+  for (const group of byTown.values()){
+    for (let i = 0; i < group.length; i++){
+      const a = group[i];
+      if (!(Number.isFinite(a.lat) && Number.isFinite(a.lng))) continue;
+      for (let j = i + 1; j < group.length; j++){
+        const b = group[j];
+        if (!(Number.isFinite(b.lat) && Number.isFinite(b.lng))) continue;
+        if (haversineKm(a.lng, a.lat, b.lng, b.lat) < 0.05){
+          // Same pin, same town, different name spelling — drop the thinner row.
+          const keepA = Number(a.reviews || 0) >= Number(b.reviews || 0);
+          dup.add(keepA ? b.id : a.id);
+        }
+      }
+    }
+  }
+  return out.filter(e => !dup.has(e.id));
 }
 
 const STOP = new Set(['the', 'and', 'for', 'with', 'you', 'your', 'are', 'can', 'how', 'what', 'where', 'when', 'who', 'why', 'any', 'some', 'best', 'good', 'great', 'top', 'please', 'want', 'need', 'looking', 'find', 'show', 'give', 'recommend', 'suggest', 'near', 'around', 'close', 'about', 'there', 'here', 'this', 'that', 'from', 'have', 'has', 'get', 'try', 'place', 'places', 'spot', 'spots', 'trip', 'pangasinan', 'philippines', 'me', 'my', 'i', 'a', 'an', 'in', 'at', 'to', 'of', 'is', 'it', 'on', 'or', 'do', 'go', 'be']);

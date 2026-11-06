@@ -7,6 +7,8 @@ import { useAuth } from '../AuthContext.jsx';
 import { saveFavorite, listFavorites } from '../store.js';
 import { haversineKm, formatDistance, driveMinutes } from '../geo.js';
 import { dragOffset, shouldDismiss } from '../sheetDrag.js';
+import { FALLBACK_CENTER } from '../App.jsx';
+import { directionsHref } from '../emergency.js';
 import { PrimaryBtn, PhotoPlaceholder } from '../ui.jsx';
 
 const VIBES = [
@@ -34,7 +36,10 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
   const trackRef = useRef(null);
   const photos = (spot.photos && spot.photos.length) ? spot.photos : null;
   const count = photos ? photos.length : 3; // reserved placeholder dots
-  const km = haversineKm(coords.lng, coords.lat, spot.lng, spot.lat);
+  // Distance is only meaningful with a real fix — measuring from the fallback
+  // centre fabricates drive times when location permission is off.
+  const hasFix = coords && !(coords.lng === FALLBACK_CENTER.lng && coords.lat === FALLBACK_CENTER.lat);
+  const km = hasFix ? haversineKm(coords.lng, coords.lat, spot.lng, spot.lat) : null;
   const minutes = driveMinutes(km);
   const vibe = vibeFor(spot);
 
@@ -166,7 +171,7 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
         </p>
 
         <p style={{ margin:'6px 0 0', fontSize:12.5, lineHeight:1.5, color:'#475569', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>
-          {spot.blurb || `A curated ${(spot.categories || ['local'])[0].toLowerCase()} stop in ${spot.town || 'Pangasinan'} — save it and let LakbAI sequence your day around it.`}
+          {spot.blurb || `A curated ${String((spot.categories && spot.categories.length) ? spot.categories[0] : 'local').toLowerCase()} stop in ${spot.town || 'Pangasinan'} — save it and let LakbAI sequence your day around it.`}
         </p>
 
         <div style={{ margin:'10px 0 2px' }}>
@@ -188,7 +193,8 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
                 className="round-action"
                 data-testid="spot-directions"
                 aria-label="Directions"
-                onClick={() => window.open('https://www.google.com/maps/dir/?api=1&destination=' + spot.lat + ',' + spot.lng)}
+                disabled={!directionsHref(spot.lat, spot.lng)}
+                onClick={() => { const href = directionsHref(spot.lat, spot.lng); if (href) window.open(href); }}
               >
                 <Navigation size={17}/>
               </button>

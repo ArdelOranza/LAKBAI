@@ -17,14 +17,17 @@ export default function SignUp({ onAuthed, onSwitchToLogin }){
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   // bfcache restore after Google (back pressed) — don't leave buttons dead.
+  // (Only pageshow: visibilitychange also fires when the traveler merely
+  // backgrounds mid-request, and clearing then allows a double-submit that
+  // overwrites the PKCE verifier.)
   useEffect(() => {
     const clear = () => setBusy(false);
-    const onVis = () => { if (!document.hidden) setBusy(false); };
-    document.addEventListener('visibilitychange', onVis);
     window.addEventListener('pageshow', clear);
-    return () => { document.removeEventListener('visibilitychange', onVis); window.removeEventListener('pageshow', clear); };
+    return () => { window.removeEventListener('pageshow', clear); };
   }, []);
 
+  // Enter submits the form (no <form>, so wire it explicitly).
+  const onEnter = e => { if (e.key === 'Enter'){ e.preventDefault(); submit(); } };
   async function submit(){
     const v = validateSignup(form);
     if (!v.ok) { setErr(v); return; }
@@ -53,7 +56,7 @@ export default function SignUp({ onAuthed, onSwitchToLogin }){
     <div>
       <label style={LABEL} htmlFor={'signup-' + k}>{label}</label>
       <div style={{ display:'flex', gap:6 }}>
-        <input id={'signup-' + k} data-testid={'signup-' + k} type={eye && !show[k] ? 'password' : type} value={form[k]} onChange={e => set(k, e.target.value)} style={{ flex:1 }} disabled={!configured || busy}/>
+        <input id={'signup-' + k} data-testid={'signup-' + k} type={eye && !show[k] ? 'password' : type} value={form[k]} onChange={e => set(k, e.target.value)} onKeyDown={onEnter} style={{ flex:1 }} disabled={!configured || busy}/>
         {eye && <EyeToggle k={k}/>}
       </div>
     </div>

@@ -74,14 +74,21 @@ async function planDay(message, hours, startHour = 9, deps = {}){
     return { title: plan.title, schedule };
   }
 
+  // Non-dataset branch: same time validation as the dataset branch above.
+  // Model-provided times are never trusted blindly.
   for (const s of plan.stops) {
+    const t = v => (typeof v === 'string' && /^([01]?\d|2[0-3]):[0-5]\d$/.test(v.trim())) ? v.trim() : null;
+    const arrive = t(s.arrive), depart = t(s.depart);
+    const mins = v => { const [h, m] = v.split(':').map(Number); return h * 60 + m; };
+    const start = startHour * 60, end = start + hours * 60;
+    if (!arrive || !depart || mins(arrive) < start || mins(depart) > end || mins(depart) <= mins(arrive)) continue;
     let hits;
     try { hits = await searchFn(`${s.name} ${s.hint || ''} Pangasinan`); }
     catch { continue; }
     const hit = hits.find(h => inBox(h.lng, h.lat) && !seen.has(h.id));
     if (!hit) continue;
     seen.add(hit.id);
-    schedule.push({ placeId: hit.id, name: hit.name, arrive: s.arrive, depart: s.depart, activities: Array.isArray(s.activities) ? s.activities : [] });
+    schedule.push({ placeId: hit.id, name: hit.name, arrive, depart, activities: Array.isArray(s.activities) ? s.activities : [] });
   }
   return { title: plan.title, schedule };
 }

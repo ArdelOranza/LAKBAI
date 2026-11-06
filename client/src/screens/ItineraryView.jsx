@@ -15,6 +15,7 @@ export default function ItineraryView({ plan, coords, pop, showToast }){
   const stops = p.schedule || [];
   const favBy = p.favBy || {};
   const [saved, setSaved] = useState(Boolean(p.saved));
+  const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(p.title || 'My Day Trip');
   const [weather, setWeather] = useState(null);
@@ -43,10 +44,16 @@ export default function ItineraryView({ plan, coords, pop, showToast }){
     return top && top[0] ? `${top[0]}, Pangasinan` : 'Pangasinan';
   })();
   async function saveItinerary(){
-    const res = await savePlan(user, { id: p.id, title, schedule: stops, starts_at: p.starts_at || null });
-    // Only call it Saved when the save actually landed; an offline guest save
-    // is queued locally and must say so instead of claiming success.
-    if (res.error && !res.local && !res.queued){
+    // In-flight guard: a double-tap on a slow network used to insert twice.
+    if (saving || saved) return;
+    setSaving(true);
+    let res;
+    try { res = await savePlan(user, { id: p.id, title, schedule: stops, starts_at: p.starts_at || null }); }
+    catch (e) { res = { error: String(e?.message || e) }; }
+    finally { setSaving(false); }
+    // A signed-in cloud failure is not a save — keep the button enabled so the
+    // traveler can retry instead of being locked out with a false "Saved".
+    if (res.error && user){
       showToast('Could not save — try again', 'error', res.error);
       return;
     }

@@ -82,6 +82,15 @@ export async function savePlan(user, plan){
     : [localRow, ...existing];
   writeLocalPlans(next);
   if (!supabase || !user) return { local: true };
+  // A plan that already has a cloud id updates its row; anything else inserts.
+  const cloudId = plan.id && !String(plan.id).startsWith('local-') ? plan.id : null;
+  if (cloudId){
+    const { data, error } = await supabase.from('plans')
+      .update({ title: plan.title, schedule: plan.schedule, starts_at: plan.starts_at || null })
+      .eq('id', cloudId).eq('user_id', user.id).select().single();
+    if (error) return { queued: true, error: error.message, local: true };
+    return { data: data || { id: cloudId }, local: false };
+  }
   const { data, error } = await supabase.from('plans').insert({ user_id: user.id, title: plan.title, schedule: plan.schedule, starts_at: plan.starts_at || null }).select().single();
   if (error) return { queued: true, error: error.message, local: true };
   // The cloud id is the canonical one — sync the local row to it so the next

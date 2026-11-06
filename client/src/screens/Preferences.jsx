@@ -5,7 +5,7 @@ import { useAuth } from '../AuthContext.jsx';
 
 export default function Preferences({ onContinue, onBack }){
   const { user } = useAuth();
-  const [picked, setPicked] = useState(() => readLocalPrefs());
+  const [picked, setPicked] = useState(() => readLocalPrefs(user));
   const [busy, setBusy] = useState(false);
   async function done(){
     setBusy(true);

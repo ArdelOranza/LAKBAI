@@ -79,7 +79,14 @@ function Shell(){
     if (user && !prefsStage && !localStorage.getItem(`lakbai.prefsSeen:${user.id}`) && readLocalPrefs(user).length === 0) setPrefsStage(true);
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (loading) return null;
+  if (loading) return (
+    <main style={{ flex:1, display:'grid', placeItems:'center', minHeight:'100dvh' }} aria-busy="true">
+      <div style={{ textAlign:'center', color:'var(--muted-ink)' }}>
+        <Logo size={56}/>
+        <p style={{ fontSize:14, marginTop:12 }}>Loading Lakbai…</p>
+      </div>
+    </main>
+  );
 
   // Password-reset recovery: the reset link mints a real session. Don't
   // drop the traveler into the app — ask for a new password first.
@@ -158,6 +165,8 @@ function SetPassword({ onDone, updatePassword }){
   const LABEL = { display:'block', fontSize:12, fontWeight:600, margin:'16px 0 6px' };
   const CARD = { background:'#FFFFFF', borderRadius:'28px 28px 0 0', padding:'28px 24px 32px', marginTop:'-24px' };
 
+  // Enter submits the form (no <form>, so wire it explicitly).
+  const onEnter = e => { if (e.key === 'Enter'){ e.preventDefault(); submit(); } };
   async function submit(){
     if (String(pw || '').length < 8) { setErr('Password must be at least 8 characters.'); return; }
     if (pw !== confirm) { setErr('Passwords do not match.'); return; }
@@ -176,10 +185,10 @@ function SetPassword({ onDone, updatePassword }){
       <section style={CARD}>
         <h1 style={{ textAlign:'center' }}>Set a New Password</h1>
         <p style={{ textAlign:'center', color:'var(--muted-ink)', fontSize:14 }}>Choose a new password for your account.</p>
-        <label style={LABEL}>New Password</label>
-        <input data-testid="set-password" type="password" value={pw} onChange={e => setPw(e.target.value)} disabled={busy} />
-        <label style={LABEL}>Confirm Password</label>
-        <input data-testid="set-password-confirm" type="password" value={confirm} onChange={e => setConfirm(e.target.value)} disabled={busy} />
+        <label style={LABEL} htmlFor="set-password-input">New Password</label>
+        <input id="set-password-input" data-testid="set-password" type="password" value={pw} onChange={e => setPw(e.target.value)} onKeyDown={onEnter} disabled={busy} />
+        <label style={LABEL} htmlFor="set-password-confirm-input">Confirm Password</label>
+        <input id="set-password-confirm-input" data-testid="set-password-confirm" type="password" value={confirm} onChange={e => setConfirm(e.target.value)} onKeyDown={onEnter} disabled={busy} />
         {err && <p data-testid="set-password-error" style={{ color:'var(--accent)', fontSize:13, margin:'12px 0 0' }}>{err}</p>}
         <div style={{ marginTop:20 }}><PrimaryBtn testid="set-password-submit" disabled={busy} onClick={submit}>Update Password</PrimaryBtn></div>
         <div style={{ textAlign:'center', marginTop:16 }}>

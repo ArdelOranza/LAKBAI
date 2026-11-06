@@ -28,7 +28,11 @@ function shortName(name){
 export default function MapTab({ coords, push, showToast, user, setTab }){
   const [radius, setRadius] = useState(5);
   const [filter, setFilter] = useState('All');
-  const [places, setPlaces] = useState(sessionGet('lakbai.rec.nearby:5') || []);
+  // Seed from the same coords-keyed lookup the effect writes, not a legacy
+  // unkeyed key that could be pins from a previous location/radius.
+  const keyFor = (r, c) => `lakbai.rec.nearby:${r}:${c.lng.toFixed(3)},${c.lat.toFixed(3)}`;
+  const coordsBucket = `${coords.lng.toFixed(3)},${coords.lat.toFixed(3)}`;
+  const [places, setPlaces] = useState(() => sessionGet(keyFor(radius, coords)) || []);
   const [spots, setSpots] = useState([]);
   const [selectedSpot, setSelectedSpot] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -51,7 +55,7 @@ export default function MapTab({ coords, push, showToast, user, setTab }){
   }, [hasFix, centeredOnFix, coords.lng, coords.lat]);
 
   useEffect(() => {
-    const key = `lakbai.rec.nearby:${radius}:${coords.lng.toFixed(3)},${coords.lat.toFixed(3)}`;
+    const key = keyFor(radius, coords);
     const hit = sessionGet(key);
     if (hit) { setPlaces(hit); return; }
     let alive = true;
@@ -66,25 +70,29 @@ export default function MapTab({ coords, push, showToast, user, setTab }){
       .catch(e => { if (alive) showToast('Map data unavailable', 'error', e.message); })
       .finally(() => { if (alive) setBusy(false); });
     return () => { alive = false; };
-  }, [radius, coords.lng, coords.lat]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [radius, coordsBucket]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     fetchSpots().then(setSpots).catch(() => showToast('Offline — curated pins load when the app has been opened online once', 'error'));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // A filter change must close a popup that no longer belongs to the visible set.
-  useEffect(() => { setSelectedSpot(null); }, [filter]);
+  // A filter or radius change must close a popup that no longer belongs to the
+  // visible set (GPS moving the spot out of radius does too, via coords).
+  useEffect(() => { setSelectedSpot(null); }, [filter, radius, coords.lng, coords.lat]);
 
   const withinRadius = place => !hasFix || !Number.isFinite(place.lng) || !Number.isFinite(place.lat)
     || haversineKm(coords.lng, coords.lat, place.lng, place.lat) <= radius;
-  const filtered = useMemo(() => places.filter(p => matches(p, filter) && withinRadius(p)), [places, filter, radius, hasFix]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Places without coordinates can't be pinned — drop them, never render an
+  // invalid marker.
+  const filtered = useMemo(() => places.filter(p => Number.isFinite(p.lng) && Number.isFinite(p.lat) && matches(p, filter) && withinRadius(p)), [places, filter, radius, hasFix, coords.lng, coords.lat]); // eslint-disable-line react-hooks/exhaustive-deps
   const catFor = f => f === 'Food' ? 'Food' : f === 'Events' ? 'Events' : 'Beaches';
   const filteredSpots = useMemo(() => {
     const base = filter === 'All'
       ? spots.filter(s => Number.isFinite(s.lng) && Number.isFinite(s.lat))
-      : spots.filter(s => Number.isFinite(s.lng) && Number.isFinite(s.lat) && s.categories.some(c => matches({ name:s.name, categories:s.categories }, catFor(filter))));
+      // Guard: a malformed record without categories must never throw.
+      : spots.filter(s => Number.isFinite(s.lng) && Number.isFinite(s.lat) && (s.categories || []).some(c => matches({ name:s.name, categories:s.categories }, catFor(filter))));
     return base.filter(s => withinRadius(s));
-  }, [spots, filter, radius, hasFix]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [spots, filter, radius, hasFix, coords.lng, coords.lat]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div style={{ position:'relative', flex:1, minHeight:0, display:'flex', flexDirection:'column' }}>
@@ -104,7 +112,7 @@ export default function MapTab({ coords, push, showToast, user, setTab }){
         {filtered.map(p => (
           <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} onClick={() => push({ name:'detail', place:p })}>
             <MarkerContent>
-              <div className="spot-pin" title={p.name}><span>{shortName(p.name)}</span></div>
+              <button type="button" className="spot-pin" title={p.name} aria-label={p.name}><span>{shortName(p.name)}</span></button>
             </MarkerContent>
           </MapMarker>
         ))}

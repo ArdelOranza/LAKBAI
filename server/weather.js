@@ -13,11 +13,14 @@ const LABELS = new Map([
 
 async function getWeather(lng, lat, deps = {}){
   const doFetch = deps.fetch || fetch;
-  const r = await doFetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code&timezone=auto`);
+  const r = await doFetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code&timezone=auto`, { signal: AbortSignal.timeout(10000) });
   if (!r.ok) { const e = new Error('Open-Meteo error ' + r.status); e.status = r.status || 502; throw e; }
   const data = await r.json();
   const cur = data.current || {};
-  return { tempC: Math.round(Number(cur.temperature_2m)), condition: LABELS.get(Number(cur.weather_code)) || 'Clear' };
+  const temp = Number(cur.temperature_2m);
+  // A payload with no current readings is an upstream failure, not "0°C".
+  if (!Number.isFinite(temp)) { const e = new Error('Open-Meteo returned no temperature'); e.status = 502; throw e; }
+  return { tempC: Math.round(temp), condition: LABELS.get(Number(cur.weather_code)) || 'Clear' };
 }
 
 module.exports = { getWeather };

@@ -11,12 +11,13 @@ export default function Splash({ onGetStarted, onLogIn }){
 
   // If the browser suspends us for Google then restores from bfcache on
   // back-press, busy would still be true and the buttons dead. Clear it.
+  // (Only pageshow: visibilitychange also fires when the traveler merely
+  // backgrounds mid-request, and clearing then allows a double-submit that
+  // overwrites the PKCE verifier.)
   useEffect(() => {
     const clear = () => setBusy(false);
-    const onVis = () => { if (!document.hidden) setBusy(false); };
-    document.addEventListener('visibilitychange', onVis);
     window.addEventListener('pageshow', clear);
-    return () => { document.removeEventListener('visibilitychange', onVis); window.removeEventListener('pageshow', clear); };
+    return () => { window.removeEventListener('pageshow', clear); };
   }, []);
 
   async function google(){

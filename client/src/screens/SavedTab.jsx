@@ -101,7 +101,7 @@ export default function SavedTab({ coords, push, showToast }){
   );
   async function saveToSaved(place){
     const res = await saveFavorite(user, place);
-    if (res.error) { showToast('Sign in to save', 'error'); return; }
+    if (res.error) { showToast('Sign in to save', 'error', res.error); return; }
     setRows(r => r.some(x => x.place_id === place.id) ? r : [
       { place_id:place.id, name:place.name, lng:place.lng, lat:place.lat, photo:place.photo || null, categories:place.categories || [] },
       ...r,

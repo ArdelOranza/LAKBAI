@@ -18,14 +18,17 @@ export default function LogIn({ onAuthed, onSwitchToSignup, notice, defaultEmail
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   // bfcache restore after Google (back pressed) — don't leave buttons dead.
+  // (Only pageshow: visibilitychange also fires when the traveler merely
+  // backgrounds mid-request, and clearing then allows a double-submit that
+  // overwrites the PKCE verifier.)
   useEffect(() => {
     const clear = () => setBusy(false);
-    const onVis = () => { if (!document.hidden) setBusy(false); };
-    document.addEventListener('visibilitychange', onVis);
     window.addEventListener('pageshow', clear);
-    return () => { document.removeEventListener('visibilitychange', onVis); window.removeEventListener('pageshow', clear); };
+    return () => { window.removeEventListener('pageshow', clear); };
   }, []);
 
+  // Enter submits the form (no <form>, so wire it explicitly).
+  const onEnter = e => { if (e.key === 'Enter'){ e.preventDefault(); submit(); } };
   async function submit(){
     const v = validateLogin(form);
     if (!v.ok) { setErr(v); return; }
@@ -89,10 +92,10 @@ export default function LogIn({ onAuthed, onSwitchToSignup, notice, defaultEmail
         <div style={{ marginTop:18 }}><GoogleBtn onClick={google} disabled={busy || !configured}/></div>
         <OrDivider/>
         <label style={LABEL} htmlFor="login-email-input">Email Address</label>
-        <input id="login-email-input" data-testid="login-email" type="email" value={form.email} onChange={e => set('email', e.target.value)} disabled={!configured || busy} />
+        <input id="login-email-input" data-testid="login-email" type="email" value={form.email} onChange={e => set('email', e.target.value)} onKeyDown={onEnter} disabled={!configured || busy} />
         <label style={LABEL} htmlFor="login-password-input">Password</label>
         <div style={{ display:'flex', gap:6 }}>
-          <input id="login-password-input" data-testid="login-password" type={show ? 'text' : 'password'} value={form.password} onChange={e => set('password', e.target.value)} style={{ flex:1 }} disabled={!configured || busy}/>
+          <input id="login-password-input" data-testid="login-password" type={show ? 'text' : 'password'} value={form.password} onChange={e => set('password', e.target.value)} onKeyDown={onEnter} style={{ flex:1 }} disabled={!configured || busy}/>
           <button type="button" className="icon-btn" onClick={() => setShow(s => !s)} aria-label="Toggle password">{show ? <EyeOff size={16}/> : <Eye size={16}/>}</button>
         </div>
         <div style={{ textAlign:'right', marginTop:8 }}>
