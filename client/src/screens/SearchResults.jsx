@@ -55,6 +55,7 @@ export default function SearchResults({ query, coords, push, pop, showToast }){
           <Search size={17} color="#64748B"/>
           <input
             data-testid="search-bar"
+            aria-label="Search places, food, events"
             value={text}
             onChange={e => setText(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') push({ name:'search', query:text }); }}
@@ -77,10 +78,10 @@ export default function SearchResults({ query, coords, push, pop, showToast }){
         {shown.map(p => {
           const dist = formatDistance(haversineKm(coords.lng, coords.lat, p.lng, p.lat));
           return (
-            <article key={p.id} data-testid="result-row" className="result-card" onClick={() => push({ name:'detail', place:p })}>
+            <article key={p.id} data-testid="result-row" className="result-card" onClick={() => push({ name:'detail', place:p })} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'detail', place:p }); } }}>
               <div className="result-thumb">
                 {p.photo
-                  ? <img src={p.photo} alt="" loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }}/>
+                  ? <img src={p.photo} alt={p.name} loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }}/>
                   : <PhotoPlaceholder size={22}/>}
                 {p.rating && (
                   <span className="result-rating">

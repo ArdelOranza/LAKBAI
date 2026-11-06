@@ -304,7 +304,23 @@ const Map = forwardRef(function Map(
   // Sync controlled viewport to map
   useEffect(() => {
     if (!mapInstance || !isControlled || !viewport) return;
-    if (mapInstance.isMoving()) return;
+    // If the map is being dragged while a radius tap changes the zoom, don't
+    // drop it — retry once it settles instead of desyncing until the next tap.
+    if (mapInstance.isMoving()){
+      const retry = setTimeout(() => {
+        if (mapInstance && isControlled) {
+          internalUpdateRef.current = true;
+          mapInstance.jumpTo({
+            center: viewport.center ?? getViewport(mapInstance).center,
+            zoom: viewport.zoom ?? getViewport(mapInstance).zoom,
+            bearing: viewport.bearing ?? getViewport(mapInstance).bearing,
+            pitch: viewport.pitch ?? getViewport(mapInstance).pitch,
+          });
+          internalUpdateRef.current = false;
+        }
+      }, 400);
+      return () => clearTimeout(retry);
+    }
 
     const current = getViewport(mapInstance);
     const next = {

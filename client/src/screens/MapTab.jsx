@@ -5,6 +5,8 @@ import { readLocalPrefs } from '../prefs.js';
 import { sessionGet, sessionSet } from '../sessionCache.js';
 import { matches } from '../filters.js';
 import { fetchSpots } from '../spots.js';
+import { haversineKm } from '../geo.js';
+import { FALLBACK_CENTER } from '../App.jsx';
 import { Map, MapMarker, MarkerContent } from '@/components/ui/map';
 import { Chip } from '../ui.jsx';
 import SpotPopup from './SpotPopup.jsx';
@@ -17,72 +19,110 @@ const FILTERS = [
   ['Events', Landmark],
 ];
 
-function iconFor(spot){
-  if (spot.categories.includes('Food')) return UtensilsCrossed;
-  if (spot.categories.includes('Beach')) return Umbrella;
-  return Landmark;
+/** Short label for a map name pill — the full name stays in title/aria. */
+function shortName(name){
+  const n = String(name || '').replace(/\s*\(.*$/, '').trim();
+  return n.length > 22 ? n.slice(0, 21).trimEnd() + '…' : n;
 }
 
 export default function MapTab({ coords, push, showToast, user, setTab }){
   const [radius, setRadius] = useState(5);
   const [filter, setFilter] = useState('All');
-  const [places, setPlaces] = useState(sessionGet('lakbai.rec.nearby:5') || []);
+  // Seed from the same coords-keyed lookup the effect writes, not a legacy
+  // unkeyed key that could be pins from a previous location/radius.
+  const keyFor = (r, c) => `lakbai.rec.nearby:${r}:${c.lng.toFixed(3)},${c.lat.toFixed(3)}`;
+  const coordsBucket = `${coords.lng.toFixed(3)},${coords.lat.toFixed(3)}`;
+  const [places, setPlaces] = useState(() => sessionGet(keyFor(radius, coords)) || []);
   const [spots, setSpots] = useState([]);
   const [selectedSpot, setSelectedSpot] = useState(null);
   const [busy, setBusy] = useState(false);
+  // A real GPS fix has arrived — until then coords are the Pangasinan fallback,
+  // which must not be shown as "You are here" or used to filter pins.
+  const hasFix = !(coords.lng === FALLBACK_CENTER.lng && coords.lat === FALLBACK_CENTER.lat);
+  const [viewport, setViewport] = useState({ center: [coords.lng, coords.lat], zoom: 11.5 });
+  const [centeredOnFix, setCenteredOnFix] = useState(false);
+
+  // Keep the controlled viewport in sync: radius chips change zoom, and the
+  // first real GPS fix re-centres the map.
+  useEffect(() => {
+    setViewport(v => ({ ...v, zoom: radius === 1 ? 13 : radius === 5 ? 11.5 : 10.5 }));
+  }, [radius]);
+  useEffect(() => {
+    if (hasFix && !centeredOnFix){
+      setViewport(v => ({ ...v, center: [coords.lng, coords.lat] }));
+      setCenteredOnFix(true);
+    }
+  }, [hasFix, centeredOnFix, coords.lng, coords.lat]);
 
   useEffect(() => {
-    const key = 'lakbai.rec.nearby:' + radius;
+    const key = keyFor(radius, coords);
     const hit = sessionGet(key);
     if (hit) { setPlaces(hit); return; }
+    let alive = true;
     setBusy(true);
-    recommend(`nearby Pangasinan attractions restaurants events within ${radius} km`, `${coords.lng},${coords.lat}`, readLocalPrefs())
+    recommend(`nearby Pangasinan attractions restaurants events within ${radius} km`, `${coords.lng},${coords.lat}`, readLocalPrefs(user))
       .then(out => {
+        if (!alive) return;
         const ps = out.places || [];
         setPlaces(ps);
         sessionSet(key, ps);
       })
-      .catch(e => showToast('Map data unavailable', 'error', e.message))
-      .finally(() => setBusy(false));
-  }, [radius]); // eslint-disable-line react-hooks/exhaustive-deps
+      .catch(e => { if (alive) showToast('Map data unavailable', 'error', e.message); })
+      .finally(() => { if (alive) setBusy(false); });
+    return () => { alive = false; };
+  }, [radius, coordsBucket]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     fetchSpots().then(setSpots).catch(() => showToast('Offline — curated pins load when the app has been opened online once', 'error'));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const filtered = useMemo(() => places.filter(p => matches(p, filter)), [places, filter]);
+  // A filter or radius change must close a popup that no longer belongs to the
+  // visible set (GPS moving the spot out of radius does too, via coords).
+  useEffect(() => { setSelectedSpot(null); }, [filter, radius, coords.lng, coords.lat]);
+
+  const withinRadius = place => !hasFix || !Number.isFinite(place.lng) || !Number.isFinite(place.lat)
+    || haversineKm(coords.lng, coords.lat, place.lng, place.lat) <= radius;
+  // Places without coordinates can't be pinned — drop them, never render an
+  // invalid marker.
+  const filtered = useMemo(() => places.filter(p => Number.isFinite(p.lng) && Number.isFinite(p.lat) && matches(p, filter) && withinRadius(p)), [places, filter, radius, hasFix, coords.lng, coords.lat]); // eslint-disable-line react-hooks/exhaustive-deps
   const catFor = f => f === 'Food' ? 'Food' : f === 'Events' ? 'Events' : 'Beaches';
   const filteredSpots = useMemo(() => {
-    if (filter === 'All') return spots.filter(s => Number.isFinite(s.lng) && Number.isFinite(s.lat));
-    return spots.filter(s => Number.isFinite(s.lng) && Number.isFinite(s.lat) && s.categories.some(c => matches({ name:s.name, categories:s.categories }, catFor(filter))));
-  }, [spots, filter]);
+    const base = filter === 'All'
+      ? spots.filter(s => Number.isFinite(s.lng) && Number.isFinite(s.lat))
+      // Guard: a malformed record without categories must never throw.
+      : spots.filter(s => Number.isFinite(s.lng) && Number.isFinite(s.lat) && (s.categories || []).some(c => matches({ name:s.name, categories:s.categories }, catFor(filter))));
+    return base.filter(s => withinRadius(s));
+  }, [spots, filter, radius, hasFix, coords.lng, coords.lat]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div style={{ position:'relative', flex:1, minHeight:0, display:'flex', flexDirection:'column' }}>
       <Map
+        viewport={viewport}
+        onViewportChange={setViewport}
         center={[coords.lng, coords.lat]}
         zoom={radius === 1 ? 13 : radius === 5 ? 11.5 : 10.5}
         theme="light"
         className="absolute inset-0"
       >
-        <MapMarker longitude={coords.lng} latitude={coords.lat}>
-          <MarkerContent><div className="userdot" title="You are here"/></MarkerContent>
-        </MapMarker>
+        {hasFix && (
+          <MapMarker longitude={coords.lng} latitude={coords.lat}>
+            <MarkerContent><div className="userdot" title="You are here"/></MarkerContent>
+          </MapMarker>
+        )}
         {filtered.map(p => (
           <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} onClick={() => push({ name:'detail', place:p })}>
             <MarkerContent>
-              <div className="spot-pin" title={p.name}><MapPin size={16}/></div>
+              <button type="button" className="spot-pin" title={p.name} aria-label={p.name}><span>{shortName(p.name)}</span></button>
             </MarkerContent>
           </MapMarker>
         ))}
         {filteredSpots.map(s => {
-          const Icon = iconFor(s);
           const active = selectedSpot && selectedSpot.id === s.id;
           return (
             <MapMarker key={'spot-' + s.id} longitude={s.lng} latitude={s.lat} onClick={() => setSelectedSpot(s)}>
               <MarkerContent>
                 <button className={'spot-pin' + (active ? ' active' : '')} title={s.name} aria-label={s.name}>
-                  <Icon size={16}/>
+                  <span>{shortName(s.name)}</span>
                 </button>
               </MarkerContent>
             </MapMarker>
@@ -90,7 +130,7 @@ export default function MapTab({ coords, push, showToast, user, setTab }){
         })}
       </Map>
 
-      <div style={{ position:'absolute', top:12, left:12, right:12, zIndex:5, background:'rgba(255,255,255,.97)', borderRadius:999, padding:'11px 16px', boxShadow:'0 10px 24px -14px rgba(15,23,42,.3)', display:'flex', alignItems:'center', gap:8, cursor:'pointer' }} onClick={() => push({ name:'search', query:'' })}>
+      <div style={{ position:'absolute', top:12, left:12, right:12, zIndex:5, background:'rgba(255,255,255,.97)', borderRadius:999, padding:'11px 16px', boxShadow:'0 10px 24px -14px rgba(15,23,42,.3)', display:'flex', alignItems:'center', gap:8, cursor:'pointer' }} onClick={() => push({ name:'search', query:'' })} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'search', query:'' }); } }}>
         <Search size={17} color="var(--muted-ink)"/>
         <span style={{ color:'var(--muted-ink)', fontSize:14 }}>Search places, food, events…</span>
       </div>

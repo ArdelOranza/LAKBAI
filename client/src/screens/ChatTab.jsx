@@ -7,18 +7,18 @@ import {
 import { chat } from '../api.js';
 import { fetchSpots } from '../spots.js';
 import { cardFor, mapThumb } from '../chatCards.js';
-import { saveFavorite } from '../store.js';
+import { saveFavorite, listFavorites } from '../store.js';
 import { haversineKm, formatDistance, driveMinutes } from '../geo.js';
 import { PhotoPlaceholder } from '../ui.jsx';
 import Logo from '../logo.jsx';
 // import AiBackdrop from '../AiBackdrop.jsx'; // parked: the chat background stays plain
 
-const WELCOME = { id:'welcome', role:'ai', text:"Hi! I'm LakbAI. Explore Pangasinan with a smile — ask for beaches, food, festivals, or let me plan your whole trip. I can spotlight secret spots and unique adventures whenever you're ready." };
+const WELCOME = { id:'welcome', role:'ai', text:"Hi! I'm LakbAI. Ask me about the places in our verified Pangasinan list — food, tourist spots, fees, or a day trip. I answer from those records only, so nothing is made up." };
 const STARTERS = [
-  'Best beaches near Bolinao',
+  'Tourist spots in Bayambang',
   'Where should I eat in Dagupan?',
-  'Festivals this month',
-  'Plan a 2-day Pangasinan trip',
+  'Fees at Balungao zipline',
+  'Plan a day trip in Bayambang',
 ];
 const MAP_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 let uid = 0;
@@ -49,7 +49,7 @@ function ChatCard({ card, coords, user, showToast, push, saved, onSaved }){
     e.stopPropagation();
     if (saved) return;
     const res = await saveFavorite(user, { id: card.id, name: card.name, lng: card.lng, lat: card.lat });
-    if (res.error) { showToast('Sign in to save', 'error'); return; }
+    if (res.error) { showToast('Sign in to save', 'error', res.error); return; }
     onSaved(card.id);
     showToast('Added to Trip');
   }
@@ -60,10 +60,10 @@ function ChatCard({ card, coords, user, showToast, push, saved, onSaved }){
   }
 
   return (
-    <article className="chat-card" data-testid="chat-card" onClick={() => push({ name:'detail', place })}>
+    <article className="chat-card" data-testid="chat-card" onClick={() => push({ name:'detail', place })} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'detail', place }); } }}>
       <div className="chat-card-media">
         {img
-          ? <img src={img} alt="" loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }}/>
+          ? <img src={img} alt={card.name} loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }}/>
           : <PhotoPlaceholder size={26}/>}
 
         {card.rating != null && (
@@ -128,6 +128,16 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
 
   useEffect(() => { listRef.current && (listRef.current.scrollTop = listRef.current.scrollHeight); }, [msgs, busy]);
   useEffect(() => { fetchSpots().then(setSpots).catch(() => {}); }, []);
+  // Seed saved buttons from the already-saved favorites, so a place saved in
+  // a previous session doesn't read as unsaved ("Add to Trip" again).
+  useEffect(() => {
+    let alive = true;
+    listFavorites(user).then(r => {
+      if (!alive || r.error || !Array.isArray(r.data)) return;
+      setSavedIds(new Set(r.data.map(f => f.place_id).filter(Boolean)));
+    }).catch(() => {});
+    return () => { alive = false; };
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     const up = () => setOnline(true), down = () => setOnline(false);
     window.addEventListener('online', up);
@@ -135,6 +145,7 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
     return () => { window.removeEventListener('online', up); window.removeEventListener('offline', down); };
   }, []);
 
+  const abortRef = useRef(null);
   async function send(text){
     const q = String(text ?? input).trim();
     if (!q || busy) return;
@@ -142,8 +153,11 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
     setStarters(false);
     setMsgs(m => [...m, { id:nid(), role:'user', text:q, at:Date.now() }, { id:nid(), role:'ai', loading:true }]);
     setBusy(true);
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
     try {
-      const out = await chat(q, coords ? `${coords.lng},${coords.lat}` : '');
+      const out = await chat(q, coords ? `${coords.lng},${coords.lat}` : '', ctrl.signal);
+      if (ctrl.signal.aborted) return;
       const candidates = out.candidates || [];
       const cards = candidates.slice(0, 1).map(c => cardFor(c, spots));
       const more = candidates.slice(1, 6).map(c => c.name + (c.hint ? ' — ' + c.hint : ''));
@@ -153,22 +167,34 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
         cards, more,
       }]);
     } catch (e) {
+      if (ctrl.signal.aborted){
+        setMsgs(m => [...m.filter(x => !x.loading), { id:nid(), role:'ai', at:Date.now(), text: 'No reply — the request was stopped. Try again.' }]);
+        return;
+      }
       setMsgs(m => [...m.filter(x => !x.loading)]);
       showToast('LakbAI is busy — try again in a minute', 'error', e.message);
     } finally {
+      abortRef.current = null;
       setBusy(false);
     }
   }
+  function stop(){ abortRef.current?.abort(new Error('stopped by traveler')); }
 
+  const recogRef = useRef(null);
   function mic(){
+    // A second tap stops an active recognizer instead of spawning another.
+    if (listening){ try { recogRef.current?.stop(); } catch { /* ignore */ } return; }
     const S = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!S) { showToast('Voice input is not supported in this browser', 'error'); return; }
     const r = new S();
+    recogRef.current = r;
     r.lang = 'en-PH';
     r.onresult = e => { setListening(false); setInput(e.results[0][0].transcript); inputRef.current?.focus(); };
     r.onerror = () => { setListening(false); showToast('Microphone unavailable', 'error'); };
+    r.onend = () => setListening(false); // recognizer ended with no result — don't stick
     setListening(true);
-    r.start();
+    try { r.start(); }
+    catch { setListening(false); showToast('Microphone unavailable', 'error'); }
   }
 
   const lastAi = [...msgs].reverse().find(m => m.role === 'ai' && !m.loading);
@@ -210,7 +236,7 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
           <>
             <button type="button" className="menu-scrim" aria-label="Close menu" onClick={() => setMenu(false)}/>
             <div className="chat-menu" role="menu">
-              <button type="button" role="menuitem" data-testid="chat-new" onClick={() => { setMsgs([{ ...WELCOME, at:Date.now() }]); setMenu(false); }}>
+              <button type="button" role="menuitem" data-testid="chat-new" onClick={() => { stop(); setMsgs([{ ...WELCOME, at:Date.now() }]); setMenu(false); }}>
                 <MessageSquarePlus size={16}/> New chat
               </button>
               <button type="button" role="menuitem" onClick={() => { setMenu(false); push({ name:'prefs-edit' }); }}>
@@ -237,6 +263,7 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
                       <span className="ai-name">LakbAI Guide</span>
                     </div>
                     <span className="shimmer" style={{ fontSize:13 }}>Searching places...</span>
+                    <button type="button" data-testid="chat-stop" className="chat-stop" onClick={stop} style={{ marginLeft:8, fontSize:12 }}>Stop</button>
                   </div>
                 ) : m.role === 'user' ? (
                   <div className="chat-user">
@@ -308,6 +335,7 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
             <input
               ref={inputRef}
               data-testid="chat-input"
+              aria-label="Ask a follow up question"
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') send(); }}

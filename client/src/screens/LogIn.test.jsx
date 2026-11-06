@@ -21,4 +21,10 @@ describe('LogIn', () => {
     expect(html).toContain('data-testid="login-email"');
     expect(html).toContain('data-testid="login-send"');
   });
+
+  it('offers Google sign-in beside the email form', () => {
+    const html = renderToString(<LogIn onAuthed={() => {}} onSwitchToSignup={() => {}} />);
+    expect(html).toContain('data-testid="google-signin"');
+    expect(html).toContain('Continue with Google');
+  });
 });

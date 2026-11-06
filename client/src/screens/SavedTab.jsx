@@ -33,7 +33,10 @@ export default function SavedTab({ coords, push, showToast }){
   function queueRestore(row){ setRows(r => [row, ...r]); }
   function suggestionLabels(row){ // hint pill from category + sunset clock (no festival data on favorites)
     const cat = (row.categories || [])[0] || 'Place';
-    return timeHint(/beach/i.test(cat) ? 'Beach' : /cafe|restaurant|food/i.test(cat) ? 'Restaurant' : cat, '');
+    // No sunset string is available here — don't render a dangling "Optimal
+    // sunset: " chip. Only the category-based dinner hint is shown.
+    if (/beach|coastal|island/i.test(cat)) return 'Best at sunset';
+    return timeHint(cat, '');
   }
   async function generate(){
     if (!rows.length) { showToast('Save a few places first', 'error'); return; }
@@ -59,7 +62,7 @@ export default function SavedTab({ coords, push, showToast }){
         {rows.map(row => (
           <article key={row.place_id} data-testid="saved-row" style={{ display:'flex', gap:12, padding:12, border:'1px solid #EDF1F7', borderRadius:16, background:'#fff', cursor:'pointer', alignItems:'center' }} onClick={() => push({ name:'detail', place:row })}>
             <div className="thumb" style={{ width:72, height:72, minWidth:72 }}>
-              {row.photo ? <img src={row.photo} alt="" loading="lazy" onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/> : <ImageIcon size={22}/>}
+              {row.photo ? <img src={row.photo} alt={row.name} loading="lazy" onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/> : <ImageIcon size={22}/>}
             </div>
             <div style={{ flex:1, minWidth:0 }}>
               <b style={{ display:'block' }}>{row.name}</b>
@@ -98,7 +101,7 @@ export default function SavedTab({ coords, push, showToast }){
   );
   async function saveToSaved(place){
     const res = await saveFavorite(user, place);
-    if (res.error) { showToast('Sign in to save', 'error'); return; }
+    if (res.error) { showToast('Sign in to save', 'error', res.error); return; }
     setRows(r => r.some(x => x.place_id === place.id) ? r : [
       { place_id:place.id, name:place.name, lng:place.lng, lat:place.lat, photo:place.photo || null, categories:place.categories || [] },
       ...r,

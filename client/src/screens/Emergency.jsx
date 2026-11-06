@@ -37,16 +37,21 @@ export default function Emergency({ coords, pop, showToast }){
   const [data, setData] = useState(null);
   const [failed, setFailed] = useState(false);
   const at = `${coords.lng},${coords.lat}`;
-  const hasFix = coords !== FALLBACK_CENTER;
-
+  // Value compare like MapTab: reference equality breaks when the caller
+  // passes a fresh fallback object (tests, another screen) — and on a safety
+  // screen that would silently share fabricated coordinates.
+  const hasFix = coords && !(coords.lng === FALLBACK_CENTER.lng && coords.lat === FALLBACK_CENTER.lat);
   useEffect(() => {
     let alive = true;
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 10000);
     setFailed(false);
-    fetch(`${BASE}/api/emergency?proximity=${encodeURIComponent(at)}`)
+    fetch(`${BASE}/api/emergency?proximity=${encodeURIComponent(at)}`, { signal: ctrl.signal })
       .then(r => { if (!r.ok) throw new Error('lookup failed'); return r.json(); })
       .then(d => { if (alive) setData(d); })
-      .catch(() => { if (alive) setFailed(true); });
-    return () => { alive = false; };
+      .catch(() => { if (alive) setFailed(true); })
+      .finally(() => clearTimeout(timer));
+    return () => { alive = false; ctrl.abort(); };
   }, [at]);
 
   async function shareLocation(){
@@ -61,10 +66,11 @@ export default function Emergency({ coords, pop, showToast }){
     }
   }
 
+  // Nearest first — time-critical on a safety screen. Null distances go last.
   const withKm = list => (list || []).map(p => ({
     ...p,
     km: haversineKm(coords.lng, coords.lat, p.lng, p.lat),
-  }));
+  })).sort((a, b) => (a.km == null ? Infinity : a.km) - (b.km == null ? Infinity : b.km));
   const hospitals = withKm(data && data.hospitals);
   const police = withKm(data && data.police);
 

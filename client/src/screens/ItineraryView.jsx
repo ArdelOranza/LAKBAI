@@ -6,7 +6,8 @@ import { sessionSet } from '../sessionCache.js';
 import { driveMinutes, haversineKm } from '../geo.js';
 import { Chip, PrimaryBtn, PhotoPlaceholder } from '../ui.jsx';
 
-const CITY = 'Bolinao, Pangasinan';
+  // (CITY was a hardcoded 'Bolinao, Pangasinan' — now derived from the stops.)
+  // Empty or unknown cases fall back to a province label, never to a wrong town.
 
 export default function ItineraryView({ plan, coords, pop, showToast }){
   const { user } = useAuth();
@@ -14,6 +15,7 @@ export default function ItineraryView({ plan, coords, pop, showToast }){
   const stops = p.schedule || [];
   const favBy = p.favBy || {};
   const [saved, setSaved] = useState(Boolean(p.saved));
+  const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(p.title || 'My Day Trip');
   const [weather, setWeather] = useState(null);
@@ -30,10 +32,33 @@ export default function ItineraryView({ plan, coords, pop, showToast }){
       .catch(() => { /* weather is a bonus card; hidden gracefully */ });
     return () => { alive = false; };
   }, [coords]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Derive the header town from the stops — a Bayambang plan must not read
+  // "Bolinao, Pangasinan" whatever the model called it.
+  const cityLabel = (() => {
+    const counts = {};
+    for (const s of stops){
+      const town = (favBy[s.name] && favBy[s.name].town) || s.hint || s.town;
+      if (town) counts[String(town).replace(/,.*$/, '').trim()] = (counts[String(town).replace(/,.*$/, '').trim()] || 0) + 1;
+    }
+    const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+    return top && top[0] ? `${top[0]}, Pangasinan` : 'Pangasinan';
+  })();
   async function saveItinerary(){
-    const res = await savePlan(user, { id: p.id, title, schedule: stops, starts_at: p.starts_at || null });
+    // In-flight guard: a double-tap on a slow network used to insert twice.
+    if (saving || saved) return;
+    setSaving(true);
+    let res;
+    try { res = await savePlan(user, { id: p.id, title, schedule: stops, starts_at: p.starts_at || null }); }
+    catch (e) { res = { error: String(e?.message || e) }; }
+    finally { setSaving(false); }
+    // A signed-in cloud failure is not a save — keep the button enabled so the
+    // traveler can retry instead of being locked out with a false "Saved".
+    if (res.error && user){
+      showToast('Could not save — try again', 'error', res.error);
+      return;
+    }
     setSaved(true);
-    showToast('Itinerary Saved — You can view saved itineraries under Profile Tab named Saved Itineraries', res.queued ? 'ok' : 'ok', res.error);
+    showToast(res.queued ? 'Saved on this device — it will sync when you sign in' : 'Itinerary Saved — You can view saved itineraries under Profile Tab named Saved Itineraries', 'ok', res.error);
   }
   return (
     <main style={{ flex:1, overflowY:'auto' }}>
@@ -57,7 +82,7 @@ export default function ItineraryView({ plan, coords, pop, showToast }){
           </h1>
         )}
         <p style={{ color:'var(--muted-ink)', fontSize:12.5, marginTop:4, display:'flex', alignItems:'center', gap:5 }}>
-          <MapPin size={13}/> {CITY} · 1 Day × {stops.length} Stops
+          <MapPin size={13}/> {cityLabel} · 1 Day × {stops.length} Stops
         </p>
         {weather && (
           <div className="soft-card" style={{ marginTop:10, borderRadius:14 }}>
@@ -78,7 +103,7 @@ export default function ItineraryView({ plan, coords, pop, showToast }){
             <article key={s.placeId || s.name || i} data-testid="itin-row" style={{ border:'1px solid #EDF1F7', borderRadius:18, background:'#fff', overflow:'hidden' }}>
               <div style={{ position:'relative', height:120 }}>
                 {mineFav && mineFav.photo
-                  ? <img src={mineFav.photo} alt="" onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+                  ? <img src={mineFav.photo} alt={s.name} onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
                   : <PhotoPlaceholder size={26}/>}
                 <span style={{ position:'absolute', left:10, top:10, background:'rgba(255,255,255,.94)', borderRadius:10, padding:'3px 10px', fontWeight:800, fontSize:12, color:'var(--ink)' }}>{String(i + 1).padStart(2, '0')}</span>
                 <div style={{ position:'absolute', left:10, bottom:10, display:'flex', gap:6 }}>

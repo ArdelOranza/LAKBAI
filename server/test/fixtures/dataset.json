@@ -40,6 +40,16 @@
       "categories": ["hospital", "health"],
       "lat": 15.928,
       "lng": 120.348
+    },
+    {
+      "id": "san-carlos-plaza",
+      "name": "San Carlos City Plaza",
+      "municipality": "San Carlos City",
+      "categories": ["park", "plaza"],
+      "rating": 4.3,
+      "reviews": 210,
+      "lat": 15.9283,
+      "lng": 120.3489
     }
   ]
 }

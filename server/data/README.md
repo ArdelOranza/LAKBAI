@@ -3,15 +3,23 @@
 Every `.json` file in this folder is part of the reference set:
 
 - `places.json` — the verified restaurants
-- `spots.json` — the verified tourist spots
+- `spots.json` — the verified tourist spots (Eastern and Southern Pangasinan)
+- `pangasinan-150.json` — the 150-spot province-wide directory (all towns)
 
-As soon as at least one exists, `/api/chat` and `/api/recommend` stop searching
-the web. The rows in these files — plus the curated attractions in
-`server/spots.js` — are handed to the AI as its only source of truth, and every
-place it names is matched back to a row before it reaches the app. A name that
-is not in the file is dropped, so it cannot invent a place, rating, hours or
-price. `agent.js` and its Google-search path are untouched; they simply stop
-being used.
+`allEntries()` deduplicates by normalized name, so places that appear in both
+`spots.json` and `pangasinan-150.json` (18 of them) are returned once — the
+first file alphabetically wins (`pangasinan-150.json` before `spots.json`).
+
+As soon as at least one exists, `/api/chat`, `/api/recommend` and `/api/plan`
+stop searching the web. These rows — and nothing else — are handed to the AI as
+its only source of truth. Every place it names is matched back to a row before
+it reaches the app: a name that is not in the file is dropped, and an answer
+that adds a place, price, rating or opening hour not written in the rows is
+replaced with one built from the rows. `server/spots.js` still drives the map
+and the curated browsing screens, but it is deliberately not part of the AI
+reference — if a place is not in these files, the assistant says the data does
+not cover it. `agent.js` and its Google-search path are untouched; they simply
+stop being used.
 
 If the AI is unavailable, the server answers from the files directly instead of
 erroring. The model chain is Gemini → Gemini lite → Groq, and each step is

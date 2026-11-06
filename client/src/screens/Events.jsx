@@ -51,7 +51,7 @@ export default function Events({ coords, push, pop, showToast }){
               {bannerPhoto && (
                 <img
                   src={bannerPhoto}
-                  alt=""
+                  alt={featured.name}
                   loading="lazy"
                   onError={e => { e.currentTarget.style.display = 'none'; }}
                   style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }}

@@ -45,9 +45,9 @@ export default function Itineraries({ pop, push, setTab }){
             const status = planStatus(p.starts_at);
             const stops = (p.schedule || []).length;
             return (
-              <article key={p.id} data-testid="itinerary-row" onClick={() => push({ name:'itinerary', plan:p })} style={{ display:'flex', gap:12, alignItems:'center', border:'1px solid #EDF1F7', borderRadius:16, background:'#fff', padding:12, cursor:'pointer' }}>
+              <article key={p.id} data-testid="itinerary-row" onClick={() => push({ name:'itinerary', plan:p })} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'itinerary', plan:p }); } }} style={{ display:'flex', gap:12, alignItems:'center', border:'1px solid #EDF1F7', borderRadius:16, background:'#fff', padding:12, cursor:'pointer' }}>
                 <div className="thumb" style={{ width:58, height:58, minWidth:58 }}>
-                  {p.photo ? <img src={p.photo} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }}/> : <Mountain size={22}/>}
+                  {p.photo ? <img src={p.photo} alt={p.title} style={{ width:'100%', height:'100%', objectFit:'cover' }}/> : <Mountain size={22}/>}
                 </div>
                 <div style={{ flex:1, minWidth:0 }}>
                   <b style={{ display:'block', fontSize:15 }}>{p.title}</b>
@@ -65,7 +65,7 @@ export default function Itineraries({ pop, push, setTab }){
           })}
         </div>
 
-        <div data-testid="generate-new" className="soft-card" style={{ marginTop:12, cursor:'pointer' }} onClick={() => setTab('saved')}>
+        <div data-testid="generate-new" className="soft-card" style={{ marginTop:12, cursor:'pointer' }} onClick={() => setTab('saved')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTab('saved'); } }}>
           <span style={{ width:28, height:28, minWidth:28, borderRadius:'50%', background:'#fff', color:'var(--primary)', display:'grid', placeItems:'center' }}>
             <Plus size={16}/>
           </span>

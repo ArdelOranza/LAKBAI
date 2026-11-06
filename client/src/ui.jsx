@@ -1,4 +1,5 @@
 import { House, Map, MessageSquare, Backpack, UserRound, Check, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
+import GoogleMark from './GoogleMark.jsx';
 
 /** Neutral, icon-based stand-in for a missing photo. No gradients, no emoji. */
 export function PhotoPlaceholder({ label, size = 26, rounded = 0, style }){
@@ -46,4 +47,14 @@ export function Chip({ active, onClick, children, testid, flat }){
 }
 export function PrimaryBtn({ children, onClick, wide, disabled, testid }){
   return <button data-testid={testid} className={'primary-btn' + (wide ? ' wide' : '')} onClick={onClick} disabled={disabled}>{children}</button>;
+}
+export function GoogleBtn({ onClick, disabled, testid = 'google-signin' }){
+  return (
+    <button type="button" data-testid={testid} className="google-btn" onClick={onClick} disabled={disabled}>
+      <GoogleMark size={18}/> Continue with Google
+    </button>
+  );
+}
+export function OrDivider(){
+  return <div className="or-divider"><span>or</span></div>;
 }

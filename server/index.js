@@ -5,6 +5,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.get('/api/health', (req, res) => res.json({ ok: true }));
+const MESSAGE_MAX = 500;
+function boundedMessage(req){
+  const m = String((req.body && req.body.message) || '');
+  return m.length > MESSAGE_MAX ? null : m;
+}
 app.get('/api/ready', (req, res) => {
   const gemini = Boolean(process.env.GEMINI_API_KEY);
   const mapbox = Boolean(process.env.VITE_MAPBOX_TOKEN);
@@ -18,9 +23,11 @@ const HOTLINES = [
 app.get('/api/emergency', async (req, res) => {
   try {
     const proximity = req.query.proximity;
+    // Partial results are fine: static hotlines always ship, and whichever
+    // lookup succeeded is still useful. One flaky upstream must not drop them.
     const [hospitals, police] = await Promise.all([
-      searchPlaces('hospital', proximity),
-      searchPlaces('police station', proximity)
+      searchPlaces('hospital', proximity).catch(() => []),
+      searchPlaces('police station', proximity).catch(() => []),
     ]);
     res.json({ hospitals: hospitals.slice(0, 5), police: police.slice(0, 5), hotlines: HOTLINES });
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
@@ -39,48 +46,70 @@ const AI_COOLDOWN_MS = 5 * 60000;
 const aiUsable = () => USE_AI && Date.now() > aiDownUntil;
 app.post('/api/recommend', async (req, res) => {
   try {
-    const message = req.body.message || '';
+    const message = boundedMessage(req);
+    if (message === null) return res.status(400).json({ error: 'Message too long.' });
     const prefs = Array.isArray(req.body.preferences) ? req.body.preferences
       : Array.isArray(req.body.prefs) ? req.body.prefs : [];
     const proximity = String(req.body.proximity || '');
     const p = proximity.split(',').map(Number);
     const proxKey = p.length === 2 && p.every(Number.isFinite) ? p[0].toFixed(2) + ',' + p[1].toFixed(2) : '';
-    const key = `r:${message}|${proxKey}|${prefs.slice().sort().join(',')}`;
+    const info = datasetInfo();
+    // The key carries the dataset signature so editing a data file (or switching
+    // dataset<->AI modes) can't serve a stale answer from the previous world.
+    const sig = info.ready ? `${info.file}|${info.count}` : 'nodataset';
+    const key = `r:${sig}:${message}|${proxKey}|${prefs.slice().sort().join(',')}`;
+    const tripBreaker = () => { aiDownUntil = Date.now() + AI_COOLDOWN_MS; };
     // Installed dataset wins: the AI may only reference those verified rows. If
     // it is unavailable, answer straight from the dataset — and do not cache
     // that fallback, so a transient model hiccup is not served for 15 minutes.
-    if (datasetInfo().ready) {
+    if (info.ready) {
       if (aiUsable()) {
-        try { return res.json(await cached(key, AI_TTL_MS, () => groundedRecommend(message, proximity, prefs))); }
-        catch (e) { aiDownUntil = Date.now() + AI_COOLDOWN_MS; console.warn('grounded recommend failed:', e.message); }
+        try { return res.json(await cached(key, AI_TTL_MS, () => groundedRecommend(message, proximity, prefs), { onStale: tripBreaker })); }
+        catch (e) { tripBreaker(); console.warn('grounded recommend failed:', e.message); }
       }
       return res.json(await localRecommend(message, proximity, prefs));
     }
-    res.json(await cached(key, AI_TTL_MS, () => recommend(message, proximity, prefs)));
+    if (!aiUsable()) return res.status(503).json({ error: 'AI unavailable' });
+    res.json(await cached(key, AI_TTL_MS, () => recommend(message, proximity, prefs), { onStale: tripBreaker }));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 const { chatRecommend } = require('./agent.js');
 app.post('/api/chat', async (req, res) => {
   try {
-    const message = req.body.message || '';
+    const message = boundedMessage(req);
+    if (message === null) return res.status(400).json({ error: 'Message too long.' });
     const proximity = String(req.body.proximity || '');
-    if (datasetInfo().ready) {
+    const p = proximity.split(',').map(Number);
+    const proxKey = p.length === 2 && p.every(Number.isFinite) ? p[0].toFixed(2) + ',' + p[1].toFixed(2) : '';
+    const info = datasetInfo();
+    const sig = info.ready ? `${info.file}|${info.count}` : 'nodataset';
+    const key = `d:${sig}:${message}|${proxKey}`;
+    const tripBreaker = () => { aiDownUntil = Date.now() + AI_COOLDOWN_MS; };
+    if (info.ready) {
       if (aiUsable()) {
-        try { return res.json(await cached(`d:${message}|${proximity}`, AI_TTL_MS, () => groundedChat(message, proximity))); }
-        catch (e) { aiDownUntil = Date.now() + AI_COOLDOWN_MS; console.warn('grounded chat failed:', e.message); }
+        try { return res.json(await cached(key, AI_TTL_MS, () => groundedChat(message, proximity), { onStale: tripBreaker })); }
+        catch (e) { tripBreaker(); console.warn('grounded chat failed:', e.message); }
       }
       return res.json(await localChat(message, proximity));
     }
-    res.json(await cached(`c:${message}`, AI_TTL_MS, () => chatRecommend(message)));
+    if (!aiUsable()) return res.status(503).json({ error: 'AI unavailable' });
+    res.json(await cached(key, AI_TTL_MS, () => chatRecommend(message), { onStale: tripBreaker }));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 const { planDay } = require('./plan.js');
 app.post('/api/plan', async (req, res) => {
   try {
     const { message = '', hours = 4, startHour = 9 } = req.body || {};
+    if (String(message).length > MESSAGE_MAX) return res.status(400).json({ error: 'Message too long.' });
     const h = Number(hours) || 4, s = Number(startHour) || 9;
-    const key = `p:${message}|${h}|${s}`;
-    res.json(await cached(key, AI_TTL_MS, () => planDay(message, h, s)));
+    const info = datasetInfo();
+    const sig = info.ready ? `${info.file}|${info.count}` : 'nodataset';
+    const key = `p:${sig}:${message}|${h}|${s}`;
+    // The plan path has no local fallback, so the breaker/off-switch must
+    // apply here too — honest 503 beats burning quota during an outage.
+    if (!aiUsable()) return res.status(503).json({ error: 'AI unavailable' });
+    const tripBreaker = () => { aiDownUntil = Date.now() + AI_COOLDOWN_MS; };
+    res.json(await cached(key, AI_TTL_MS, () => planDay(message, h, s), { onStale: tripBreaker }));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 const { searchPlaces } = require('./places.js');
