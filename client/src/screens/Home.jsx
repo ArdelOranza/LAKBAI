@@ -156,7 +156,7 @@ export default function Home({ coords, push, showToast, setTab }){
         </p>
         <div style={{ display:'flex', gap:8, background:'#fff', border:'1px solid #EDF1F7', borderRadius:999, padding:'6px 6px 6px 16px', alignItems:'center', boxShadow:'0 1px 2px rgba(15,23,42,.04)' }}>
           <Search size={17} color="#94A3B8"/>
-          <input data-testid="home-search" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') search(query); }} placeholder="Search places, food, events…" style={{ border:'none', padding:'8px 0', background:'none' }}/>
+          <input data-testid="home-search" aria-label="Search places, food, events" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') search(query); }} placeholder="Search places, food, events…" style={{ border:'none', padding:'8px 0', background:'none' }}/>
           <button data-testid="mic-btn" onClick={mic} aria-label="Voice search" style={{ width:36, height:36, flex:'0 0 36px', borderRadius:'50%', background:'#EFF6FF', border:'none', color:'var(--primary)', display:'grid', placeItems:'center', padding:0, opacity: listening ? .5 : 1 }}>
             <Mic size={16}/>
           </button>
@@ -176,10 +176,10 @@ export default function Home({ coords, push, showToast, setTab }){
         {busy && !recs.length && <p className="shimmer" style={{ fontSize:14 }}>Finding hidden gems for you…</p>}
 
         {feature && (
-          <article className="event-hero" data-testid="event-banner" onClick={() => push({ name:'detail', place:feature })}>
+          <article className="event-hero" data-testid="event-banner" onClick={() => push({ name:'detail', place:feature })} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'detail', place:feature }); } }}>
             <div className="event-hero-photo">
               {featurePhoto
-                ? <img src={featurePhoto} alt="" loading="lazy" onError={e => { e.currentTarget.style.display='none'; }}/>
+                ? <img src={featurePhoto} alt={feature.name} loading="lazy" onError={e => { e.currentTarget.style.display='none'; }}/>
                 : <PhotoPlaceholder size={30}/>}
             </div>
             <div className="event-hero-shade"/>
@@ -194,7 +194,7 @@ export default function Home({ coords, push, showToast, setTab }){
           </article>
         )}
 
-        <div data-testid="plan-cta" onClick={() => setTab('chat')} className="soft-card" style={{ margin:'16px 0', cursor:'pointer', borderRadius:18, padding:14 }}>
+        <div data-testid="plan-cta" onClick={() => setTab('chat')} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTab('chat'); } }} role="button" tabIndex={0} className="soft-card" style={{ margin:'16px 0', cursor:'pointer', borderRadius:18, padding:14 }}>
           <span style={{ width:40, height:40, minWidth:40, borderRadius:'50%', background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center' }}><Sparkles size={19}/></span>
           <span style={{ flex:1 }}>
             <b style={{ fontSize:14 }}>Need a personalized plan?</b>
@@ -210,10 +210,10 @@ export default function Home({ coords, push, showToast, setTab }){
 
         <div data-testid="recs" style={{ display:'flex', gap:12, overflowX:'auto', paddingBottom:8, scrollbarWidth:'none' }}>
           {recs.map(p => (
-            <article key={p.id} style={{ flex:'0 0 220px', borderRadius:18, background:'#fff', border:'1px solid #EDF1F7', overflow:'hidden', cursor:'pointer', boxShadow:'0 10px 24px -20px rgba(15,23,42,.55)' }} onClick={() => push({ name:'detail', place:p })}>
+            <article key={p.id} style={{ flex:'0 0 220px', borderRadius:18, background:'#fff', border:'1px solid #EDF1F7', overflow:'hidden', cursor:'pointer', boxShadow:'0 10px 24px -20px rgba(15,23,42,.55)' }} onClick={() => push({ name:'detail', place:p })} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'detail', place:p }); } }}>
               <div style={{ position:'relative', height:130 }}>
                 {p.photo
-                  ? <img src={p.photo} alt="" loading="lazy" onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+                  ? <img src={p.photo} alt={p.name} loading="lazy" onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
                   : <PhotoPlaceholder size={26}/>}
                 <span className="chip" style={{ position:'absolute', left:8, top:8, fontSize:10.5, padding:'3px 9px' }}>{(p.categories && p.categories[0]) || 'Pangasinan'}</span>
                 <button className="chip" data-testid={'fav-' + p.id} aria-label={'Save ' + p.name} onClick={e => { e.stopPropagation(); fav(p); }} style={{ position:'absolute', right:8, top:8, width:30, height:30, padding:0, borderRadius:'50%', background:'var(--primary)', color:'#fff', border:'none', display:'grid', placeItems:'center' }}><Plus size={15}/></button>

@@ -10,23 +10,40 @@
 const { callGeminiForPlan, extractJson } = require('./agent.js');
 const { callGroq } = require('./groq.js');
 const {
-  datasetInfo, allEntries, search, withCoords, reasonFor, intentOf, NO_MATCH,
+  datasetInfo, allEntries, search, withCoords, reasonFor, intentOf, answerFor, NO_MATCH,
 } = require('./dataset.js');
 const { isAttraction } = require('./attractions.js');
 const { parseProximity, nearestTown, haversineKm } = require('./location.js');
 
 const MAX_RECORDS = 8;
-const MAX_INDEX = 60;
+// Every provided row goes to the model, so nothing in the files is invisible.
+const MAX_INDEX = 400;
 const MAX_CANDIDATES = 6;
 
 // The primary model's free-tier quota can run out mid-day. agent.js is not
 // touched, so this is an extra attempt on the lite model before we fall back to
 // the deterministic dataset answer.
 const LITE_MODEL = 'gemini-flash-lite-latest';
+const MODEL_TIMEOUT_MS = 30000;
+
+/** fetch with a hard timeout so a hung provider can't hang the request. */
+async function fetchWithTimeout(url, init = {}, ms = MODEL_TIMEOUT_MS){
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(new Error('model request timed out')), ms);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function callLite(system, payload){
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw Object.assign(new Error('Missing GEMINI_API_KEY'), { status: 503 });
-  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${LITE_MODEL}:generateContent?key=${key}`, {
+  // NOTE: Gemini's generateContent API takes the key in the query string —
+  // there is no Authorization-header alternative for this endpoint. The key is
+  // never logged; fetch() goes straight to Google over TLS.
+  const r = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/${LITE_MODEL}:generateContent?key=${key}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -41,13 +58,20 @@ async function callLite(system, payload){
 }
 async function askModel(system, payload){
   // Gemini primary → Gemini lite → Groq. Each step is independent, so a dead
-  // quota or a 402 never stops the answer.
-  try { return await callGeminiForPlan(system, payload); } catch { /* next */ }
-  try { return await callLite(system, payload); } catch { /* next */ }
-  return callGroq(system, payload);
+  // quota or a 402 never stops the answer. Failures are logged (without keys)
+  // so a 429/quota failure is diagnosable; the last error is surfaced when
+  // every provider has failed, never swallowed into an empty 502.
+  let lastError = null;
+  try { return await callGeminiForPlan(system, payload); }
+  catch (e) { lastError = e; console.warn('gemini primary unavailable:', e.message); }
+  try { return await callLite(system, payload); }
+  catch (e) { lastError = e; console.warn('gemini lite unavailable:', e.message); }
+  try { return await callGroq(system, payload); }
+  catch (e) { lastError = e; console.warn('groq unavailable:', e.message); }
+  throw lastError || Object.assign(new Error('All model providers unavailable'), { status: 502 });
 }
 
-const SYSTEM = `You are LakbAI, a Pangasinan (Philippines) travel guide. Answer ONLY from the RECORDS and INDEX in the user message — that list is the verified, complete truth. Never invent a place, rating, hours, price or review, and never use outside knowledge about a place. Copy every candidate name character-for-character from a RECORDS or INDEX line. If nothing in the list answers the request, return candidates: [] and say so in one short sentence. Respond with JSON only: {"intent":"discover|food|event|nearby|emergency|plan|redirect|refuse","answer":"short markdown","candidates":[{"name":"exact name from the list","reason":"one grounded why, using only facts from the list","peopleSay":"quote from the record, else empty"}],"spotlight":null,"sources":[]}. Max ${MAX_CANDIDATES} candidates, best first.`;
+const SYSTEM = `You are LakbAI, a Pangasinan (Philippines) travel guide. Answer ONLY from the RECORDS and INDEX in the user message — those rows are the complete and only truth you have. Never invent a place, rating, hours, price, review or activity, and never use outside knowledge about a place or a town. Copy every candidate name character-for-character from a RECORDS or INDEX line. If a place or town is not in the list, say plainly that the provided data does not cover it — do not guess, do not suggest an alternative from memory. Respond with JSON only: {"intent":"discover|food|event|nearby|emergency|plan|redirect|refuse","answer":"short markdown that only restates facts from the rows","candidates":[{"name":"exact name from the list","reason":"one grounded why, using only facts from the list","peopleSay":"quote from the record, else empty"}],"spotlight":null,"sources":[]}. Max ${MAX_CANDIDATES} candidates, best first.`;
 
 function keyOf(name){
   return String(name || '').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -100,7 +124,7 @@ function buildContext(message, proximity){
     const ordered = here
       ? rest.slice().sort((a, b) => distance(a, here) - distance(b, here))
       : rest.slice().sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0));
-    lines.push('', 'INDEX (more verified rows you may pick from):', ...ordered.slice(0, MAX_INDEX).map(indexLine));
+    lines.push('', 'INDEX (every other row in the provided files):', ...ordered.slice(0, MAX_INDEX).map(indexLine));
   }
   if (!hits.length) lines.push('', 'No RECORDS matched directly — pick from INDEX by meaning if anything fits, otherwise say you do not have it.');
   return { text: lines.join('\n'), hits };
@@ -147,6 +171,52 @@ function hydrate(candidates, entries){
   return picked;
 }
 
+// --- the answer prose is checked too --------------------------------------
+// Hydration protects the cards; this protects the text. If the model adds a
+// place, a price or an opening hour that is not written in the rows, the reply
+// is rebuilt from the rows instead of being shown.
+const PLACE_WORD = /\b(beach(es)?|falls?|park|island|cove|bay|river|lake|mount(ain)?|hills?|resort|hotel|inn|church|parish|shrine|basilica|museum|plaza|market|mall|cafe|restaurant|garden|farm|springs?|zipline|trail|deck|viewpoint|point|sanctuary|pavilion|stadium|airport|terminal|bridge|caves?|pools?|dam)\b/i;
+
+const numbersIn = text => [...String(text || '').matchAll(/\d[\d,]*(?:\.\d+)?/g)]
+  .map(m => Number(m[0].replace(/,/g, '')))
+  .filter(n => Number.isFinite(n));
+
+const capitalizedRuns = text => [...String(text || '').matchAll(/\b([A-Z][A-Za-z'’.-]*(?:\s+[A-Z][A-Za-z'’.-]*)+)/g)]
+  .map(m => m[1].trim());
+
+function factsOf(entries){
+  return entries.map(e => [
+    e.name, e.town, e.address, e.description, e.hours, e.price, e.feesDetail,
+    e.activities.join(' '), e.quotes.join(' '), e.rating, e.reviews, e.phone,
+    e.categories.join(' '),
+  ].join(' ')).join(' ');
+}
+
+/** Return the model's prose only when every claim in it is written in the rows. */
+function groundAnswer(answer, intent, entries){
+  const fallback = answerFor(intent, entries);
+  const text = String(answer || '').trim();
+  if (!text) return fallback;
+  const facts = factsOf(entries);
+  const factsKey = keyOf(facts) + ' pangasinan';
+  const factNumbers = numbersIn(facts);
+
+  // 1. every figure (price, rating, review count, year) must be in the rows
+  for (const n of numbersIn(text)){
+    if (n < 10) continue; // list markers and small counts are too noisy to police
+    if (!factNumbers.some(f => Math.abs(f - n) < 0.001)) return fallback;
+  }
+  // 2. a named place (anything ending in Beach / Falls / Church / Resort …)
+  //    must be written somewhere in the rows, not recalled from elsewhere
+  for (const run of capitalizedRuns(text)){
+    if (!PLACE_WORD.test(run)) continue;
+    const k = keyOf(run);
+    if (!k) continue;
+    if (!factsKey.includes(k)) return fallback;
+  }
+  return text;
+}
+
 async function ask(message, proximity, deps = {}){
   const askFn = deps.askFn || askModel;
   const { text } = buildContext(message, proximity);
@@ -168,7 +238,7 @@ async function groundedChat(message, proximity, deps = {}){
     return { intent, answer: NO_MATCH, candidates: [], spotlight: null, sources: [], source: 'dataset+ai' };
   }
   await withCoords(picked.map(p => p.entry), proximity);
-  const answer = parsed.answer || `Here is what I found in the Pangasinan list:\n${picked.map(p => `- **${p.entry.name}**`).join('\n')}`;
+  const answer = groundAnswer(parsed.answer, intent, picked.map(p => p.entry));
   const spotName = parsed.spotlight && keyOf(parsed.spotlight.name);
   const spot = (spotName && picked.find(p => keyOf(p.entry.name) === spotName)) || picked[0];
   return {
@@ -188,6 +258,8 @@ async function groundedChat(message, proximity, deps = {}){
       lng: entry.lng,
       lat: entry.lat,
       categories: entry.categories,
+      photos: entry.photos || [],
+      photo: (entry.photos && entry.photos[0]) || null,
     })),
     spotlight: parsed.spotlight ? { name: spot.entry.name, reason: spot.reason } : null,
     sources: picked.map(p => p.entry.mapsUrl).filter(Boolean),
@@ -226,17 +298,19 @@ async function groundedRecommend(message, proximity, prefs = [], deps = {}){
       description: e.description,
       festival: e.festival,
       fees: e.price,
+      photos: e.photos || [],
+      photo: (e.photos && e.photos[0]) || null,
       sources: e.mapsUrl ? [e.mapsUrl] : [],
       sourceKind: 'dataset',
     };
   });
   return {
     intent,
-    answer: parsed.answer,
+    answer: groundAnswer(parsed.answer, intent, entries),
     places,
     spotlight: places[0] || null,
     source: 'dataset+ai',
   };
 }
 
-module.exports = { groundedChat, groundedRecommend, buildContext, hydrate, parseGrounded, SYSTEM, callLite };
+module.exports = { groundedChat, groundedRecommend, buildContext, hydrate, parseGrounded, groundAnswer, SYSTEM, callLite };

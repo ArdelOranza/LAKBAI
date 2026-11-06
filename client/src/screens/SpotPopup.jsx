@@ -121,7 +121,7 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
             {(photos || [0, 1, 2]).map((src, i) => (
               <div key={i} style={{ flex:'0 0 100%', scrollSnapAlign:'center', position:'relative' }}>
                 {photos
-                  ? <img src={src} alt="" loading="lazy" style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+                  ? <img src={src} alt={spot.name} loading="lazy" style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
                   : <PhotoPlaceholder size={30}/>}
               </div>
             ))}

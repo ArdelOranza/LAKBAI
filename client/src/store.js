@@ -52,24 +52,43 @@ export async function flushOutbox(user){
   }
 }
 const PLANS_KEY = 'lakbai-plans';
+function readLocalPlans(){
+  try { const v = JSON.parse(localStorage.getItem(PLANS_KEY) || '[]'); return Array.isArray(v) ? v : []; }
+  catch { return []; }
+}
+function writeLocalPlans(rows){
+  try { localStorage.setItem(PLANS_KEY, JSON.stringify(rows)); } catch { /* full storage: cloud row only */ }
+}
 export async function listPlans(user){
-  if (!supabase || !user) {
-    try { const v = JSON.parse(localStorage.getItem(PLANS_KEY) || '[]'); return { data: Array.isArray(v) ? v : [] }; } catch { return { data: [] }; }
-  }
+  const local = readLocalPlans();
+  if (!supabase || !user) return { data: local };
   const { data, error } = await supabase.from('plans').select('*').order('created_at', { ascending: false });
-  if (error) return { data: [], error: error.message };
-  return { data: data || [] };
+  if (error) return { data: local, error: error.message };
+  // Merge: offline-saved local plans must not vanish when logged in. Dedupe by
+  // id so a plan saved to both places appears once (remote wins on conflict).
+  const byId = new Map();
+  for (const r of local) if (r && r.id) byId.set(r.id, r);
+  for (const r of (data || [])) if (r && r.id) byId.set(r.id, r);
+  return { data: [...byId.values()] };
 }
 export async function savePlan(user, plan){
-  const localRow = { id: plan.id || 'local-' + Date.now(), title: plan.title, schedule: plan.schedule, starts_at: plan.starts_at || null, created_at: new Date().toISOString() };
-  try {
-    const v = JSON.parse(localStorage.getItem(PLANS_KEY) || '[]');
-    const next = [localRow, ...(Array.isArray(v) ? v.map(r => r.id === localRow.id ? localRow : r) : [])];
-    localStorage.setItem(PLANS_KEY, JSON.stringify(next));
-  } catch { /* full storage: cloud row only */ }
+  const id = plan.id || 'local-' + Date.now();
+  const localRow = { id, title: plan.title, schedule: plan.schedule, starts_at: plan.starts_at || null, created_at: new Date().toISOString() };
+  const existing = readLocalPlans();
+  // Dedupe: re-saving the same plan updates its local row instead of
+  // prepending a second copy.
+  const next = existing.some(r => r && r.id === id)
+    ? existing.map(r => (r && r.id === id ? localRow : r))
+    : [localRow, ...existing];
+  writeLocalPlans(next);
   if (!supabase || !user) return { local: true };
   const { data, error } = await supabase.from('plans').insert({ user_id: user.id, title: plan.title, schedule: plan.schedule, starts_at: plan.starts_at || null }).select().single();
   if (error) return { queued: true, error: error.message, local: true };
+  // The cloud id is the canonical one — sync the local row to it so the next
+  // save updates instead of duplicating, and listPlans dedupes cleanly.
+  if (data && data.id && data.id !== id){
+    writeLocalPlans(readLocalPlans().map(r => (r && r.id === id ? { ...localRow, id: data.id } : r)));
+  }
   return { data, local: false };
 }
 export async function logSearch(user, query){

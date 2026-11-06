@@ -75,7 +75,7 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
     <div style={{ flex:1, overflowY:'auto', background:'#fff' }}>
       <div style={{ position:'relative', height:250 }}>
         {photos
-          ? <img data-testid="hero-photo" src={photos[0]} alt="" onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+          ? <img data-testid="hero-photo" src={photos[0]} alt={p.name} onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
           : <PhotoPlaceholder size={34} label="Photo coming soon"/>}
 
         <button className="icon-btn" data-testid="back-btn" onClick={pop} aria-label="Back" style={{ position:'absolute', left:14, top:14, background:'#fff' }}><ArrowLeft size={18}/></button>

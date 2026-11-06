@@ -31,6 +31,9 @@ export default defineConfig({
     }
   })],
   resolve: { alias: { '@': path.resolve(__dirname, './src') } },
+  // SECURITY: envDir loads server secrets into the client build context, but only
+  // variables prefixed with VITE_ are inlined into the browser bundle — everything
+  // else stays server-side. Never prefix a secret with VITE_ (see client/.env.example).
   envDir: '../',
-  server: { proxy: { '/api': 'http://localhost:3001' } },
+  server: { proxy: { '/api': `http://localhost:${process.env.PORT || 3001}` } },
 })

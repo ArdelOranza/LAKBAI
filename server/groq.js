@@ -8,22 +8,33 @@ const DEFAULT_MODEL = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
 async function callGroq(system, payload, opts = {}){
   const key = process.env.GROQ_API_KEY;
   if (!key) throw Object.assign(new Error('Missing GROQ_API_KEY'), { status: 503 });
-  const r = await fetch(opts.endpoint || ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
-    body: JSON.stringify({
-      model: opts.model || DEFAULT_MODEL,
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: payload },
-      ],
-      response_format: { type: 'json_object' },
-      temperature: 0.2,
-    }),
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(new Error('model request timed out')), 30000);
+  let r;
+  try {
+    r = await fetch(opts.endpoint || ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
+      body: JSON.stringify({
+        model: opts.model || DEFAULT_MODEL,
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: payload },
+        ],
+        response_format: { type: 'json_object' },
+        temperature: 0.2,
+      }),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
   if (!r.ok) throw Object.assign(new Error('Groq error ' + r.status), { status: r.status || 502 });
   const data = await r.json();
-  return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+  // Empty content is a failure, not a success — callers must not parse ''.
+  const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+  if (typeof content !== 'string' || !content.trim()) throw Object.assign(new Error('Groq returned empty content'), { status: 502 });
+  return content;
 }
 
 module.exports = { callGroq, DEFAULT_MODEL };

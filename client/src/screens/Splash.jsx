@@ -1,13 +1,37 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import Logo from '../logo.jsx';
-import GoogleMark from '../GoogleMark.jsx';
-import { PrimaryBtn } from '../ui.jsx';
-
-const NOTE = 'Google sign-in is not connected yet — use email for now.';
+import { PrimaryBtn, GoogleBtn } from '../ui.jsx';
+import { useAuth } from '../AuthContext.jsx';
 
 export default function Splash({ onGetStarted, onLogIn }){
-  const [googleNote, setGoogleNote] = useState(false);
+  const { signInWithGoogle, configured } = useAuth();
+  const [googleNote, setGoogleNote] = useState(null);
+  const [busy, setBusy] = useState(false);
+
+  // If the browser suspends us for Google then restores from bfcache on
+  // back-press, busy would still be true and the buttons dead. Clear it.
+  useEffect(() => {
+    const clear = () => setBusy(false);
+    const onVis = () => { if (!document.hidden) setBusy(false); };
+    document.addEventListener('visibilitychange', onVis);
+    window.addEventListener('pageshow', clear);
+    return () => { document.removeEventListener('visibilitychange', onVis); window.removeEventListener('pageshow', clear); };
+  }, []);
+
+  async function google(){
+    setBusy(true); setGoogleNote(null);
+    let res;
+    try { res = await signInWithGoogle(); }
+    catch (e) { res = { error: String(e?.message || e) }; }
+    finally { setBusy(false); }
+    // A successful call leaves the page for Google, so only errors land here.
+    if (res.error){
+      setGoogleNote(/not enabled|provider/i.test(res.error)
+        ? 'Google sign-in isn’t available right now — use email for now.'
+        : res.error);
+    }
+  }
 
   return (
     <main style={{ position:'relative', flex:1, minHeight:0, display:'flex', flexDirection:'column', justifyContent:'flex-end' }}>
@@ -28,20 +52,18 @@ export default function Splash({ onGetStarted, onLogIn }){
           </div>
         </div>
 
-        <button
-          type="button"
-          data-testid="google-signin"
-          onClick={() => setGoogleNote(true)}
-          style={{ width:'100%', minHeight:52, display:'flex', alignItems:'center', justifyContent:'center', gap:11, padding:'12px 18px', border:'1px solid var(--border)', background:'#fff', color:'var(--ink)', fontSize:15.5, fontWeight:600, boxShadow:'var(--shadow)' }}
-        >
-          <GoogleMark size={19}/> Continue with Google
-        </button>
+        {!configured && (
+          <p data-testid="auth-unconfigured" style={{ textAlign:'center', fontSize:12, color:'var(--muted-ink)', margin:'0 0 12px' }}>
+            Auth isn’t configured yet. Add your Supabase keys to .env to enable sign-in.
+          </p>
+        )}
+        <GoogleBtn onClick={google} disabled={busy || !configured}/>
         <div aria-live="polite" style={{ minHeight:19, padding:'5px 2px 0', textAlign:'center' }}>
-          {googleNote && <span style={{ fontSize:11.5, lineHeight:1.4, color:'var(--muted-ink)' }}>{NOTE}</span>}
+          {googleNote && <span style={{ fontSize:11.5, lineHeight:1.4, color:'var(--muted-ink)' }}>{googleNote}</span>}
         </div>
 
-        <PrimaryBtn testid="get-started" onClick={onGetStarted}>Get Started <ArrowRight size={17}/></PrimaryBtn>
-        <button style={{ display:'block', margin:'14px auto 0', border:'none', background:'none', color:'var(--muted-ink)' }} onClick={onLogIn}>Log In</button>
+        <PrimaryBtn testid="get-started" onClick={onGetStarted} disabled={!configured}>Get Started <ArrowRight size={17}/></PrimaryBtn>
+        <button style={{ display:'block', margin:'14px auto 0', border:'none', background:'none', color:'var(--muted-ink)' }} onClick={onLogIn} disabled={!configured}>Log In</button>
       </div>
     </main>
   );

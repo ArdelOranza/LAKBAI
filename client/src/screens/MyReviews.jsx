@@ -56,7 +56,7 @@ export default function MyReviews({ pop, showToast }){
           {(rows || []).map(r => (
             <article key={r.id} data-testid="my-review-card" style={{ display:'flex', gap:12, border:'1px solid #EDF1F7', borderRadius:16, background:'#fff', padding:12 }}>
               <div className="thumb" style={{ width:64, height:64, minWidth:64 }}>
-                {r.photo ? <img src={r.photo} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }}/> : <Mountain size={22}/>}
+                {r.photo ? <img src={r.photo} alt={r.place_name} style={{ width:'100%', height:'100%', objectFit:'cover' }}/> : <Mountain size={22}/>}
               </div>
               <div style={{ flex:1, minWidth:0 }}>
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', gap:8 }}>

@@ -61,10 +61,11 @@ export default function Emergency({ coords, pop, showToast }){
     }
   }
 
+  // Nearest first — time-critical on a safety screen. Null distances go last.
   const withKm = list => (list || []).map(p => ({
     ...p,
     km: haversineKm(coords.lng, coords.lat, p.lng, p.lat),
-  }));
+  })).sort((a, b) => (a.km == null ? Infinity : a.km) - (b.km == null ? Infinity : b.km));
   const hospitals = withKm(data && data.hospitals);
   const police = withKm(data && data.police);
 

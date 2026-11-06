@@ -1,6 +1,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { planDay } = require('../plan.js');
+const ROWS = [{ id: 'p1', name: 'Patar Beach', town: 'Bolinao', price: '', categories: [] }];
 test('unverifiable stops are dropped, times kept', async () => {
   const fakeAgent = async () => ({
     title: 'Alaminos food day',
@@ -12,7 +13,7 @@ test('unverifiable stops are dropped, times kept', async () => {
   const fakeSearch = async (q) => q.startsWith('Patar')
     ? [{ id: 'p1', name: 'Patar Beach', lng: 119.79, lat: 16.12, address: '', categories: [] }]
     : [];
-  const out = await planDay('food day', 4, 9, { agentFn: fakeAgent, searchFn: fakeSearch });
+  const out = await planDay('food day', 4, 9, { agentFn: fakeAgent, searchFn: fakeSearch, entries: ROWS });
   assert.equal(out.title, 'Alaminos food day');
   assert.equal(out.schedule.length, 1);
   assert.deepEqual(out.schedule[0].activities, ['Swim', 'Photos']);
@@ -30,7 +31,7 @@ test('plan generation retries once on 503', async () => {
   try {
     process.env.GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'test-key';
     const fakeSearch = async () => [{ id: 'p1', name: 'Patar Beach', lng: 119.79, lat: 16.12, address: '', categories: [] }];
-    const out = await planDay('food day', 4, 9, { searchFn: fakeSearch });
+    const out = await planDay('food day', 4, 9, { searchFn: fakeSearch, entries: ROWS });
     assert.equal(out.schedule.length, 1);
     assert.equal(calls, 2);
   } finally {

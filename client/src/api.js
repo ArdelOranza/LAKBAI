@@ -11,12 +11,23 @@ async function readError(r){
   }
 }
 
-/** fetch() that marks the request as AI activity for the whole round trip. */
-async function aiFetch(url, init){
+/** fetch() that marks the request as AI activity for the whole round trip.
+ *  `timeoutMs` bounds a hung request so the composer never freezes forever;
+ *  pass a signal from the caller for an explicit cancel button. */
+async function aiFetch(url, init, { timeoutMs = 60000, signal } = {}){
   aiBegin();
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(new Error('Request timed out')), timeoutMs);
+  const onAbort = () => controller.abort(signal?.reason);
+  if (signal){
+    if (signal.aborted) controller.abort(signal.reason);
+    else signal.addEventListener('abort', onAbort, { once: true });
+  }
   try {
-    return await fetch(url, init);
+    return await fetch(url, { ...init, signal: controller.signal });
   } finally {
+    clearTimeout(timer);
+    if (signal) signal.removeEventListener('abort', onAbort);
     aiEnd();
   }
 }
@@ -26,8 +37,8 @@ export async function recommend(message, proximity, prefs = []){
   if (!r.ok) throw new Error(await readError(r));
   return r.json();
 }
-export async function chat(message, proximity){
-  const r = await aiFetch(`${BASE}/api/chat`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ message, proximity }) });
+export async function chat(message, proximity, signal){
+  const r = await aiFetch(`${BASE}/api/chat`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ message, proximity }) }, { signal });
   if (!r.ok) throw new Error(await readError(r));
   return r.json();
 }

@@ -47,6 +47,9 @@ export function cardFor(candidate = {}, spots = []){
   const spot = matchSpot(candidate.name, spots);
   const lng = spot?.lng ?? candidate.lng;
   const lat = spot?.lat ?? candidate.lat;
+  // The dataset's own photo wins over the curated-spots fallback: the 150-spot
+  // file carries real image URLs, and a server candidate photo is the most
+  // specific thing we have for the name the AI just returned.
   return {
     id: spot?.id || normalizeName(candidate.name),
     name: candidate.name || spot?.name || 'Unknown place',
@@ -59,7 +62,8 @@ export function cardFor(candidate = {}, spots = []){
     tags: (spot?.categories || candidate.categories || []).slice(0, 3),
     lng,
     lat,
-    photo: (spot?.photos && spot.photos[0]) || null,
+    photos: (candidate.photos && candidate.photos.length) ? candidate.photos : (spot?.photos || []),
+    photo: candidate.photo || (candidate.photos && candidate.photos[0]) || (spot?.photos && spot.photos[0]) || null,
     spot,
   };
 }

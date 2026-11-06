@@ -111,11 +111,24 @@ const feeLabel = k => k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()
 function feeText(fees){
   if (!fees) return { short: '', detail: '' };
   if (typeof fees !== 'object') return { short: str(fees), detail: str(fees) };
-  const rows = Object.entries(fees).filter(([, v]) => v !== null && v !== undefined && v !== '' && typeof v !== 'object');
-  if (!rows.length) return { short: '', detail: '' };
-  const priority = rows.find(([k]) => /admission|entrance/i.test(k)) || rows[0];
+  // Flatten one level of nesting (e.g. { fees: { admission: '100' } }) and
+  // drop nested objects deeper than that. A value under a "note/notes" key is
+  // never the displayed price — it is prose, not a rate.
+  const rows = [];
+  const push = (k, v) => {
+    if (v === null || v === undefined || v === '') return;
+    if (typeof v === 'object' && !Array.isArray(v)){
+      for (const [k2, v2] of Object.entries(v)) push(k2, v2);
+      return;
+    }
+    rows.push([k, String(v)]);
+  };
+  for (const [k, v] of Object.entries(fees)) push(k, v);
+  rows.sort(([a], [b]) => /admission|entrance|price|rate/i.test(a) ? -1 : /admission|entrance|price|rate/i.test(b) ? 1 : 0);
+  const priced = rows.filter(([k]) => !/notes?/i.test(k));
+  const priority = priced.find(([k]) => /admission|entrance/i.test(k)) || priced[0];
   return {
-    short: str(priority[1]),
+    short: priority ? str(priority[1]) : '',
     detail: rows.slice(0, 8).map(([k, v]) => `${feeLabel(k)}: ${v}`).join(' · '),
   };
 }
@@ -160,10 +173,34 @@ function parseRating(raw, countRaw){
 function reviewQuotes(raw){
   if (!Array.isArray(raw)) return [];
   return raw
-    .map(r => str(typeof r === 'string' ? r : (r && (r.text || r.quote || r.review))))
+    .map(r => str(typeof r === 'string' ? r : (r && (r.text || r.quote || r.comment || r.review))))
     .filter(Boolean)
     .map(t => (t.length > 180 ? t.slice(0, 177).trimEnd() + '…' : t))
     .slice(0, 3);
+}
+
+/** The 150-spot file's `verified_sources` are { title, url } objects, not bare URLs. */
+function sourceUrlsOf(raw){
+  const direct = listOf(raw.verified_source_urls || raw.sources);
+  if (direct.length) return direct;
+  if (Array.isArray(raw.verified_sources)) return raw.verified_sources.map(s => str(s && (s.url || s.href || s.link))).filter(Boolean);
+  if (Array.isArray(raw.sources)) return raw.sources.map(s => str(s && (s.url || s.href || s.link))).filter(Boolean);
+  return [];
+}
+
+/** Phone numbers live inside the 150-spot file's `location` prose, not a field. */
+function phoneFromText(text){
+  const m = String(text || '').match(/(?:Phone:\s*)([\+\d][\d\s\/()-]*\d)/i);
+  return m ? m[1].replace(/\s+/g, ' ').trim() : '';
+}
+
+/** The 150-spot file has no festival field; a spot name of the form
+ *  "X Festival (...)" is itself the festival signal. */
+function festivalFromText(name, address){
+  const m = String(name || '').match(/(.+?\bFestival\b)/i);
+  if (m) return m[1].trim();
+  const m2 = String(address || '').match(/(.+?\bFestival\b)/i);
+  return m2 ? m2[1].trim() : '';
 }
 
 function listOf(v){
@@ -180,35 +217,55 @@ const INTENT_WORDS = {
 };
 
 const CATEGORY_HINTS = {
-  food: /\b(food|restaurant|cafe|coffee|eatery|grill|bar|bakery|dessert|kitchen|dining|seafood|carinderia|panciteria)\b/i,
-  beach: /\b(beach|island|cove|coast|shore|sandbar)\b/i,
+  food: /\b(foods?|restaurants?|cafes|coffee|eateries|grills?|bars?|bakeries|desserts?|kitchens?|dining|seafood|carinderia|panciteria)\b/i,
+  beach: /\b(beaches|beach|islands|island|coves|cove|coast|shore|sandbar)\b/i,
   nature: /\b(falls|waterfall|spring|cave|river|mountain|forest|park|eco|garden|lake)\b/i,
   culture: /\b(church|basilica|shrine|museum|heritage|historical|landmark|festival)\b/i,
-  stay: /\b(hotel|resort|inn|transient|lodge|hostel|villa)\b/i,
-  event: /\b(festival|fiesta|event)\b/i,
+  stay: /\b(hotels?|resorts?|inns?|transient|lodges?|hostels?|villas?)\b/i,
+  event: /\b(festivals?|fiestas?|events?)\b/i,
 };
+
+// What kind of place the message is asking for. Used to keep a beach request
+// from being answered with the town's restaurants when the provided files only
+// carry restaurants there.
+const KIND_WORDS = {
+  beach: /\b(beaches|beach|islands|island|coves|cove|coast|shore|sandbar)\b/i,
+  nature: /\b(falls|waterfalls|waterfall|springs|spring|caves|cave|rivers|river|mountains|mountain|forests|forest|eco[- ]?parks?|gardens|garden|lakes|lake|trails?|hiking)\b/i,
+  culture: /\b(churches|church|basilicas|basilica|shrines|shrine|museums|museum|heritages?|historical|landmarks|landmark)\b/i,
+  stay: /\b(hotels|hotel|resorts|resort|inns|inn|transient|lodges|hostel|villas|villa)\b/i,
+  attraction: /\b(tourist|attractions?|sightseeing|spots?|things to do|places? to visit)\b/i,
+};
+
+function requestedKinds(message){
+  return Object.keys(KIND_WORDS).filter(k => KIND_WORDS[k].test(String(message || '')));
+}
 
 function intentsFor(entry){
   const text = `${entry.name} ${entry.categories.join(' ')} ${entry.description}`;
   return Object.entries(CATEGORY_HINTS).filter(([, re]) => re.test(text)).map(([k]) => k);
 }
 
-function normalize(raw, index, kind = ''){
+function normalize(raw, index, kind = '', fileTag = ''){
   if (!raw || typeof raw !== 'object') return null;
   const name = str(raw.name || raw.title || raw.official_name || raw.place_name || raw.placeName);
   if (!name) return null;
   const town = str(raw.municipality || raw.town || raw.city || raw.locality || raw.municipality_or_city || (typeof raw.location === 'string' ? raw.location : '')).replace(/\s*\(.*$/, '').trim();
-  const address = str(raw.address || raw.full_address || raw.formatted_address || raw.vicinity || raw.exact_location_address);
+  // The 150-spot file calls this `location`; it carries the address (often with
+  // the plus code) even when there is no separate address field.
+  const address = str(raw.address || raw.full_address || raw.formatted_address || raw.vicinity || raw.exact_location_address || (typeof raw.location === 'string' ? raw.location : ''));
   const rr = raw.ratings_and_reviews && typeof raw.ratings_and_reviews === 'object' ? raw.ratings_and_reviews : {};
+  // Numeric review counts win over a `reviews` array (the 150-spot file carries
+  // both `total_review_count` and a `reviews` array of quote objects).
   const { rating, reviews } = parseRating(
     raw.rating ?? raw.average_rating ?? raw.avg_rating ?? rr.overall_rating,
-    raw.reviews ?? raw.review_count ?? raw.user_ratings_total ?? raw.total_reviews ?? rr.total_review_count
+    raw.total_review_count ?? raw.review_count ?? raw.user_ratings_total ?? raw.total_reviews ?? rr.total_review_count ?? raw.reviews
   );
   const categories = listOf(raw.categories || raw.category || raw.type || raw.tags);
   // A restaurants-only file carries no category field, so the list key itself
   // tells us what these are.
   if (/restaurant|food|eater/i.test(kind) && !categories.length) categories.push('restaurant');
-  const fees = feeText(raw.entrance_and_venue_fees || raw.price || raw.price_range || raw.fees);
+  // `fee_in_venue` is the 150-spot file's prose paragraph of rates.
+  const fees = feeText(raw.entrance_and_venue_fees || raw.fee_in_venue || raw.price || raw.price_range || raw.fees);
   let lat = num(raw.lat ?? raw.latitude ?? (raw.coordinates && raw.coordinates.lat));
   let lng = num(raw.lng ?? raw.lon ?? raw.longitude ?? (raw.coordinates && raw.coordinates.lng));
   if ((lat === null || lng === null) && address){
@@ -216,7 +273,7 @@ function normalize(raw, index, kind = ''){
     if (found){ lat = found.lat; lng = found.lng; }
   }
   const entry = {
-    id: str(raw.id || raw.place_id || raw.placeId) || `${name}-${town}-${index}`.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+    id: str(raw.id || raw.place_id || raw.placeId) || `${fileTag ? fileTag + '-' : ''}${name}-${town}-${index}`.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
     name,
     town,
     address,
@@ -226,17 +283,17 @@ function normalize(raw, index, kind = ''){
     rating,
     reviews,
     hours: listOf(raw.opening_hours || raw.hours).join(' · '),
-    phone: str(raw.phone_number || raw.phone || raw.contact),
+    phone: str(raw.phone_number || raw.phone || raw.contact) || phoneFromText(address),
     website: str(raw.website || raw.site),
     mapsUrl: str(raw.google_maps_url || raw.maps_url || raw.map_url),
-    sourceUrls: listOf(raw.verified_source_urls || raw.sources),
-    photos: listOf(raw.verified_image_urls || raw.photos),
+    sourceUrls: sourceUrlsOf(raw),
+    photos: listOf(raw.verified_image_urls || raw.photos || raw.images),
     description: str(raw.description || raw.blurb || raw.about || raw.summary || raw.detailed_description),
-    activities: listOf(raw.what_to_do_activities || raw.activities),
+    activities: listOf(raw.what_to_do_activities || raw.activities || raw.what_to_do),
     price: fees.short,
     feesDetail: fees.detail,
-    festival: str(raw.festival),
-    quotes: reviewQuotes(raw.real_reviews || raw.reviews_list || raw.top_reviews || rr.verified_reviews),
+    festival: str(raw.festival) || festivalFromText(name, address),
+    quotes: reviewQuotes(raw.real_reviews || raw.reviews_list || raw.top_reviews || raw.reviews || rr.verified_reviews),
   };
   entry.intents = intentsFor(entry);
   // The tourist-spot file has no category column; the derived kinds are good
@@ -263,8 +320,9 @@ function readEntries(){
     const kind = !Array.isArray(raw) && raw && typeof raw === 'object'
       ? Object.keys(raw).find(k => raw[k] === list) || ''
       : '';
+    const fileTag = path.basename(file, path.extname(file));
     list.forEach((item, i) => {
-      const entry = normalize(item, i, kind);
+      const entry = normalize(item, i, kind, fileTag);
       if (entry) entries.push(entry);
     });
   }
@@ -277,22 +335,14 @@ function datasetInfo(){
   return { ready: entries.length > 0, file: dataFiles().join(', '), count: entries.length };
 }
 
-// The curated attraction list already lives in spots.js; when the dataset is
-// active it is folded in so the AI references places *and* restaurants.
-let spotCache = null;
-function spotEntries(){
-  if (!spotCache){
-    spotCache = SPOTS
-      .map((s, i) => normalize({ ...s, description: s.blurb, town: s.town }, `spot-${i}`, 'spots'))
-      .filter(Boolean);
-  }
-  return spotCache;
-}
-
+// The AI reference is exactly the files in server/data — nothing else.
+// server/spots.js still drives the map and the curated browsing screens, but it
+// is deliberately NOT mixed in here: if a place is not in the provided files,
+// the assistant says so instead of quietly answering from another list.
 function allEntries(){
   const seen = new Set();
   const out = [];
-  for (const entry of [...readEntries(), ...spotEntries()]){
+  for (const entry of readEntries()){
     const key = entry.name.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
     if (seen.has(key)) continue;
     seen.add(key);
@@ -303,11 +353,21 @@ function allEntries(){
 
 const STOP = new Set(['the', 'and', 'for', 'with', 'you', 'your', 'are', 'can', 'how', 'what', 'where', 'when', 'who', 'why', 'any', 'some', 'best', 'good', 'great', 'top', 'please', 'want', 'need', 'looking', 'find', 'show', 'give', 'recommend', 'suggest', 'near', 'around', 'close', 'about', 'there', 'here', 'this', 'that', 'from', 'have', 'has', 'get', 'try', 'place', 'places', 'spot', 'spots', 'trip', 'pangasinan', 'philippines', 'me', 'my', 'i', 'a', 'an', 'in', 'at', 'to', 'of', 'is', 'it', 'on', 'or', 'do', 'go', 'be']);
 
+function singular(w){
+  // Normalise plurals so "beaches" and "beach" (and islands/coves/falls…)
+  // match the same dataset entries.
+  if (/ies$/.test(w) && w.length > 3) return w.slice(0, -3) + 'y';
+  if (/es$/.test(w) && w.length > 2) return w.slice(0, -2);
+  if (/s$/.test(w) && !/ss$/.test(w) && w.length > 3) return w.slice(0, -1);
+  return w;
+}
+
 function tokens(message){
   return [...new Set(String(message || '')
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, ' ')
     .split(/\s+/)
+    .map(singular)
     .filter(t => t.length > 2 && !STOP.has(t)))];
 }
 
@@ -328,7 +388,7 @@ function scoreEntry(entry, toks, intent, here){
     else if (town.includes(t)){ score += 3; matched = true; }
     else if (entry.searchText.includes(t)){ score += 1; matched = true; }
   }
-  if (intent !== 'discover' && intent !== 'nearby' && entry.intents.includes(intent)){ score += 3; matched = true; }
+  if (intent !== 'discover' && intent !== 'nearby' && entry.intents.includes(intent)){ score += 4; matched = true; }
   if (here && Number.isFinite(entry.lat) && Number.isFinite(entry.lng)){
     const km = haversineKm(here.lng, here.lat, entry.lng, entry.lat);
     score += Math.max(0, 4 - km / 8);
@@ -336,6 +396,23 @@ function scoreEntry(entry, toks, intent, here){
   const rating = Number(entry.rating);
   if (Number.isFinite(rating)) score += rating / 5;
   return { score, matched };
+}
+
+const isFoodOnly = entry => entry.intents.includes('food') && !entry.intents.some(i => i !== 'food');
+
+/** The town the message names, if the files cover it. */
+function townFilterFor(message, entries){
+  const text = ' ' + String(message || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim() + ' ';
+  const towns = [...new Set(entries.map(e => e.town).filter(Boolean))];
+  for (const town of towns){
+    const k = town.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    if (k && text.includes(` ${k} `)) return town;
+  }
+  for (const town of towns){
+    const short = town.toLowerCase().replace(/\s+city$/, '').replace(/[^a-z0-9]+/g, ' ').trim();
+    if (short && text.includes(` ${short} `)) return town;
+  }
+  return null;
 }
 
 function distanceKm(entry, here){
@@ -354,11 +431,31 @@ function search(message, proximity, limit = 6){
   let hits = scored.filter(s => s.matched);
   if (!hits.length && intent !== 'discover') hits = scored.filter(s => s.entry.intents.includes(intent));
   if (!hits.length) return [];
+  // A named town wins over a loose word match elsewhere.
+  const town = townFilterFor(message, entries);
+  if (town){
+    const local = hits.filter(s => s.entry.town === town);
+    if (local.length) hits = local;
+  }
   // "Where can I eat?" should not return a beach that happens to sit in the
   // town you named, as long as the file has actual food places.
   if (intent === 'food' || intent === 'event'){
     const typed = hits.filter(s => s.entry.intents.includes(intent));
     if (typed.length) hits = typed;
+  }
+  // A beach / falls / church request should not be answered with the town's
+  // restaurants just because the town name matched. If the provided files have
+  // nothing of that kind, the honest answer is "not in the data".
+  const kinds = requestedKinds(message);
+  const specific = kinds.filter(k => k !== 'attraction');
+  if (specific.length){
+    const typed = hits.filter(s => specific.some(k => s.entry.intents.includes(k)));
+    if (!typed.length) return [];
+    hits = typed;
+  } else if (kinds.includes('attraction') && intent !== 'food' && intent !== 'event'){
+    const typed = hits.filter(s => !isFoodOnly(s.entry));
+    if (!typed.length) return [];
+    hits = typed;
   }
   hits.sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
@@ -369,7 +466,9 @@ function search(message, proximity, limit = 6){
   const seen = new Set();
   const out = [];
   for (const { entry } of hits){
-    const key = entry.name.toLowerCase();
+    // Fuzzy dedupe: same place with a parenthetical suffix ("The Spa (Bolinao)")
+    // must not surface twice.
+    const key = entry.name.toLowerCase().replace(/\([^)]*\)/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
     if (seen.has(key)) continue;
     seen.add(key);
     out.push(entry);
@@ -380,26 +479,36 @@ function search(message, proximity, limit = 6){
 
 /** Fill in coordinates for entries the file did not carry, via Mapbox (cached). */
 async function withCoords(entries, proximity){
-  await Promise.all(entries.map(async entry => {
-    if (Number.isFinite(entry.lat) && Number.isFinite(entry.lng)) return;
-    const hit = geoCache.get(entry.id);
-    if (hit){ entry.lng = hit.lng; entry.lat = hit.lat; return; }
-    try {
-      const hits = await searchPlaces(`${entry.name} ${entry.town} Pangasinan`, proximity);
-      const found = hits.find(h => inBox(h.lng, h.lat));
-      if (found){
-        entry.lng = found.lng;
-        entry.lat = found.lat;
-        geoCache.set(entry.id, { lng: found.lng, lat: found.lat });
-      }
-    } catch { /* no coords beats wrong coords */ }
-  }));
-  return entries;
+  // Clone so the cached allEntries() objects are never mutated in place — a
+  // geocode for one place must not poison another request's entry, and two
+  // files' same-named fallback ids can no longer collide in geoCache.
+  const out = entries.map(e => ({ ...e }));
+  const missing = out.filter(entry => !(Number.isFinite(entry.lat) && Number.isFinite(entry.lng)));
+  // Bound concurrent Mapbox calls (up to 61% of rows may need geocoding).
+  for (let i = 0; i < missing.length; i += 5){
+    await Promise.all(missing.slice(i, i + 5).map(async entry => {
+      const hit = geoCache.get(entry.id);
+      if (hit){ entry.lng = hit.lng; entry.lat = hit.lat; return; }
+      try {
+        const hits = await searchPlaces(`${entry.name} ${entry.town} Pangasinan`, proximity);
+        const found = hits.find(h => inBox(h.lng, h.lat));
+        if (found){
+          entry.lng = found.lng;
+          entry.lat = found.lat;
+          geoCache.set(entry.id, { lng: found.lng, lat: found.lat });
+        }
+      } catch { /* no coords beats wrong coords */ }
+    }));
+  }
+  return out;
 }
 
 function reasonFor(entry){
-  if (entry.rating && entry.reviews) return `${entry.rating}★ from ${entry.reviews} Google reviews${entry.town ? ` in ${entry.town}` : ''}.`;
-  if (entry.rating) return `${entry.rating}★ on Google${entry.town ? ` in ${entry.town}` : ''}.`;
+  const urls = entry.sourceUrls || [];
+  const isGoogle = urls.some(u => /google\.com\/maps/i.test(String(u))) || /google\.com\/maps/i.test(entry.mapsUrl || '');
+  const source = isGoogle ? 'Google' : '';
+  if (entry.rating && entry.reviews) return `${entry.rating}★ from ${entry.reviews}${source ? ' ' + source : ''} reviews${entry.town ? ` in ${entry.town}` : ''}.`;
+  if (entry.rating) return `${entry.rating}★${source ? ' on ' + source : ''}${entry.town ? ` in ${entry.town}` : ''}.`;
   if (entry.description) return entry.description;
   return entry.town ? `A verified place in ${entry.town}.` : 'A verified place in Pangasinan.';
 }
@@ -416,7 +525,7 @@ function answerFor(intent, entries){
     : intent === 'nearby' ? 'Closest to you'
     : 'Worth a look';
   const bullets = entries.slice(0, 5).map(e => {
-    const meta = [e.town, e.rating ? `${e.rating}★${e.reviews ? ` · ${e.reviews} reviews` : ''}` : ''].filter(Boolean).join(' · ');
+    const meta = [e.town, e.rating ? `${e.rating}★${e.reviews ? ` · ${e.reviews} reviews` : ''}` : '', e.price || ''].filter(Boolean).join(' · ');
     const why = e.description ? ' — ' + firstSentence(e.description) : '';
     return `- **${e.name}**${meta ? ` (${meta})` : ''}${why}`;
   }).join('\n');
@@ -433,6 +542,16 @@ function spotlightFor(entries){
 /** Chat-shaped payload: what /api/chat used to return from the agent. */
 async function localChat(message, proximity){
   const intent = intentOf(message);
+  // Emergency: the dataset carries no emergency entries, so never answer from
+  // thin air — guide to 911 and the nearest hospital instead of a travel dead
+  // end. No hospital names or numbers are invented here; only 911 is universal.
+  if (intent === 'emergency'){
+    return {
+      intent,
+      answer: 'For an emergency, call 911 now, then go to the nearest hospital. The Emergency tab shows hospitals and police near you with numbers you can tap.',
+      candidates: [], spotlight: null, sources: [], source: 'dataset',
+    };
+  }
   const entries = await withCoords(search(message, proximity), proximity);
   if (!entries.length) return { intent, answer: NO_MATCH, candidates: [], spotlight: null, sources: [], source: 'dataset' };
   return {
@@ -451,6 +570,8 @@ async function localChat(message, proximity){
       lng: e.lng,
       lat: e.lat,
       categories: e.categories,
+      photos: e.photos || [],
+      photo: (e.photos && e.photos[0]) || null,
     })),
     spotlight: spotlightFor(entries),
     sources: entries.map(e => e.mapsUrl).filter(Boolean),
@@ -487,6 +608,8 @@ async function localRecommend(message, proximity, prefs = []){
     description: e.description,
     festival: e.festival,
     fees: e.price,
+    photos: e.photos || [],
+    photo: (e.photos && e.photos[0]) || null,
     sources: e.mapsUrl ? [e.mapsUrl] : [],
     sourceKind: 'dataset',
   }));
@@ -498,6 +621,7 @@ module.exports = {
   allEntries,
   withCoords,
   reasonFor,
+  answerFor,
   localChat,
   localRecommend,
   search,

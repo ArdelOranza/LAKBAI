@@ -1,15 +1,98 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { supabase, configured } from './supabaseClient.js';
 
-const Ctx = createContext({ user: null, loading: true, configured, signUp: async () => ({ error: 'Auth not configured' }), signInWithPassword: async () => ({ error: 'Auth not configured' }), resendConfirmation: async () => ({ error: 'Auth not configured' }), resetPassword: async () => ({ error: 'Auth not configured' }), signOut: async () => {} });
+const Ctx = createContext({ user: null, loading: true, recovery: false, configured, signUp: async () => ({ error: 'Auth not configured' }), signInWithPassword: async () => ({ error: 'Auth not configured' }), signInWithGoogle: async () => ({ error: 'Auth not configured' }), resendConfirmation: async () => ({ error: 'Auth not configured' }), resetPassword: async () => ({ error: 'Auth not configured' }), updatePassword: async () => ({ error: 'Auth not configured' }), clearRecovery: () => {}, signOut: async () => {} });
+
+function isRecoveryHash(){
+  if (typeof window === 'undefined') return false;
+  try { return window.location.hash.includes('type=recovery'); } catch { return false; }
+}
+
+// Strip auth params (?code= / #access_token=...) once the SDK has exchanged them
+// so a refresh or back-button doesn't re-trigger sign-in/recovery.
+function cleanAuthUrl(){
+  if (typeof window === 'undefined') return;
+  try {
+    const url = new URL(window.location.href);
+    let changed = false;
+    if (url.searchParams.has('code')) { url.searchParams.delete('code'); changed = true; }
+    if (url.hash) {
+      const hp = new URLSearchParams(url.hash.replace(/^#/, ''));
+      let hashChanged = false;
+      ['access_token', 'refresh_token', 'expires_in', 'expires_at', 'token_type', 'type', 'code'].forEach(k => { if (hp.has(k)) { hp.delete(k); hashChanged = true; } });
+      if (hashChanged) { url.hash = hp.toString() ? '#' + hp.toString() : ''; changed = true; }
+    }
+    if (changed) window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+  } catch { /* non-browser / noop */ }
+}
 
 export function AuthProvider({ children }){
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [recovery, setRecovery] = useState(false);
+  // Monotonic seq so the latest auth event wins: a slow/stale getSession
+  // result can't clobber a SIGNED_IN that already arrived via onAuthStateChange.
+  // Initial getSession is only adopted if no onAuthStateChange event has
+  // landed yet (seqRef > 0) — see the getSession handler below.
+  const seqRef = useRef(0);
+  const recoveryRef = useRef(false);
+
   useEffect(() => {
     if (!supabase) { setLoading(false); return; }
-    supabase.auth.getSession().then(({ data }) => { setUser(data.session?.user || null); setLoading(false); });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => setUser(session?.user || null));
+    const apply = (session, event) => {
+      // Latest auth event wins; bump seq so a late getSession snapshot
+      // (checked below) knows an event already landed.
+      const seq = ++seqRef.current;
+      if (event === 'PASSWORD_RECOVERY') {
+        recoveryRef.current = true; setRecovery(true);
+        setLoading(false);
+        cleanAuthUrl();
+        return { seq, session, event };
+      }
+      setUser(session?.user || null);
+      setLoading(false);
+      return { seq, session, event };
+    };
+
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      // Don't clobber an in-progress recovery screen with a normal session.
+      if (recoveryRef.current && event !== 'PASSWORD_RECOVERY') {
+        // Still consume OAuth/PKCE codes so the URL is clean, but keep recovery UI.
+        if (event === 'SIGNED_IN') cleanAuthUrl();
+        return;
+      }
+      apply(session, event);
+      cleanAuthUrl();
+    });
+
+    // Initial session snapshot. Catch + finally so a rejected getSession
+    // (offline / blocked host) never leaves loading stuck true forever;
+    // a cached session (if the SDK resolves one) still renders.
+    supabase.auth.getSession()
+      .then(({ data, error }) => {
+        if (error) { setLoading(false); return; }
+        if (recoveryRef.current) { setLoading(false); return; }
+        // If onAuthStateChange already fired (e.g. SIGNED_IN during PKCE
+        // exchange), don't let this older snapshot null out that user.
+        // getSession is the boot baseline only when no event walked ahead.
+        if (seqRef.current > 0) return;
+        setUser(data.session?.user || null);
+        const isRecovery = isRecoveryHash();
+        if (isRecovery && data.session?.user) {
+          recoveryRef.current = true; setRecovery(true);
+        }
+        setLoading(false);
+      })
+      .catch(() => { setLoading(false); })
+      .finally(() => setLoading(l => l && false));
+
+    // Hash-fragment recovery links fire before/without a state event in some
+    // flows; detect them directly as a backstop. Check again after the
+    // initial exchange too, but only adopt it if a recovery session exists
+    // (getSession/onAuthStateChange may set the user we then promote).
+    if (isRecoveryHash()) {
+      recoveryRef.current = true; setRecovery(true);
+    }
     return () => sub.subscription.unsubscribe();
   }, []);
   async function signUp(email, password){
@@ -26,6 +109,17 @@ export function AuthProvider({ children }){
     const { error } = await supabase.auth.signInWithPassword({ email: String(email).trim(), password });
     return error ? { error: String(error.message || error) } : {};
   }
+  // Full-page redirect to Google, then back to the app. Supabase picks the
+  // session out of the return URL, so onAuthStateChange signs the traveler in.
+  async function signInWithGoogle(){
+    if (!supabase) return { error: 'Auth not configured — add Supabase keys to .env.' };
+    const redirectTo = typeof window !== 'undefined' ? window.location.origin : undefined;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo, queryParams: { prompt: 'select_account' } },
+    });
+    return error ? { error: String(error.message || error) } : {};
+  }
   async function resendConfirmation(email){
     if (!supabase) return { error: 'Auth not configured — add Supabase keys to .env.' };
     const emailRedirectTo = typeof window !== 'undefined' ? window.location.origin : undefined;
@@ -37,7 +131,27 @@ export function AuthProvider({ children }){
     const { error } = await supabase.auth.resetPasswordForEmail(String(email).trim(), { redirectTo: window.location.origin });
     return error ? { error: String(error.message || error) } : { detail: 'Password reset link sent. Check your email.' };
   }
+  async function updatePassword(password){
+    if (!supabase) return { error: 'Auth not configured — add Supabase keys to .env.' };
+    if (String(password || '').length < 8) return { error: 'Password must be at least 8 characters.' };
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) return { error: String(error.message || error) };
+      // Recovery token consumed — drop the session so we don't end up signed
+      // in through the reset link, and surface the login screen instead.
+      try { await supabase.auth.signOut(); } catch { /* best effort */ }
+      recoveryRef.current = false; setRecovery(false); setUser(null);
+      cleanAuthUrl();
+      return {};
+    } catch (e) { return { error: String(e?.message || e) }; }
+  }
+  function clearRecovery(){
+    recoveryRef.current = false; setRecovery(false);
+    cleanAuthUrl();
+    if (supabase) supabase.auth.signOut().catch(() => {}).finally(() => setUser(null));
+    else setUser(null);
+  }
   async function signOut(){ if (supabase) await supabase.auth.signOut(); setUser(null); }
-  return <Ctx.Provider value={{ user, loading, configured, signUp, signInWithPassword, resendConfirmation, resetPassword, signOut }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ user, loading, recovery, configured, signUp, signInWithPassword, signInWithGoogle, resendConfirmation, resetPassword, updatePassword, clearRecovery, signOut }}>{children}</Ctx.Provider>;
 }
 export const useAuth = () => useContext(Ctx);

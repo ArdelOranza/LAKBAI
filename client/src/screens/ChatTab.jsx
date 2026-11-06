@@ -13,12 +13,12 @@ import { PhotoPlaceholder } from '../ui.jsx';
 import Logo from '../logo.jsx';
 // import AiBackdrop from '../AiBackdrop.jsx'; // parked: the chat background stays plain
 
-const WELCOME = { id:'welcome', role:'ai', text:"Hi! I'm LakbAI. Explore Pangasinan with a smile — ask for beaches, food, festivals, or let me plan your whole trip. I can spotlight secret spots and unique adventures whenever you're ready." };
+const WELCOME = { id:'welcome', role:'ai', text:"Hi! I'm LakbAI. Ask me about the places in our verified Pangasinan list — food, tourist spots, fees, or a day trip. I answer from those records only, so nothing is made up." };
 const STARTERS = [
-  'Best beaches near Bolinao',
+  'Tourist spots in Bayambang',
   'Where should I eat in Dagupan?',
-  'Festivals this month',
-  'Plan a 2-day Pangasinan trip',
+  'Fees at Balungao zipline',
+  'Plan a day trip in Bayambang',
 ];
 const MAP_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 let uid = 0;
@@ -60,10 +60,10 @@ function ChatCard({ card, coords, user, showToast, push, saved, onSaved }){
   }
 
   return (
-    <article className="chat-card" data-testid="chat-card" onClick={() => push({ name:'detail', place })}>
+    <article className="chat-card" data-testid="chat-card" onClick={() => push({ name:'detail', place })} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'detail', place }); } }}>
       <div className="chat-card-media">
         {img
-          ? <img src={img} alt="" loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }}/>
+          ? <img src={img} alt={card.name} loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }}/>
           : <PhotoPlaceholder size={26}/>}
 
         {card.rating != null && (
@@ -135,6 +135,7 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
     return () => { window.removeEventListener('online', up); window.removeEventListener('offline', down); };
   }, []);
 
+  const abortRef = useRef(null);
   async function send(text){
     const q = String(text ?? input).trim();
     if (!q || busy) return;
@@ -142,8 +143,11 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
     setStarters(false);
     setMsgs(m => [...m, { id:nid(), role:'user', text:q, at:Date.now() }, { id:nid(), role:'ai', loading:true }]);
     setBusy(true);
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
     try {
-      const out = await chat(q, coords ? `${coords.lng},${coords.lat}` : '');
+      const out = await chat(q, coords ? `${coords.lng},${coords.lat}` : '', ctrl.signal);
+      if (ctrl.signal.aborted) return;
       const candidates = out.candidates || [];
       const cards = candidates.slice(0, 1).map(c => cardFor(c, spots));
       const more = candidates.slice(1, 6).map(c => c.name + (c.hint ? ' — ' + c.hint : ''));
@@ -153,12 +157,18 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
         cards, more,
       }]);
     } catch (e) {
+      if (ctrl.signal.aborted){
+        setMsgs(m => [...m.filter(x => !x.loading), { id:nid(), role:'ai', at:Date.now(), text: 'No reply — the request was stopped. Try again.' }]);
+        return;
+      }
       setMsgs(m => [...m.filter(x => !x.loading)]);
       showToast('LakbAI is busy — try again in a minute', 'error', e.message);
     } finally {
+      abortRef.current = null;
       setBusy(false);
     }
   }
+  function stop(){ abortRef.current?.abort(new Error('stopped by traveler')); }
 
   function mic(){
     const S = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -237,6 +247,7 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
                       <span className="ai-name">LakbAI Guide</span>
                     </div>
                     <span className="shimmer" style={{ fontSize:13 }}>Searching places...</span>
+                    <button type="button" data-testid="chat-stop" className="chat-stop" onClick={stop} style={{ marginLeft:8, fontSize:12 }}>Stop</button>
                   </div>
                 ) : m.role === 'user' ? (
                   <div className="chat-user">
@@ -308,6 +319,7 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
             <input
               ref={inputRef}
               data-testid="chat-input"
+              aria-label="Ask a follow up question"
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') send(); }}

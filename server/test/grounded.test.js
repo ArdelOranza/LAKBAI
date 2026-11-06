@@ -82,3 +82,30 @@ test('a totally empty answer falls back to the honest no-match line', async () =
   });
   assert.equal(out.answer, NO_MATCH);
 });
+
+test('an answer that adds a place or a price outside the rows is rebuilt from the rows', async () => {
+  const out = await groundedChat('food in Dagupan', '120.341,16.043', {
+    askFn: fake({
+      intent: 'food',
+      answer: 'Try **Patar Beach** — open 24 hours, PHP 150 entrance.',
+      candidates: [{ name: "Conrad's Dagupan" }],
+      sources: [],
+    }),
+  });
+  assert.doesNotMatch(out.answer, /Patar Beach/);
+  assert.doesNotMatch(out.answer, /24 hours/);
+  assert.doesNotMatch(out.answer, /150/);
+  assert.match(out.answer, /Conrad's Dagupan/);
+});
+
+test('an answer that only restates the rows is kept as written', async () => {
+  const out = await groundedChat('food in Dagupan', '120.341,16.043', {
+    askFn: fake({
+      intent: 'food',
+      answer: "**Conrad's Dagupan** — 4.2★ from 185 reviews in Dagupan City.",
+      candidates: [{ name: "Conrad's Dagupan" }],
+      sources: [],
+    }),
+  });
+  assert.equal(out.answer, "**Conrad's Dagupan** — 4.2★ from 185 reviews in Dagupan City.");
+});

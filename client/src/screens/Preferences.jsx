@@ -9,9 +9,13 @@ export default function Preferences({ onContinue, onBack }){
   const [busy, setBusy] = useState(false);
   async function done(){
     setBusy(true);
-    await savePrefs(user, picked);
-    setBusy(false);
-    onContinue(picked);
+    try{
+      await savePrefs(user, picked);
+    }catch{ /* best-effort: never trap the traveler in onboarding */ }
+    finally{
+      setBusy(false);
+      onContinue(picked);
+    }
   }
   return (
     <main style={{ flex:1, overflowY:'auto' }}>

@@ -108,11 +108,14 @@ export default function Browse({ kind = 'beaches', coords, push, pop, showToast 
             key={p.id}
             data-testid="browse-row"
             onClick={() => push({ name:'detail', place:p })}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'detail', place:p }); } }}
             style={{ display:'flex', gap:12, alignItems:'center', padding:10, border:'1px solid #EDF1F7', borderRadius:16, background:'#fff', cursor:'pointer', boxShadow:'0 1px 2px rgba(15,23,42,.04)' }}
           >
             <div style={{ position:'relative', width:88, height:88, flex:'0 0 88px', borderRadius:12, overflow:'hidden' }}>
               {p.photos && p.photos.length
-                ? <img src={p.photos[0]} alt="" loading="lazy" style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+                ? <img src={p.photos[0]} alt={p.name} loading="lazy" style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
                 : <PhotoPlaceholder size={22}/>}
               {typeof p.rating === 'number' && (
                 <span style={{ position:'absolute', left:6, top:6, display:'inline-flex', alignItems:'center', gap:3, background:'#fff', borderRadius:999, padding:'2px 7px', fontSize:10, fontWeight:700 }}>
