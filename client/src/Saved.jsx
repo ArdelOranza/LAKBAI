@@ -30,7 +30,7 @@ export default function Saved(){
     }
     return () => window.removeEventListener('online', onOnline);
   }, [user, tab]);
-  if (!loading && !user) return <Login />;
+  if (!loading && !user) return <p data-testid="saved-login">Sign in to view saved places.</p>;
   if (authError) return <p data-testid="notice">{authError}</p>;
   async function importLocal(){
     for (let i = 0; i < localStorage.length; i++) {

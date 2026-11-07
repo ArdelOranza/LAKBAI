@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Search, Umbrella, UtensilsCrossed, Landmark, MapPin } from 'lucide-react';
+import { Search, Umbrella, UtensilsCrossed, Landmark, MapPin, LocateFixed } from 'lucide-react';
 import { recommend } from '../api.js';
 import { readLocalPrefs } from '../prefs.js';
 import { sessionGet, sessionSet } from '../sessionCache.js';
@@ -10,6 +10,7 @@ import { FALLBACK_CENTER } from '../App.jsx';
 import { Map, MapMarker, MarkerContent } from '@/components/ui/map';
 import { Chip } from '../ui.jsx';
 import SpotPopup from './SpotPopup.jsx';
+import { placeImage, mapboxToken } from '../staticMap.js';
 
 const RADII = [[1,'1 km'],[5,'Within 5 km'],[10,'10 km']];
 const FILTERS = [
@@ -42,22 +43,37 @@ export default function MapTab({ coords, push, showToast, user, setTab }){
   const [viewport, setViewport] = useState({ center: [coords.lng, coords.lat], zoom: 11.5 });
   const [centeredOnFix, setCenteredOnFix] = useState(false);
 
-  // Keep the controlled viewport in sync: radius chips change zoom, and the
-  // first real GPS fix re-centres the map.
+  // Keep the controlled viewport in sync: radius chips change zoom, the
+  // first real GPS fix re-centres. Later fixes only move the view when the
+  // user is in "following" mode (tapped Locate) — otherwise the map feels
+  // drunk on every GPS jitter step.
+  const [following, setFollowing] = useState(false);
   useEffect(() => {
     setViewport(v => ({ ...v, zoom: radius === 1 ? 13 : radius === 5 ? 11.5 : 10.5 }));
   }, [radius]);
   useEffect(() => {
-    if (hasFix && !centeredOnFix){
+    if (!hasFix) return;
+    if (!centeredOnFix){
       setViewport(v => ({ ...v, center: [coords.lng, coords.lat] }));
       setCenteredOnFix(true);
     }
   }, [hasFix, centeredOnFix, coords.lng, coords.lat]);
+  useEffect(() => {
+    if (!hasFix || !following) return;
+    setViewport(v => ({ ...v, center: [coords.lng, coords.lat] }));
+  }, [coords.lng, coords.lat, hasFix, following]);
+
+  function locateMe(){
+    if (!hasFix) { showToast('Waiting for GPS fix — enable location to see yourself', 'error'); return; }
+    setViewport(v => ({ ...v, center: [coords.lng, coords.lat], zoom: 14 }));
+    setCenteredOnFix(true);
+    setFollowing(true);
+  }
 
   useEffect(() => {
     const key = keyFor(radius, coords);
     const hit = sessionGet(key);
-    if (hit) { setPlaces(hit); return; }
+    if (hit) setPlaces(hit); // instant paint, then live revalidation below
     let alive = true;
     setBusy(true);
     recommend(`nearby Pangasinan attractions restaurants events within ${radius} km`, `${coords.lng},${coords.lat}`, readLocalPrefs(user))
@@ -94,6 +110,16 @@ export default function MapTab({ coords, push, showToast, user, setTab }){
     return base.filter(s => withinRadius(s));
   }, [spots, filter, radius, hasFix, coords.lng, coords.lat]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // U14-B: Mapbox-discovered places (from SearchResults) join the live map,
+  // visibly distinct, under the same radius and chip filters.
+  const discovered = useMemo(() => {
+    const list = sessionGet('lakbai.discovered');
+    return Array.isArray(list) ? list : [];
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps — session snapshot per mount
+  const filteredDiscover = useMemo(() =>
+    discovered.filter(p => Number.isFinite(p.lng) && Number.isFinite(p.lat) && matches(p, filter) && withinRadius(p)),
+  [discovered, filter, radius, hasFix, coords.lng, coords.lat]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <div style={{ position:'relative', flex:1, minHeight:0, display:'flex', flexDirection:'column' }}>
       <Map
@@ -106,23 +132,63 @@ export default function MapTab({ coords, push, showToast, user, setTab }){
       >
         {hasFix && (
           <MapMarker longitude={coords.lng} latitude={coords.lat}>
-            <MarkerContent><div className="userdot" title="You are here"/></MarkerContent>
-          </MapMarker>
-        )}
-        {filtered.map(p => (
-          <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} onClick={() => push({ name:'detail', place:p })}>
             <MarkerContent>
-              <button type="button" className="spot-pin" title={p.name} aria-label={p.name}><span>{shortName(p.name)}</span></button>
+              <span
+                data-testid="you-marker"
+                role="img"
+                aria-label="Your location"
+                title="You are here"
+                style={{
+                  display:'inline-flex', alignItems:'center', gap:6,
+                  background:'var(--primary)', color:'#fff',
+                  border:'2px solid #fff', borderRadius:999,
+                  padding:'4px 10px 4px 5px',
+                  fontSize:11, fontWeight:800, letterSpacing:.3,
+                  boxShadow:'0 8px 20px rgba(15,23,42,.35)',
+                  whiteSpace:'nowrap',
+                }}
+              >
+                <span className="userdot" style={{ width:12, height:12, flex:'0 0 12px' }} />
+                You{coords.accuracy != null ? ` ±${Math.round(coords.accuracy)}m` : ''}
+              </span>
             </MarkerContent>
           </MapMarker>
-        ))}
+        )}
+        {filtered.map(p => {
+          const img = placeImage(p, mapboxToken());
+          return (
+            <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} onClick={() => push({ name:'detail', place:p })}>
+              <MarkerContent>
+                <button type="button" className="spot-pin" title={p.name} aria-label={p.name}>
+                  {img && <span className="pin-photo"><img src={img} alt="" loading="lazy" onError={e => { e.currentTarget.closest('.pin-photo').style.display='none'; }} /></span>}
+                  <span className="pin-name">{shortName(p.name)}</span>
+                </button>
+              </MarkerContent>
+            </MapMarker>
+          );
+        })}
         {filteredSpots.map(s => {
           const active = selectedSpot && selectedSpot.id === s.id;
+          const img = placeImage(s, mapboxToken());
           return (
             <MapMarker key={'spot-' + s.id} longitude={s.lng} latitude={s.lat} onClick={() => setSelectedSpot(s)}>
               <MarkerContent>
                 <button className={'spot-pin' + (active ? ' active' : '')} title={s.name} aria-label={s.name}>
-                  <span>{shortName(s.name)}</span>
+                  {img && <span className="pin-photo"><img src={img} alt="" loading="lazy" onError={e => { e.currentTarget.closest('.pin-photo').style.display='none'; }} /></span>}
+                  <span className="pin-name">{shortName(s.name)}</span>
+                </button>
+              </MarkerContent>
+            </MapMarker>
+          );
+        })}
+        {filteredDiscover.map(p => {
+          const img = placeImage(p, mapboxToken());
+          return (
+            <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} onClick={() => push({ name:'detail', place:p })}>
+              <MarkerContent>
+                <button type="button" className="spot-pin discover" title={p.name + ' — discovered via Mapbox'} aria-label={p.name}>
+                  {img && <span className="pin-photo"><img src={img} alt="" loading="lazy" onError={e => { e.currentTarget.closest('.pin-photo').style.display='none'; }} /></span>}
+                  <span className="pin-name">{shortName(p.name)}</span>
                 </button>
               </MarkerContent>
             </MapMarker>
@@ -145,8 +211,19 @@ export default function MapTab({ coords, push, showToast, user, setTab }){
       </div>
 
       {busy && <div style={{ position:'absolute', top:110, left:12, zIndex:5 }}><span className="shimmer chip" style={{ background:'#fff' }}>Loading nearby…</span></div>}
-      {!busy && !filtered.length && !filteredSpots.length && <div style={{ position:'absolute', top:110, left:12, right:12, zIndex:5 }}><span className="chip" style={{ background:'#fff' }}>No stops here yet — widen the radius.</span></div>}
-      {!busy && !filtered.length && filteredSpots.length > 0 && <div style={{ position:'absolute', top:110, left:12, zIndex:5 }}><span className="chip" style={{ background:'#fff' }}>{filteredSpots.length} curated{filter === 'All' ? '' : ' ' + filter.toLowerCase()} spots</span></div>}
+      {!busy && !filtered.length && !filteredSpots.length && !filteredDiscover.length && <div style={{ position:'absolute', top:110, left:12, right:12, zIndex:5 }}><span className="chip" style={{ background:'#fff' }}>No stops here yet — widen the radius.</span></div>}
+      {!busy && !filtered.length && !filteredDiscover.length && filteredSpots.length > 0 && <div style={{ position:'absolute', top:110, left:12, zIndex:5 }}><span className="chip" style={{ background:'#fff' }}>{filteredSpots.length} curated{filter === 'All' ? '' : ' ' + filter.toLowerCase()} spots</span></div>}
+
+      <button
+        type="button"
+        data-testid="locate-me"
+        aria-label="Locate me"
+        title={hasFix ? 'Centre on my location' : 'Waiting for GPS…'}
+        onClick={locateMe}
+        style={{ position:'absolute', right:12, bottom:78, zIndex:6, width:46, height:46, borderRadius:'50%', border:'1px solid #EDF1F7', background:'#fff', color:'var(--primary)', display:'grid', placeItems:'center', boxShadow:'0 10px 24px -12px rgba(15,23,42,.45)', padding:0 }}
+      >
+        <LocateFixed size={20}/>
+      </button>
 
       {selectedSpot && <SpotPopup spot={selectedSpot} coords={coords} pop={() => setSelectedSpot(null)} push={push} setTab={setTab} showToast={showToast} user={user} />}
     </div>

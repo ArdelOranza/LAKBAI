@@ -5,6 +5,7 @@ import { savePlan } from '../store.js';
 import { sessionSet } from '../sessionCache.js';
 import { driveMinutes, haversineKm } from '../geo.js';
 import { Chip, PrimaryBtn, PhotoPlaceholder } from '../ui.jsx';
+import { placeImage, mapboxToken } from '../staticMap.js';
 
   // (CITY was a hardcoded 'Bolinao, Pangasinan' — now derived from the stops.)
   // Empty or unknown cases fall back to a province label, never to a wrong town.
@@ -102,8 +103,8 @@ export default function ItineraryView({ plan, coords, pop, showToast }){
           return (
             <article key={s.placeId || s.name || i} data-testid="itin-row" style={{ border:'1px solid #EDF1F7', borderRadius:18, background:'#fff', overflow:'hidden' }}>
               <div style={{ position:'relative', height:120 }}>
-                {mineFav && mineFav.photo
-                  ? <img src={mineFav.photo} alt={s.name} onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+                {placeImage(mineFav, mapboxToken())
+                  ? <img src={placeImage(mineFav, mapboxToken())} alt={s.name} onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
                   : <PhotoPlaceholder size={26}/>}
                 <span style={{ position:'absolute', left:10, top:10, background:'rgba(255,255,255,.94)', borderRadius:10, padding:'3px 10px', fontWeight:800, fontSize:12, color:'var(--ink)' }}>{String(i + 1).padStart(2, '0')}</span>
                 <div style={{ position:'absolute', left:10, bottom:10, display:'flex', gap:6 }}>

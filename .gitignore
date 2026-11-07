@@ -5,3 +5,13 @@ dist/
 graphify-out/
 .superpowers/
 .opencode/
+# Admin runtime edits (persisted spots/photos) — not source
+server/data/admin-spots.json
+# Planning docs — local only, not pushed/deployed
+*_PLAN.md
+*_FIXES.md
+MAPBOX_PLAN.md
+UI_FIXES.md
+P0_FIXES.md
+plan_*.md
+*-plan.md

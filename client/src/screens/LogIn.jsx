@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Eye, EyeOff, ArrowRight, Mail, MailCheck, RefreshCw } from 'lucide-react';
-import { useAuth } from '../AuthContext.jsx';
+import { useAuth, friendlyAuthError } from '../AuthContext.jsx';
 import { validateLogin, needsEmailConfirmation } from '../authValidate.js';
 import Logo from '../logo.jsx';
 import { PrimaryBtn, GoogleBtn, OrDivider } from '../ui.jsx';
@@ -35,7 +35,7 @@ export default function LogIn({ onAuthed, onSwitchToSignup, notice, defaultEmail
     setBusy(true); setErr(null);
     let res;
     try { res = await signInWithPassword(form.email, form.password); }
-    catch (e) { res = { error: String(e?.message || e) }; }
+    catch (e) { res = { error: friendlyAuthError(String(e?.message || e)) }; }
     finally { setBusy(false); }
     if (res.error) setErr({ field:null, message:res.error });
     else onAuthed('login');
@@ -44,7 +44,7 @@ export default function LogIn({ onAuthed, onSwitchToSignup, notice, defaultEmail
     setBusy(true); setErr(null);
     let res;
     try { res = await signInWithGoogle(); }
-    catch (e) { res = { error: String(e?.message || e) }; }
+    catch (e) { res = { error: friendlyAuthError(String(e?.message || e)) }; }
     finally { setBusy(false); }
     // On success the browser leaves for Google; only a failure returns here.
     if (res.error){
@@ -54,11 +54,11 @@ export default function LogIn({ onAuthed, onSwitchToSignup, notice, defaultEmail
     }
   }
   async function resend(){
-    if (!form.email) { setErr({ field:null, message:'Enter your email address first.' }); return; }
+    if (!/^\S+@\S+\.\S+$/.test(String(form.email || '').trim())) { setErr({ field:null, message:'Enter a valid email address first.' }); return; }
     setBusy(true);
     let res;
     try { res = await resendConfirmation(form.email); }
-    catch (e) { res = { error: String(e?.message || e) }; }
+    catch (e) { res = { error: friendlyAuthError(String(e?.message || e)) }; }
     finally { setBusy(false); }
     if (res.error) setErr({ field:null, message:res.error });
     else { setErr(null); setResent(true); }
@@ -70,7 +70,7 @@ export default function LogIn({ onAuthed, onSwitchToSignup, notice, defaultEmail
     setBusy(true);
     let res;
     try { res = await resetPassword(form.email); }
-    catch (e) { res = { error: String(e?.message || e) }; }
+    catch (e) { res = { error: friendlyAuthError(String(e?.message || e)) }; }
     finally { setBusy(false); }
     setErr(res.error ? { field:null, message:res.error } : { field:null, message:res.detail || 'Check your email.' });
   }
@@ -121,7 +121,7 @@ export default function LogIn({ onAuthed, onSwitchToSignup, notice, defaultEmail
 
         <div style={{ marginTop:18 }}><PrimaryBtn testid="login-send" disabled={busy || !configured} onClick={submit}>Log In <ArrowRight size={17}/></PrimaryBtn></div>
         <p style={{ textAlign:'center', marginTop:16, fontSize:14 }}>
-          Don't have an account? <b><a href="#" onClick={e => { e.preventDefault(); onSwitchToSignup(); }}>Sign Up</a></b>
+          Don't have an account? <b><button type="button" data-testid="switch-signup" style={{ background:'none', border:'none', padding:0, color:'var(--primary)', font:'inherit', cursor:'pointer' }} onClick={onSwitchToSignup}>Sign Up</button></b>
         </p>
       </section>
     </main>

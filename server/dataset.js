@@ -645,6 +645,7 @@ async function localChat(message, proximity){
       categories: e.categories,
       photos: e.photos || [],
       photo: (e.photos && e.photos[0]) || null,
+      photoSource: (e.photos && e.photos[0]) ? 'json' : 'mapbox',
     })),
     spotlight: spotlightFor(entries),
     sources: entries.map(e => e.mapsUrl).filter(Boolean),
@@ -683,6 +684,7 @@ async function localRecommend(message, proximity, prefs = []){
     fees: e.price,
     photos: e.photos || [],
     photo: (e.photos && e.photos[0]) || null,
+    photoSource: (e.photos && e.photos[0]) ? 'json' : 'mapbox',
     sources: e.mapsUrl ? [e.mapsUrl] : [],
     sourceKind: 'dataset',
   }));

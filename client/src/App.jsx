@@ -1,8 +1,8 @@
 import { Component, useEffect, useState } from 'react';
 import { AuthProvider, useAuth } from './AuthContext.jsx';
-import { Toast, TabBar, PrimaryBtn } from './ui.jsx';
+import { Toast, TabBar, PrimaryBtn, useAutoToast } from './ui.jsx';
 import Logo from './logo.jsx';
-import { readLocalPrefs } from './prefs.js';
+import { readLocalPrefs, loadPrefs } from './prefs.js';
 import Splash from './screens/Splash.jsx';
 import SignUp from './screens/SignUp.jsx';
 import LogIn from './screens/LogIn.jsx';
@@ -34,7 +34,7 @@ class ScreenErrorBoundary extends Component {
         <div style={{ flex:1, display:'grid', placeItems:'center', padding:24 }}>
           <div style={{ maxWidth:320, textAlign:'center' }}>
             <h1 style={{ fontSize:20 }}>This screen couldn’t load</h1>
-            <p style={{ color:'var(--muted-ink)', fontSize:14 }}>The map could not start on this device. You can keep using the rest of the app.</p>
+            <p style={{ color:'var(--muted-ink)', fontSize:14 }}>Give it another go below — the rest of the app still works.</p>
             <button type="button" onClick={() => { this.setState({ error: null }); this.props.onReset?.(); }}>Back to home</button>
           </div>
         </div>
@@ -55,31 +55,71 @@ function Shell(){
   const [authStage, setAuthStage] = useState(null);   // 'signup' | 'login' override while no session yet
   const [authNotice, setAuthNotice] = useState(null); // { text, email } hand-off from Sign Up
   const [prefsStage, setPrefsStage] = useState(false); // onboarding overlay after first signup
-  const [toast, setToast] = useState(null);
+  const [toast, setToast] = useAutoToast(4000); // every toast self-dismisses
   const [coords, setCoords] = useState(FALLBACK_CENTER);
   const push = view => setStack(s => [...s, view]);
   const pop = () => setStack(s => s.slice(0, -1));
   const showToast = (text, kind = 'ok', detail) => setToast({ text, kind, detail });
 
-  useEffect(() => {  // LIVE touring GPS (Review Focus #1)
-    if (!('geolocation' in navigator)) return;
-    const OPTS = { enableHighAccuracy: true, timeout: 8000, maximumAge: 5000 };
-    const onOk = pos => setCoords({ lng: pos.coords.longitude, lat: pos.coords.latitude });
-    let id = navigator.geolocation.watchPosition(onOk, () => {}, OPTS); // errors keep Pangasinan fallback
+  useEffect(() => {  // LIVE touring GPS (high-accuracy, smoothed, accuracy-gated)
+    // 'geolocation' in navigator can be true while geolocation itself is null
+    // (test DOMs, hardened browsers) — require the callable API.
+    if (typeof navigator.geolocation?.watchPosition !== 'function') return;
+    // maximumAge 0 — never accept a browser-cached stale fix from a previous session.
+    const OPTS = { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 };
+    let best = null; // best fix so far { lng, lat, accuracy }
+    const onOk = pos => {
+      const { longitude, latitude, accuracy } = pos.coords || {};
+      if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return;
+      // Reject very poor fixes instead of snapping the map to a guessed point.
+      // IndoorWi-Fi / tower fixes often report accuracy > 300 m — worse than useless.
+      const acc = Number.isFinite(accuracy) ? accuracy : 999;
+      if (acc > 300) return; // keep waiting for a real fix; dot stays honest
+      // Smooth: average with the previous best, weighted by inverse accuracy.
+      // A single noisy fix then can't yank the dot 100 m.
+      if (best){
+        const wNew = 1 / Math.max(10, acc);
+        const wOld = 1 / Math.max(10, best.accuracy);
+        const lng = (best.lng * wOld + longitude * wNew) / (wOld + wNew);
+        const lat = (best.lat * wOld + latitude * wNew) / (wOld + wNew);
+        best = { lng, lat, accuracy: Math.min(best.accuracy, acc) };
+      } else {
+        best = { lng: longitude, lat: latitude, accuracy: acc };
+      }
+      setCoords({ lng: best.lng, lat: best.lat, accuracy: best.accuracy });
+    };
+    const onErr = () => { /* keep fallback; a failed permission is not a fake pin */ };
+    let id = navigator.geolocation.watchPosition(onOk, onErr, OPTS);
+    // Fire a fresh high-accuracy fix now so the dot lands quickly instead of
+    // waiting for the first watchPosition tick (often a stale cached value).
+    navigator.geolocation.getCurrentPosition?.(onOk, onErr, OPTS);
     const onHide = () => {  // battery: no GPS while backgrounded
       navigator.geolocation.clearWatch(id);
-      if (!document.hidden) id = navigator.geolocation.watchPosition(onOk, () => {}, OPTS);
+      if (!document.hidden) id = navigator.geolocation.watchPosition(onOk, onErr, OPTS);
     };
     document.addEventListener('visibilitychange', onHide);
     return () => { navigator.geolocation.clearWatch(id); document.removeEventListener('visibilitychange', onHide); };
   }, []);
 
-  // first real session → preferences onboarding once (unless already filled locally)
+  // first real session → preferences onboarding once (unless already filled
+  // locally OR remotely — a fresh device must still see the cloud's chips).
   useEffect(() => {
-    if (user && !prefsStage && !localStorage.getItem(`lakbai.prefsSeen:${user.id}`) && readLocalPrefs(user).length === 0) setPrefsStage(true);
-  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!user || prefsStage || recovery) return;
+    if (localStorage.getItem(`lakbai.prefsSeen:${user.id}`)) return;
+    let alive = true;
+    loadPrefs(user)
+      .then(p => { if (alive && (p.preferences || []).length === 0) setPrefsStage(true); })
+      .catch(() => { if (alive) setPrefsStage(true); });
+    return () => { alive = false; };
+  }, [user?.id, recovery]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (loading) return (
+  // Every screen render (loading, recovery, auth gates, tabs, stacked screens)
+  // goes through this guard: one bad screen must degrade to a fallback for that
+  // screen only, never a dead app shell.
+  const reset = () => { setStack([]); setTab('home'); setPrefsStage(false); };
+  const guard = children => <ScreenErrorBoundary onReset={reset}>{children}</ScreenErrorBoundary>;
+
+  if (loading) return guard(
     <main style={{ flex:1, display:'grid', placeItems:'center', minHeight:'100dvh' }} aria-busy="true">
       <div style={{ textAlign:'center', color:'var(--muted-ink)' }}>
         <Logo size={56}/>
@@ -90,7 +130,7 @@ function Shell(){
 
   // Password-reset recovery: the reset link mints a real session. Don't
   // drop the traveler into the app — ask for a new password first.
-  if (recovery) return <SetPassword onDone={clearRecovery} updatePassword={updatePassword}/>;
+  if (recovery) return guard(<SetPassword onDone={() => { clearRecovery(); setPrefsStage(false); }} updatePassword={updatePassword}/>); // recovery exit must also drop a stranded onboarding state
 
 
   const prefsOnce = checked => (
@@ -98,8 +138,8 @@ function Shell(){
   );
 
   if (!user){
-    if (prefsStage) return prefsOnce(() => setStack([]));
-    if (authStage === 'signup') return <SignUp onAuthed={(stage, detail, email) => {
+    if (prefsStage) return guard(prefsOnce(() => setStack([])));
+    if (authStage === 'signup') return guard(<SignUp onAuthed={(stage, detail, email) => {
       // Supabase needs the signup email confirmed before the first login. Send
       // the traveler to Log In with the reason (and their email, so "Resend"
       // works straight away) instead of dropping them back on the intro.
@@ -109,11 +149,11 @@ function Shell(){
         return;
       }
       setAuthStage(null);
-    }} onSwitchToLogin={() => setAuthStage('login')} />;
-    if (authStage === 'login') return <LogIn notice={authNotice?.text} defaultEmail={authNotice?.email} onAuthed={() => { setAuthNotice(null); setAuthStage(null); }} onSwitchToSignup={() => setAuthStage('signup')} />;
-    return <Splash onGetStarted={() => setAuthStage('signup')} onLogIn={() => setAuthStage('login')} />;
+    }} onSwitchToLogin={() => setAuthStage('login')} />);
+    if (authStage === 'login') return guard(<LogIn notice={authNotice?.text} defaultEmail={authNotice?.email} onAuthed={() => { setAuthNotice(null); setAuthStage(null); }} onSwitchToSignup={() => setAuthStage('signup')} />);
+    return guard(<Splash onGetStarted={() => setAuthStage('signup')} onLogIn={() => setAuthStage('login')} />);
   }
-  if (prefsStage) return prefsOnce(() => setStack([]));
+  if (prefsStage) return guard(prefsOnce(() => setStack([])));
 
   // A tab tap must clear the stack, otherwise a tab change while a detail is
   // open is invisible (stuck on the old detail). Screens call setTab directly,
@@ -147,9 +187,7 @@ function Shell(){
   return (
     <div data-testid="app" style={{ display:'flex', flexDirection:'column', height:'100%', overflow:'hidden' }}>
       <Toast toast={toast} onClose={() => setToast(null)} />
-      <ScreenErrorBoundary onReset={() => { setStack([]); setTab('home'); }}>
-        {body}
-      </ScreenErrorBoundary>
+      {guard(body)}
       {!stack.length && <TabBar tab={tab} onTab={t => { setStack([]); setTab(t); }} />}
     </div>
   );

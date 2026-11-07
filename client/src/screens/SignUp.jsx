@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Eye, EyeOff, ArrowRight } from 'lucide-react';
-import { useAuth } from '../AuthContext.jsx';
+import { useAuth, friendlyAuthError } from '../AuthContext.jsx';
 import { validateSignup } from '../authValidate.js';
 import Logo from '../logo.jsx';
 import { PrimaryBtn, GoogleBtn, OrDivider } from '../ui.jsx';
@@ -34,7 +34,7 @@ export default function SignUp({ onAuthed, onSwitchToLogin }){
     setBusy(true); setErr(null);
     let res;
     try { res = await signUp(form.email, form.password); }
-    catch (e) { res = { error: String(e?.message || e) }; }
+    catch (e) { res = { error: friendlyAuthError(String(e?.message || e)) }; }
     finally { setBusy(false); }
     if (res.error) setErr({ field:null, message:res.error, detail:res.detail });
     else onAuthed(res.needsConfirm ? 'confirm' : 'signup', res.detail, form.email);
@@ -43,7 +43,7 @@ export default function SignUp({ onAuthed, onSwitchToLogin }){
     setBusy(true); setErr(null);
     let res;
     try { res = await signInWithGoogle(); }
-    catch (e) { res = { error: String(e?.message || e) }; }
+    catch (e) { res = { error: friendlyAuthError(String(e?.message || e)) }; }
     finally { setBusy(false); }
     if (res.error){
       setErr({ field:null, message: /not enabled|provider/i.test(res.error)
@@ -56,7 +56,7 @@ export default function SignUp({ onAuthed, onSwitchToLogin }){
     <div>
       <label style={LABEL} htmlFor={'signup-' + k}>{label}</label>
       <div style={{ display:'flex', gap:6 }}>
-        <input id={'signup-' + k} data-testid={'signup-' + k} type={eye && !show[k] ? 'password' : type} value={form[k]} onChange={e => set(k, e.target.value)} onKeyDown={onEnter} style={{ flex:1 }} disabled={!configured || busy}/>
+        <input id={'signup-' + k} data-testid={'signup-' + k} type={eye ? (show[k] ? 'text' : 'password') : type} value={form[k]} onChange={e => set(k, e.target.value)} onKeyDown={onEnter} style={{ flex:1 }} disabled={!configured || busy}/>
         {eye && <EyeToggle k={k}/>}
       </div>
     </div>
@@ -80,7 +80,7 @@ export default function SignUp({ onAuthed, onSwitchToLogin }){
         {err && <p data-testid="signup-error" style={{ color:'var(--accent)', fontSize:13, margin:'12px 0 0' }}>{err.message}{err.detail ? ' — ' + err.detail : ''}</p>}
         <div style={{ marginTop:20 }}><PrimaryBtn testid="signup-send" disabled={busy || !configured} onClick={submit}>Sign Up <ArrowRight size={17}/></PrimaryBtn></div>
         <p style={{ textAlign:'center', marginTop:16, fontSize:14 }}>
-          Already have an account? <b><a href="#" onClick={e => { e.preventDefault(); onSwitchToLogin(); }}>Log In</a></b>
+          Already have an account? <b><button type="button" data-testid="switch-login" style={{ background:'none', border:'none', padding:0, color:'var(--primary)', font:'inherit', cursor:'pointer' }} onClick={onSwitchToLogin}>Log In</button></b>
         </p>
       </section>
     </main>

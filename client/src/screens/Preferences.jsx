@@ -1,12 +1,26 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, Sparkles } from 'lucide-react';
-import { TAGS, toggleTag, readLocalPrefs, savePrefs } from '../prefs.js';
+import { TAGS, toggleTag, readLocalPrefs, savePrefs, loadPrefs } from '../prefs.js';
 import { useAuth } from '../AuthContext.jsx';
 
 export default function Preferences({ onContinue, onBack }){
   const { user } = useAuth();
   const [picked, setPicked] = useState(() => readLocalPrefs(user));
   const [busy, setBusy] = useState(false);
+  // Hydrate from the cloud profile on open — a fresh device has no local prefs,
+  // and showing the empty editor here meant the first Save wiped the cloud too.
+  useEffect(() => {
+    if (!user) return;
+    let alive = true;
+    loadPrefs(user).then(p => { if (alive && Array.isArray(p.preferences)) setPicked(p.preferences); }).catch(() => {});
+    return () => { alive = false; };
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Cross-tab sync: another tab changing prefs updates this open editor.
+  useEffect(() => {
+    const onStorage = () => setPicked(readLocalPrefs(user));
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   async function done(){
     setBusy(true);
     try{

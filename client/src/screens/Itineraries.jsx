@@ -21,6 +21,13 @@ export default function Itineraries({ pop, push, setTab }){
   }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const shown = (rows || []).filter(p => matchesFilter(planStatus(p.starts_at), filter));
 
+  function generate(){
+    // This screen is stacked above Saved — switching the tab alone is invisible
+    // while Itineraries is still on top. Pop first, then land on Saved.
+    pop();
+    setTab('saved');
+  }
+
   return (
     <main style={{ flex:1, overflowY:'auto' }}>
       <div className="pane" style={{ paddingTop:16 }}>
@@ -65,7 +72,7 @@ export default function Itineraries({ pop, push, setTab }){
           })}
         </div>
 
-        <div data-testid="generate-new" className="soft-card" style={{ marginTop:12, cursor:'pointer' }} onClick={() => setTab('saved')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTab('saved'); } }}>
+        <div data-testid="generate-new" className="soft-card" style={{ marginTop:12, cursor:'pointer' }} onClick={generate} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); generate(); } }}>
           <span style={{ width:28, height:28, minWidth:28, borderRadius:'50%', background:'#fff', color:'var(--primary)', display:'grid', placeItems:'center' }}>
             <Plus size={16}/>
           </span>

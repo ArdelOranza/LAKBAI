@@ -36,12 +36,13 @@ function PlaceRow({ place, icon:Icon }){
 export default function Emergency({ coords, pop, showToast }){
   const [data, setData] = useState(null);
   const [failed, setFailed] = useState(false);
-  const at = `${coords.lng},${coords.lat}`;
+  const at = coords && Number.isFinite(Number(coords.lng)) && Number.isFinite(Number(coords.lat)) ? `${coords.lng},${coords.lat}` : '';
   // Value compare like MapTab: reference equality breaks when the caller
   // passes a fresh fallback object (tests, another screen) — and on a safety
   // screen that would silently share fabricated coordinates.
-  const hasFix = coords && !(coords.lng === FALLBACK_CENTER.lng && coords.lat === FALLBACK_CENTER.lat);
+  const hasFix = Boolean(coords && !(coords.lng === FALLBACK_CENTER.lng && coords.lat === FALLBACK_CENTER.lat));
   useEffect(() => {
+    if (!at) return undefined;
     let alive = true;
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 10000);
@@ -69,7 +70,7 @@ export default function Emergency({ coords, pop, showToast }){
   // Nearest first — time-critical on a safety screen. Null distances go last.
   const withKm = list => (list || []).map(p => ({
     ...p,
-    km: haversineKm(coords.lng, coords.lat, p.lng, p.lat),
+    km: at ? haversineKm(coords.lng, coords.lat, p.lng, p.lat) : null,
   })).sort((a, b) => (a.km == null ? Infinity : a.km) - (b.km == null ? Infinity : b.km));
   const hospitals = withKm(data && data.hospitals);
   const police = withKm(data && data.police);

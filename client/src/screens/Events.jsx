@@ -33,6 +33,12 @@ export default function Events({ coords, push, pop, showToast }){
     showToast(res.error ? 'Sign in to save' : 'Added to Saved', res.error ? 'error' : 'ok');
   }
 
+  function open(f){
+    push({ name:'detail', place:{ ...f, categories:['Festival','Cultural'] } });
+  }
+  // Keyboard parity for the two kinds of tappable card: Enter/Space behave like click.
+  const keyOpen = f => e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(f); } };
+
   return (
     <div style={{ flex:1, overflowY:'auto' }}>
       <div className="pane" style={{ paddingTop:16 }}>
@@ -43,7 +49,10 @@ export default function Events({ coords, push, pop, showToast }){
         {featured && (
           <article
             data-testid="event-feature"
-            onClick={() => push({ name:'detail', place:{ ...featured, categories:['Festival','Cultural'] } })}
+            onClick={() => open(featured)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={keyOpen(featured)}
             style={{ position:'relative', marginTop:14, borderRadius:18, overflow:'hidden', cursor:'pointer', boxShadow:'0 10px 26px -18px rgba(15,23,42,.5)' }}
           >
             <div style={{ position:'relative', height:168, background:'#EDF1F7' }}>
@@ -100,7 +109,10 @@ export default function Events({ coords, push, pop, showToast }){
             <article
               key={f.id + f.starts.toISOString()}
               data-testid="event-row"
-              onClick={() => push({ name:'detail', place:{ ...f, categories:['Festival','Cultural'] } })}
+              onClick={() => open(f)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={keyOpen(f)}
               style={{ display:'flex', gap:12, alignItems:'center', padding:10, border:'1px solid #EDF1F7', borderRadius:16, background:'#fff', cursor:'pointer', boxShadow:'0 1px 2px rgba(15,23,42,.04)' }}
             >
               <div style={{ width:52, height:52, minWidth:52, borderRadius:12, background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center', alignContent:'center', lineHeight:1 }}>

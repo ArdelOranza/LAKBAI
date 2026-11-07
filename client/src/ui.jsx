@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { House, Map, MessageSquare, Backpack, UserRound, Check, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
 import GoogleMark from './GoogleMark.jsx';
 
@@ -11,6 +12,18 @@ export function PhotoPlaceholder({ label, size = 26, rounded = 0, style }){
       </div>
     </div>
   );
+}
+
+/** Co-owned toast state so every toast self-dismisses. Returns [toast, setToast];
+ *  a fresh toast clears itself after `ms` (replacing a toast restarts the timer). */
+export function useAutoToast(ms = 4000){
+  const [toast, setToast] = useState(null);
+  useEffect(() => {
+    if (!toast) return undefined;
+    const t = setTimeout(() => setToast(null), ms);
+    return () => clearTimeout(t);
+  }, [toast, ms]);
+  return [toast, setToast];
 }
 
 export function Toast({ toast, onClose }){
@@ -34,7 +47,7 @@ export function TabBar({ tab, onTab }){
   return (
     <nav className="tabbar" aria-label="Main">
       {TAB_ITEMS.map(([id, Icon]) => (
-        <button key={id} data-testid={'nav-' + id} className={tab === id ? 'active' : ''} aria-current={tab === id ? 'page' : undefined} aria-label={id[0].toUpperCase() + id.slice(1)} onClick={() => onTab(id)}>
+        <button type="button" key={id} data-testid={'nav-' + id} className={tab === id ? 'active' : ''} aria-current={tab === id ? 'page' : undefined} aria-label={id[0].toUpperCase() + id.slice(1)} onClick={() => onTab(id)}>
           <span className="navdot"><Icon size={21} strokeWidth={2}/></span>
         </button>
       ))}
@@ -46,7 +59,7 @@ export function Chip({ active, onClick, children, testid, flat }){
   return <button type="button" data-testid={testid} className={'chip' + (flat ? ' chip-flat' : '') + (active ? ' active' : '')} onClick={onClick}>{children}</button>;
 }
 export function PrimaryBtn({ children, onClick, wide, disabled, testid }){
-  return <button data-testid={testid} className={'primary-btn' + (wide ? ' wide' : '')} onClick={onClick} disabled={disabled}>{children}</button>;
+  return <button type="button" data-testid={testid} className={'primary-btn' + (wide ? ' wide' : '')} onClick={onClick} disabled={disabled}>{children}</button>;
 }
 export function GoogleBtn({ onClick, disabled, testid = 'google-signin' }){
   return (
