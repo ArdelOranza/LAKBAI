@@ -11,4 +11,5 @@ export default defineConfig({
     strictPort: true,
     proxy: { '/api': `http://localhost:${process.env.PORT || 3001}` },
   },
+  preview: { allowedHosts: true },
 })

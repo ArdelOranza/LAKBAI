@@ -36,4 +36,5 @@ export default defineConfig({
   // else stays server-side. Never prefix a secret with VITE_ (see client/.env.example).
   envDir: '../',
   server: { proxy: { '/api': `http://localhost:${process.env.PORT || 3001}` } },
+  preview: { allowedHosts: true },
 })
