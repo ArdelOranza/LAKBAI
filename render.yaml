@@ -1,5 +1,4 @@
 # Render blueprint — Lakbai (traveller app + API + hidden admin)
-# Treat this as the single source of truth — do not hand-pick "Build Command" in the dashboard.
 services:
   - type: web
     name: lakbai-api
@@ -11,9 +10,7 @@ services:
     autoDeploy: true
     envVars:
       - key: NODE_VERSION
-        value: 22
-      - key: PORT
-        generateValue: true
+        value: "22"
       - key: ADMIN_TOKEN
         sync: false
       - key: GEMINI_API_KEY
@@ -33,35 +30,42 @@ services:
       - key: SUPABASE_SERVICE_KEY
         sync: false
 
-  # Static sites are type: web + runtime: static (a bare type: static → "unknown type" on Render).
   - type: web
     name: lakbai-app
     runtime: static
     rootDir: client
     buildCommand: npm install && npm run build
-    publishPath: dist
+    staticPublishPath: dist
     autoDeploy: true
     envVars:
       - key: NODE_VERSION
-        value: 22
+        value: "22"
       - key: VITE_API_URL
-        sync: false  # = https://lakbai-api.onrender.com (your API service URL)
+        sync: false
       - key: VITE_MAPBOX_TOKEN
         sync: false
       - key: VITE_SUPABASE_URL
         sync: false
       - key: VITE_SUPABASE_ANON_KEY
         sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
 
   - type: web
     name: lakbai-admin
     runtime: static
     rootDir: admin
     buildCommand: npm install && npm run build
-    publishPath: dist
+    staticPublishPath: dist
     autoDeploy: true
     envVars:
       - key: NODE_VERSION
-        value: 22
+        value: "22"
       - key: VITE_API_URL
-        sync: false  # = https://lakbai-api.onrender.com (same API service)
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
