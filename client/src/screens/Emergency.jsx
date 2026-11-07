@@ -5,8 +5,7 @@ import {
 import { FALLBACK_CENTER } from '../App.jsx';
 import { haversineKm } from '../geo.js';
 import { telHref, directionsHref, awayLabel } from '../emergency.js';
-
-const BASE = import.meta.env.VITE_API_URL || '';
+import { apiUrl } from '../apiBase.js';
 
 // Public national numbers plus the provincial disaster office. Nothing local is
 // guessed: nearby stations come from the live lookup.
@@ -47,7 +46,7 @@ export default function Emergency({ coords, pop, showToast }){
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 10000);
     setFailed(false);
-    fetch(`${BASE}/api/emergency?proximity=${encodeURIComponent(at)}`, { signal: ctrl.signal })
+    fetch(apiUrl(`/api/emergency?proximity=${encodeURIComponent(at)}`), { signal: ctrl.signal })
       .then(r => { if (!r.ok) throw new Error('lookup failed'); return r.json(); })
       .then(d => { if (alive) setData(d); })
       .catch(() => { if (alive) setFailed(true); })

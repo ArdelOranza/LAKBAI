@@ -119,12 +119,8 @@ export default function SearchResults({ query, coords, push, pop, showToast, use
         </div>
       </div>
 
-      <div className="kind-row" style={{ display:'flex', alignItems:'center', gap:10 }}>
+      <div className="kind-row">
         {KINDS.map(([label, k]) => <Chip key={k} flat active={kind === k} onClick={() => setKind(k)}>{label}</Chip>)}
-        <span data-testid="live-badge" style={{ marginLeft:'auto', fontSize:11, fontWeight:700, letterSpacing:.4, color: busy ? 'var(--primary)' : '#047857', display:'inline-flex', alignItems:'center', gap:6 }}>
-          <span style={{ width:7, height:7, borderRadius:'50%', background: busy ? 'var(--primary)' : '#10b981', display:'inline-block' }}/>
-          {busy ? 'SEARCHING LIVE…' : '● LIVE RESULTS'}
-        </span>
       </div>
 
       <div className="result-list">

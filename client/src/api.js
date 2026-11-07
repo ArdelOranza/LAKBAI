@@ -1,7 +1,6 @@
 import { aiBegin, aiEnd } from './aiActivity.js';
 import { sessionGet, sessionSet } from './sessionCache.js';
-
-const BASE = import.meta.env.VITE_API_URL || '';
+import { apiUrl } from './apiBase.js';
 async function readError(r){
   try {
     const body = await r.json();
@@ -33,12 +32,12 @@ async function aiFetch(url, init, { timeoutMs = 60000, signal } = {}){
 }
 
 export async function recommend(message, proximity, prefs = []){
-  const r = await aiFetch(`${BASE}/api/recommend`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ message, proximity, preferences: prefs }) });
+  const r = await aiFetch(apiUrl('/api/recommend'), { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ message, proximity, preferences: prefs }) });
   if (!r.ok) throw new Error(await readError(r));
   return r.json();
 }
 export async function chat(message, proximity, signal){
-  const r = await aiFetch(`${BASE}/api/chat`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ message, proximity }) }, { signal });
+  const r = await aiFetch(apiUrl('/api/chat'), { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ message, proximity }) }, { signal });
   if (!r.ok) throw new Error(await readError(r));
   return r.json();
 }
@@ -46,7 +45,7 @@ export async function itineraryFromSaved(names, hours = 8, startHour = 9){
   const key = 'lakbai.plan:' + names.join('|');
   const hit = sessionGet(key);
   if (hit) return hit;
-  const r = await aiFetch(`${BASE}/api/plan`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ message: 'A day trip in Pangasinan visiting: ' + names.join(', '), hours, startHour }) });
+  const r = await aiFetch(apiUrl('/api/plan'), { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ message: 'A day trip in Pangasinan visiting: ' + names.join(', '), hours, startHour }) });
   if (!r.ok) throw new Error(await readError(r));
   const plan = await r.json();
   sessionSet(key, plan);
