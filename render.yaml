@@ -1,0 +1,65 @@
+# Render blueprint — Lakbai (traveller app + API + hidden admin)
+# Treat this as the single source of truth — do not hand-pick "Build Command" in the dashboard.
+services:
+  - type: web
+    name: lakbai-api
+    runtime: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node index.js
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: PORT
+        generateValue: true
+      - key: ADMIN_TOKEN
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: VITE_MAPBOX_TOKEN
+        sync: false
+      - key: GOOGLE_CSE_ID
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+
+  # Static sites must be type: static — type: web + publishPath has no start command → exit 127.
+  - type: static
+    name: lakbai-app
+    rootDir: client
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: VITE_API_URL
+        sync: false  # = https://lakbai-api.onrender.com (your API service URL)
+      - key: VITE_MAPBOX_TOKEN
+        sync: false
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+
+  - type: static
+    name: lakbai-admin
+    rootDir: admin
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: VITE_API_URL
+        sync: false  # = https://lakbai-api.onrender.com (same API service)
