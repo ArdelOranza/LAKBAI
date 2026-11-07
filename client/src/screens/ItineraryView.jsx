@@ -6,6 +6,7 @@ import { sessionSet } from '../sessionCache.js';
 import { driveMinutes, haversineKm } from '../geo.js';
 import { Chip, PrimaryBtn, PhotoPlaceholder } from '../ui.jsx';
 import { placeImage, mapboxToken } from '../staticMap.js';
+import { apiUrl } from '../apiBase.js';
 
   // (CITY was a hardcoded 'Bolinao, Pangasinan' — now derived from the stops.)
   // Empty or unknown cases fall back to a province label, never to a wrong town.
@@ -22,7 +23,7 @@ export default function ItineraryView({ plan, coords, pop, showToast }){
   const [weather, setWeather] = useState(null);
   useEffect(() => {
     let alive = true;
-    fetch(`/api/weather?lng=${coords.lng}&lat=${coords.lat}`)
+    fetch(apiUrl(`/api/weather?lng=${coords.lng}&lat=${coords.lat}`))
       .then(r => (r.ok ? r.json() : null))
       .then(w => {
         if (alive && w && typeof w.tempC === 'number') {
