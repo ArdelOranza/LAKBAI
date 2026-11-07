@@ -1,0 +1,68 @@
+# Render blueprint — Lakbai (traveller app + API + hidden admin)
+# One repo, three services. Admin is a separate site, never linked from the app.
+# In Render Dashboard: New → Blueprint, point this repo at this file.
+
+services:
+  - type: web
+    name: lakbai-api
+    runtime: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node index.js
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: PORT
+        sync: false  # Render injects $PORT automatically
+      - key: ADMIN_TOKEN
+        sync: false  # SET THIS in Render dashboard — your admin password (hashed at startup)
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: VITE_MAPBOX_TOKEN
+        sync: false  # public token, but server needs it for Search Box
+      - key: GOOGLE_CSE_ID
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+
+  - type: web
+    name: lakbai-app
+    runtime: node
+    rootDir: client
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: VITE_API_URL
+        sync: false  # = https://lakbai-api.onrender.com (your API service URL)
+      - key: VITE_MAPBOX_TOKEN
+        sync: false
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+
+  - type: web
+    name: lakbai-admin
+    runtime: node
+    rootDir: admin
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: VITE_API_URL
+        sync: false  # = https://lakbai-api.onrender.com (same API service)

@@ -1,35 +1,37 @@
 import { supabase } from './supabaseClient.js';
-import { readOutbox, queueReview, queueFavDelete, takeAll, requeue, stripForInsert } from './outbox.js';
+import { peekOutbox, removeFirst, queueReview, queueFavDelete, stripForInsert } from './outbox.js';
 export async function saveFavorite(user, place){
   if (!supabase || !user) return { error: 'login required' };
   return supabase.from('favorites').upsert({ user_id: user.id, place_id: place.id, name: place.name, lng: place.lng, lat: place.lat, photo: place.photo || null }, { onConflict: 'user_id,place_id' });
 }
 export async function listFavorites(user){
   if (!supabase || !user) return { data: [], error: 'login required' };
-  return supabase.from('favorites').select('*').order('created_at', { ascending: false });
+  return supabase.from('favorites').select('id,place_id,name,lng,lat,photo,categories,created_at').eq('user_id', user.id).order('created_at', { ascending: false });
 }
 export async function postReview(user, place, score, text){
   const row = { place_id: place.id, place_name: place.name, score, text };
-  if (!supabase || !user || !navigator.onLine) {
-    queueReview(row);
+  if (!supabase || !user) return { error: 'login required' };
+  if (!navigator.onLine) {
+    queueReview(user, row);
     return { queued: true };
   }
   const { error } = await supabase.from('reviews').insert({ ...row, user_id: user.id });
   if (error) {
-    queueReview(row);
+    queueReview(user, row);
     return { queued: true, error: error.message };
   }
   try { await flushOutbox(user); } catch { /* keep queue */ }
   return { queued: false };
 }
 export async function removeFavorite(user, placeId){
-  if (!supabase || !user || !navigator.onLine) {
-    queueFavDelete(placeId);
+  if (!supabase || !user) return { error: 'login required' };
+  if (!navigator.onLine) {
+    queueFavDelete(user, placeId);
     return { queued: true };
   }
   const { error } = await supabase.from('favorites').delete().eq('user_id', user.id).eq('place_id', placeId);
   if (error) {
-    queueFavDelete(placeId);
+    queueFavDelete(user, placeId);
     return { queued: true, error: error.message };
   }
   try { await flushOutbox(user); } catch { /* keep queue */ }
@@ -37,18 +39,20 @@ export async function removeFavorite(user, placeId){
 }
 export async function flushOutbox(user){
   if (!supabase || !user) return;
-  const box = takeAll();
-  for (const r of box) {
+  // Peek-then-remove: only pop an entry after its write succeeds. On failure
+  // the whole queue (including later entries) stays queued in order.
+  while (true) {
+    const box = peekOutbox(user);
+    if (!box.length) return;
+    const r = box[0];
     let error;
     if (r.kind === 'favdelete') {
       ({ error } = await supabase.from('favorites').delete().eq('user_id', user.id).eq('place_id', r.placeId));
     } else {
       ({ error } = await supabase.from('reviews').insert({ ...stripForInsert(r), user_id: user.id }));
     }
-    if (error) {
-      requeue([r]); // back at the front, order preserved
-      return;
-    }
+    if (error) return;
+    removeFirst(user);
   }
 }
 const PLANS_KEY = 'lakbai-plans';

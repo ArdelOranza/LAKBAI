@@ -7,6 +7,7 @@ import { readLocalPrefs } from '../prefs.js';
 import { sessionGet, sessionSet } from '../sessionCache.js';
 import { haversineKm, formatDistance, timeHint } from '../geo.js';
 import { PrimaryBtn } from '../ui.jsx';
+import { placeImage, mapboxToken } from '../staticMap.js';
 
 export default function SavedTab({ coords, push, showToast }){
   const { user } = useAuth();
@@ -17,7 +18,7 @@ export default function SavedTab({ coords, push, showToast }){
     let alive = true;
     listFavorites(user).then(res => { if (alive) setRows(res.data || []); });
     if (!suggs.length) {
-      recommend('hidden gems attractions near me', `${coords.lng},${coords.lat}`, readLocalPrefs())
+      recommend('hidden gems attractions near me', `${coords.lng},${coords.lat}`, readLocalPrefs(user))
         .then(out => { const ps = (out.places || []).slice(0, 4); setSuggs(ps); sessionSet('lakbai.rec.sugg', ps); })
         .catch(() => { /* suggestions are optional */ });
     }
@@ -59,10 +60,10 @@ export default function SavedTab({ coords, push, showToast }){
       </div>
       <div className="pane" data-testid="saved-list" style={{ display:'grid', gap:10, marginTop:10 }}>
         {!rows.length && <p style={{ color:'var(--muted-ink)', fontSize:14 }}>Nothing saved yet — tap the bookmark on any place.</p>}
-        {rows.map(row => (
-          <article key={row.place_id} data-testid="saved-row" style={{ display:'flex', gap:12, padding:12, border:'1px solid #EDF1F7', borderRadius:16, background:'#fff', cursor:'pointer', alignItems:'center' }} onClick={() => push({ name:'detail', place:row })}>
+        {rows.map(row => { const savedThumb = placeImage(row, mapboxToken(), { width: 200, height: 200 }); return (
+          <article key={row.place_id} data-testid="saved-row" style={{ display:'flex', gap:12, padding:12, border:'1px solid #EDF1F7', borderRadius:16, background:'#fff', cursor:'pointer', alignItems:'center' }} onClick={() => push({ name:'detail', place:{ ...row, id: row.place_id } })}>
             <div className="thumb" style={{ width:72, height:72, minWidth:72 }}>
-              {row.photo ? <img src={row.photo} alt={row.name} loading="lazy" onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/> : <ImageIcon size={22}/>}
+              {savedThumb ? <img src={savedThumb} alt={row.name} loading="lazy" onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/> : <ImageIcon size={22}/>}
             </div>
             <div style={{ flex:1, minWidth:0 }}>
               <b style={{ display:'block' }}>{row.name}</b>
@@ -74,7 +75,7 @@ export default function SavedTab({ coords, push, showToast }){
             </div>
             <button data-testid="remove-fav" aria-label="Remove" onClick={e => { e.stopPropagation(); remove(row); }} style={{ flex:'0 0 34px', width:34, height:34, borderRadius:'50%', border:'1px solid #EDF1F7', background:'#fff', display:'grid', placeItems:'center', padding:0, color:'var(--muted-ink)' }}><X size={15}/></button>
           </article>
-        ))}
+        ); })}
       </div>
       {suggs.length > 0 && (
         <div className="pane" style={{ marginTop:18 }}>

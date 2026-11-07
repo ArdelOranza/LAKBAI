@@ -8,18 +8,22 @@ function isRecoveryHash(){
   try { return window.location.hash.includes('type=recovery'); } catch { return false; }
 }
 
-// Map backend provider strings to copy a traveler can act on. Anything unknown
-// falls through untouched so real errors are never hidden.
-function friendlyAuthError(message){
-  const m = String(message || '');
-  if (/invalid login credentials/i.test(m)) return 'Invalid email or password.';
-  if (/auth session missing/i.test(m)) return 'This link has expired or was already used. Request a new one.';
-  if (/failed to fetch|network error|load failed/i.test(m)) return 'Network error — check your connection and try again.';
-  if (/rate limit|too many/i.test(m)) return 'Too many tries — wait a minute and try again.';
-  if (/user already registered/i.test(m)) return 'An account with this email already exists — try logging in.';
-  if (/email not confirmed|email_not_confirmed/i.test(m)) return 'Confirm your email first, then log in.';
-  return m;
-}
+  // Sign-in/password-update handlers return friendly errors from AuthContext
+  // directly; screen-level try/catch wrappers call this too. Exported for screens.
+  export function friendlyAuthError(message){
+    const m = String(message || '');
+    if (/invalid login credentials|invalid password/i.test(m)) return 'Invalid email or password.';
+    if (/auth session missing/i.test(m)) return 'This link has expired or was already used. Request a new one.';
+    if (/email link is invalid|invalid.*otp|link.*expired|email link.*(expired|invalid)/i.test(m)) return 'This link has expired or was already used. Request a new one.';
+    if (/failed to fetch|network error|load failed/i.test(m)) return 'Network error — check your connection and try again.';
+    if (/rate limit|too many/i.test(m)) return 'Too many tries — wait a minute and try again.';
+    if (/user already registered/i.test(m)) return 'An account with this email already exists — try logging in.';
+    if (/email not confirmed|email_not_confirmed/i.test(m)) return 'Confirm your email first, then log in.';
+    if (/unable to validate email|invalid format/i.test(m)) return 'Enter a valid email address.';
+    if (/signup disabled|signups.*disabled/i.test(m)) return 'Sign-ups are closed — sign in instead.';
+    if (/password should be at least/i.test(m)) return 'Password must be at least 8 characters.';
+    return m;
+  }
 
 // Strip auth params (?code= / #access_token=...) once the SDK has exchanged them
 // so a refresh or back-button doesn't re-trigger sign-in/recovery.
@@ -49,6 +53,11 @@ export function AuthProvider({ children }){
   // landed yet (seqRef > 0) — see the getSession handler below.
   const seqRef = useRef(0);
   const recoveryRef = useRef(false);
+  // Only a real PASSWORD_RECOVERY event means the current session came from a
+  // reset link — only then may "Cancel and log in" drop the session. A hash
+  // alone (possibly a dead, reused link on a healthy session) must not log
+  // the traveler out.
+  const recoveryFromEventRef = useRef(false);
 
   useEffect(() => {
     if (!supabase) { setLoading(false); return; }
@@ -62,7 +71,15 @@ export function AuthProvider({ children }){
       // (checked below) knows an event already landed.
       const seq = ++seqRef.current;
       if (event === 'PASSWORD_RECOVERY') {
-        recoveryRef.current = true; setRecovery(true);
+        recoveryRef.current = true; recoveryFromEventRef.current = true; setRecovery(true);
+        setLoading(false);
+        cleanAuthUrl();
+        return { seq, session, event };
+      }
+      // A SIGNED_IN that follows a recovery URL is a PKCE password-reset
+      // exchange — treat it as recovery (no brief app/onboarding flash).
+      if ((event === 'SIGNED_IN') && isRecoveryHash() && session?.user) {
+        recoveryRef.current = true; recoveryFromEventRef.current = true; setRecovery(true);
         setLoading(false);
         cleanAuthUrl();
         return { seq, session, event };
@@ -137,6 +154,7 @@ export function AuthProvider({ children }){
   }
   async function resendConfirmation(email){
     if (!supabase) return { error: 'Auth not configured — add Supabase keys to .env.' };
+    if (!/^\S+@\S+\.\S+$/.test(String(email || '').trim())) return { error: 'Enter a valid email address.' };
     const emailRedirectTo = typeof window !== 'undefined' ? window.location.origin : undefined;
     const { error } = await supabase.auth.resend({ type: 'signup', email: String(email).trim(), options: { emailRedirectTo } });
     return error ? { error: friendlyAuthError(String(error.message || error)) } : { detail: 'Confirmation email sent again. Check your inbox and spam folder.' };
@@ -161,10 +179,13 @@ export function AuthProvider({ children }){
     } catch (e) { return { error: friendlyAuthError(String(e?.message || e)) }; }
   }
   function clearRecovery(){
-    recoveryRef.current = false; setRecovery(false);
+    const fromEvent = recoveryFromEventRef.current;
+    recoveryRef.current = false; recoveryFromEventRef.current = false; setRecovery(false);
     cleanAuthUrl();
-    if (supabase) supabase.auth.signOut().catch(() => {}).finally(() => setUser(null));
-    else setUser(null);
+    // Only a real reset-link session is dropped; a hash-only promotion on an
+    // already-healthy session keeps the traveler logged in.
+    if (fromEvent && supabase) supabase.auth.signOut().catch(() => {}).finally(() => setUser(null));
+    else if (fromEvent) setUser(null);
   }
   async function signOut(){ if (supabase) await supabase.auth.signOut(); setUser(null); }
   return <Ctx.Provider value={{ user, loading, recovery, configured, signUp, signInWithPassword, signInWithGoogle, resendConfirmation, resetPassword, updatePassword, clearRecovery, signOut }}>{children}</Ctx.Provider>;

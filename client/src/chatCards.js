@@ -35,12 +35,8 @@ function hasCoords(lng, lat){
   return Number.isFinite(Number(lng)) && Number.isFinite(Number(lat));
 }
 
-/** Mapbox static map centred on the place, so cards are never imageless. */
-export function mapThumb(lng, lat, token, { width = 600, height = 340 } = {}){
-  if (!token || !hasCoords(lng, lat)) return null;
-  const pin = `pin-s+0066FF(${lng},${lat})`;
-  return `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/${pin}/${lng},${lat},14.5,0/${width}x${height}@2x?access_token=${encodeURIComponent(token)}`;
-}
+/** Re-exported from staticMap.js — the implementation lives there single-source. */
+export { staticMapThumb as mapThumb } from './staticMap.js';
 
 /** Normalised card data for one AI candidate. */
 export function cardFor(candidate = {}, spots = []){

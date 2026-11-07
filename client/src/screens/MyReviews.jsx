@@ -34,6 +34,11 @@ export default function MyReviews({ pop, showToast }){
     setRows(rs => rs.filter(r => r.id !== id));
     showToast('Review deleted');
   }
+  // Destructive tap-proofing: the first Delete press only arms the row; the
+  // write happens on an explicit Confirm, and Cancel re-arms to pristine.
+  const [confirmId, setConfirmId] = useState(null);
+  const startDelete = id => setConfirmId(id);
+  const cancelDelete = () => setConfirmId(null);
   return (
     <main style={{ flex:1, overflowY:'auto' }}>
       <div className="pane" style={{ paddingTop:16 }}>
@@ -81,7 +86,15 @@ export default function MyReviews({ pop, showToast }){
                     <div style={{ display:'flex', justifyContent:'flex-end', gap:10, marginTop:8 }}>
                       <button data-testid="edit-review" onClick={() => startEdit(r)} style={{ background:'none', border:'none', padding:0, fontSize:11.5, color:'var(--muted-ink)', display:'inline-flex', alignItems:'center', gap:4 }}><Pencil size={12}/> Edit</button>
                       <span style={{ color:'#CBD5E1' }}>|</span>
-                      <button data-testid="delete-review" onClick={() => remove(r.id)} style={{ background:'none', border:'none', padding:0, fontSize:11.5, color:'var(--muted-ink)', display:'inline-flex', alignItems:'center', gap:4 }}><Trash2 size={12}/> Delete</button>
+                      {confirmId === r.id ? (
+                        <>
+                          <button data-testid="confirm-delete" onClick={() => { setConfirmId(null); remove(r.id); }} style={{ background:'none', border:'none', padding:0, fontSize:11.5, color:'var(--accent)', fontWeight:700, display:'inline-flex', alignItems:'center', gap:4 }}>Confirm delete</button>
+                          <span style={{ color:'#CBD5E1' }}>|</span>
+                          <button data-testid="cancel-delete" onClick={cancelDelete} style={{ background:'none', border:'none', padding:0, fontSize:11.5, color:'var(--muted-ink)' }}>Cancel</button>
+                        </>
+                      ) : (
+                        <button data-testid="delete-review" onClick={() => startDelete(r.id)} style={{ background:'none', border:'none', padding:0, fontSize:11.5, color:'var(--muted-ink)', display:'inline-flex', alignItems:'center', gap:4 }}><Trash2 size={12}/> Delete</button>
+                      )}
                     </div>
                   </>
                 )}

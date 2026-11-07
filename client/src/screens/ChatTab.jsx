@@ -6,7 +6,10 @@ import {
 } from 'lucide-react';
 import { chat } from '../api.js';
 import { fetchSpots } from '../spots.js';
-import { cardFor, mapThumb } from '../chatCards.js';
+import { cardFor } from '../chatCards.js';
+import { placeImage, mapboxToken } from '../staticMap.js';
+import { MdText } from '../mdText.jsx';
+import { openExternal } from '../extLinks.js';
 import { saveFavorite, listFavorites } from '../store.js';
 import { haversineKm, formatDistance, driveMinutes } from '../geo.js';
 import { PhotoPlaceholder } from '../ui.jsx';
@@ -20,7 +23,7 @@ const STARTERS = [
   'Fees at Balungao zipline',
   'Plan a day trip in Bayambang',
 ];
-const MAP_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
+const MAP_TOKEN = mapboxToken();
 let uid = 0;
 const nid = () => 'm' + (++uid);
 const clock = ts => new Date(ts).toLocaleTimeString([], { hour:'numeric', minute:'2-digit' });
@@ -38,7 +41,7 @@ function distanceLine(km){
 
 function ChatCard({ card, coords, user, showToast, push, saved, onSaved }){
   const km = haversineKm(coords.lng, coords.lat, card.lng, card.lat);
-  const img = card.photo || mapThumb(card.lng, card.lat, MAP_TOKEN);
+  const img = placeImage(card, MAP_TOKEN);
   const badge = card.fees || card.festival;
   const place = card.spot || {
     id: card.id, name: card.name, lng: card.lng, lat: card.lat,
@@ -56,7 +59,7 @@ function ChatCard({ card, coords, user, showToast, push, saved, onSaved }){
   function directions(e){
     e.stopPropagation();
     if (card.lat == null) { push({ name:'detail', place }); return; }
-    window.open('https://www.google.com/maps/dir/?api=1&destination=' + card.lat + ',' + card.lng);
+    openExternal('https://www.google.com/maps/dir/?api=1&destination=' + card.lat + ',' + card.lng);
   }
 
   return (
@@ -279,7 +282,7 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
                       <span className="ai-avatar"><Sparkles size={14} color="#fff" strokeWidth={2.2}/></span>
                       <span className="ai-name">LakbAI Guide</span>
                     </div>
-                    <p className="ai-text">{m.text}</p>
+                    <div className="ai-text"><MdText text={m.text}/></div>
 
                     {(m.cards || []).map(card => (
                       <ChatCard

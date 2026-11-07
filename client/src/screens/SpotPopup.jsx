@@ -10,6 +10,8 @@ import { dragOffset, shouldDismiss } from '../sheetDrag.js';
 import { FALLBACK_CENTER } from '../App.jsx';
 import { directionsHref } from '../emergency.js';
 import { PrimaryBtn, PhotoPlaceholder } from '../ui.jsx';
+import { staticMapThumb, mapboxToken } from '../staticMap.js';
+import { openExternal } from '../extLinks.js';
 
 const VIBES = [
   [/beach|coast|island|sea|shore/i, 'Coastal Wonder', Waves],
@@ -36,6 +38,11 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
   const trackRef = useRef(null);
   const photos = (spot.photos && spot.photos.length) ? spot.photos : null;
   const count = photos ? photos.length : 3; // reserved placeholder dots
+  // U14-A: located spot with no photos gallery still shows its static map instead of icons.
+  const gallery = photos || (() => {
+    const thumb = staticMapThumb(spot.lng, spot.lat, mapboxToken(), { width: 600, height: 340 });
+    return thumb ? [thumb] : null;
+  })();
   // Distance is only meaningful with a real fix — measuring from the fallback
   // centre fabricates drive times when location permission is off.
   const hasFix = coords && !(coords.lng === FALLBACK_CENTER.lng && coords.lat === FALLBACK_CENTER.lat);
@@ -123,9 +130,9 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
 
         <div style={{ position:'relative', borderRadius:16, overflow:'hidden', background:'#EDF1F7' }}>
           <div ref={trackRef} onScroll={e => { const i = Math.round(e.currentTarget.scrollLeft / Math.max(1, e.currentTarget.clientWidth)); if (i !== slide) setSlide(i); }} style={{ display:'flex', overflowX:'auto', scrollSnapType:'x mandatory', height:112, scrollbarWidth:'none' }}>
-            {(photos || [0, 1, 2]).map((src, i) => (
+            {(gallery || [0, 1, 2]).map((src, i) => (
               <div key={i} style={{ flex:'0 0 100%', scrollSnapAlign:'center', position:'relative' }}>
-                {photos
+                {gallery
                   ? <img src={src} alt={spot.name} loading="lazy" style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
                   : <PhotoPlaceholder size={30}/>}
               </div>
@@ -194,7 +201,7 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
                 data-testid="spot-directions"
                 aria-label="Directions"
                 disabled={!directionsHref(spot.lat, spot.lng)}
-                onClick={() => { const href = directionsHref(spot.lat, spot.lng); if (href) window.open(href); }}
+                onClick={() => { const href = directionsHref(spot.lat, spot.lng); if (href) openExternal(href); }}
               >
                 <Navigation size={17}/>
               </button>

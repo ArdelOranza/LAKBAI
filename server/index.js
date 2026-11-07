@@ -114,15 +114,86 @@ app.post('/api/plan', async (req, res) => {
 });
 const { searchPlaces } = require('./places.js');
 const { SPOTS } = require('./spots.js');
+const adminStore = require('./adminSpots.js');
+const { findPhoto } = require('./photos.js');
+
+// --- real-photo hierarchy: 1 JSON → 2 Wikimedia → 3 Mapbox (client fallback)
+// JSON = curated dataset / admin-verified URL (wins). Wikimedia = real photo
+// found via commons search (secondary). Mapbox = static map (client-only last resort).
+const photoCache = new Map(); // key -> { value, at }
+const PHOTO_TTL = 60 * 60 * 1000;
+function hintFromAddress(address){
+  const parts = String(address || '').split(',').map(s => s.trim()).filter(Boolean);
+  return parts.length > 2 ? parts[parts.length - 2] : (parts[0] || '');
+}
+function isJsonPhoto(url){ return url && !/wikimedia\.org|upload\.wikimedia/i.test(String(url)); }
+async function enrichWithPhoto(place){
+  // Hierarchy 1: JSON wins — never overwrite a curated/admin photo with Wikimedia.
+  const existingPhotos = Array.isArray(place.photos) ? place.photos.filter(Boolean) : [];
+  const existingBare = place.photo || (existingPhotos[0] || null);
+  if (existingBare && isJsonPhoto(existingBare)){
+    return { ...place, photo: existingBare, photos: existingPhotos.length ? existingPhotos : [existingBare], photoSource: 'json' };
+  }
+  // Hierarchy 2: Wikimedia real photo
+  const key = String(place.name || '').toLowerCase() + '|' + hintFromAddress(place.address);
+  const hit = photoCache.get(key);
+  if (hit && Date.now() - hit.at < PHOTO_TTL){
+    return hit.value
+      ? { ...place, photo: hit.value.src, photos: [hit.value.src], photoSource: 'wikimedia' }
+      : { ...place, photo: null, photos: [], photoSource: 'mapbox' };
+  }
+  try {
+    const found = await findPhoto(place.name || '', hintFromAddress(place.address), place.lng, place.lat);
+    photoCache.set(key, { value: found, at: Date.now() });
+    return found
+      ? { ...place, photo: found.src, photos: [found.src], photoSource: 'wikimedia' }
+      : { ...place, photo: null, photos: [], photoSource: 'mapbox' };
+  } catch { return { ...place, photo: null, photos: [], photoSource: 'mapbox' }; }
+}
+async function enrichPlaces(places){
+  if (!places || !places.length) return places;
+  // cap concurrency: all at once is 8, which is fine for this endpoint
+  return Promise.all(places.map(enrichWithPhoto));
+}
 app.get('/api/spots', async (req, res) => {
   try {
-    res.json(await cached('spots:all', 24 * 60 * 60 * 1000, async () => ({ spots: SPOTS })));
+    // Cheap: listSpots() re-reads the file each time so admin edits show up immediately.
+    res.json({ spots: adminStore.listSpots() });
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 app.get('/api/places', async (req, res) => {
   try {
     const places = await searchPlaces(req.query.q || '', req.query.proximity);
-    res.json({ places });
+    // photos=0 skips the (slower) Wikimedia enrichment for emergency lookups
+    const withPhotos = req.query.photos === '0' ? places : await enrichPlaces(places);
+    res.json({ places: withPhotos });
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
+// --- separate admin API (see admin/ app). Token-guarded, token lives in ADMIN_TOKEN.
+app.get('/api/admin/spots', adminStore.requireAdmin, (req, res) => {
+  try { res.json({ spots: adminStore.listSpots() }); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+app.post('/api/admin/spots', adminStore.requireAdmin, (req, res) => {
+  try { res.status(201).json({ spot: adminStore.createSpot(req.body || {}) }); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+app.put('/api/admin/spots/:id', adminStore.requireAdmin, (req, res) => {
+  try { res.json({ spot: adminStore.updateSpot(req.params.id, req.body || {}) }); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+app.delete('/api/admin/spots/:id', adminStore.requireAdmin, (req, res) => {
+  try { res.json(adminStore.deleteSpot(req.params.id)); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+app.post('/api/admin/photos/find', adminStore.requireAdmin, async (req, res) => {
+  try {
+    const { name = '', town = '', lng, lat } = req.body || {};
+    if (!String(name).trim()) return res.status(400).json({ error: 'name is required' });
+    const found = await findPhoto(String(name), String(town), lng, lat);
+    if (!found) return res.status(404).json({ error: 'No real photo found for this place yet — add a photo URL manually.' });
+    res.json({ photo: found });
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 const { getWeather } = require('./weather.js');

@@ -4,11 +4,13 @@ import {
   Clock, CircleParking, Waves, UtensilsCrossed, Music, Mountain, Landmark, Sparkles, User,
 } from 'lucide-react';
 import { saveFavorite, removeFavorite, listFavorites, listPlaceReviews } from '../store.js';
+import { placeImage, mapboxToken } from '../staticMap.js';
 import { useAuth } from '../AuthContext.jsx';
 import { dateRange, bannerDate } from '../festival.js';
 import { feeLabel } from '../filters.js';
 import { haversineKm, formatDistance } from '../geo.js';
 import { PhotoPlaceholder } from '../ui.jsx';
+import { safeExternalUrl, openExternal } from '../extLinks.js';
 
 const CAT_ICON = [
   [/beach|coast|island|sea|shore/i, Waves],
@@ -34,6 +36,8 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
   const [reviews, setReviews] = useState([]);
   const km = haversineKm(coords.lng, coords.lat, p.lng, p.lat);
   const photos = (p.photos && p.photos.length) ? p.photos : (p.photo ? [p.photo] : null);
+  // U14-A: a place that only has a location still gets a real image — its static map.
+  const heroPhoto = placeImage(p, mapboxToken(), { width: 600, height: 340 });
   const when = bannerDate(p)
     || (p.festival ? dateRange(p.festival) : null)
     || (p.starts instanceof Date ? editionText(p.starts, p.ends) : null);
@@ -74,8 +78,8 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
   return (
     <div style={{ flex:1, overflowY:'auto', background:'#fff' }}>
       <div style={{ position:'relative', height:250 }}>
-        {photos
-          ? <img data-testid="hero-photo" src={photos[0]} alt={p.name} onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+        {heroPhoto
+          ? <img data-testid="hero-photo" src={heroPhoto} alt={p.name} onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
           : <PhotoPlaceholder size={34} label="Photo coming soon"/>}
 
         <button className="icon-btn" data-testid="back-btn" onClick={pop} aria-label="Back" style={{ position:'absolute', left:14, top:14, background:'#fff' }}><ArrowLeft size={18}/></button>
@@ -130,7 +134,7 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
             className="chip"
             data-testid="directions-btn"
             style={{ flex:1, padding:12, display:'inline-flex', alignItems:'center', justifyContent:'center', gap:7, fontWeight:600 }}
-            onClick={() => window.open('https://www.google.com/maps/dir/?api=1&destination=' + p.lat + ',' + p.lng)}
+            onClick={() => openExternal('https://www.google.com/maps/dir/?api=1&destination=' + p.lat + ',' + p.lng)}
           >
             <Navigation size={15}/> Directions
           </button>
@@ -257,7 +261,17 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
           <section style={{ marginTop:16 }}>
             <div className="label" style={{ margin:'0 0 6px' }}>Sources</div>
             <ul style={{ fontSize:11.5, color:'var(--muted-ink)', margin:0, paddingLeft:18 }}>
-              {p.sources.map(s => <li key={s}><a href={s} target="_blank" rel="noreferrer">{s.length > 60 ? s.slice(0, 60) + '…' : s}</a></li>)}
+              {p.sources.map(s => {
+                const href = safeExternalUrl(s);
+                const label = s.length > 60 ? s.slice(0, 60) + '…' : s;
+                return (
+                  <li key={s}>
+                    {href
+                      ? <a href={href} target="_blank" rel="noopener noreferrer">{label}</a>
+                      : <span data-testid="source-inert">{label}</span>}
+                  </li>
+                );
+              })}
             </ul>
           </section>
         )}

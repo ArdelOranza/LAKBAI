@@ -130,10 +130,16 @@ li{margin:6px 0}
 .shimmer{animation:shimmer 1.2s ease-in-out infinite;color:var(--primary);font-weight:600}
 /* map pins (rendered through mapcn MarkerContent) — small name pills instead of icons */
 .userdot{width:18px;height:18px;border-radius:50%;background:var(--primary);border:3px solid #fff;box-shadow:0 0 0 6px rgba(0,102,255,.22);animation:pulse 2s ease-in-out infinite}
-.spot-pin{max-width:100px;height:24px;border-radius:999px;background:#fff;border:1.5px solid var(--primary);display:inline-flex;align-items:center;padding:0 8px;box-shadow:0 4px 10px rgba(15,23,42,.22);color:var(--ink);font-size:10px;font-weight:700;letter-spacing:-.1px;line-height:1;white-space:nowrap;overflow:hidden}
-.spot-pin span{overflow:hidden;text-overflow:ellipsis}
-.spot-pin:hover{background:#EFF6FF}
-.spot-pin.active{background:var(--primary);color:#fff}
+/* map pins — modern · clean · minimal */
+.spot-pin{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;padding:2px;box-shadow:none;color:var(--ink);font-size:11px;font-weight:600;letter-spacing:0;line-height:1.2;white-space:nowrap;text-align:center}
+.spot-pin:active{transform:scale(.96)}
+.pin-photo{width:64px;height:64px;border-radius:50%;overflow:hidden;background:#fff;border:2px solid #fff;box-shadow:0 6px 16px rgba(15,23,42,.14);display:block;flex:0 0 64px}
+.pin-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.pin-name{max-width:128px;background:rgba(255,255,255,.96);border:none;border-radius:8px;padding:5px 9px;box-shadow:0 2px 8px rgba(15,23,42,.10);overflow:hidden;text-overflow:ellipsis;font-size:11px;font-weight:600;color:#0A2540;letter-spacing:0}
+.spot-pin.active .pin-name{background:#0A2540;color:#fff}
+.spot-pin.discover .pin-photo{border-color:#fff}
+.spot-pin.discover .pin-name{color:#475569}
+.spot-pin.discover .pin-name::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:#94A3B8;margin-right:5px;vertical-align:2px}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
 .spot-sheet{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(430px,100vw);background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -12px 40px rgba(10,37,64,.22);z-index:30;max-height:64vh;display:flex;flex-direction:column;padding-bottom:calc(78px + var(--safe-bottom));overflow:hidden}
 .grab-btn{background:none;border:none;border-radius:0;width:100%;height:22px;padding:0;margin:0;display:grid;place-items:center;flex:0 0 22px}

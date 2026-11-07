@@ -4,16 +4,18 @@ import {
   Sparkles, ArrowRight, Plus, Star,
 } from 'lucide-react';
 import { recommend } from '../api.js';
+import { reverseGeocode } from '../geocode.js';
 import { FALLBACK_CENTER } from '../App.jsx';
 import { readLocalPrefs } from '../prefs.js';
 import { sessionGet, sessionSet } from '../sessionCache.js';
 import { haversineKm, formatDistance } from '../geo.js';
 import { saveFavorite } from '../store.js';
-import { useAuth } from '../AuthContext.jsx';
+// User comes from the shell via props (App.jsx screenProps) — single source, no context shadow.
 import { dateRange, bannerDate } from '../festival.js';
 import { upcomingFestivals, FESTIVALS } from '../festivals.js';
 import { feeLabel } from '../filters.js';
 import { PhotoPlaceholder } from '../ui.jsx';
+import { placeImage, mapboxToken } from '../staticMap.js';
 // import PangasinanMap from '../PangasinanMap.jsx'; // parked with the map header
 
 const QUICK = [
@@ -27,8 +29,7 @@ const QUICK = [
 const REC_KEY = 'lakbai.rec.home.v2';
 const REC_AT_KEY = 'lakbai.rec.homeAt.v2';
 
-export default function Home({ coords, push, showToast, setTab }){
-  const { user } = useAuth();
+export default function Home({ coords, push, showToast, setTab, user }){
   const [place, setPlace] = useState('Pangasinan');
   const [query, setQuery] = useState('');
   const [recs, setRecs] = useState(sessionGet(REC_KEY) || []);
@@ -41,31 +42,21 @@ export default function Home({ coords, push, showToast, setTab }){
   // Last resolved label + the fix it belongs to. Keeping these out of state is
   // what stops the location line blinking back to "Pangasinan" on every GPS tick.
   const placeRef = useRef({ key: '', label: '' });
+  const recogRef = useRef(null);
 
-  useEffect(() => { // reverse geocode once per ~100 m; never blank the label mid-lookup
-    const fallback = coords === FALLBACK_CENTER ? 'Bolinao, Pangasinan' : 'Pangasinan';
-    const key = coords.lng.toFixed(3) + ',' + coords.lat.toFixed(3);
-    if (placeRef.current.key === key) return undefined;
-    placeRef.current.key = key;
-    if (!placeRef.current.label) setPlace(fallback); // first paint only
+  useEffect(() => { // reverse geocode; never blank the label mid-lookup
+    // No real fix yet: show the province, never a fabricated town (a fallback
+    // centre is a guess, and claiming a specific town it isn't is worse).
+    if (coords === FALLBACK_CENTER) { setPlace('Pangasinan'); return undefined; }
     let alive = true;
-    (async () => {
-      try {
-        const token = import.meta.env.VITE_MAPBOX_TOKEN;
-        if (!token) return;
-        const r = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${coords.lng},${coords.lat}.json?types=place&limit=1&access_token=${token}`);
-        if (!r.ok) return;
-        const data = await r.json();
-        const name = data.features && data.features[0] && data.features[0].text;
-        if (!alive || !name) return;
-        const label = name + ', Pangasinan';
-        if (label === placeRef.current.label) return;
-        placeRef.current.label = label;
-        setPlace(label);
-      } catch { /* keep the last good label */ }
-    })();
+    reverseGeocode(coords.lng, coords.lat).then(label => {
+      if (!alive || !label) return; // offline/no token: keep the last good label
+      if (placeRef.current.label === label) return;
+      placeRef.current.label = label;
+      setPlace(label);
+    });
     return () => { alive = false; };
-  }, [coords]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [coords.lng.toFixed(3), coords.lat.toFixed(3)]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ~1 km bucket: a jittering GPS fix does not refetch, a real move does.
   const locKey = coords === FALLBACK_CENTER ? 'fallback' : coords.lng.toFixed(2) + ',' + coords.lat.toFixed(2);
@@ -92,7 +83,7 @@ export default function Home({ coords, push, showToast, setTab }){
     setBusy(true);
     const timer = setTimeout(() => {
       setBusy(true);
-      recommend('top attractions, events and hidden gems', `${coords.lng},${coords.lat}`, readLocalPrefs())
+      recommend('top attractions, events and hidden gems', `${coords.lng},${coords.lat}`, readLocalPrefs(user))
         .then(out => {
           if (!alive) return;
           const ps = out.places || [];
@@ -113,14 +104,24 @@ export default function Home({ coords, push, showToast, setTab }){
     push({ name:'search', query:q });
   }
   function mic(){
-    const S = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!S) { showToast('Voice search not supported here', 'error'); return; }
-    const r = new S();
+    // A second tap stops an active recognizer instead of spawning another.
+    if (listening){ try { recogRef.current?.stop(); } catch { /* ignore */ } return; }
+    const SpeechCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechCtor) { showToast('Voice search not supported here', 'error'); return; }
+    const r = new SpeechCtor();
+    recogRef.current = r;
     r.lang = 'en-PH';
-    r.onresult = e => { setListening(false); setQuery(e.results[0][0].transcript); search(e.results[0][0].transcript); };
+    r.onresult = e => {
+      setListening(false);
+      const transcript = e.results?.[0]?.[0]?.transcript;
+      if (!transcript) return;
+      setQuery(transcript); search(transcript);
+    };
     r.onerror = () => { setListening(false); showToast('Microphone unavailable', 'error'); };
+    r.onend = () => setListening(false); // recognizer ended with no result — don't stick
     setListening(true);
-    r.start();
+    try { r.start(); }
+    catch { setListening(false); showToast('Microphone unavailable', 'error'); }
   }
   async function fav(p){
     const res = await saveFavorite(user, p);
@@ -209,11 +210,11 @@ export default function Home({ coords, push, showToast, setTab }){
         </div>
 
         <div data-testid="recs" style={{ display:'flex', gap:12, overflowX:'auto', paddingBottom:8, scrollbarWidth:'none' }}>
-          {recs.map(p => (
+          {recs.map(p => { const cardImg = placeImage(p, mapboxToken()); return (
             <article key={p.id} style={{ flex:'0 0 220px', borderRadius:18, background:'#fff', border:'1px solid #EDF1F7', overflow:'hidden', cursor:'pointer', boxShadow:'0 10px 24px -20px rgba(15,23,42,.55)' }} onClick={() => push({ name:'detail', place:p })} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'detail', place:p }); } }}>
               <div style={{ position:'relative', height:130 }}>
-                {p.photo
-                  ? <img src={p.photo} alt={p.name} loading="lazy" onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+                {cardImg
+                  ? <img src={cardImg} alt={p.name} loading="lazy" onError={e => { e.currentTarget.style.display='none'; }} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
                   : <PhotoPlaceholder size={26}/>}
                 <span className="chip" style={{ position:'absolute', left:8, top:8, fontSize:10.5, padding:'3px 9px' }}>{(p.categories && p.categories[0]) || 'Pangasinan'}</span>
                 <button className="chip" data-testid={'fav-' + p.id} aria-label={'Save ' + p.name} onClick={e => { e.stopPropagation(); fav(p); }} style={{ position:'absolute', right:8, top:8, width:30, height:30, padding:0, borderRadius:'50%', background:'var(--primary)', color:'#fff', border:'none', display:'grid', placeItems:'center' }}><Plus size={15}/></button>
@@ -232,7 +233,7 @@ export default function Home({ coords, push, showToast, setTab }){
                 )}
               </div>
             </article>
-          ))}
+          ); })}
           {!recs.length && !busy && <p style={{ color:'var(--muted-ink)', fontSize:14 }}>Recommendations will appear here once you search or ask LakbAI.</p>}
         </div>
       </div>

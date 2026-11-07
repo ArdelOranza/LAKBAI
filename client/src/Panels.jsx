@@ -6,22 +6,34 @@ import { recommend } from './api.js';
 const BASE = import.meta.env.VITE_API_URL || '';
 
 export function NearbyButton({ onResults, onNotice, onFix }){
+  const [busy, setBusy] = useState(false);
   function nearby(){
-    if (!('geolocation' in navigator)) {
+    // 'geolocation' in navigator is true even when geolocation is null in some
+    // environments — the method must exist and be callable.
+    if (typeof navigator.geolocation?.getCurrentPosition !== 'function') {
       onNotice('GPS unavailable — showing Pangasinan');
       return;
     }
+    if (busy) return; // one locate at a time: re-taps must not stack
+    setBusy(true);
     navigator.geolocation.getCurrentPosition(
       pos => {
         const at = `${pos.coords.longitude},${pos.coords.latitude}`;
         if (onFix) onFix(at);
-        recommend('nearby attractions and restaurants', at).then(onResults).catch(e => onNotice(e.message));
+        recommend('nearby attractions and restaurants', at)
+          .then(out => { if (onResults) onResults(out); })
+          .catch(e => onNotice(e.message))
+          .finally(() => setBusy(false));
       },
-      () => onNotice('GPS unavailable — showing Pangasinan'),
+      () => { setBusy(false); onNotice('GPS unavailable — showing Pangasinan'); },
       { timeout: 8000 }
     );
   }
-  return <button data-testid="nearby-btn" onClick={nearby}>Nearby</button>;
+  return (
+    <button type="button" data-testid="nearby-btn" aria-busy={busy} disabled={busy} onClick={nearby}>
+      {busy ? 'Locating…' : 'Nearby'}
+    </button>
+  );
 }
 
 function readReviews(key){
@@ -34,17 +46,25 @@ function readReviews(key){
 }
 export function useReviews(placeId){
   const key = 'lakbai-reviews:' + placeId;
-  const [reviews, setReviews] = useState(() => readReviews(key));
+  const [reviews, setReviews] = useState(() => (placeId ? readReviews(key) : []));
+  useEffect(() => {
+    setReviews(placeId ? readReviews('lakbai-reviews:' + placeId) : []);
+  }, [placeId]);
   function add(score, text){
-    const next = [...reviews, { score, text, at: Date.now() }];
-    setReviews(next); localStorage.setItem(key, JSON.stringify(next));
+    if (!placeId) return;
+    setReviews(prev => {
+      const next = [...prev, { score: Number(score), text: String(text ?? ''), at: Date.now() }];
+      try { localStorage.setItem('lakbai-reviews:' + placeId, JSON.stringify(next)); } catch { /* storage full */ }
+      return next;
+    });
   }
   return { reviews, add };
 }
 
 export function Reviews({ place }){
   const { user } = useAuth();
-  const { reviews, add } = useReviews(place.id);
+  const placeId = place?.id ?? null;
+  const { reviews, add } = useReviews(placeId);
   const [score, setScore] = useState(5);
   const [text, setText] = useState('');
   useEffect(() => {
@@ -60,6 +80,7 @@ export function Reviews({ place }){
     try { await postReview(user, place, Number(score), text); } catch {}
     setText('');
   }
+  if (!place?.id) return null;
   return (
     <section>
       <h4>Reviews: {place.name}</h4>
@@ -70,7 +91,7 @@ export function Reviews({ place }){
         <input value={text} onChange={e => setText(e.target.value)} placeholder="Your experience…" aria-label="Review text" />
         <button type="submit">Post</button>
       </form>
-      <ul>{reviews.map((r, i) => <li key={i} data-testid="review-item">{r.score}/5 — {r.text}</li>)}</ul>
+      {reviews.length === 0 ? <p>No reviews yet — be the first.</p> : <ul>{reviews.map((r, i) => <li key={i} data-testid="review-item">{r.score}/5 — {r.text}</li>)}</ul>}
     </section>
   );
 }
