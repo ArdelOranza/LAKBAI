@@ -3,11 +3,13 @@
  * (which merges server/data/admin-spots.json) — localStorage is only an
  * offline fallback, never a stale early return.
  */
+import { apiUrl } from './apiBase.js';
+
 export async function fetchSpots(){
   let local = [];
   try { local = JSON.parse(localStorage.getItem('lakbai.spots') || '[]'); } catch { local = []; }
   try {
-    const r = await fetch('/api/spots');
+    const r = await fetch(apiUrl('/api/spots'));
     if (!r.ok) throw new Error('spots unavailable');
     const { spots } = await r.json();
     try { localStorage.setItem('lakbai.spots', JSON.stringify(spots)); } catch { /* full storage */ }

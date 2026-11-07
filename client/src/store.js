@@ -2,7 +2,7 @@ import { supabase } from './supabaseClient.js';
 import { peekOutbox, removeFirst, queueReview, queueFavDelete, stripForInsert } from './outbox.js';
 export async function saveFavorite(user, place){
   if (!supabase || !user) return { error: 'login required' };
-  return supabase.from('favorites').upsert({ user_id: user.id, place_id: place.id, name: place.name, lng: place.lng, lat: place.lat, photo: place.photo || null }, { onConflict: 'user_id,place_id' });
+  return supabase.from('favorites').upsert({ user_id: user.id, place_id: place.id, name: place.name, lng: place.lng, lat: place.lat, photo: place.photo || null, categories: Array.isArray(place.categories) ? place.categories : [] }, { onConflict: 'user_id,place_id' });
 }
 export async function listFavorites(user){
   if (!supabase || !user) return { data: [], error: 'login required' };

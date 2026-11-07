@@ -1,8 +1,10 @@
 // U14-B: live Mapbox discovery for places outside the curated dataset.
 // All discovery goes through the server's bbox-locked /api/places proxy —
 // never direct Mapbox calls from the client, and never outside Pangasinan.
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { discoverPlaces } from './discover.js';
+
+afterEach(() => vi.unstubAllEnvs());
 
 const SERVER_BODY = {
   places: [
@@ -28,6 +30,13 @@ describe('discoverPlaces', () => {
     });
     expect(rows[0].hint).toContain('Bolinao'); // town inferred from address
     expect(typeof rows[0].lng).toBe('number');
+  });
+
+  it('uses VITE_API_URL so production calls the API service, not the static site', async () => {
+    vi.stubEnv('VITE_API_URL', 'https://lakbai-api.onrender.com/');
+    const f = okFetch();
+    await discoverPlaces('falls', '120.2,16.0', f);
+    expect(f.mock.calls[0][0]).toBe('https://lakbai-api.onrender.com/api/places?q=falls&proximity=120.2%2C16.0');
   });
 
   it('never queries without a real search term', async () => {

@@ -7,6 +7,8 @@
  * The client never calls Mapbox directly for forward search.
  */
 
+import { apiUrl } from './apiBase.js';
+
 /** The place card shape used across search rows and map pins. */
 function toCard(row, sourceFeed){
   const missing = v => v === null || v === undefined || v === '';
@@ -37,7 +39,7 @@ export async function discoverPlaces(q, proximity, fetchImpl = fetch){
   const params = new URLSearchParams({ q: query });
   if (proximity) params.set('proximity', proximity);
   let res;
-  try { res = await fetchImpl('/api/places?' + params); }
+  try { res = await fetchImpl(apiUrl('/api/places?' + params)); }
   catch { return []; } // offline: search still shows the dataset results
   if (!res.ok) return [];
   const data = await res.json().catch(() => null);

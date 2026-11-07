@@ -3,8 +3,6 @@ import { useAuth } from './AuthContext.jsx';
 import { postReview, flushOutbox } from './store.js';
 import { recommend } from './api.js';
 
-const BASE = import.meta.env.VITE_API_URL || '';
-
 export function NearbyButton({ onResults, onNotice, onFix }){
   const [busy, setBusy] = useState(false);
   function nearby(){

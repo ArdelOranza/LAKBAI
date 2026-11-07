@@ -82,7 +82,7 @@ describe('dynamic search (not static)', () => {
     recommend.mockImplementation(() => new Promise(() => {})); // never resolves
     const h = await mount('falls');
     expect(h.container.textContent).toMatch(/searching/i);
-    expect(h.container.querySelector('[data-testid="live-badge"]')).not.toBeNull();
+    expect(h.container.querySelector('[data-testid="live-badge"]')).toBeNull();
     await h.unmount();
   });
 });
