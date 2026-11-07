@@ -1,7 +1,5 @@
 # Render blueprint — Lakbai (traveller app + API + hidden admin)
-# One repo, three services. Admin is a separate site, never linked from the app.
-# In Render Dashboard: New → Blueprint, point this repo at this file.
-
+# Treat this as the single source of truth — do not hand-pick "Build Command" in the dashboard.
 services:
   - type: web
     name: lakbai-api
@@ -15,13 +13,13 @@ services:
       - key: NODE_VERSION
         value: 22
       - key: PORT
-        sync: false  # Render injects $PORT automatically
+        generateValue: true
       - key: ADMIN_TOKEN
-        sync: false  # SET THIS in Render dashboard — your admin password (hashed at startup)
+        sync: false
       - key: GEMINI_API_KEY
         sync: false
       - key: VITE_MAPBOX_TOKEN
-        sync: false  # public token, but server needs it for Search Box
+        sync: false
       - key: GOOGLE_CSE_ID
         sync: false
       - key: GROQ_API_KEY
@@ -35,9 +33,9 @@ services:
       - key: SUPABASE_SERVICE_KEY
         sync: false
 
-  - type: web
+  # Static sites must be type: static — type: web + publishPath has no start command → exit 127.
+  - type: static
     name: lakbai-app
-    runtime: node
     rootDir: client
     buildCommand: npm install && npm run build
     publishPath: dist
@@ -54,9 +52,8 @@ services:
       - key: VITE_SUPABASE_ANON_KEY
         sync: false
 
-  - type: web
+  - type: static
     name: lakbai-admin
-    runtime: node
     rootDir: admin
     buildCommand: npm install && npm run build
     publishPath: dist
