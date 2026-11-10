@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './AuthContext.jsx';
 import { Toast, TabBar, PrimaryBtn, useAutoToast } from './ui.jsx';
 import Logo from './logo.jsx';
 import { readLocalPrefs, loadPrefs } from './prefs.js';
+import { tabFromSearch } from './deepLink.js';
 import Splash from './screens/Splash.jsx';
 import SignUp from './screens/SignUp.jsx';
 import LogIn from './screens/LogIn.jsx';
@@ -60,6 +61,15 @@ function Shell(){
   const push = view => setStack(s => [...s, view]);
   const pop = () => setStack(s => s.slice(0, -1));
   const showToast = (text, kind = 'ok', detail) => setToast({ text, kind, detail });
+
+  // PWA app shortcuts open `/?tab=map` etc. Land on that tab, then strip the
+  // query so a refresh (and the browser history) stays clean.
+  useEffect(() => {
+    const t = tabFromSearch(window.location.search);
+    if (!t) return;
+    setTab(t);
+    try { window.history.replaceState(null, '', window.location.pathname + window.location.hash); } catch { /* file:// etc. */ }
+  }, []);
 
   useEffect(() => {  // LIVE touring GPS (high-accuracy, smoothed, accuracy-gated)
     // 'geolocation' in navigator can be true while geolocation itself is null

@@ -13,8 +13,23 @@ export default defineConfig({
       id: '/',
       name: 'LakbAI', short_name: 'LakbAI',
       description: 'Lakbai, smarter, not harder. AI travel guide for Pangasinan.',
+      lang: 'en', dir: 'ltr', categories: ['travel', 'navigation', 'lifestyle'],
       theme_color: '#0B3E8F', background_color: '#FFFFFF', display: 'standalone',
+      display_override: ['standalone', 'minimal-ui'],
+      orientation: 'portrait',
       start_url: '/', scope: '/',
+      // Reuse the already-open window instead of stacking a new one, and let
+      // in-scope links open inside the installed app rather than the browser.
+      launch_handler: { client_mode: 'navigate-existing' },
+      handle_links: 'preferred',
+      prefer_related_applications: false,
+      // Long-press the icon / right-click for these (targets the deep-link router).
+      shortcuts: [
+        { name: 'Home', short_name: 'Home', url: '/?tab=home', icons: [{ src: '/pwa-192.png', sizes: '192x192' }] },
+        { name: 'Map', short_name: 'Map', url: '/?tab=map', icons: [{ src: '/pwa-192.png', sizes: '192x192' }] },
+        { name: 'AI Chat', short_name: 'Chat', url: '/?tab=chat', icons: [{ src: '/pwa-192.png', sizes: '192x192' }] },
+        { name: 'Saved', short_name: 'Saved', url: '/?tab=saved', icons: [{ src: '/pwa-192.png', sizes: '192x192' }] }
+      ],
       icons: [
         { src: '/pwa-192.png', sizes: '192x192', type: 'image/png' },
         { src: '/pwa-512.png', sizes: '512x512', type: 'image/png' },
