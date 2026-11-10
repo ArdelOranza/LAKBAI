@@ -41,10 +41,16 @@ export default function SavedTab({ coords, push, showToast }){
   }
   async function generate(){
     if (!rows.length) { showToast('Save a few places first', 'error'); return; }
+    // Only a real GPS fix has accuracy. FALLBACK_CENTER does not, and sending
+    // it would make the server plan around the wrong town.
+    if (!coords || coords.accuracy == null) {
+      showToast('Turn on location to build a route within 50 km of you', 'error');
+      return;
+    }
     setBusyGen(true);
     try {
       const names = rows.map(r => r.name);
-      const plan = await itineraryFromSaved(names);
+      const plan = await itineraryFromSaved(names, 8, 9, `${coords.lng},${coords.lat}`);
       plan.inputNames = names;
       plan.favBy = Object.fromEntries(rows.filter(r => r.lng != null || r.photo).map(r => [r.name, { lng:r.lng, lat:r.lat, photo:r.photo || null }]));
       push({ name:'itinerary', plan });

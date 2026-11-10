@@ -41,11 +41,13 @@ export async function chat(message, proximity, signal){
   if (!r.ok) throw new Error(await readError(r));
   return r.json();
 }
-export async function itineraryFromSaved(names, hours = 8, startHour = 9){
-  const key = 'lakbai.plan:' + names.join('|');
+export async function itineraryFromSaved(names, hours = 8, startHour = 9, proximity = ''){
+  // The radius depends on the fix, so the cache key must too: a plan generated
+  // in Bolinao must never be reopened as if it were near Lingayen.
+  const key = 'lakbai.plan:' + names.join('|') + '@' + (proximity || 'no-location');
   const hit = sessionGet(key);
   if (hit) return hit;
-  const r = await aiFetch(apiUrl('/api/plan'), { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ message: 'A day trip in Pangasinan visiting: ' + names.join(', '), hours, startHour }) });
+  const r = await aiFetch(apiUrl('/api/plan'), { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ message: 'A day trip in Pangasinan visiting: ' + names.join(', '), hours, startHour, proximity }) });
   if (!r.ok) throw new Error(await readError(r));
   const plan = await r.json();
   sessionSet(key, plan);

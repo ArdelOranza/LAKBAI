@@ -101,15 +101,20 @@ app.post('/api/plan', async (req, res) => {
   try {
     const { message = '', hours = 4, startHour = 9 } = req.body || {};
     if (String(message).length > MESSAGE_MAX) return res.status(400).json({ error: 'Message too long.' });
+    const proximity = String(req.body.proximity || '');
+    const p = proximity.split(',').map(Number);
+    const proxKey = p.length === 2 && p.every(Number.isFinite) ? p[0].toFixed(2) + ',' + p[1].toFixed(2) : '';
     const h = Number(hours) || 4, s = Number(startHour) || 9;
     const info = datasetInfo();
     const sig = info.ready ? `${info.file}|${info.count}` : 'nodataset';
-    const key = `p:${sig}:${message}|${h}|${s}`;
+    // The radius depends on the fix, so two travelers must never share a
+    // cached plan even when they ask the same question.
+    const key = `p:${sig}:${message}|${h}|${s}|${proxKey}`;
     // The plan path has no local fallback, so the breaker/off-switch must
     // apply here too — honest 503 beats burning quota during an outage.
     if (!aiUsable()) return res.status(503).json({ error: 'AI unavailable' });
     const tripBreaker = () => { aiDownUntil = Date.now() + AI_COOLDOWN_MS; };
-    res.json(await cached(key, AI_TTL_MS, () => planDay(message, h, s), { onStale: tripBreaker }));
+    res.json(await cached(key, AI_TTL_MS, () => planDay(message, h, s, { proximity }), { onStale: tripBreaker }));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 const { searchPlaces } = require('./places.js');
