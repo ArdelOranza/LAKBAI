@@ -25,6 +25,7 @@ vi.mock('../sessionCache.js', () => ({
 vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => ({ hospitals: [], police: [] }) })));
 
 import SavedTab from './SavedTab.jsx';
+import { itineraryFromSaved } from '../api.js';
 
 describe('SavedTab detail navigation', () => {
   it('normalizes favorite rows so PlaceDetail receives id=place_id', async () => {
@@ -44,6 +45,51 @@ describe('SavedTab detail navigation', () => {
     const pushed = push.mock.calls[0][0];
     expect(pushed.name).toBe('detail');
     expect(pushed.place.id).toBe('p-123');
+    await React.act(async () => root.unmount());
+    container.remove();
+  });
+});
+
+describe('SavedTab itinerary location', () => {
+  async function renderSaved(coords, push, showToast){
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+    await React.act(async () => {
+      root.render(<SavedTab coords={coords} push={push} showToast={showToast} />);
+    });
+    return { container, root };
+  }
+
+  it('builds the route from the real GPS fix, within 50 km of the traveler', async () => {
+    itineraryFromSaved.mockClear();
+    const push = vi.fn();
+    const { container, root } = await renderSaved({ lng: 119.79, lat: 16.12, accuracy: 8 }, push, () => {});
+    const btn = container.querySelector('[data-testid="generate-itinerary"] button');
+    await React.act(async () => {
+      btn.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+      await Promise.resolve();
+    });
+    expect(itineraryFromSaved).toHaveBeenCalledWith(['Saved Beach'], 8, 9, '119.79,16.12');
+    expect(push.mock.calls[0][0].name).toBe('itinerary');
+    await React.act(async () => root.unmount());
+    container.remove();
+  });
+
+  it('does not guess a location when there is no GPS fix', async () => {
+    itineraryFromSaved.mockClear();
+    const push = vi.fn();
+    const showToast = vi.fn();
+    // FALLBACK_CENTER has no `accuracy` — it is not a real fix.
+    const { container, root } = await renderSaved({ lng: 120.23, lat: 16.03 }, push, showToast);
+    const btn = container.querySelector('[data-testid="generate-itinerary"] button');
+    await React.act(async () => {
+      btn.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+      await Promise.resolve();
+    });
+    expect(itineraryFromSaved).not.toHaveBeenCalled();
+    expect(push).not.toHaveBeenCalled();
+    expect(showToast.mock.calls.some(c => /location/i.test(String(c[0])))).toBe(true);
     await React.act(async () => root.unmount());
     container.remove();
   });

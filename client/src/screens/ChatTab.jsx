@@ -2,11 +2,12 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import {
   Send, ArrowUp, Mic, Plus, Sparkles, CircleCheck, MapPin, Star, CheckCheck,
   ChevronRight, EllipsisVertical, SlidersHorizontal, MessageSquarePlus,
-  Bookmark, Navigation, Compass, ArrowLeft,
+  Bookmark, Navigation, Compass, ArrowLeft, History,
 } from 'lucide-react';
 import { chat } from '../api.js';
 import { fetchSpots } from '../spots.js';
 import { cardFor } from '../chatCards.js';
+import { latestThread, listThreads, saveThread, cleanMessages } from '../chatStore.js';
 import { placeImage, mapboxToken } from '../staticMap.js';
 import { MdText } from '../mdText.jsx';
 import { openExternal } from '../extLinks.js';
@@ -26,6 +27,15 @@ const STARTERS = [
 const MAP_TOKEN = mapboxToken();
 let uid = 0;
 const nid = () => 'm' + (++uid);
+const signatureOf = (messages, id) => `${id || ''}:${messages.length}:${messages[messages.length - 1]?.id || ''}`;
+const newThreadId = () => `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+/** Restored ids must not collide with fresh ones after a reload (uid resets). */
+function seedUid(messages){
+  for (const m of messages || []){
+    const n = Number(String(m && m.id || '').replace(/^m/, ''));
+    if (Number.isFinite(n) && n > uid) uid = n;
+  }
+}
 const clock = ts => new Date(ts).toLocaleTimeString([], { hour:'numeric', minute:'2-digit' });
 function dayLabel(ts){
   const d = new Date(ts), now = new Date();
@@ -126,11 +136,63 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
   const [starters, setStarters] = useState(false);
   const [listening, setListening] = useState(false);
   const [online, setOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine));
+  const [history, setHistory] = useState([]);
   const listRef = useRef(null);
   const inputRef = useRef(null);
+  const threadRef = useRef(null);
+  const hydratedRef = useRef(false);
+  const savedSigRef = useRef('');
 
   useEffect(() => { listRef.current && (listRef.current.scrollTop = listRef.current.scrollHeight); }, [msgs, busy]);
   useEffect(() => { fetchSpots().then(setSpots).catch(() => {}); }, []);
+
+  // Reopen the last conversation (account history, merged with the local
+  // mirror). A reload or a tab switch must never erase what was asked.
+  useEffect(() => {
+    let alive = true;
+    hydratedRef.current = false;
+    threadRef.current = null;
+    savedSigRef.current = '';
+    setMsgs([WELCOME]);
+    Promise.all([latestThread(user), listThreads(user)]).then(([latest, threads]) => {
+      if (!alive) return;
+      setHistory(threads || []);
+      if (latest && Array.isArray(latest.messages) && latest.messages.length){
+        seedUid(latest.messages);
+        threadRef.current = { id: latest.id, created_at: latest.created_at };
+        savedSigRef.current = signatureOf(latest.messages, latest.id);
+        setMsgs(latest.messages);
+      } else {
+        threadRef.current = { id: newThreadId(), created_at: new Date().toISOString() };
+      }
+      hydratedRef.current = true;
+    }).catch(() => { if (alive) hydratedRef.current = true; });
+    return () => { alive = false; };
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Persist after every settled change. Loading placeholders are stripped and
+  // the signature guard avoids rewriting the same state twice.
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    const messages = cleanMessages(msgs);
+    if (!messages.some(m => m.role === 'user')) return;
+    const id = threadRef.current?.id;
+    const sig = signatureOf(messages, id);
+    if (sig === savedSigRef.current) return;
+    savedSigRef.current = sig;
+    saveThread(user, { ...(threadRef.current || {}), messages }).then(saved => {
+      if (!saved || !saved.id) return;
+      const previousId = id;
+      if (saved.id !== previousId){
+        threadRef.current = { ...(threadRef.current || {}), id: saved.id, created_at: saved.created_at };
+        savedSigRef.current = signatureOf(saved.messages || messages, saved.id);
+      }
+      setHistory(prev => [
+        { id: saved.id, title: saved.title, messages: saved.messages, created_at: saved.created_at, updated_at: saved.updated_at },
+        ...prev.filter(t => t.id !== saved.id && t.id !== previousId),
+      ].slice(0, 12));
+    }).catch(() => { /* the local mirror already holds the chat */ });
+  }, [msgs, user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   // Seed saved buttons from the already-saved favorites, so a place saved in
   // a previous session doesn't read as unsaved ("Add to Trip" again).
   useEffect(() => {
@@ -154,13 +216,17 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
     if (!q || busy) return;
     setInput('');
     setStarters(false);
+    const sendingThread = threadRef.current?.id;
+    const stillCurrent = () => threadRef.current?.id === sendingThread;
     setMsgs(m => [...m, { id:nid(), role:'user', text:q, at:Date.now() }, { id:nid(), role:'ai', loading:true }]);
     setBusy(true);
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     try {
       const out = await chat(q, coords ? `${coords.lng},${coords.lat}` : '', ctrl.signal);
-      if (ctrl.signal.aborted) return;
+      // The traveler may have opened another thread while this was in flight;
+      // its answer belongs to the archived one, not to the new screen.
+      if (ctrl.signal.aborted || !stillCurrent()) return;
       const candidates = out.candidates || [];
       const cards = candidates.slice(0, 1).map(c => cardFor(c, spots));
       const more = candidates.slice(1, 6).map(c => c.name + (c.hint ? ' — ' + c.hint : ''));
@@ -171,9 +237,10 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
       }]);
     } catch (e) {
       if (ctrl.signal.aborted){
-        setMsgs(m => [...m.filter(x => !x.loading), { id:nid(), role:'ai', at:Date.now(), text: 'No reply — the request was stopped. Try again.' }]);
+        if (stillCurrent()) setMsgs(m => [...m.filter(x => !x.loading), { id:nid(), role:'ai', at:Date.now(), text: 'No reply — the request was stopped. Try again.' }]);
         return;
       }
+      if (!stillCurrent()) return;
       setMsgs(m => [...m.filter(x => !x.loading)]);
       showToast('LakbAI is busy — try again in a minute', 'error', e.message);
     } finally {
@@ -182,6 +249,28 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
     }
   }
   function stop(){ abortRef.current?.abort(new Error('stopped by traveler')); }
+
+  /** Archive the current thread (already saved) and start a clean one. */
+  function newChat(){
+    stop();
+    threadRef.current = { id: newThreadId(), created_at: new Date().toISOString() };
+    savedSigRef.current = '';
+    setMsgs([{ ...WELCOME, at: Date.now() }]);
+    setMenu(false);
+  }
+
+  function openThread(t){
+    if (!t) return;
+    stop();
+    const messages = Array.isArray(t.messages) && t.messages.length
+      ? t.messages
+      : [{ ...WELCOME, at: Date.now() }];
+    seedUid(messages);
+    threadRef.current = { id: t.id, created_at: t.created_at };
+    savedSigRef.current = signatureOf(messages, t.id);
+    setMsgs(messages);
+    setMenu(false);
+  }
 
   const recogRef = useRef(null);
   function mic(){
@@ -239,9 +328,32 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
           <>
             <button type="button" className="menu-scrim" aria-label="Close menu" onClick={() => setMenu(false)}/>
             <div className="chat-menu" role="menu">
-              <button type="button" role="menuitem" data-testid="chat-new" onClick={() => { stop(); setMsgs([{ ...WELCOME, at:Date.now() }]); setMenu(false); }}>
+              <button type="button" role="menuitem" data-testid="chat-new" onClick={newChat}>
                 <MessageSquarePlus size={16}/> New chat
               </button>
+              {history.length > 0 && (
+                <>
+                  <div style={{ height:1, background:'#EDF1F7', margin:'4px 0' }} aria-hidden="true"/>
+                  <p style={{ fontSize:10.5, color:'var(--muted-ink)', margin:'2px 12px', textTransform:'uppercase', letterSpacing:.5 }}>
+                    Recent chats
+                  </p>
+                  {history.slice(0, 5).map(t => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      role="menuitem"
+                      data-testid="chat-thread"
+                      title={t.title || 'Chat'}
+                      onClick={() => openThread(t)}
+                    >
+                      <History size={15}/>
+                      <span style={{ flex:1, minWidth:0, textAlign:'left', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                        {t.title || 'Chat'}
+                      </span>
+                    </button>
+                  ))}
+                </>
+              )}
               <button type="button" role="menuitem" onClick={() => { setMenu(false); push({ name:'prefs-edit' }); }}>
                 <SlidersHorizontal size={16}/> Travel preferences
               </button>

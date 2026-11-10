@@ -1,6 +1,13 @@
 const { searchPlaces, inBox } = require('./places.js');
 const { extractJson } = require('./agent.js');
 const { datasetInfo, allEntries } = require('./dataset.js');
+const { haversineKm, parseProximity, nearestTown } = require('./location.js');
+
+// A day trip must stay walkable/drivable from where the traveler actually is.
+// Beyond this the app would be inventing a destination instead of using the fix.
+const MAX_PLAN_KM = 50;
+const NO_FIX = 'Turn on location so the route can stay within 50 km of you.';
+const NOTHING_NEAR = 'No verified places within 50 km of your location.';
 
 const keyOf = name => String(name || '').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
 
@@ -17,16 +24,41 @@ function referenceRows(deps){
   return datasetInfo().ready ? allEntries() : [];
 }
 
+/** Only rows whose real coordinates are inside the radius. A row without
+ *  coordinates cannot be proven nearby, so it is excluded. */
+function withinRadius(rows, traveler){
+  return rows.filter(e => {
+    const lng = Number(e.lng), lat = Number(e.lat);
+    if (!Number.isFinite(lng) || !Number.isFinite(lat)) return false;
+    return haversineKm(traveler.lng, traveler.lat, lng, lat) <= MAX_PLAN_KM;
+  });
+}
+
 function placeList(entries){
   return entries.map(e => `- ${e.name}${e.town ? ` — ${e.town}` : ''}${e.price ? ` — ${e.price}` : ''}`).join('\n');
 }
 
+function radiusLine(traveler){
+  const town = nearestTown(traveler.lng, traveler.lat);
+  const where = town
+    ? `near ${town} (${traveler.lat.toFixed(3)}, ${traveler.lng.toFixed(3)})`
+    : `at ${traveler.lat.toFixed(3)}, ${traveler.lng.toFixed(3)}`;
+  return `The traveler is ${where}. Every stop MUST be within 50 km of that point — never guess a destination or send them across the province.`;
+}
+
 async function planDay(message, hours, startHour = 9, deps = {}){
-  const rows = referenceRows(deps);
+  const traveler = parseProximity(deps.proximity);
+  if (!traveler) throw Object.assign(new Error(NO_FIX), { status: 422 });
+
+  const sourceRows = referenceRows(deps);
+  const rows = sourceRows.length ? withinRadius(sourceRows, traveler) : [];
+  if (sourceRows.length && !rows.length) throw Object.assign(new Error(NOTHING_NEAR), { status: 422 });
+
+  const where = radiusLine(traveler);
   const agentFn = deps.agentFn || (async (msg, h, s) => {
     const sys = rows.length
-      ? `You plan a Pangasinan day trip of ${h} hours starting ${s}:00. Use ONLY the places in this list and copy every name exactly as written — do not add a place that is not here:\n${placeList(rows)}\nJSON only: {"title":"...","stops":[{"name":"exact name from the list","hint":"town","arrive":"HH:MM","depart":"HH:MM","activities":["..."]}]}. All times inside the ${h}-hour window starting ${s}:00.`
-      : `You plan a Pangasinan day trip of ${h} hours starting ${s}:00. JSON only: {"title":"...","stops":[{"name":"exact place","hint":"town","arrive":"HH:MM","depart":"HH:MM","activities":["..."]}]}. Real places only, all times inside the ${h}-hour window starting ${s}:00.`;
+      ? `You plan a Pangasinan day trip of ${h} hours starting ${s}:00. ${where} Use ONLY the places in this list and copy every name exactly as written — do not add a place that is not here:\n${placeList(rows)}\nJSON only: {"title":"...","stops":[{"name":"exact name from the list","hint":"town","arrive":"HH:MM","depart":"HH:MM","activities":["..."]}]}. All times inside the ${h}-hour window starting ${s}:00.`
+      : `You plan a Pangasinan day trip of ${h} hours starting ${s}:00. ${where} JSON only: {"title":"...","stops":[{"name":"exact place","hint":"town","arrive":"HH:MM","depart":"HH:MM","activities":["..."]}]}. Real places within 50 km only, all times inside the ${h}-hour window starting ${s}:00.`;
     let raw;
     try { raw = await require('./agent.js').callGeminiForPlan(sys, msg); }
     catch { raw = await require('./groq.js').callGroq(sys, msg); }
@@ -75,7 +107,8 @@ async function planDay(message, hours, startHour = 9, deps = {}){
   }
 
   // Non-dataset branch: same time validation as the dataset branch above.
-  // Model-provided times are never trusted blindly.
+  // Model-provided times are never trusted blindly, and hits outside the
+  // traveler's radius are dropped instead of being scheduled.
   for (const s of plan.stops) {
     const t = v => (typeof v === 'string' && /^([01]?\d|2[0-3]):[0-5]\d$/.test(v.trim())) ? v.trim() : null;
     const arrive = t(s.arrive), depart = t(s.depart);
@@ -85,11 +118,12 @@ async function planDay(message, hours, startHour = 9, deps = {}){
     let hits;
     try { hits = await searchFn(`${s.name} ${s.hint || ''} Pangasinan`); }
     catch { continue; }
-    const hit = hits.find(h => inBox(h.lng, h.lat) && !seen.has(h.id));
+    const hit = hits.find(h => inBox(h.lng, h.lat) && !seen.has(h.id)
+      && haversineKm(traveler.lng, traveler.lat, Number(h.lng), Number(h.lat)) <= MAX_PLAN_KM);
     if (!hit) continue;
     seen.add(hit.id);
     schedule.push({ placeId: hit.id, name: hit.name, arrive, depart, activities: Array.isArray(s.activities) ? s.activities : [] });
   }
   return { title: plan.title, schedule };
 }
-module.exports = { planDay, parsePlan };
+module.exports = { planDay, parsePlan, MAX_PLAN_KM };
