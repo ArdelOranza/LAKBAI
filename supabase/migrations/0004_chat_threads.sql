@@ -11,6 +11,7 @@ create table if not exists chat_threads (
 
 alter table chat_threads enable row level security;
 
+drop policy if exists "own chat threads" on chat_threads;
 create policy "own chat threads" on chat_threads
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
