@@ -3,9 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <!-- A single viewport. viewport-fit=cover lets the app paint under the notch;
+         the top inset is reserved by --safe-top in index.css. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
     <meta name="theme-color" content="#0B3E8F" />
+    <!-- Installed app opens standalone, with no Safari/Chrome browser chrome. -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="LakbAI" />
+    <!-- Don't let iOS turn place phone numbers into tel: links. -->
+    <meta name="format-detection" content="telephone=no" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>LakbAI</title>
   </head>
