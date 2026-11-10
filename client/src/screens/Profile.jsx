@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../AuthContext.jsx';
 import { listPlans, listMyReviews } from '../store.js';
 import { loadPrefs } from '../prefs.js';
-import { Route, MessageSquare, Bookmark, SlidersHorizontal, ChevronRight, LogOut } from 'lucide-react';
+import { Route, MessageSquare, Bookmark, SlidersHorizontal, ChevronRight, LogOut, Download } from 'lucide-react';
+
+// The APK row is pointless inside the Android shell itself.
+const inNativeApp = () => typeof window !== 'undefined' && !!window.Capacitor?.isNativePlatform?.();
 
 const initialsOf = (name, email) => {
   const src = String(name || '').trim() || String(email || '').split('@')[0];
@@ -72,6 +75,13 @@ export default function Profile({ push, setTab, user, signOut }){
             My Reviews
             <span className="chev"><ChevronRight size={18}/></span>
           </button>
+          {!inNativeApp() && (
+            <a className="menu-row" data-testid="menu-android" href="/LakbAI.apk" download="LakbAI.apk" style={{ textDecoration:'none' }}>
+              <span className="mi"><Download size={18}/></span>
+              Get the Android app
+              <span style={{ marginLeft:'auto', fontSize:11.5, fontWeight:600, color:'#64748B', letterSpacing:0 }}>v1.0.0</span>
+            </a>
+          )}
         </div>
 
         <button
