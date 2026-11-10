@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   ArrowLeft, Share2, Heart, Camera, MapPin, Star, Navigation, CirclePlus, CircleCheck,
-  Clock, CircleParking, Waves, UtensilsCrossed, Music, Mountain, Landmark, Sparkles, User,
+  Clock, CircleParking, Waves, UtensilsCrossed, Music, Mountain, Landmark, User,
 } from 'lucide-react';
 import { saveFavorite, removeFavorite, listFavorites, listPlaceReviews } from '../store.js';
 import { placeImage, mapboxToken } from '../staticMap.js';
@@ -11,6 +11,7 @@ import { feeLabel } from '../filters.js';
 import { haversineKm, formatDistance } from '../geo.js';
 import { PhotoPlaceholder } from '../ui.jsx';
 import { safeExternalUrl, openExternal } from '../extLinks.js';
+import { directionsHref } from '../emergency.js';
 
 const CAT_ICON = [
   [/beach|coast|island|sea|shore/i, Waves],
@@ -19,7 +20,7 @@ const CAT_ICON = [
   [/nature|waterfall|mountain|hike|camp|forest|river/i, Mountain],
   [/histor|heritage|church|museum/i, Landmark],
 ];
-const iconFor = text => (CAT_ICON.find(([re]) => re.test(text)) || [null, Sparkles])[1];
+const iconFor = text => (CAT_ICON.find(([re]) => re.test(text)) || [null, MapPin])[1];
 const isFree = fees => fees === 0 || /free|none|no fee|₱?0\b/i.test(String(fees ?? ''));
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 function editionText(a, b){
@@ -123,7 +124,7 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
             )}
             {topTag && (
               <span style={{ display:'inline-flex', alignItems:'center', gap:4, background:'#E7F0FE', color:'var(--primary)', borderRadius:999, padding:'4px 10px', fontSize:10.5, fontWeight:700 }}>
-                <Sparkles size={10}/> {topTag}
+                {topTag}
               </span>
             )}
           </div>
@@ -134,7 +135,7 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
             className="chip"
             data-testid="directions-btn"
             style={{ flex:1, padding:12, display:'inline-flex', alignItems:'center', justifyContent:'center', gap:7, fontWeight:600 }}
-            onClick={() => openExternal('https://www.google.com/maps/dir/?api=1&destination=' + p.lat + ',' + p.lng)}
+            onClick={() => { const href = directionsHref(p.lat, p.lng); if (href) openExternal(href); }}
           >
             <Navigation size={15}/> Directions
           </button>
@@ -214,7 +215,7 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
                 <p style={{ margin:'3px 0 0', fontSize:11, color:'var(--muted-ink)' }}>Based on {reviews.length} verified {reviews.length === 1 ? 'visit' : 'visits'}</p>
               </div>
               <div style={{ textAlign:'right' }}>
-                <div style={{ fontSize:24, fontWeight:800, lineHeight:1, color:'var(--primary)' }}>{rating != null ? Number(rating).toFixed(1) : '—'}</div>
+                <div style={{ fontSize:26, fontWeight:600, lineHeight:1, color:'var(--primary)', fontFamily:'var(--font-display)', letterSpacing:'-.02em' }}>{rating != null ? Number(rating).toFixed(1) : '-'}</div>
                 <div style={{ display:'inline-flex', gap:1.5, marginTop:4, color:'var(--accent)' }}>
                   {[1,2,3,4,5].map(n => <Star key={n} size={11} fill={rating != null && n <= Math.round(rating) ? 'currentColor' : 'none'} strokeWidth={1.8}/>)}
                 </div>

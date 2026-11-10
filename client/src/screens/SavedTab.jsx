@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MapPin, Sparkles, Plus, X, Image as ImageIcon } from 'lucide-react';
+import { MapPin, Compass, Plus, X, Image as ImageIcon } from 'lucide-react';
 import { listFavorites, removeFavorite, saveFavorite } from '../store.js';
 import { useAuth } from '../AuthContext.jsx';
 import { recommend, itineraryFromSaved } from '../api.js';
@@ -76,7 +76,7 @@ export default function SavedTab({ coords, push, showToast }){
               <p style={{ fontSize:12, color:'var(--muted-ink)', margin:'2px 0 0' }}>{(row.categories || [])[0] || 'Pangasinan'}</p>
               <div style={{ display:'flex', gap:6, marginTop:5, flexWrap:'wrap' }}>
                 {haversineKm(coords.lng, coords.lat, row.lng, row.lat) != null && <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:11.5, color:'var(--muted-ink)' }}><MapPin size={12}/> {formatDistance(haversineKm(coords.lng, coords.lat, row.lng, row.lat))}</span>}
-                {suggestionLabels(row) && row.name && <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:11.5, color:'var(--primary)' }}><Sparkles size={12}/> {suggestionLabels(row)}</span>}
+                {suggestionLabels(row) && row.name && <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:11.5, color:'var(--primary)' }}><Compass size={12}/> {suggestionLabels(row)}</span>}
               </div>
             </div>
             <button data-testid="remove-fav" aria-label="Remove" onClick={e => { e.stopPropagation(); remove(row); }} style={{ flex:'0 0 34px', width:34, height:34, borderRadius:'50%', border:'1px solid #EDF1F7', background:'#fff', display:'grid', placeItems:'center', padding:0, color:'var(--muted-ink)' }}><X size={15}/></button>
@@ -101,7 +101,7 @@ export default function SavedTab({ coords, push, showToast }){
         </div>
       )}
       <div className="pane" style={{ marginTop:18 }}>
-        <div data-testid="generate-itinerary"><PrimaryBtn disabled={busyGen} onClick={generate}><Sparkles size={17}/> {busyGen ? 'Sequencing stops…' : 'Generate Smart Itinerary'}</PrimaryBtn></div>
+        <div data-testid="generate-itinerary"><PrimaryBtn disabled={busyGen} onClick={generate}><Compass size={17}/> {busyGen ? 'Sequencing stops…' : 'Generate Smart Itinerary'}</PrimaryBtn></div>
         <p style={{ fontSize:11, color:'var(--muted-ink)', textAlign:'center', marginTop:8 }}>LakbAI will automatically sequence stops by distance and sunset timing.</p>
       </div>
     </main>

@@ -3,7 +3,7 @@ import { Eye, EyeOff, ArrowRight, Mail, MailCheck, RefreshCw } from 'lucide-reac
 import { useAuth, friendlyAuthError } from '../AuthContext.jsx';
 import { validateLogin, needsEmailConfirmation } from '../authValidate.js';
 import Logo from '../logo.jsx';
-import { PrimaryBtn, GoogleBtn, OrDivider } from '../ui.jsx';
+import { PrimaryBtn, GoogleBtn, OrDivider, TextField } from '../ui.jsx';
 
 const LABEL = { display:'block', fontSize:12, fontWeight:600, margin:'16px 0 6px' };
 const CARD = { background:'#FFFFFF', borderRadius:'28px 28px 0 0', padding:'28px 24px 32px', marginTop:'-24px' };
@@ -92,12 +92,22 @@ export default function LogIn({ onAuthed, onSwitchToSignup, notice, defaultEmail
         <div style={{ marginTop:18 }}><GoogleBtn onClick={google} disabled={busy || !configured}/></div>
         <OrDivider/>
         <label style={LABEL} htmlFor="login-email-input">Email Address</label>
-        <input id="login-email-input" data-testid="login-email" type="email" value={form.email} onChange={e => set('email', e.target.value)} onKeyDown={onEnter} disabled={!configured || busy} />
+        <TextField id="login-email-input" testid="login-email" type="email" value={form.email} onChange={e => set('email', e.target.value)} onKeyDown={onEnter} disabled={!configured || busy} />
         <label style={LABEL} htmlFor="login-password-input">Password</label>
-        <div style={{ display:'flex', gap:6 }}>
-          <input id="login-password-input" data-testid="login-password" type={show ? 'text' : 'password'} value={form.password} onChange={e => set('password', e.target.value)} onKeyDown={onEnter} style={{ flex:1 }} disabled={!configured || busy}/>
-          <button type="button" className="icon-btn" onClick={() => setShow(s => !s)} aria-label="Toggle password">{show ? <EyeOff size={16}/> : <Eye size={16}/>}</button>
-        </div>
+        <TextField
+          id="login-password-input"
+          testid="login-password"
+          type={show ? 'text' : 'password'}
+          value={form.password}
+          onChange={e => set('password', e.target.value)}
+          onKeyDown={onEnter}
+          disabled={!configured || busy}
+          trailing={(
+            <button type="button" className="field-btn" onClick={() => setShow(s => !s)} aria-label="Toggle password">
+              {show ? <EyeOff size={16}/> : <Eye size={16}/>}
+            </button>
+          )}
+        />
         <div style={{ textAlign:'right', marginTop:8 }}>
           <button type="button" style={{ background:'none', border:'none', color:'var(--primary)', fontSize:13, fontWeight:600, padding:0 }} onClick={forgot} data-testid="forgot-link" disabled={!configured || busy}>Forgot Password?</button>
         </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ChevronRight, Plus, Sparkles, Sun, Cloud, Info, Mountain } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Plus, Compass, Sun, Cloud, Info, Mountain } from 'lucide-react';
 import { listPlans } from '../store.js';
 import { useAuth } from '../AuthContext.jsx';
 import { planStatus, matchesFilter, STATUS_FILTERS } from '../planStatus.js';
@@ -77,7 +77,7 @@ export default function Itineraries({ pop, push, setTab }){
             <Plus size={16}/>
           </span>
           <b style={{ flex:1, color:'var(--primary)', fontSize:13.5 }}>Generate New AI Itinerary</b>
-          <Sparkles size={17} color="var(--primary)"/>
+          <Compass size={17} color="var(--primary)"/>
         </div>
 
         <div data-testid="offline-footer" style={{ marginTop:'auto', display:'flex', alignItems:'center', gap:10, background:'#F1F5F9', borderRadius:14, padding:'12px 14px', margin:'24px 0 24px' }}>

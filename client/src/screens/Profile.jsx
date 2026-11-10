@@ -35,7 +35,7 @@ export default function Profile({ push, setTab, user, signOut }){
           </div>
           <div style={{ flex:1, minWidth:0, paddingTop:4 }}>
             <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-              <h2 style={{ margin:0, fontSize:19, letterSpacing:'-.2px', fontWeight:800, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{displayName}</h2>
+              <h2 style={{ margin:0, fontSize:19, letterSpacing:'-.01em', fontWeight:650, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{displayName}</h2>
               <button data-testid="profile-edit-btn" onClick={() => push({ name:'profileEdit' })} style={{ flex:'0 0 auto', background:'#EFF6FF', color:'var(--primary)', border:'none', borderRadius:999, padding:'5px 13px', fontSize:12, fontWeight:600 }}>Edit</button>
             </div>
             <p style={{ margin:'3px 0 0', fontSize:13, color:'var(--muted-ink)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{email}</p>

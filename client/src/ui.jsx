@@ -71,3 +71,14 @@ export function GoogleBtn({ onClick, disabled, testid = 'google-signin' }){
 export function OrDivider(){
   return <div className="or-divider"><span>or</span></div>;
 }
+
+/** One textbox shell for the whole app: the label sits above, any icon
+ *  (reveal eye, mic, clear) lives inside the same border as the input. */
+export function TextField({ testid, trailing, ...props }){
+  return (
+    <div className="field">
+      <input data-testid={testid} {...props}/>
+      {trailing}
+    </div>
+  );
+}

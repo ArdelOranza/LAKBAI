@@ -23,8 +23,9 @@ describe('telHref', () => {
 });
 
 describe('directionsHref', () => {
-  it('links to the exact point', () => {
-    expect(directionsHref(16.03, 120.23)).toBe('https://www.google.com/maps/dir/?api=1&destination=16.03,120.23');
+  it('links to the exact point in driving mode and starts navigation', () => {
+    const href = directionsHref(16.03, 120.23);
+    expect(href).toBe('https://www.google.com/maps/dir/?api=1&destination=16.03,120.23&travelmode=driving&dir_action=navigate');
   });
 
   it('returns null without coordinates', () => {

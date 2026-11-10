@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Compass } from 'lucide-react';
 import { TAGS, toggleTag, readLocalPrefs, savePrefs, loadPrefs } from '../prefs.js';
 import { useAuth } from '../AuthContext.jsx';
 
@@ -56,7 +56,7 @@ export default function Preferences({ onContinue, onBack }){
 
         <div className="soft-card" style={{ marginTop:28 }}>
           <span style={{ width:36, height:36, minWidth:36, borderRadius:12, background:'#fff', color:'var(--primary)', display:'grid', placeItems:'center' }}>
-            <Sparkles size={17}/>
+            <Compass size={17}/>
           </span>
           <span>
             <b style={{ color:'var(--primary)', fontSize:13.5 }}>AI Recommendation Style</b>

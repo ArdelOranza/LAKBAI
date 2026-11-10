@@ -1,16 +1,18 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import {
-  Send, ArrowUp, Mic, Plus, Sparkles, CircleCheck, MapPin, Star, CheckCheck,
-  ChevronRight, EllipsisVertical, SlidersHorizontal, MessageSquarePlus,
-  Bookmark, Navigation, Compass, ArrowLeft, History,
+  ArrowUp, Mic, Plus, CircleCheck, MapPin, Star, CheckCheck,
+  ChevronRight, ChevronDown, EllipsisVertical, SlidersHorizontal, MessageSquarePlus,
+  Bookmark, Navigation, Compass, ArrowLeft, History, Ticket, Square,
 } from 'lucide-react';
 import { chat } from '../api.js';
 import { fetchSpots } from '../spots.js';
-import { cardFor } from '../chatCards.js';
-import { latestThread, listThreads, saveThread, cleanMessages } from '../chatStore.js';
+import { cardFor, cardsFromMore } from '../chatCards.js';
+import { answerLead } from '../chatAnswer.js';
+import { latestThread, listThreads, saveThread, cleanMessages, cachedThreads } from '../chatStore.js';
 import { placeImage, mapboxToken } from '../staticMap.js';
 import { MdText } from '../mdText.jsx';
 import { openExternal } from '../extLinks.js';
+import { directionsHref } from '../emergency.js';
 import { saveFavorite, listFavorites } from '../store.js';
 import { haversineKm, formatDistance, driveMinutes } from '../geo.js';
 import { PhotoPlaceholder } from '../ui.jsx';
@@ -49,10 +51,9 @@ function distanceLine(km){
   return `${mins} ${mins === 1 ? 'min' : 'mins'} away • ${formatDistance(km)}`;
 }
 
-function ChatCard({ card, coords, user, showToast, push, saved, onSaved }){
+function ChatHero({ card, coords, user, showToast, push, saved, onSaved }){
   const km = haversineKm(coords.lng, coords.lat, card.lng, card.lat);
   const img = placeImage(card, MAP_TOKEN);
-  const badge = card.fees || card.festival;
   const place = card.spot || {
     id: card.id, name: card.name, lng: card.lng, lat: card.lat,
     blurb: card.description, categories: card.tags, town: card.hint,
@@ -63,59 +64,61 @@ function ChatCard({ card, coords, user, showToast, push, saved, onSaved }){
     if (saved) return;
     const res = await saveFavorite(user, { id: card.id, name: card.name, lng: card.lng, lat: card.lat });
     if (res.error) { showToast('Sign in to save', 'error', res.error); return; }
-    onSaved(card.id);
+    onSaved(card);
     showToast('Added to Trip');
   }
   function directions(e){
     e.stopPropagation();
-    if (card.lat == null) { push({ name:'detail', place }); return; }
-    openExternal('https://www.google.com/maps/dir/?api=1&destination=' + card.lat + ',' + card.lng);
+    const href = directionsHref(card.lat, card.lng);
+    if (!href) { push({ name:'detail', place }); return; }
+    openExternal(href);
   }
 
   return (
-    <article className="chat-card" data-testid="chat-card" onClick={() => push({ name:'detail', place })} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'detail', place }); } }}>
-      <div className="chat-card-media">
+    <article
+      className="chat-hero"
+      data-testid="chat-card"
+      onClick={() => push({ name:'detail', place })}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'detail', place }); } }}
+    >
+      <div className="chat-hero-media">
         {img
           ? <img src={img} alt={card.name} loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }}/>
-          : <PhotoPlaceholder size={26}/>}
-
-        {card.rating != null && (
-          <span className="chat-card-rating">
-            <Star size={11} fill="currentColor" strokeWidth={0}/> {card.rating}
-          </span>
-        )}
+          : <PhotoPlaceholder size={30}/>}
 
         {card.hint && (
-          <span className="chat-card-place">
-            <MapPin size={11}/> {card.hint}
+          <span className="chat-hero-town">
+            <MapPin size={10}/> {card.hint}
           </span>
         )}
       </div>
 
-      <div className="chat-card-body">
-        <div className="chat-card-title">
-          <b>{card.name}</b>
-          {badge && <span className="chat-card-badge" title={badge}>{badge}</span>}
+      <div className="chat-hero-body">
+        <h3 className="chat-hero-name">{card.name}</h3>
+
+        <div className="chat-hero-meta">
+          {card.rating != null && (
+            <span className="chat-hero-rating">
+              <Star size={11} fill="currentColor" strokeWidth={0}/> {card.rating}
+            </span>
+          )}
+          {card.reviews && <span>{card.reviews} reviews</span>}
+          {km != null && (
+            <button type="button" className="chat-hero-dist" onClick={directions} aria-label={'Drive to ' + card.name}>
+              <Navigation size={11}/> {distanceLine(km)}
+            </button>
+          )}
         </div>
 
-        {km != null && (
-          <button type="button" className="chat-card-dist" onClick={directions} aria-label={'Directions to ' + card.name}>
-            <span className="dist-ico"><Navigation size={11}/></span>
-            <span>{distanceLine(km)}</span>
-            <ChevronRight size={13} className="dist-chev"/>
-          </button>
-        )}
-
-        {card.tags.length > 0 && (
-          <div className="chat-card-tags">
-            {card.tags.map(t => <span key={t} className="chat-tag">{t}</span>)}
-          </div>
-        )}
+        {card.description && <p className="chat-hero-desc">{card.description}</p>}
+        {card.fees && <p className="chat-hero-fees"><Ticket size={12}/> <span>{card.fees}</span></p>}
 
         <button
           type="button"
           data-testid="chat-card-save"
-          className="chat-card-save"
+          className="chat-hero-save"
           onClick={add}
           disabled={saved}
         >
@@ -126,8 +129,77 @@ function ChatCard({ card, coords, user, showToast, push, saved, onSaved }){
   );
 }
 
+function ChatRow({ card, coords, user, push, showToast, saved, onSaved }){
+  const km = haversineKm(coords.lng, coords.lat, card.lng, card.lat);
+  const img = placeImage(card, MAP_TOKEN);
+  const place = card.spot || {
+    id: card.id, name: card.name, lng: card.lng, lat: card.lat,
+    blurb: card.description, categories: card.tags, town: card.hint,
+  };
+  const meta = [
+    card.hint,
+    card.rating != null ? '★ ' + card.rating : '',
+    km != null ? distanceLine(km) : '',
+  ].filter(Boolean).join(' · ');
+
+  async function add(e){
+    e.stopPropagation();
+    if (saved) return;
+    const res = await saveFavorite(user, { id: card.id, name: card.name, lng: card.lng, lat: card.lat });
+    if (res.error) { showToast('Sign in to save', 'error', res.error); return; }
+    onSaved(card);
+    showToast('Added to Trip');
+  }
+
+  return (
+    <article
+      className="chat-row"
+      data-testid="chat-row"
+      onClick={() => push({ name:'detail', place })}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'detail', place }); } }}
+    >
+      <div className="chat-row-media">
+        {img
+          ? <img src={img} alt={card.name} loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }}/>
+          : <PhotoPlaceholder size={18}/>}
+      </div>
+      <div className="chat-row-body">
+        <b className="chat-row-name">{card.name}</b>
+        {meta && <span className="chat-row-sub">{meta}</span>}
+      </div>
+      <button
+        type="button"
+        data-testid="chat-row-save"
+        className="chat-row-save"
+        onClick={add}
+        disabled={saved}
+        aria-label={saved ? card.name + ' added to Trip' : 'Add ' + card.name + ' to Trip'}
+      >
+        {saved ? <CircleCheck size={15}/> : <Plus size={16}/>}
+      </button>
+    </article>
+  );
+}
+
 export default function ChatTab({ user, coords, push, setTab, showToast }){
-  const [msgs, setMsgs] = useState([WELCOME]);
+  // Paint the saved conversation from the local mirror on the first frame.
+  // Supabase is a background sync, never a gate: waiting on it made the thread
+  // disappear into the welcome card on every tab switch / reload.
+  const [initial] = useState(() => {
+    const threads = cachedThreads(user);
+    const latest = threads.find(t => Array.isArray(t.messages) && t.messages.length) || null;
+    if (latest) seedUid(latest.messages);
+    return {
+      threads,
+      latest,
+      thread: latest
+        ? { id: latest.id, created_at: latest.created_at }
+        : { id: newThreadId(), created_at: new Date().toISOString() },
+    };
+  });
+  const [msgs, setMsgs] = useState(() => (initial.latest ? initial.latest.messages : [WELCOME]));
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [spots, setSpots] = useState([]);
@@ -136,44 +208,65 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
   const [starters, setStarters] = useState(false);
   const [listening, setListening] = useState(false);
   const [online, setOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine));
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState(() => initial.threads);
+  const [openLists, setOpenLists] = useState(() => new Set());
   const listRef = useRef(null);
   const inputRef = useRef(null);
-  const threadRef = useRef(null);
-  const hydratedRef = useRef(false);
-  const savedSigRef = useRef('');
+  const threadRef = useRef(initial.thread);
+  const savedSigRef = useRef(initial.latest ? signatureOf(initial.latest.messages, initial.latest.id) : '');
+  const msgsRef = useRef(msgs);
+  msgsRef.current = msgs;
+  // Any local edit (send, new chat, open another thread) wins over a cloud row
+  // that was already in flight when it happened.
+  const dirtyRef = useRef(false);
+  // Thread ids change when the first save returns a canonical id. Answers in
+  // flight must survive that, so they track a generation instead of the id.
+  const genRef = useRef(0);
+  const activeUserRef = useRef(user?.id);
 
   useEffect(() => { listRef.current && (listRef.current.scrollTop = listRef.current.scrollHeight); }, [msgs, busy]);
   useEffect(() => { fetchSpots().then(setSpots).catch(() => {}); }, []);
 
-  // Reopen the last conversation (account history, merged with the local
-  // mirror). A reload or a tab switch must never erase what was asked.
+  // Reconcile with the account history in the background. The screen already
+  // shows the local mirror, so a slow or failed network never blanks it.
   useEffect(() => {
     let alive = true;
-    hydratedRef.current = false;
-    threadRef.current = null;
-    savedSigRef.current = '';
-    setMsgs([WELCOME]);
+    const userId = user?.id;
+    if (activeUserRef.current !== userId){
+      // A different account: swap to that account's mirror before merging.
+      activeUserRef.current = userId;
+      const threads = cachedThreads(user);
+      const latest = threads.find(t => Array.isArray(t.messages) && t.messages.length) || null;
+      dirtyRef.current = false;
+      if (latest) seedUid(latest.messages);
+      setHistory(threads);
+      setMsgs(latest ? latest.messages : [WELCOME]);
+      threadRef.current = latest
+        ? { id: latest.id, created_at: latest.created_at }
+        : { id: newThreadId(), created_at: new Date().toISOString() };
+      savedSigRef.current = latest ? signatureOf(latest.messages, latest.id) : '';
+      return () => { alive = false; };
+    }
     Promise.all([latestThread(user), listThreads(user)]).then(([latest, threads]) => {
       if (!alive) return;
       setHistory(threads || []);
-      if (latest && Array.isArray(latest.messages) && latest.messages.length){
-        seedUid(latest.messages);
-        threadRef.current = { id: latest.id, created_at: latest.created_at };
-        savedSigRef.current = signatureOf(latest.messages, latest.id);
-        setMsgs(latest.messages);
-      } else {
-        threadRef.current = { id: newThreadId(), created_at: new Date().toISOString() };
-      }
-      hydratedRef.current = true;
-    }).catch(() => { if (alive) hydratedRef.current = true; });
+      if (!latest || !Array.isArray(latest.messages) || !latest.messages.length) return;
+      if (dirtyRef.current) return;
+      const current = msgsRef.current;
+      const sameThread = latest.id === threadRef.current?.id;
+      const cloudIsNewer = !sameThread || latest.messages.length > current.length;
+      if (!cloudIsNewer) return;
+      seedUid(latest.messages);
+      threadRef.current = { id: latest.id, created_at: latest.created_at };
+      savedSigRef.current = signatureOf(latest.messages, latest.id);
+      setMsgs(latest.messages);
+    }).catch(() => { /* the local mirror already holds the chat */ });
     return () => { alive = false; };
   }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Persist after every settled change. Loading placeholders are stripped and
   // the signature guard avoids rewriting the same state twice.
   useEffect(() => {
-    if (!hydratedRef.current) return;
     const messages = cleanMessages(msgs);
     if (!messages.some(m => m.role === 'user')) return;
     const id = threadRef.current?.id;
@@ -216,8 +309,9 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
     if (!q || busy) return;
     setInput('');
     setStarters(false);
-    const sendingThread = threadRef.current?.id;
-    const stillCurrent = () => threadRef.current?.id === sendingThread;
+    dirtyRef.current = true;
+    const gen = genRef.current;
+    const stillCurrent = () => genRef.current === gen;
     setMsgs(m => [...m, { id:nid(), role:'user', text:q, at:Date.now() }, { id:nid(), role:'ai', loading:true }]);
     setBusy(true);
     const ctrl = new AbortController();
@@ -228,12 +322,13 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
       // its answer belongs to the archived one, not to the new screen.
       if (ctrl.signal.aborted || !stillCurrent()) return;
       const candidates = out.candidates || [];
-      const cards = candidates.slice(0, 1).map(c => cardFor(c, spots));
-      const more = candidates.slice(1, 6).map(c => c.name + (c.hint ? ' — ' + c.hint : ''));
+      // Every result becomes a card; the sheet shows the best three first and
+      // keeps the rest one tap away instead of dumping bare names as text.
+      const cards = candidates.slice(0, 6).map(c => cardFor(c, spots));
       setMsgs(m => [...m.filter(x => !x.loading), {
         id:nid(), role:'ai', at:Date.now(),
         text: out.answer || 'I could not find that — ask me about Pangasinan travel.',
-        cards, more,
+        cards,
       }]);
     } catch (e) {
       if (ctrl.signal.aborted){
@@ -253,15 +348,35 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
   /** Archive the current thread (already saved) and start a clean one. */
   function newChat(){
     stop();
+    dirtyRef.current = true;
+    genRef.current += 1;
     threadRef.current = { id: newThreadId(), created_at: new Date().toISOString() };
     savedSigRef.current = '';
     setMsgs([{ ...WELCOME, at: Date.now() }]);
+    setOpenLists(new Set());
     setMenu(false);
+  }
+
+  // Saving from a chat card appends a real, data-driven confirmation: the count
+  // and the place name come from the account's saved list, never a fixed line.
+  async function confirmSaved(card){
+    setSavedIds(prev => new Set(prev).add(card.id));
+    let count = 1;
+    try {
+      const r = await listFavorites(user);
+      count = (r.data || []).length || 1;
+    } catch { /* keep 1 — the save itself already succeeded */ }
+    setMsgs(m => [...m, {
+      id:nid(), role:'ai', kind:'saved', at:Date.now(),
+      saved:{ name: card.name, count },
+    }]);
   }
 
   function openThread(t){
     if (!t) return;
     stop();
+    dirtyRef.current = true;
+    genRef.current += 1;
     const messages = Array.isArray(t.messages) && t.messages.length
       ? t.messages
       : [{ ...WELCOME, at: Date.now() }];
@@ -269,6 +384,7 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
     threadRef.current = { id: t.id, created_at: t.created_at };
     savedSigRef.current = signatureOf(messages, t.id);
     setMsgs(messages);
+    setOpenLists(new Set());
     setMenu(false);
   }
 
@@ -293,11 +409,11 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
   const followUp = lastAi?.cards?.[0]
     ? [
         { icon:Compass, label:'Plan a day here', send:'Plan a day trip to ' + lastAi.cards[0].name },
-        { icon:Sparkles, label:'More like this', send:'Show me more places like ' + lastAi.cards[0].name },
+        { icon:MapPin, label:'More like this', send:'Show me more places like ' + lastAi.cards[0].name },
       ]
     : [
         { icon:Compass, label:'Beaches near me', send:'Best beaches near me' },
-        { icon:Sparkles, label:'Festivals this month', send:'Which festivals are on this month?' },
+        { icon:MapPin, label:'Festivals this month', send:'Which festivals are on this month?' },
       ];
 
   return (
@@ -314,7 +430,7 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
               <i className={'online-dot' + (online ? '' : ' off')}/>
             </span>
             <div className="h-text">
-              <b className="chat-title">LakbAI Assistant</b>
+              <b className="chat-title">LakbAI</b>
               <span className="chat-sub">Your Personal Travel Guide</span>
             </div>
           </div>
@@ -368,17 +484,47 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
           {msgs.map((m, i) => {
             // The day/time divider sits above the first message that was actually sent.
             const startsDay = m.at && !msgs.slice(0, i).some(x => x.at);
+            // One featured place, then a short list; the rest stay one tap away.
+            // Threads saved before the sheet existed stored their extra results
+            // as "Name — Town" lines — rebuild them into cards instead of
+            // leaving history on the old plain list.
+            const stored = [...(m.cards || []), ...cardsFromMore(m.more, spots)];
+            const list = stored.filter((c, n) => stored.findIndex(x => x.id === c.id) === n);
+            const expanded = openLists.has(m.id);
+            const rows = list.slice(1);
+            const shownRows = expanded ? rows : rows.slice(0, 2);
+            const hidden = rows.length - shownRows.length;
+            const answer = answerLead(m.text, list.length > 0);
             return (
               <Fragment key={m.id}>
                 {startsDay && <div className="chat-day">{dayLabel(m.at)}</div>}
                 {m.loading ? (
                   <div className="chat-ai">
                     <div className="chat-ai-head">
-                      <span className="ai-avatar"><Sparkles size={14} color="#fff" strokeWidth={2.2}/></span>
-                      <span className="ai-name">LakbAI Guide</span>
+                      <span className="ai-avatar"><Compass size={14} color="#fff" strokeWidth={2.2}/></span>
+                      <span className="ai-name">LakbAI</span>
                     </div>
                     <span className="shimmer" style={{ fontSize:13 }}>Searching places...</span>
-                    <button type="button" data-testid="chat-stop" className="chat-stop" onClick={stop} style={{ marginLeft:8, fontSize:12 }}>Stop</button>
+                  </div>
+                ) : m.kind === 'saved' ? (
+                  <div className="chat-saved" data-testid="saved-to-trips">
+                    <div className="chat-saved-bar">
+                      <Bookmark size={15} color="var(--primary)"/>
+                      <span>Saved to <b>Trips</b></span>
+                      <span style={{ color:'var(--muted-ink)' }}>· {m.saved.count} {m.saved.count === 1 ? 'place' : 'places'} saved</span>
+                      <button type="button" className="chat-saved-view" onClick={() => setTab?.('saved')}>
+                        View Trips <ChevronRight size={13}/>
+                      </button>
+                    </div>
+                    <div className="chat-saved-msg">
+                      I've added <b>{m.saved.name}</b> to your Trip.{' '}
+                      {m.saved.count === 1
+                        ? 'Check your Trips tab to generate your schedule!'
+                        : `You now have ${m.saved.count} places saved — open your Trips tab to build the day.`}
+                    </div>
+                    <button type="button" data-testid="saved-to-trips-go" className="chat-saved-go" onClick={() => setTab?.('saved')}>
+                      <Bookmark size={15}/> Go to Trips Tab
+                    </button>
                   </div>
                 ) : m.role === 'user' ? (
                   <div className="chat-user">
@@ -391,33 +537,62 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
                 ) : (
                   <div className="chat-ai">
                     <div className="chat-ai-head">
-                      <span className="ai-avatar"><Sparkles size={14} color="#fff" strokeWidth={2.2}/></span>
-                      <span className="ai-name">LakbAI Guide</span>
+                      <span className="ai-avatar"><Compass size={14} color="#fff" strokeWidth={2.2}/></span>
+                      <span className="ai-name">LakbAI</span>
                     </div>
-                    <div className="ai-text"><MdText text={m.text}/></div>
+                    {answer.kind === 'label' && list.length > 0 ? (
+                      <div className="chat-results-eyebrow" data-testid="chat-results-label">
+                        <span>{answer.lead ? answer.lead.replace(/:\s*$/, '') : 'Results'}</span>
+                        <i>· {list.length} {list.length === 1 ? 'place' : 'places'}</i>
+                      </div>
+                    ) : (
+                      <div className="ai-text"><MdText text={answer.lead}/></div>
+                    )}
 
-                    {(m.cards || []).map(card => (
-                      <ChatCard
-                        key={card.id}
-                        card={card}
-                        coords={coords}
-                        user={user}
-                        push={push}
-                        showToast={showToast}
-                        saved={savedIds.has(card.id)}
-                        onSaved={id => setSavedIds(prev => new Set(prev).add(id))}
-                      />
-                    ))}
+                    {list.length > 0 && (
+                      <>
+                        <div className="chat-results" data-testid="chat-results">
+                          <ChatHero
+                            card={list[0]}
+                            coords={coords}
+                            user={user}
+                            push={push}
+                            showToast={showToast}
+                            saved={savedIds.has(list[0].id)}
+                            onSaved={confirmSaved}
+                          />
+                          {shownRows.map(card => (
+                            <ChatRow
+                              key={card.id}
+                              card={card}
+                              coords={coords}
+                              user={user}
+                              push={push}
+                              showToast={showToast}
+                              saved={savedIds.has(card.id)}
+                              onSaved={confirmSaved}
+                            />
+                          ))}
+                        </div>
 
-                    {(m.more || []).length > 0 && (
-                      <ul data-testid="chat-more" className="chat-more">
-                        {m.more.map(line => (
-                          <li key={line}>
-                            <MapPin size={12} color="var(--primary)"/>
-                            <span>{line}</span>
-                          </li>
-                        ))}
-                      </ul>
+                        {rows.length > 2 && (
+                          <button
+                            type="button"
+                            data-testid="chat-show-more"
+                            className="chat-show-more"
+                            aria-expanded={expanded}
+                            onClick={() => setOpenLists(prev => {
+                              const next = new Set(prev);
+                              if (next.has(m.id)) next.delete(m.id); else next.add(m.id);
+                              return next;
+                            })}
+                          >
+                            {expanded
+                              ? <><span>Show less</span> <ChevronDown size={14} style={{ transform:'rotate(180deg)' }}/></>
+                              : <><span>Show {hidden} more</span> <ChevronDown size={14}/></>}
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 )}
@@ -470,12 +645,11 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
             <button
               type="button"
               data-testid="chat-send"
-              className="c-send"
-              onClick={() => send()}
-              disabled={busy}
-              aria-label="Send"
+              className={'c-send' + (busy ? ' is-stop' : '')}
+              onClick={() => (busy ? stop() : send())}
+              aria-label={busy ? 'Stop the answer' : 'Send'}
             >
-              {busy ? <Send size={16}/> : <ArrowUp size={18}/>}
+              {busy ? <Square size={13} fill="currentColor" strokeWidth={0}/> : <ArrowUp size={18}/>}
             </button>
           </div>
         </div>

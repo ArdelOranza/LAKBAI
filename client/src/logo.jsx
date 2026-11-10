@@ -134,7 +134,7 @@ export default function Logo({ size = 40, withWordmark = false }){
     <div style={{ display:'flex', alignItems:'center', gap:12 }}>
       {mark}
       <div>
-        <div style={{ fontWeight:800, fontSize:size * 0.72, color:'var(--ink)', lineHeight:1 }}>LakbAI</div>
+        <div style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:size * 0.72, color:'var(--ink)', lineHeight:1.05, letterSpacing:'-.02em' }}>LakbAI</div>
         <div style={{ fontSize:11, color:'var(--muted-ink)', marginTop:2 }}>Lakbai, smarter, not harder.</div>
       </div>
     </div>

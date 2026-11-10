@@ -38,6 +38,21 @@ function hasCoords(lng, lat){
 /** Re-exported from staticMap.js — the implementation lives there single-source. */
 export { staticMapThumb as mapThumb } from './staticMap.js';
 
+/** Old threads stored the extra results as "Name — Town" lines. Turn them
+ *  back into the same card shape so history renders exactly like a fresh
+ *  answer instead of falling back to a plain bullet list. */
+export function cardsFromMore(lines = [], spots = []){
+  return (Array.isArray(lines) ? lines : [])
+    .map(line => {
+      const raw = String(line || '').trim();
+      const at = raw.indexOf(' — ');
+      const name = at === -1 ? raw : raw.slice(0, at).trim();
+      const hint = at === -1 ? '' : raw.slice(at + 3).trim();
+      return cardFor({ name, hint }, spots);
+    })
+    .filter(c => c.name && c.name !== 'Unknown place');
+}
+
 /** Normalised card data for one AI candidate. */
 export function cardFor(candidate = {}, spots = []){
   const spot = matchSpot(candidate.name, spots);
@@ -52,6 +67,8 @@ export function cardFor(candidate = {}, spots = []){
     hint: candidate.hint || spot?.town || '',
     description: candidate.description || spot?.blurb || '',
     rating: toNumber(candidate.rating),
+    // Review counts come from the dataset row, never estimated.
+    reviews: String(candidate.reviews ?? '').trim(),
     // Only what the model actually returned: no invented opening hours or prices.
     fees: String(candidate.fees || '').trim(),
     festival: String(candidate.festival || '').trim(),

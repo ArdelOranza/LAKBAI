@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Check, CalendarDays, Pencil, MapPin, CloudSun, Sparkles, Car, Ticket } from 'lucide-react';
+import { ArrowLeft, Check, CalendarDays, Pencil, MapPin, CloudSun, Car, Ticket } from 'lucide-react';
 import { useAuth } from '../AuthContext.jsx';
 import { savePlan } from '../store.js';
 import { sessionSet } from '../sessionCache.js';
@@ -110,7 +110,7 @@ export default function ItineraryView({ plan, coords, pop, showToast }){
                 <span style={{ position:'absolute', left:10, top:10, background:'rgba(255,255,255,.94)', borderRadius:10, padding:'3px 10px', fontWeight:800, fontSize:12, color:'var(--ink)' }}>{String(i + 1).padStart(2, '0')}</span>
                 <div style={{ position:'absolute', left:10, bottom:10, display:'flex', gap:6 }}>
                   {!(p.inputNames || []).includes(s.name) && (
-                    <span className="chip" style={{ fontSize:10, padding:'3px 9px', background:'var(--primary)', color:'#fff', border:'none', display:'inline-flex', alignItems:'center', gap:4 }}><Sparkles size={11}/> AI Added</span>
+                    <span className="chip" style={{ fontSize:10, padding:'3px 9px', background:'var(--primary)', color:'#fff', border:'none', display:'inline-flex', alignItems:'center', gap:4 }}><Check size={11}/> Added</span>
                   )}
                   {s.arrive && s.depart && <span className="chip" style={{ fontSize:10, padding:'3px 9px', background:'rgba(15,23,42,.7)', color:'#fff', border:'none' }}>{s.arrive} – {s.depart}</span>}
                 </div>

@@ -12,7 +12,7 @@ describe('ChatTab', () => {
   });
 
   it('keeps the header, welcome copy and composer', () => {
-    expect(html).toContain('LakbAI Assistant');
+    expect(html).toContain('LakbAI');
     expect(html).toContain("Hi! I&#x27;m LakbAI");
     expect(html).toContain('data-testid="chat-input"');
   });

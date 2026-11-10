@@ -3,7 +3,7 @@ import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useAuth, friendlyAuthError } from '../AuthContext.jsx';
 import { validateSignup } from '../authValidate.js';
 import Logo from '../logo.jsx';
-import { PrimaryBtn, GoogleBtn, OrDivider } from '../ui.jsx';
+import { PrimaryBtn, GoogleBtn, OrDivider, TextField } from '../ui.jsx';
 
 const LABEL = { display:'block', fontSize:12, fontWeight:600, margin:'16px 0 6px' };
 const CARD = { background:'#FFFFFF', borderRadius:'28px 28px 0 0', padding:'28px 24px 32px', marginTop:'-24px' };
@@ -51,14 +51,20 @@ export default function SignUp({ onAuthed, onSwitchToLogin }){
         : res.error });
     }
   }
-  const EyeToggle = ({ k }) => <button type="button" className="icon-btn" onClick={() => setShow(s => ({ ...s, [k]: !s[k] }))} aria-label={'Toggle ' + k}>{show[k] ? <EyeOff size={16}/> : <Eye size={16}/>}</button>;
+  const EyeToggle = ({ k }) => <button type="button" className="field-btn" onClick={() => setShow(s => ({ ...s, [k]: !s[k] }))} aria-label={'Toggle ' + k}>{show[k] ? <EyeOff size={16}/> : <Eye size={16}/>}</button>;
   const field = (k, label, type, eye) => (
     <div>
       <label style={LABEL} htmlFor={'signup-' + k}>{label}</label>
-      <div style={{ display:'flex', gap:6 }}>
-        <input id={'signup-' + k} data-testid={'signup-' + k} type={eye ? (show[k] ? 'text' : 'password') : type} value={form[k]} onChange={e => set(k, e.target.value)} onKeyDown={onEnter} style={{ flex:1 }} disabled={!configured || busy}/>
-        {eye && <EyeToggle k={k}/>}
-      </div>
+      <TextField
+        id={'signup-' + k}
+        testid={'signup-' + k}
+        type={eye ? (show[k] ? 'text' : 'password') : type}
+        value={form[k]}
+        onChange={e => set(k, e.target.value)}
+        onKeyDown={onEnter}
+        disabled={!configured || busy}
+        trailing={eye ? <EyeToggle k={k}/> : null}
+      />
     </div>
   );
   return (

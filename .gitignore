@@ -7,6 +7,8 @@ graphify-out/
 .opencode/
 # Admin runtime edits (persisted spots/photos) — not source
 server/data/admin-spots.json
+# Supabase CLI scratch files
+supabase/.temp/
 # Planning docs — local only, not pushed/deployed
 *_PLAN.md
 *_FIXES.md

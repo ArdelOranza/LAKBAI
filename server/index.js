@@ -5,6 +5,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.get('/api/health', (req, res) => res.json({ ok: true }));
+// The API host is public, so opening it should identify the service instead of
+// showing Express's default "Cannot GET /" to anyone who checks the deployment.
+app.get('/', (req, res) => res.json({
+  service: 'Lakbai API',
+  ok: true,
+  health: '/api/health',
+  app: process.env.APP_ORIGIN || 'https://lakbai-app.onrender.com',
+}));
 const MESSAGE_MAX = 500;
 function boundedMessage(req){
   const m = String((req.body && req.body.message) || '');

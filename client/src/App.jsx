@@ -1,6 +1,7 @@
 import { Component, useEffect, useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import { AuthProvider, useAuth } from './AuthContext.jsx';
-import { Toast, TabBar, PrimaryBtn, useAutoToast } from './ui.jsx';
+import { Toast, TabBar, PrimaryBtn, TextField, useAutoToast } from './ui.jsx';
 import Logo from './logo.jsx';
 import { readLocalPrefs, loadPrefs } from './prefs.js';
 import { tabFromSearch } from './deepLink.js';
@@ -208,6 +209,7 @@ function Shell(){
 function SetPassword({ onDone, updatePassword }){
   const [pw, setPw] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [show, setShow] = useState({ pw:false, confirm:false });
   const [err, setErr] = useState(null);
   const [busy, setBusy] = useState(false);
   const LABEL = { display:'block', fontSize:12, fontWeight:600, margin:'16px 0 6px' };
@@ -234,9 +236,35 @@ function SetPassword({ onDone, updatePassword }){
         <h1 style={{ textAlign:'center' }}>Set a New Password</h1>
         <p style={{ textAlign:'center', color:'var(--muted-ink)', fontSize:14 }}>Choose a new password for your account.</p>
         <label style={LABEL} htmlFor="set-password-input">New Password</label>
-        <input id="set-password-input" data-testid="set-password" type="password" value={pw} onChange={e => setPw(e.target.value)} onKeyDown={onEnter} disabled={busy} />
+        <TextField
+          id="set-password-input"
+          testid="set-password"
+          type={show.pw ? 'text' : 'password'}
+          value={pw}
+          onChange={e => setPw(e.target.value)}
+          onKeyDown={onEnter}
+          disabled={busy}
+          trailing={(
+            <button type="button" className="field-btn" onClick={() => setShow(s => ({ ...s, pw:!s.pw }))} aria-label="Toggle password">
+              {show.pw ? <EyeOff size={16}/> : <Eye size={16}/>}
+            </button>
+          )}
+        />
         <label style={LABEL} htmlFor="set-password-confirm-input">Confirm Password</label>
-        <input id="set-password-confirm-input" data-testid="set-password-confirm" type="password" value={confirm} onChange={e => setConfirm(e.target.value)} onKeyDown={onEnter} disabled={busy} />
+        <TextField
+          id="set-password-confirm-input"
+          testid="set-password-confirm"
+          type={show.confirm ? 'text' : 'password'}
+          value={confirm}
+          onChange={e => setConfirm(e.target.value)}
+          onKeyDown={onEnter}
+          disabled={busy}
+          trailing={(
+            <button type="button" className="field-btn" onClick={() => setShow(s => ({ ...s, confirm:!s.confirm }))} aria-label="Toggle confirm">
+              {show.confirm ? <EyeOff size={16}/> : <Eye size={16}/>}
+            </button>
+          )}
+        />
         {err && <p data-testid="set-password-error" style={{ color:'var(--accent)', fontSize:13, margin:'12px 0 0' }}>{err}</p>}
         <div style={{ marginTop:20 }}><PrimaryBtn testid="set-password-submit" disabled={busy} onClick={submit}>Update Password</PrimaryBtn></div>
         <div style={{ textAlign:'center', marginTop:16 }}>

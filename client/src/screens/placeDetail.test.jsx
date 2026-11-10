@@ -67,7 +67,7 @@ describe('PlaceDetail directions popup', () => {  it('opens the maps URL without
       btn.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
     });
     expect(window.open).toHaveBeenCalledWith(
-      'https://www.google.com/maps/dir/?api=1&destination=16.1,120.1',
+      'https://www.google.com/maps/dir/?api=1&destination=16.1,120.1&travelmode=driving&dir_action=navigate',
       '_blank', 'noopener,noreferrer'
     );
     await React.act(async () => root.unmount());

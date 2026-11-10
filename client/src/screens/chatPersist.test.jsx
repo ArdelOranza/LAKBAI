@@ -8,6 +8,7 @@ vi.mock('../chatStore.js', () => ({
   listThreads: vi.fn(),
   saveThread: vi.fn(async (user, thread) => thread),
   cleanMessages: (messages) => messages,
+  cachedThreads: () => [],
   threadTitle: () => 'Chat',
 }));
 vi.mock('../api.js', () => ({

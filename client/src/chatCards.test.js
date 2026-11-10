@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeName, matchSpot, mapThumb, cardFor } from './chatCards.js';
+import { normalizeName, matchSpot, mapThumb, cardFor, cardsFromMore } from './chatCards.js';
 
 const SPOTS = [
   { id: 'giant-sungayan-grill-bolinao', name: 'Giant Sungayan Grill', town: 'Bolinao', lng: 119.869, lat: 16.302, categories: ['Food', 'Dining'], photos: [] },
@@ -41,6 +41,23 @@ describe('mapThumb', () => {
     expect(mapThumb(119.869, 16.302, '')).toBeNull();
     expect(mapThumb(null, 16.302, 'pk.test')).toBeNull();
     expect(mapThumb(119.869, undefined, 'pk.test')).toBeNull();
+  });
+});
+
+describe('cardsFromMore', () => {
+  it('turns saved "Name — Town" lines back into cards', () => {
+    const cards = cardsFromMore(['Patar Beach — Bolinao', 'Mystery Eatery — Dagupan'], SPOTS);
+    expect(cards[0]).toMatchObject({ id: 'patar-beach-bolinao', lng: 119.799, lat: 16.339 });
+    expect(cards[1]).toMatchObject({ name: 'Mystery Eatery', hint: 'Dagupan' });
+  });
+
+  it('keeps the curated town when a saved line has no town', () => {
+    expect(cardsFromMore(['Patar Beach'], SPOTS)[0].hint).toBe('Bolinao');
+  });
+
+  it('ignores empty input', () => {
+    expect(cardsFromMore(undefined, SPOTS)).toEqual([]);
+    expect(cardsFromMore([], SPOTS)).toEqual([]);
   });
 });
 

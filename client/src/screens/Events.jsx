@@ -117,7 +117,7 @@ export default function Events({ coords, push, pop, showToast }){
             >
               <div style={{ width:52, height:52, minWidth:52, borderRadius:12, background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center', alignContent:'center', lineHeight:1 }}>
                 <span style={{ fontSize:9.5, fontWeight:700, letterSpacing:.8 }}>{MONTHS[f.starts.getMonth()]}</span>
-                {!f.vague && <b style={{ fontSize:19, fontWeight:800, marginTop:2 }}>{f.starts.getDate()}</b>}
+                {!f.vague && <b style={{ fontSize:19, fontWeight:650, marginTop:2 }}>{f.starts.getDate()}</b>}
               </div>
 
               <div style={{ flex:1, minWidth:0 }}>

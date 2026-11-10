@@ -11,10 +11,12 @@ export function telHref(number){
   return 'tel:' + digits;
 }
 
-/** Google Maps directions to a point, or null when we have no coordinates. */
+/** Google Maps driving directions to a point, or null when we have no
+ *  coordinates. `dir_action=navigate` starts turn-by-turn immediately on a
+ *  phone; on desktop Maps opens the same route in driving mode. */
 export function directionsHref(lat, lng){
   if (lat == null || lng == null) return null;
-  return 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng;
+  return 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '&travelmode=driving&dir_action=navigate';
 }
 
 /** Human "1.2 km away" / "400 m away". */

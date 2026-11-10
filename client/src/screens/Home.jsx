@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   MapPin, Search, Mic, Umbrella, UtensilsCrossed, Soup, CalendarDays,
-  Sparkles, ArrowRight, Plus, Star,
+  Compass, ArrowRight, Plus, Star,
 } from 'lucide-react';
 import { recommend } from '../api.js';
 import { reverseGeocode } from '../geocode.js';
@@ -196,7 +196,7 @@ export default function Home({ coords, push, showToast, setTab, user }){
         )}
 
         <div data-testid="plan-cta" onClick={() => setTab('chat')} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTab('chat'); } }} role="button" tabIndex={0} className="soft-card" style={{ margin:'16px 0', cursor:'pointer', borderRadius:18, padding:14 }}>
-          <span style={{ width:40, height:40, minWidth:40, borderRadius:'50%', background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center' }}><Sparkles size={19}/></span>
+          <span style={{ width:40, height:40, minWidth:40, borderRadius:'50%', background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center' }}><Compass size={19}/></span>
           <span style={{ flex:1 }}>
             <b style={{ fontSize:14 }}>Need a personalized plan?</b>
             <p style={{ margin:0, fontSize:12.5, color:'var(--muted-ink)' }}>Let LakbAI orchestrate your day in {place.split(',')[0]}</p>

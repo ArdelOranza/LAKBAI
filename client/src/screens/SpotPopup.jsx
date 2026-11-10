@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  Waves, UtensilsCrossed, Mountain, Landmark, Sparkles, Car, Camera, Maximize2,
-  Star, MapPin, Navigation, CirclePlus, CircleCheck, ArrowRight,
+  Waves, UtensilsCrossed, Mountain, Landmark, Car, Camera, Maximize2,
+  Star, MapPin, Navigation, CirclePlus, CircleCheck,
 } from 'lucide-react';
 import { useAuth } from '../AuthContext.jsx';
 import { saveFavorite, listFavorites } from '../store.js';
@@ -23,7 +23,7 @@ const VIBES = [
 function vibeFor(spot){
   const hay = [spot.name, spot.blurb, ...(spot.categories || [])].join(' ');
   const hit = VIBES.find(([re]) => re.test(hay));
-  return hit ? { label: hit[1], Icon: hit[2] } : { label: 'Hidden Gem', Icon: Sparkles };
+  return hit ? { label: hit[1], Icon: hit[2] } : { label: 'Local Spot', Icon: MapPin };
 }
 
 export default function SpotPopup({ spot, coords, pop, push, showToast, user, setTab }){
@@ -37,12 +37,12 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
   const dragYRef = useRef(0);
   const trackRef = useRef(null);
   const photos = (spot.photos && spot.photos.length) ? spot.photos : null;
-  const count = photos ? photos.length : 3; // reserved placeholder dots
   // U14-A: located spot with no photos gallery still shows its static map instead of icons.
   const gallery = photos || (() => {
     const thumb = staticMapThumb(spot.lng, spot.lat, mapboxToken(), { width: 600, height: 340 });
     return thumb ? [thumb] : null;
   })();
+  const count = gallery ? gallery.length : 3; // placeholder dots when there is no image
   // Distance is only meaningful with a real fix — measuring from the fallback
   // centre fabricates drive times when location permission is off.
   const hasFix = coords && !(coords.lng === FALLBACK_CENTER.lng && coords.lat === FALLBACK_CENTER.lat);
@@ -118,18 +118,18 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
 
       <div className="spot-scroll">
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:10, marginBottom:10 }}>
-          <span style={{ display:'inline-flex', alignItems:'center', gap:5, background:'#E7F0FE', color:'var(--primary)', borderRadius:999, padding:'5px 11px', fontSize:9.5, fontWeight:800, letterSpacing:.9, textTransform:'uppercase' }}>
+          <span className="spot-vibe">
             <vibe.Icon size={11}/> {vibe.label}
           </span>
           {km != null && (
             <span style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:12, color:'var(--ink)', fontWeight:600 }}>
-              <Car size={14} color="var(--muted-ink)"/> {formatDistance(km)} • {minutes} min
+              <Car size={14} color="var(--muted-ink)"/> {formatDistance(km)} · {minutes} min
             </span>
           )}
         </div>
 
         <div style={{ position:'relative', borderRadius:16, overflow:'hidden', background:'#EDF1F7' }}>
-          <div ref={trackRef} onScroll={e => { const i = Math.round(e.currentTarget.scrollLeft / Math.max(1, e.currentTarget.clientWidth)); if (i !== slide) setSlide(i); }} style={{ display:'flex', overflowX:'auto', scrollSnapType:'x mandatory', height:112, scrollbarWidth:'none' }}>
+          <div ref={trackRef} onScroll={e => { const i = Math.round(e.currentTarget.scrollLeft / Math.max(1, e.currentTarget.clientWidth)); if (i !== slide) setSlide(i); }} style={{ display:'flex', overflowX:'auto', scrollSnapType:'x mandatory', height:150, scrollbarWidth:'none' }}>
             {(gallery || [0, 1, 2]).map((src, i) => (
               <div key={i} style={{ flex:'0 0 100%', scrollSnapAlign:'center', position:'relative' }}>
                 {gallery
@@ -160,8 +160,8 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
           )}
         </div>
 
-        <div style={{ display:'flex', alignItems:'flex-start', gap:10, marginTop:8 }}>
-          <h3 style={{ margin:0, flex:1, minWidth:0, fontSize:18, fontWeight:800, letterSpacing:'-.5px', lineHeight:1.25 }}>{spot.name}</h3>
+        <div style={{ display:'flex', alignItems:'flex-start', gap:10, marginTop:10 }}>
+          <h3 className="spot-name" style={{ margin:0, flex:1, minWidth:0, fontSize:22, fontWeight:600, letterSpacing:'-.02em', lineHeight:1.2 }}>{spot.name}</h3>
           {rating != null && (
             <div style={{ textAlign:'right', flex:'0 0 auto', paddingTop:2 }}>
               <span style={{ display:'inline-flex', alignItems:'center', gap:4, background:'#F7F9FC', border:'1px solid #EDF1F7', borderRadius:999, padding:'3px 9px', fontSize:12.5, fontWeight:700 }}>
@@ -172,16 +172,16 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
           )}
         </div>
 
-        <p style={{ margin:'5px 0 0', fontSize:12.5, display:'flex', alignItems:'center', gap:5 }}>
+        <p style={{ margin:'6px 0 0', fontSize:12.5, display:'flex', alignItems:'center', gap:5 }}>
           <MapPin size={13} color="var(--accent)"/>
           <span>{spot.address || [spot.town, 'Pangasinan'].filter(Boolean).join(', ')}</span>
         </p>
 
-        <p style={{ margin:'6px 0 0', fontSize:12.5, lineHeight:1.5, color:'#475569', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>
+        <p style={{ margin:'8px 0 0', fontSize:13, lineHeight:1.55, color:'#475569' }}>
           {spot.blurb || `A curated ${String((spot.categories && spot.categories.length) ? spot.categories[0] : 'local').toLowerCase()} stop in ${spot.town || 'Pangasinan'} — save it and let LakbAI sequence your day around it.`}
         </p>
 
-        <div style={{ margin:'10px 0 2px' }}>
+        <div style={{ margin:'14px 0 2px' }}>
           {saved ? (
             <div style={{ display:'grid', gap:8 }}>
               <button className="primary-btn" data-testid="spot-save" disabled style={{ background:'var(--primary)', opacity:1 }}>
@@ -189,6 +189,7 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
               </button>
               <button
                 className="secondary-btn"
+                data-testid="spot-ask"
                 onClick={() => { pop(); setTab && setTab('chat'); }}
               >
                 Ask LakbAI
@@ -211,19 +212,6 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
             </div>
           )}
         </div>
-
-        <div style={{ display:'flex', gap:6, flexWrap:'wrap', margin:'8px 0 0' }}>
-          {(spot.categories || []).map(c => <span key={c} className="tag">{c}</span>)}
-        </div>
-
-        <button
-          data-testid="spot-details"
-          onClick={() => { pop(); push({ name: 'detail', place: spot }); }}
-          style={{ marginTop:10, width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, background:'#F7F9FC', border:'1px solid #EDF1F7', borderRadius:12, padding:'11px 13px', fontSize:12.5, fontWeight:600, color:'var(--ink)' }}
-        >
-          <span>Reviews, hours &amp; full details</span>
-          <ArrowRight size={15} color="var(--primary)"/>
-        </button>
       </div>
     </aside>
   );
