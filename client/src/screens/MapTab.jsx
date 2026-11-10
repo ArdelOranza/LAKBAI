@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, Umbrella, UtensilsCrossed, Landmark, MapPin, LocateFixed } from 'lucide-react';
 import { recommend } from '../api.js';
 import { readLocalPrefs } from '../prefs.js';
@@ -10,9 +10,13 @@ import { FALLBACK_CENTER } from '../App.jsx';
 import { Map, MapMarker, MarkerContent } from '@/components/ui/map';
 import { Chip } from '../ui.jsx';
 import SpotPopup from './SpotPopup.jsx';
-import { placeImage, mapboxToken } from '../staticMap.js';
 
 const RADII = [[1,'1 km'],[5,'Within 5 km'],[10,'10 km']];
+const RADIUS_ZOOM = { 1: 13, 5: 11.5, 10: 10.5 };
+// Below this zoom the map is a city/region view: 80 name labels turn into a
+// wall. Pins stay, names wait until the traveler is close enough to read them.
+const PIN_DETAIL_ZOOM = 12.5;
+const easeOut = t => 1 - Math.pow(1 - t, 3);
 const FILTERS = [
   ['All', MapPin],
   ['Beaches', Umbrella],
@@ -25,6 +29,58 @@ function shortName(name){
   const n = String(name || '').replace(/\s*\(.*$/, '').trim();
   return n.length > 22 ? n.slice(0, 21).trimEnd() + '…' : n;
 }
+
+/** Google-Maps-style teardrop marker (white rim + centre dot). */
+function PinDrop(){
+  return (
+    <span className="pin-drop" aria-hidden="true">
+      <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z"/>
+        <circle cx="12" cy="9" r="2.5"/>
+      </svg>
+    </span>
+  );
+}
+
+/** True when two screen boxes touch (with a little breathing room). */
+function overlaps(a, b, pad){
+  return !(a.right + pad < b.left || b.right + pad < a.left || a.bottom + pad < b.top || b.bottom + pad < a.top);
+}
+
+/**
+ * Google-Maps-style declutter, done in screen space after the map settles.
+ * Pins that would stack on top of a higher-priority pin step aside; in close
+ * view the name underneath a pin also yields when another name already owns
+ * that patch of map. Nothing is removed from the data — it fades back in as
+ * soon as the traveler pans or zooms to give it room.
+ */
+function declutterPins(root, detailed){
+  if (!root) return;
+  const pins = Array.from(root.querySelectorAll('button.spot-pin'));
+  if (!pins.length) return;
+  pins.forEach(p => p.classList.remove('is-hidden', 'label-hidden'));
+  const priority = p => p.classList.contains('active') ? 0 : p.dataset.pin === 'spot' ? 1 : p.dataset.pin === 'discover' ? 3 : 2;
+  const ordered = pins
+    .map((p, i) => ({ p, i, r: priority(p) }))
+    .sort((a, b) => a.r - b.r || a.i - b.i)
+    .map(x => x.p);
+  const keptPins = [];
+  const keptNames = [];
+  for (const pin of ordered){
+    const box = pin.getBoundingClientRect();
+    if (!box.width || !box.height) continue; // hidden tab / not laid out yet
+    if (keptPins.some(b => overlaps(box, b, 1))){ pin.classList.add('is-hidden'); continue; }
+    keptPins.push(box);
+    if (!detailed) continue;
+    const name = pin.querySelector('.pin-name');
+    if (!name) continue;
+    const label = name.getBoundingClientRect();
+    if (!label.width) continue;
+    if (keptNames.some(b => overlaps(label, b, 1)) || keptPins.some(b => b !== box && overlaps(label, b, 0))) pin.classList.add('label-hidden');
+    else keptNames.push(label);
+  }
+}
+
 
 export default function MapTab({ coords, push, showToast, user, setTab }){
   const [radius, setRadius] = useState(5);
@@ -40,35 +96,80 @@ export default function MapTab({ coords, push, showToast, user, setTab }){
   // A real GPS fix has arrived — until then coords are the Pangasinan fallback,
   // which must not be shown as "You are here" or used to filter pins.
   const hasFix = !(coords.lng === FALLBACK_CENTER.lng && coords.lat === FALLBACK_CENTER.lat);
-  const [viewport, setViewport] = useState({ center: [coords.lng, coords.lat], zoom: 11.5 });
+  const [viewport, setViewport] = useState({ center: [coords.lng, coords.lat], zoom: RADIUS_ZOOM[5] });
   const [centeredOnFix, setCenteredOnFix] = useState(false);
+  const [following, setFollowing] = useState(false);
+  // While the traveler pans, the map is the source of truth: only crossing the
+  // detail threshold touches the DOM, so 80 markers are never re-rendered on
+  // an animation frame (that is what made zooming feel heavy).
+  const detailedRef = useRef(false);
+  const viewRef = useRef(viewport);
+  const mapRef = useRef(null);
+  const shellRef = useRef(null);
+  const declutterTimer = useRef(0);
 
-  // Keep the controlled viewport in sync: radius chips change zoom, the
-  // first real GPS fix re-centres. Later fixes only move the view when the
+  function markDetail(on){
+    if (detailedRef.current === on) return;
+    detailedRef.current = on;
+    shellRef.current?.classList.toggle('pins-far', !on);
+  }
+
+  function scheduleDeclutter(){
+    clearTimeout(declutterTimer.current);
+    declutterTimer.current = setTimeout(() => declutterPins(shellRef.current, detailedRef.current), 90);
+  }
+
+  function onViewChange(v){
+    viewRef.current = v;
+    const detail = v.zoom >= PIN_DETAIL_ZOOM;
+    if (detail !== detailedRef.current) markDetail(detail);
+    scheduleDeclutter();
+  }
+
+  function moveTo(center, zoom){
+    const map = mapRef.current;
+    if (map && typeof map.easeTo === 'function'){
+      map.easeTo({ center, ...(zoom != null ? { zoom } : {}), duration: 560, easing: easeOut });
+      return;
+    }
+    const next = { ...viewRef.current, center, ...(zoom != null ? { zoom } : {}) };
+    viewRef.current = next;
+    setViewport(next);
+  }
+
+  function pickRadius(km){
+    setRadius(km);
+    const zoom = RADIUS_ZOOM[km];
+    markDetail(zoom >= PIN_DETAIL_ZOOM);
+    moveTo(viewRef.current.center, zoom);
+  }
+
+  // First real GPS fix re-centres. Later fixes only move the view when the
   // user is in "following" mode (tapped Locate) — otherwise the map feels
   // drunk on every GPS jitter step.
-  const [following, setFollowing] = useState(false);
   useEffect(() => {
-    setViewport(v => ({ ...v, zoom: radius === 1 ? 13 : radius === 5 ? 11.5 : 10.5 }));
-  }, [radius]);
-  useEffect(() => {
-    if (!hasFix) return;
-    if (!centeredOnFix){
-      setViewport(v => ({ ...v, center: [coords.lng, coords.lat] }));
-      setCenteredOnFix(true);
-    }
-  }, [hasFix, centeredOnFix, coords.lng, coords.lat]);
+    if (!hasFix || centeredOnFix) return;
+    moveTo([coords.lng, coords.lat], viewRef.current.zoom);
+    setCenteredOnFix(true);
+  }, [hasFix, centeredOnFix, coords.lng, coords.lat]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!hasFix || !following) return;
-    setViewport(v => ({ ...v, center: [coords.lng, coords.lat] }));
-  }, [coords.lng, coords.lat, hasFix, following]);
+    moveTo([coords.lng, coords.lat], viewRef.current.zoom);
+  }, [coords.lng, coords.lat, hasFix, following]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function locateMe(){
     if (!hasFix) { showToast('Waiting for GPS fix — enable location to see yourself', 'error'); return; }
-    setViewport(v => ({ ...v, center: [coords.lng, coords.lat], zoom: 14 }));
+    markDetail(14 >= PIN_DETAIL_ZOOM);
+    moveTo([coords.lng, coords.lat], 14);
     setCenteredOnFix(true);
     setFollowing(true);
   }
+
+  useEffect(() => () => clearTimeout(declutterTimer.current), []);
+
+  // Any render that changes pins re-runs the declutter; the work itself is
+  // debounced and only touches classes, never React state.
+  useEffect(() => { scheduleDeclutter(); });
 
   useEffect(() => {
     const key = keyFor(radius, coords);
@@ -121,12 +222,13 @@ export default function MapTab({ coords, push, showToast, user, setTab }){
   [discovered, filter, radius, hasFix, coords.lng, coords.lat]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div style={{ position:'relative', flex:1, minHeight:0, display:'flex', flexDirection:'column' }}>
+    <div ref={shellRef} className="pins-far" style={{ position:'relative', flex:1, minHeight:0, display:'flex', flexDirection:'column' }}>
       <Map
+        ref={mapRef}
         viewport={viewport}
-        onViewportChange={setViewport}
+        onViewportChange={onViewChange}
         center={[coords.lng, coords.lat]}
-        zoom={radius === 1 ? 13 : radius === 5 ? 11.5 : 10.5}
+        zoom={RADIUS_ZOOM[radius]}
         theme="light"
         className="absolute inset-0"
       >
@@ -154,46 +256,39 @@ export default function MapTab({ coords, push, showToast, user, setTab }){
             </MarkerContent>
           </MapMarker>
         )}
-        {filtered.map(p => {
-          const img = placeImage(p, mapboxToken());
-          return (
-            <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} onClick={() => push({ name:'detail', place:p })}>
-              <MarkerContent>
-                <button type="button" className="spot-pin" title={p.name} aria-label={p.name}>
-                  {img && <span className="pin-photo"><img src={img} alt="" loading="lazy" onError={e => { e.currentTarget.closest('.pin-photo').style.display='none'; }} /></span>}
-                  <span className="pin-name">{shortName(p.name)}</span>
-                </button>
-              </MarkerContent>
-            </MapMarker>
-          );
-        })}
+        {filtered.map(p => (
+          <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} onClick={() => push({ name:'detail', place:p })}>
+            <MarkerContent>
+              <button type="button" className="spot-pin" data-pin="rec" title={p.name} aria-label={p.name}>
+                <PinDrop/>
+                <span className="pin-name">{shortName(p.name)}</span>
+              </button>
+            </MarkerContent>
+          </MapMarker>
+        ))}
         {filteredSpots.map(s => {
           const active = selectedSpot && selectedSpot.id === s.id;
-          const img = placeImage(s, mapboxToken());
           return (
             <MapMarker key={'spot-' + s.id} longitude={s.lng} latitude={s.lat} onClick={() => setSelectedSpot(s)}>
               <MarkerContent>
-                <button className={'spot-pin' + (active ? ' active' : '')} title={s.name} aria-label={s.name}>
-                  {img && <span className="pin-photo"><img src={img} alt="" loading="lazy" onError={e => { e.currentTarget.closest('.pin-photo').style.display='none'; }} /></span>}
+                <button className={'spot-pin' + (active ? ' active' : '')} data-pin="spot" title={s.name} aria-label={s.name}>
+                  <PinDrop/>
                   <span className="pin-name">{shortName(s.name)}</span>
                 </button>
               </MarkerContent>
             </MapMarker>
           );
         })}
-        {filteredDiscover.map(p => {
-          const img = placeImage(p, mapboxToken());
-          return (
-            <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} onClick={() => push({ name:'detail', place:p })}>
-              <MarkerContent>
-                <button type="button" className="spot-pin discover" title={p.name + ' — discovered via Mapbox'} aria-label={p.name}>
-                  {img && <span className="pin-photo"><img src={img} alt="" loading="lazy" onError={e => { e.currentTarget.closest('.pin-photo').style.display='none'; }} /></span>}
-                  <span className="pin-name">{shortName(p.name)}</span>
-                </button>
-              </MarkerContent>
-            </MapMarker>
-          );
-        })}
+        {filteredDiscover.map(p => (
+          <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} onClick={() => push({ name:'detail', place:p })}>
+            <MarkerContent>
+              <button type="button" className="spot-pin discover" data-pin="discover" title={p.name + ' — discovered via Mapbox'} aria-label={p.name}>
+                <PinDrop/>
+                <span className="pin-name">{shortName(p.name)}</span>
+              </button>
+            </MarkerContent>
+          </MapMarker>
+        ))}
       </Map>
 
       <div style={{ position:'absolute', top:12, left:12, right:12, zIndex:5, background:'rgba(255,255,255,.97)', borderRadius:999, padding:'11px 16px', boxShadow:'0 10px 24px -14px rgba(15,23,42,.3)', display:'flex', alignItems:'center', gap:8, cursor:'pointer' }} onClick={() => push({ name:'search', query:'' })} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'search', query:'' }); } }}>
@@ -202,7 +297,7 @@ export default function MapTab({ coords, push, showToast, user, setTab }){
       </div>
 
       <div className="map-chips">
-        {RADII.map(([km, label]) => <Chip key={km} active={radius === km} onClick={() => setRadius(km)} testid={'radius-' + km}>{label}</Chip>)}
+        {RADII.map(([km, label]) => <Chip key={km} active={radius === km} onClick={() => pickRadius(km)} testid={'radius-' + km}>{label}</Chip>)}
         {FILTERS.map(([f, Icon]) => (
           <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>
             <span style={{ display:'inline-flex', alignItems:'center', gap:6 }}><Icon size={14}/>{f}</span>

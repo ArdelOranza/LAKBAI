@@ -38,7 +38,7 @@ vi.mock('@/components/ui/map', () => {
 import MapTab from './MapTab.jsx';
 
 const DISCOVERED = [
-  { id: 'box:d009j', name: 'Balingasay Headland', lng: 119.8695, lat: 16.3018, address: 'Balingasay, Bolinao, Pangasinan', categories: ['natural'], photo: null, hint: 'Bolinao', source: 'mapbox' },
+  { id: 'box:d009j', name: 'Balingasay Headland', lng: 119.8695, lat: 16.3018, address: 'Balingasay, Bolinao, Pangasinan', categories: ['natural'], photo: '/photos/balingasay.jpg', hint: 'Bolinao', source: 'mapbox' },
   // far away: must never show inside a 5 km radius around the fix
   { id: 'box:d0020', name: 'Faraway Point', lng: 120.6, lat: 15.75, categories: [], photo: null, source: 'mapbox' },
 ];
@@ -65,7 +65,7 @@ describe('MapTab discovered pins', () => {
   it('Mapbox discoveries render as clearly-marked discover pins next to dataset pins', async () => {
     const h = await mount();
     const pins = Array.from(h.container.querySelectorAll('button.spot-pin'));
-    expect(pins.some(b => b.textContent.includes('Dataset Beach'))).toBe(true);
+    expect(pins.some(b => b.getAttribute('aria-label') === 'Dataset Beach')).toBe(true);
     const discovered = pins.filter(b => b.className.includes('discover'));
     expect(discovered.map(b => b.getAttribute('aria-label')))
       .toEqual(['Balingasay Headland']); // Faraway Point is outside the 5 km radius
@@ -90,8 +90,8 @@ describe('MapTab discovered pins', () => {
       chip.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
     });
     const pins = Array.from(h.container.querySelectorAll('button.spot-pin'));
-    expect(pins.some(b => b.textContent.includes('Balingasay Headland'))).toBe(false);
-    expect(pins.some(b => b.textContent.includes('Dataset Beach'))).toBe(false);
+    expect(pins.some(b => b.getAttribute('aria-label') === 'Balingasay Headland')).toBe(false);
+    expect(pins.some(b => b.getAttribute('aria-label') === 'Dataset Beach')).toBe(false);
     await h.unmount();
   });
 
@@ -112,16 +112,12 @@ describe('MapTab discovered pins', () => {
     await h.unmount();
   });
 
-  it('map pins show the establishment photo (JSON photo first)', async () => {
+  it('pins never draw a photo or static-map thumbnail (a map inside the map)', async () => {
     const h = await mount();
-    const pins = Array.from(h.container.querySelectorAll('button.spot-pin'));
-    const dsPin = pins.find(b => b.textContent.includes('Dataset Beach'));
-    expect(dsPin).not.toBeUndefined();
-    // token is stubbed in tests to '' so mapbox fallback is null → but dataset photo would show
-    // Dataset Beach in this test has photo: null and no token → no img is OK.
-    // Discover pins always get a mapbox static fallback only if token present;
-    // with no token they still render without crashing.
-    expect(h.container.innerHTML).toBeTruthy();
+    // Even pins with a real photo and discovered pins with a Mapbox fallback
+    // stay icon-only: the thumbnail made a second pin appear above the first.
+    expect(h.container.querySelectorAll('button.spot-pin img').length).toBe(0);
+    expect(h.container.querySelectorAll('.pin-photo').length).toBe(0);
     await h.unmount();
   });
 
@@ -130,6 +126,35 @@ describe('MapTab discovered pins', () => {
     const h = await mount();
     expect(h.container.querySelectorAll('button.spot-pin.discover').length).toBe(0);
     expect(h.container.textContent).toBeTruthy();
+    await h.unmount();
+  });
+
+  it('far zoom keeps the pin and its name in the DOM so the label can fade', async () => {
+    const h = await mount(); // default radius 5 km → zoom 11.5
+    expect(h.container.firstElementChild.className).toContain('pins-far');
+    expect(h.container.querySelectorAll('.pin-drop').length)
+      .toBe(h.container.querySelectorAll('button.spot-pin').length);
+    const pin = h.container.querySelector('button.spot-pin');
+    expect(pin.getAttribute('aria-label')).toBe('Dataset Beach');
+    expect(pin.getAttribute('title')).toBe('Dataset Beach');
+    // The name stays mounted and is hidden by CSS, so it can transition.
+    expect(pin.querySelector('.pin-name').textContent).toBe('Dataset Beach');
+    expect(pin.dataset.pin).not.toBeUndefined(); // declutter priority
+    await h.unmount();
+  });
+
+  it('zooming into a neighbourhood (1 km) reveals the name below the pin', async () => {
+    const h = await mount();
+    const chip = Array.from(h.container.querySelectorAll('.map-chips button, .map-chips .chip'))
+      .find(b => b.textContent.trim() === '1 km');
+    await React.act(async () => {
+      chip.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+    });
+    expect(h.container.firstElementChild.className).not.toContain('pins-far');
+    const pin = h.container.querySelector('button.spot-pin[aria-label="Dataset Beach"]');
+    expect(pin.querySelector('.pin-name').textContent).toBe('Dataset Beach');
+    expect(h.container.querySelectorAll('.pin-photo').length).toBe(0);
+    expect(h.container.textContent).toContain('Balingasay Headland');
     await h.unmount();
   });
 });

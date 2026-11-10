@@ -150,16 +150,29 @@ li{margin:6px 0}
 .shimmer{color:var(--muted-ink);font-weight:500}
 /* map pins (rendered through mapcn MarkerContent) — small name pills instead of icons */
 .userdot{width:18px;height:18px;border-radius:50%;background:var(--primary);border:3px solid #fff;box-shadow:0 0 0 6px rgba(0,102,255,.22);animation:pulse 2s ease-in-out infinite}
-/* map pins — modern · clean · minimal */
-.spot-pin{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;padding:2px;box-shadow:none;color:var(--ink);font-size:11px;font-weight:600;letter-spacing:0;line-height:1.2;white-space:nowrap;text-align:center}
+/* map pins — Google-Maps-style teardrop, name as a map label below it */
+.spot-pin{position:relative;display:flex;flex-direction:column;align-items:center;background:none;border:none;padding:0;box-shadow:none;color:var(--ink);font-size:11px;font-weight:600;letter-spacing:0;line-height:1.2;white-space:nowrap;text-align:center;transition:opacity .18s ease,transform .18s ease}
 .spot-pin:active{transform:scale(.96)}
-.pin-photo{width:64px;height:64px;border-radius:50%;overflow:hidden;background:#fff;border:2px solid #fff;box-shadow:0 6px 16px rgba(15,23,42,.14);display:block;flex:0 0 64px}
-.pin-photo img{width:100%;height:100%;object-fit:cover;display:block}
-.pin-name{max-width:128px;background:rgba(255,255,255,.96);border:none;border-radius:8px;padding:5px 9px;box-shadow:0 2px 8px rgba(15,23,42,.10);overflow:hidden;text-overflow:ellipsis;font-size:11px;font-weight:600;color:#0A2540;letter-spacing:0}
-.spot-pin.active .pin-name{background:#0A2540;color:#fff}
-.spot-pin.discover .pin-photo{border-color:#fff}
+/* Colliding pins yield instead of stacking into an unreadable pile. */
+.spot-pin.is-hidden{opacity:0;pointer-events:none;transform:scale(.78)}
+.pin-drop{display:block;width:26px;height:30px;filter:drop-shadow(0 3px 5px rgba(15,23,42,.30));transform-origin:50% 100%;transition:transform .2s ease}
+.pin-drop svg{display:block;width:100%;height:100%}
+.pin-drop path{fill:var(--primary);stroke:#fff;stroke-width:1.4;paint-order:stroke fill}
+.pin-drop circle{fill:#fff}
+.spot-pin:hover .pin-drop{transform:translateY(-1px) scale(1.05)}
+.spot-pin.active .pin-drop path{fill:#0A2540}
+.spot-pin.discover .pin-drop path{fill:#fff;stroke:#64748B}
+.spot-pin.discover .pin-drop circle{fill:#64748B}
+/* The name hangs under the pin like a map label — no white billboard, no
+   photo thumbnail (a tiny map inside the map reads as a second pin). */
+.pin-name{position:absolute;top:calc(100% + 2px);left:50%;transform:translateX(-50%);max-width:132px;background:none;border:none;border-radius:0;padding:0 2px;box-shadow:none;overflow:hidden;text-overflow:ellipsis;font-size:10.5px;font-weight:650;color:#1F2937;letter-spacing:-.01em;text-shadow:0 0 2px #fff,0 0 3px #fff,0 1px 2px rgba(255,255,255,.95),0 -1px 2px rgba(255,255,255,.95);opacity:1;pointer-events:none;transition:opacity .18s ease,transform .18s ease}
+.spot-pin.active .pin-name{color:#0A2540;font-weight:700}
 .spot-pin.discover .pin-name{color:#475569}
-.spot-pin.discover .pin-name::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:#94A3B8;margin-right:5px;vertical-align:2px}
+/* Far zoom: the pin stays, its name waits until the map is close enough to
+   read it. Both states are the same DOM node, so the label fades instead of
+   popping. */
+.pins-far .pin-name,.spot-pin.label-hidden .pin-name{opacity:0;transform:translate(-50%,-3px)}
+.pins-far .spot-pin:hover .pin-name{opacity:1;transform:translate(-50%,0)}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
 .spot-sheet{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(430px,100vw);background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -12px 40px rgba(10,37,64,.22);z-index:30;max-height:86vh;display:flex;flex-direction:column;padding-bottom:calc(78px + var(--safe-bottom));overflow:hidden}
 .spot-vibe{display:inline-flex;align-items:center;gap:5px;background:var(--primary);color:#fff;border-radius:999px;padding:5px 11px;font-size:9.5px;font-weight:650;letter-spacing:.1em;text-transform:uppercase}
