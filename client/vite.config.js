@@ -4,9 +4,9 @@ import path from 'node:path'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react(), tailwindcss(), VitePWA({
+// The APK ships the same bundle, but a service worker inside the native shell
+// only caches a second copy of assets Capacitor already ships locally.
+const pwa = VitePWA({
     registerType: 'autoUpdate',
     includeAssets: ['hero.svg'],
     manifest: {
@@ -44,7 +44,11 @@ export default defineConfig({
         handler: 'CacheFirst', options: { cacheName: 'fonts', expiration: { maxEntries: 30, maxAgeSeconds: 60*60*24*365 } }
       }]
     }
-  })],
+  });
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(), tailwindcss(), ...(process.env.MOBILE_BUILD === '1' ? [] : [pwa])],
   resolve: { alias: { '@': path.resolve(__dirname, './src') } },
   // SECURITY: envDir loads server secrets into the client build context, but only
   // variables prefixed with VITE_ are inlined into the browser bundle — everything

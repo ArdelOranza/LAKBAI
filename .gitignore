@@ -9,6 +9,12 @@ graphify-out/
 server/data/admin-spots.json
 # Supabase CLI scratch files
 supabase/.temp/
+# Android (Capacitor) — generated assets, build output, signing material
+mobile/node_modules/
+mobile/out/
+mobile/resources/
+mobile/android/keystore/
+mobile/android/keystore.properties
 # Planning docs — local only, not pushed/deployed
 *_PLAN.md
 *_FIXES.md

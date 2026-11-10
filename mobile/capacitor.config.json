@@ -1,0 +1,12 @@
+{
+  "appId": "com.lakbai.app",
+  "appName": "LakbAI",
+  "webDir": "../client/dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#FFFFFF",
+    "allowMixedContent": false
+  }
+}

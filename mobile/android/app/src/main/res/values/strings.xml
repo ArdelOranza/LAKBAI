@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">LakbAI</string>
+    <string name="title_activity_main">LakbAI</string>
+    <string name="package_name">com.lakbai.app</string>
+    <string name="custom_url_scheme">com.lakbai.app</string>
+</resources>
