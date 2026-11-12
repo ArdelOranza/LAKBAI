@@ -15,6 +15,8 @@ import { saveFavorite, listFavorites } from '../store.js';
 import { haversineKm, formatDistance, driveMinutes } from '../geo.js';
 import { suggestionsFor } from '../chatSuggest.js';
 import { topicTabs } from '../chatTopics.js';
+import { buildChatContext } from '../chatContext.js';
+import { readLocalPrefs } from '../prefs.js';
 import { PhotoPlaceholder } from '../ui.jsx';
 import Logo from '../logo.jsx';
 // import AiBackdrop from '../AiBackdrop.jsx'; // parked: the chat background stays plain
@@ -182,7 +184,7 @@ function ChatRow({ card, coords, user, push, showToast, saved, onSaved }){
   );
 }
 
-export default function ChatTab({ user, coords, push, setTab, showToast, openDirections }){
+export default function ChatTab({ user, coords, hasFix = true, push, setTab, showToast, openDirections }){
   // Paint the saved conversation from the local mirror on the first frame.
   // Supabase is a background sync, never a gate: waiting on it made the thread
   // disappear into the welcome card on every tab switch / reload.
@@ -316,7 +318,13 @@ export default function ChatTab({ user, coords, push, setTab, showToast, openDir
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     try {
-      const out = await chat(q, coords ? `${coords.lng},${coords.lat}` : '', ctrl.signal);
+      const out = await chat(q, coords ? `${coords.lng},${coords.lat}` : '', ctrl.signal, {
+        // Where they are travels as proximity; this adds who they are, what
+        // they said they like, and their local time — built on every send so
+        // the hour is never stale.
+        context: buildChatContext({ user, prefs: readLocalPrefs(user) }),
+        hasFix,
+      });
       // The traveler may have opened another thread while this was in flight;
       // its answer belongs to the archived one, not to the new screen.
       if (ctrl.signal.aborted || !stillCurrent()) return;

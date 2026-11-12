@@ -83,22 +83,28 @@ app.post('/api/recommend', async (req, res) => {
 });
 const { chatRecommend } = require('./agent.js');
 const { commuteVersion, isCommuteQuestion, fareFacts, fareAnswer, outOfScopeNote } = require('./commute.js');
+const { sanitizeChatContext, profileHash } = require('./chatContext.js');
 app.post('/api/chat', async (req, res) => {
   try {
     const message = boundedMessage(req);
     if (message === null) return res.status(400).json({ error: 'Message too long.' });
     const proximity = String(req.body.proximity || '');
+    // Who they are and what they like: bounded, one line, never trusted as
+    // instructions. An old client sends none, and behaves exactly as before.
+    const context = sanitizeChatContext(req.body.context);
+    const hasFix = req.body.hasFix !== false;
     const p = proximity.split(',').map(Number);
     const proxKey = p.length === 2 && p.every(Number.isFinite) ? p[0].toFixed(2) + ',' + p[1].toFixed(2) : '';
     const info = datasetInfo();
     const sig = info.ready ? `${info.file}|${info.count}` : 'nodataset';
     // The LTFRB file's version rides in the key: a fare update can never be
-    // shadowed by an answer cached against yesterday's matrix.
-    const key = `d:${sig}:${commuteVersion()}:${message}|${proxKey}`;
+    // shadowed by an answer cached against yesterday's matrix. The profile
+    // fingerprint rides along too, so Ana's itinerary is never served to Ben.
+    const key = `d:${sig}:${commuteVersion()}:${message}|${proxKey}|${profileHash(context, hasFix)}`;
     const tripBreaker = () => { aiDownUntil = Date.now() + AI_COOLDOWN_MS; };
     if (info.ready) {
       if (aiUsable()) {
-        try { return res.json(await cached(key, AI_TTL_MS, () => groundedChat(message, proximity), { onStale: tripBreaker })); }
+        try { return res.json(await cached(key, AI_TTL_MS, () => groundedChat(message, proximity, { profile: context, hasFix }), { onStale: tripBreaker })); }
         catch (e) { tripBreaker(); console.warn('grounded chat failed:', e.message); }
       }
       // A fare question does not need a model: the answer is in the LTFRB file,

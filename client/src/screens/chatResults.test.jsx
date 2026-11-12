@@ -32,6 +32,7 @@ vi.mock('../spots.js', () => ({ fetchSpots: vi.fn(async () => []) }));
 
 import ChatTab from './ChatTab.jsx';
 import { latestThread } from '../chatStore.js';
+import { chat } from '../api.js';
 
 function click(el){
   el.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
@@ -170,5 +171,25 @@ describe('chat result sheet', () => {
 
     await React.act(async () => root.unmount());
     container.remove();
+  });
+
+  it('sends where the traveler is and what they like with the question', async () => {
+    localStorage.setItem('lakbai.prefs:u1', JSON.stringify(['Beaches', 'Food & Dining']));
+    const { container, root } = await renderChat();
+
+    expect(chat).toHaveBeenCalledWith(
+      'beaches please',
+      expect.any(String),
+      expect.anything(),
+      expect.objectContaining({
+        context: expect.stringContaining('Interests: Beaches, Food & Dining'),
+        hasFix: true,
+      }),
+    );
+    expect(chat.mock.calls.at(-1)[3].context).not.toContain('lakbai.prefs');
+
+    await React.act(async () => root.unmount());
+    container.remove();
+    localStorage.removeItem('lakbai.prefs:u1');
   });
 });

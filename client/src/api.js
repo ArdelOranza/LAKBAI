@@ -36,8 +36,14 @@ export async function recommend(message, proximity, prefs = []){
   if (!r.ok) throw new Error(await readError(r));
   return r.json();
 }
-export async function chat(message, proximity, signal){
-  const r = await aiFetch(apiUrl('/api/chat'), { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ message, proximity }) }, { signal });
+export async function chat(message, proximity, signal, extra = {}){
+  const body = { message, proximity };
+  // The traveler profile is optional: a signed-out guest still gets the time,
+  // and an old caller that passes no fourth argument sends exactly what it did
+  // before.
+  if (extra.context) body.context = extra.context;
+  if (extra.hasFix === false) body.hasFix = false;
+  const r = await aiFetch(apiUrl('/api/chat'), { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) }, { signal });
   if (!r.ok) throw new Error(await readError(r));
   return r.json();
 }

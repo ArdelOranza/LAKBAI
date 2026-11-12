@@ -18,6 +18,32 @@ test('the context hands the AI the verified rows, not a web search', () => {
   assert.match(text, /Traveler is in/);
 });
 
+test('the traveler profile rides along as a fact, clearly labeled', () => {
+  const { text } = buildContext('where can I eat', '120.341,16.043', {
+    profile: 'Ana. Interests: Beaches, Food & Dining. Local time: Thu 14:05 (Asia/Manila).',
+  });
+  assert.match(text, /Traveler profile: Ana\. Interests: Beaches, Food & Dining\./);
+  assert.match(text, /Traveler is in Dagupan/);
+});
+
+test('without a GPS fix the AI is told not to claim a town', () => {
+  const { text } = buildContext('where can I eat', '120.23,16.03', { hasFix: false });
+  assert.match(text, /location is not known/);
+  assert.doesNotMatch(text, /Traveler is in/);
+});
+
+test('groundedChat hands the profile to the model, not just the builder', async () => {
+  let seen = '';
+  const askFn = async (_system, payload) => {
+    seen = payload;
+    return JSON.stringify({ intent: 'discover', answer: 'ok', candidates: [] });
+  };
+  await groundedChat('beaches', '120.341,16.043', {
+    askFn, profile: 'Ana. Interests: Beaches.', hasFix: true,
+  });
+  assert.match(seen, /Traveler profile: Ana\. Interests: Beaches\./);
+});
+
 test('a request that matches nothing still gets the index to choose from', () => {
   const { text, hits } = buildContext('somewhere for a quiet anniversary', '120.341,16.043');
   assert.equal(hits.length, 0);

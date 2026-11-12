@@ -181,7 +181,8 @@ function Shell(){
     setStack([]); setTab('home'); setPrefsStage(false); setAuthStage(null); setAuthNotice(null);
   };
   const top = stack[stack.length - 1];
-  const screenProps = { coords, push, pop, showToast, setTab: switchTab, user, signOut: doSignOut, openDirections };
+  const hasFix = !(coords.lng === FALLBACK_CENTER.lng && coords.lat === FALLBACK_CENTER.lat);
+  const screenProps = { coords, hasFix, push, pop, showToast, setTab: switchTab, user, signOut: doSignOut, openDirections };
   let body;
   if (top?.name === 'search') body = <SearchResults query={top.query} {...screenProps}/>;
   else if (top?.name === 'browse') body = <Browse kind={top.kind} {...screenProps}/>;
@@ -208,7 +209,7 @@ function Shell(){
         <RouteSheet
           place={routePlace}
           coords={coords}
-          hasFix={!(coords.lng === FALLBACK_CENTER.lng && coords.lat === FALLBACK_CENTER.lat)}
+          hasFix={hasFix}
           onClose={() => setRoutePlace(null)}
         />
       )}
