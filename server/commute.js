@@ -344,7 +344,14 @@ function commuteVersion(){
   return `${META.version}|${META.effective_date_ltfrb}|${TOWNS.length}`;
 }
 
+// A question that explicitly asks a price keeps the LTFRB fare path even when it
+// also names a terminal ("how much is the fare from the Cubao terminal?").
+const FARE_QUESTION = /\b(fare|fares|pamasahe|magkano|magkanu|mag kano|how much|price|presyo)\b/i;
+function isFareQuestion(text){
+  return FARE_QUESTION.test(String(text || ''));
+}
+
 module.exports = {
-  isCommuteQuestion, fareFacts, fareAnswer, fareFor, localRidesNote, outOfScopeNote,
-  groundCommuteAnswer, commuteVersion, DISCLAIMER,
+  isCommuteQuestion, isFareQuestion, fareFacts, fareAnswer, fareFor, localRidesNote,
+  outOfScopeNote, groundCommuteAnswer, commuteVersion, DISCLAIMER,
 };

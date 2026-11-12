@@ -1,0 +1,679 @@
+{
+  "dataset_metadata": {
+    "title": "All Bus Terminals Going to Pangasinan (Metro Manila & Regional Luzon Hubs)",
+    "description": "Comprehensive, source-grounded directory of all provincial bus terminals across Metro Manila (Cubao, Pasay, PITX, Avenida/Santa Cruz, Sampaloc, Caloocan/Monumento, One Ayala Makati) and major Luzon regional hubs (Baguio, Dau/Clark, Olongapo, Cabanatuan) serving destinations in Pangasinan.",
+    "destination_province": "Pangasinan, Ilocos Region (Region I), Philippines",
+    "last_verified": "2026-11-12"
+  },
+  "metro_manila_terminals_by_district": {
+    "cubao_quezon_city": [
+      {
+        "terminal_id": "five-star-cubao",
+        "operator_name": "Pangasinan Five Star Bus Company, Inc.",
+        "terminal_name": "Five Star Bus Co. Cubao Terminal",
+        "address": "Epifanio de los Santos Ave (EDSA Northbound), J2FX+CV4, Cubao, Quezon City, Metro Manila",
+        "google_maps_place_id": "ChIJZ9jSZwu3lzMRyCho67xKES4",
+        "contact_phone": "+63 927 712 4349",
+        "google_rating": {
+          "score": 4.3,
+          "review_count": 1863
+        },
+        "pangasinan_destinations": [
+          "Dagupan City (via TPLEX and via Carmen)",
+          "Alaminos City",
+          "Bolinao",
+          "Anda",
+          "Agno",
+          "Dasol",
+          "Bani",
+          "Mabini",
+          "Burgos",
+          "San Carlos City",
+          "Bayambang",
+          "Malasiqui",
+          "Calasiao",
+          "Rosales (Carmen / SM City Rosales)",
+          "Villasis",
+          "Urdaneta City",
+          "Tayug"
+        ],
+        "schedule_summary": "Dagupan: 12:00 AM - 11:00 PM (45-60 min interval); Bolinao: 12:00 AM - 10:00 PM (1-2 hr interval); San Carlos: 1:00 AM - 11:00 PM (hourly); Tayug: 4:00 AM - 9:00 PM (1-2 hr interval)",
+        "fare_range_php": "₱440 - ₱900 (₱498 regular to Dagupan)",
+        "grounding_sources": [
+          "https://www.fivestarph.com/routes-and-schedules",
+          "https://bustickets.ph/five-star-bus/",
+          "https://pamasahe.com/routes/cubao-manila-dagupan-five-star-bus-schedule-fares",
+          "https://5starbus.com/schedules"
+        ]
+      },
+      {
+        "terminal_id": "solid-north-cubao",
+        "operator_name": "Pangasinan Solid North Transit, Inc.",
+        "terminal_name": "Pangasinan Solid North Transit Cubao Terminal",
+        "address": "676-677 Epifanio de los Santos Ave (EDSA), Immaculate Conception 4, Cubao, Quezon City, 1109 Metro Manila",
+        "google_maps_place_id": "ChIJOTYI47i3lzMRi_GckQs82VE",
+        "contact_phone": "+63 917 886 6784",
+        "contact_email": "info@solidnorthinc.com",
+        "google_rating": {
+          "score": 3.9,
+          "review_count": 494
+        },
+        "pangasinan_destinations": [
+          "Dagupan City",
+          "San Carlos City",
+          "Lingayen",
+          "Manaoag (Our Lady of Manaoag)",
+          "Alaminos City",
+          "Bolinao",
+          "Bayambang",
+          "Malasiqui",
+          "Calasiao",
+          "Binmaley",
+          "Rosales (Carmen / SM City Rosales)",
+          "Urdaneta City",
+          "Binalonan",
+          "Villasis",
+          "Pozorrubio",
+          "Sison"
+        ],
+        "schedule_summary": "Open 24 hours; departures 1:00 AM - 11:30 PM (~32 daily trips across Pangasinan routes)",
+        "fare_range_php": "₱440 - ₱900",
+        "grounding_sources": [
+          "https://solidnorthinc.com/",
+          "https://solidnorthtransit.com/schedule",
+          "https://www.rome2rio.com/s/Solid-North-Transit-Terminal-Cubao/Dagupan",
+          "https://12go.asia/en/travel/pangasinan/cubao-pangasinan-solid-north"
+        ]
+      },
+      {
+        "terminal_id": "dagupan-bus-cubao",
+        "operator_name": "Dagupan Bus Co., Inc.",
+        "terminal_name": "Dagupan Bus Terminal Cubao",
+        "address": "713 Epifanio de los Santos Ave (EDSA) corner New York Street, Cubao, Quezon City, 1111 Metro Manila",
+        "google_maps_place_id": "ChIJK2aNkv23lzMRyK9NLFu6u1U",
+        "google_rating": {
+          "score": 4.2,
+          "review_count": 51
+        },
+        "pangasinan_destinations": [
+          "Dagupan City",
+          "Lingayen",
+          "Manaoag",
+          "San Carlos City",
+          "Alaminos City",
+          "Bolinao",
+          "Mangaldan",
+          "San Fabian",
+          "Rosales (Carmen)",
+          "Urdaneta City",
+          "Binalonan"
+        ],
+        "schedule_summary": "Manaoag: 1:00 AM - 11:00 PM; Bolinao: 4:00 AM, 12:00 PM, 3:00 PM, 11:00 PM (frequently boards at sister terminal Pangasinan Solid North Transit)",
+        "fare_range_php": "₱439 - ₱750 (₱439 regular to Manaoag)",
+        "grounding_sources": [
+          "https://pamasahe.com/routes/cubao-manila-manaoag-pangasinan-dagupan-bus-schedule-fares",
+          "https://ph.commutetour.com/travel/transport/bus/dagupan-bus/",
+          "https://www.klook.com/en-US/activity/85541-bus-ticket-cubao-manaoag-pangasinan/"
+        ]
+      },
+      {
+        "terminal_id": "victory-liner-cubao",
+        "operator_name": "Victory Liner, Inc.",
+        "terminal_name": "Victory Liner Cubao Terminal",
+        "address": "683 Epifanio de los Santos Ave (EDSA), Cubao, Quezon City, 1111 Metro Manila",
+        "google_maps_place_id": "ChIJPf75JEfJlzMRTcyW1pF6TBE",
+        "google_rating": {
+          "score": 4.3,
+          "review_count": 5394
+        },
+        "pangasinan_destinations": [
+          "Dagupan City",
+          "Lingayen",
+          "Alaminos City",
+          "Bolinao",
+          "Sual",
+          "Rosales (Carmen)",
+          "Urdaneta City",
+          "Binalonan",
+          "Pozorrubio",
+          "Sison"
+        ],
+        "schedule_summary": "Open 24 hours; Deluxe and Regular AC trips to Lingayen/Dagupan (including 12:20 PM, 2:40 PM, 5:20 PM, 6:40 PM) and trips every ~3 hours to Alaminos/Bolinao",
+        "fare_range_php": "₱490 - ₱750 (₱570 Deluxe to Lingayen; ₱650+ to Alaminos)",
+        "grounding_sources": [
+          "https://www.victoryliner.com/RouteMap.html",
+          "https://bustickets.ph/victory-liner-between-manila-and-dagupan/",
+          "https://ph.commutetour.com/travel/transport/bus/victory-liner-bus/alaminos-terminal/",
+          "https://ph.commutetour.com/travel/transport/bus/victory-liner-bus/bolinao-terminal/"
+        ]
+      },
+      {
+        "terminal_id": "cisco-bus-cubao",
+        "operator_name": "2010 Luzon Cisco Transport, Inc.",
+        "terminal_name": "Cisco Bus Co. - Cubao Terminal",
+        "address": "690 Epifanio de los Santos Ave (EDSA), Cubao, Quezon City, Metro Manila",
+        "contact_phone": "+63 917 502 4726",
+        "google_rating": {
+          "score": 3.7,
+          "review_count": 91
+        },
+        "pangasinan_destinations": [
+          "San Quintin",
+          "Tayug",
+          "Umingan",
+          "Alaminos City",
+          "Dagupan City",
+          "Rosales (Carmen)"
+        ],
+        "schedule_summary": "Departures starting 12:30 AM (every ~3 hours); shares operational hub with Five Star Bus Co.",
+        "fare_range_php": "₱490 - ₱750",
+        "grounding_sources": [
+          "https://www.rome2rio.com/s/Cisco-Bus-Terminal-Cubao/Dagupan",
+          "https://ph.commutetour.com/travel/transport/bus/cisco/",
+          "https://www.pinoytravel.com.ph/"
+        ]
+      },
+      {
+        "terminal_id": "viron-transit-cubao",
+        "operator_name": "Viron Transit Corporation",
+        "terminal_name": "Viron Transit Cubao Terminal",
+        "address": "697 Epifanio de los Santos Ave (EDSA), Immaculate Concepcion, Cubao, Quezon City, 1108 Metro Manila",
+        "google_maps_place_id": "ChIJ1Z8jC7m3lzMRNri95fF_W28",
+        "contact_phone": "+63 2 8726 7409",
+        "google_rating": {
+          "score": 4.3,
+          "review_count": 419
+        },
+        "pangasinan_destinations": [
+          "Rosales (Carmen)",
+          "Villasis",
+          "Urdaneta City",
+          "Binalonan",
+          "Pozorrubio",
+          "Sison"
+        ],
+        "schedule_summary": "Daily northbound trips en route to La Union, Ilocos Sur, Ilocos Norte, and Abra passing through Eastern Pangasinan along MacArthur Highway",
+        "grounding_sources": [
+          "https://virontransit.com/schedule"
+        ]
+      },
+      {
+        "terminal_id": "partas-cubao",
+        "operator_name": "Partas Transportation Co., Inc.",
+        "terminal_name": "Partas Bus Terminal Cubao",
+        "address": "812-816 Aurora Boulevard, Cubao, Quezon City, Metro Manila",
+        "google_maps_place_id": "ChIJd5hNuMe3lzMRRzip4Z8HsMw",
+        "contact_phone": "+63 917 819 3909",
+        "google_rating": {
+          "score": 4.1,
+          "review_count": 678
+        },
+        "pangasinan_destinations": [
+          "Rosales (Carmen)",
+          "Urdaneta City",
+          "Binalonan",
+          "Pozorrubio",
+          "Sison"
+        ],
+        "schedule_summary": "Pass-through stops on regular/inner-town northbound routes to La Union and Ilocos",
+        "grounding_sources": [
+          "https://www.rome2rio.com/Bus/Alaminos-Philippines/Cubao-Bus-Terminal"
+        ]
+      },
+      {
+        "terminal_id": "genesis-joybus-cubao",
+        "operator_name": "Genesis Transport Service, Inc.",
+        "terminal_name": "Genesis Transport & JoyBus Cubao Terminal",
+        "address": "704 Epifanio de los Santos Ave (EDSA) corner New York Ave, Cubao, Quezon City, 1102 Metro Manila",
+        "google_maps_place_id": "ChIJFSZ-brm3lzMRYaFzjCEmvuE",
+        "contact_phone": "+63 2 8709 0803 / +63 933 852 7648",
+        "google_rating": {
+          "score": 4.1,
+          "review_count": 344
+        },
+        "pangasinan_destinations": [
+          "Rosales (Carmen)",
+          "Urdaneta City",
+          "Binalonan",
+          "Pozorrubio",
+          "Sison"
+        ],
+        "schedule_summary": "Regular Baguio-bound trips passing through Eastern Pangasinan",
+        "grounding_sources": [
+          "http://genesistransportserviceinc.com/",
+          "https://www.pinoytravel.com.ph/"
+        ]
+      }
+    ],
+    "pasay_city": [
+      {
+        "terminal_id": "five-star-pasay",
+        "operator_name": "Pangasinan Five Star Bus Company, Inc. & Luzon Cisco Transport",
+        "terminal_name": "Five Star Bus Co. Pasay Terminal (Main Headquarters)",
+        "address": "2220-2240 Aurora Blvd (Tramo), Malibay, Pasay City, 1300 Metro Manila",
+        "google_maps_place_id": "ChIJO9rRdE_JlzMRog-NbIleW5w",
+        "contact_phone": "+63 2 8851 6614 / +63 950 289 3369",
+        "google_rating": {
+          "score": 4.1,
+          "review_count": 627
+        },
+        "pangasinan_destinations": [
+          "Dagupan City",
+          "San Carlos City",
+          "Bolinao",
+          "Alaminos City",
+          "Anda",
+          "Agno",
+          "Tayug",
+          "San Quintin (via Cisco)",
+          "Umingan (via Cisco)",
+          "San Fabian",
+          "Rosales (Carmen)",
+          "Urdaneta City"
+        ],
+        "schedule_summary": "24-hour transit hub with hourly departures to Dagupan, San Carlos, Alaminos, and Bolinao",
+        "fare_range_php": "₱500 - ₱900",
+        "grounding_sources": [
+          "http://5starbus.co/terminals/",
+          "https://www.fivestarph.com/routes-and-schedules",
+          "https://en.wikipedia.org/wiki/Five_Star_Bus_Company",
+          "https://ph.commutetour.com/travel/transport/bus/cisco/"
+        ]
+      },
+      {
+        "terminal_id": "victory-liner-pasay",
+        "operator_name": "Victory Liner, Inc.",
+        "terminal_name": "Victory Liner Pasay Terminal",
+        "address": "712 Epifanio de los Santos Ave (EDSA), Malibay, Pasay City, 1300 Metro Manila",
+        "google_maps_place_id": "ChIJAbskxEbJlzMR7MxSFX9zx14",
+        "contact_phone": "+63 2 8833 5019 / +63 2 8842 8679",
+        "google_rating": {
+          "score": 4.2,
+          "review_count": 3876
+        },
+        "pangasinan_destinations": [
+          "Dagupan City",
+          "Lingayen",
+          "Alaminos City",
+          "Bolinao",
+          "Rosales (Carmen)",
+          "Urdaneta City",
+          "Binalonan",
+          "Pozorrubio",
+          "Sison"
+        ],
+        "schedule_summary": "Daily Regular AC, Deluxe, and First Class departures to Dagupan, Lingayen, Alaminos, Bolinao, and Baguio via Pangasinan",
+        "fare_range_php": "₱500 - ₱950",
+        "grounding_sources": [
+          "https://www.victoryliner.com/",
+          "https://bustickets.ph/victory-liner-between-manila-and-dagupan/",
+          "https://ph.commutetour.com/travel/transport/bus/victory-liner-bus/dagupan-terminal/"
+        ]
+      },
+      {
+        "terminal_id": "partas-pasay",
+        "operator_name": "Partas Transportation Co., Inc.",
+        "terminal_name": "Partas Bus Terminal Pasay",
+        "address": "364 Edang St, Malibay, Pasay City, Metro Manila",
+        "google_maps_place_id": "ChIJee1qWE_JlzMRRNdbWkUkfuc",
+        "google_rating": {
+          "score": 4.2,
+          "review_count": 1774
+        },
+        "pangasinan_destinations": [
+          "Rosales (Carmen)",
+          "Urdaneta City",
+          "Binalonan",
+          "Pozorrubio",
+          "Sison"
+        ],
+        "schedule_summary": "Pass-through stops along MacArthur Highway on regular trips bound for La Union, Vigan, and Laoag",
+        "grounding_sources": [
+          "https://www.rome2rio.com/s/Dagupan/Solid-North-Transit-Terminal-Cubao"
+        ]
+      }
+    ],
+    "paranaque_pitx": [
+      {
+        "terminal_id": "pitx-paranaque",
+        "operator_name": "Pangasinan Solid North Transit, Inc. (at PITX Landport)",
+        "terminal_name": "Parañaque Integrated Terminal Exchange (PITX) - Gate/Ticketing Booth 6 (G/F)",
+        "address": "1 Kennedy Road, Tambo, Parañaque City, 1700 Metro Manila",
+        "google_maps_place_id": "ChIJRda7xxHPlzMRrxJorylkRko",
+        "contact_phone": "+63 927 864 7695",
+        "google_rating": {
+          "score": 4.3,
+          "review_count": 3083
+        },
+        "pangasinan_destinations": [
+          "Dagupan City",
+          "San Carlos City",
+          "Lingayen",
+          "Bolinao",
+          "Alaminos City",
+          "Manaoag",
+          "Bayambang",
+          "Urdaneta City",
+          "Rosales (Carmen)"
+        ],
+        "schedule_summary": "15 to 16 daily departures via TPLEX (approx. 4 to 5.5 hours travel time to Dagupan/San Carlos)",
+        "fare_range_php": "₱600 - ₱700+",
+        "grounding_sources": [
+          "http://pitx.ph/",
+          "https://pamasahe.com/routes/pitx-manila-dagupan-pangasinan-solid-north-transit-schedule-fares",
+          "https://bustickets.ph/solid-north-bus-manila-to-pangasinan/",
+          "https://bustickets.ph/solid-north-bus-manila-to-dagupan/",
+          "https://ticketpitx.com/routes/pangasinan-dagupan"
+        ]
+      }
+    ],
+    "makati_one_ayala": [
+      {
+        "terminal_id": "one-ayala-makati",
+        "operator_name": "Pangasinan Solid North Transit, Inc. (at One Ayala Hub)",
+        "terminal_name": "One Ayala Terminal",
+        "address": "1 Ayala Ave corner EDSA, Ayala Center, Makati City, 1223 Metro Manila",
+        "google_maps_place_id": "ChIJz_kOuvbJlzMR5dsYFh7nJhI",
+        "google_rating": {
+          "score": 4.8,
+          "review_count": 1775
+        },
+        "pangasinan_destinations": [
+          "Dagupan City",
+          "San Carlos City",
+          "Urdaneta City",
+          "Rosales (Carmen)"
+        ],
+        "schedule_summary": "Listed as an official origin hub by Solid North Transit connecting Makati CBD commuters to Pangasinan and Baguio",
+        "grounding_sources": [
+          "https://solidnorthinc.com/",
+          "https://www.facebook.com/OneAyala/"
+        ]
+      }
+    ],
+    "avenida_santa_cruz_manila": [
+      {
+        "terminal_id": "five-star-bataan-transit-avenida",
+        "operator_name": "Pangasinan Five Star Bus Company, Inc. / Pangasinan Solid North Transit / Bataan Transit",
+        "terminal_name": "Five Star & Bataan Transit Bus Terminal Avenida (Doroteo Jose)",
+        "address": "Doroteo Jose Street / 933 Oroquieta Road, Santa Cruz, Manila, Metro Manila",
+        "google_maps_place_id": "ChIJTfLdTgDLlzMRh1zBac7Ydis",
+        "contact_phone": "+63 927 864 1597 / +63 998 595 2645",
+        "google_rating": {
+          "score": 3.8,
+          "review_count": 91
+        },
+        "pangasinan_destinations": [
+          "Dagupan City",
+          "San Carlos City",
+          "Bayambang",
+          "Alaminos City",
+          "Bolinao"
+        ],
+        "schedule_summary": "Daily trips from Avenida (near LRT-1 Doroteo Jose Station) to Dagupan, San Carlos, Bayambang, and Western Pangasinan",
+        "fare_range_php": "₱460 - ₱550",
+        "grounding_sources": [
+          "https://bustickets.ph/five-star-bus/",
+          "https://ph.commutetour.com/travel/transport/bus/pangasinan-solid-north/",
+          "https://www.rome2rio.com/s/Alaminos-Philippines/Malate",
+          "https://en.wikipedia.org/wiki/Five_Star_Bus_Company"
+        ]
+      },
+      {
+        "terminal_id": "philippine-rabbit-avenida",
+        "operator_name": "Philippine Rabbit Bus Lines, Inc.",
+        "terminal_name": "Philippine Rabbit Avenida Terminal",
+        "address": "Rizal Avenue (Avenida) corner Oroquieta Rd, Santa Cruz, Manila, Metro Manila",
+        "pangasinan_destinations": [
+          "Rosales (Carmen)",
+          "Villasis",
+          "Urdaneta City",
+          "Binalonan",
+          "Pozorrubio",
+          "Sison"
+        ],
+        "schedule_summary": "Daily trips via Tarlac/Dau and MacArthur Highway toward Baguio and Northern Luzon",
+        "grounding_sources": [
+          "https://www.rome2rio.com/s/Province-of-Pangasinan/Pedro-Gil-Street"
+        ]
+      }
+    ],
+    "sampaloc_manila": [
+      {
+        "terminal_id": "victory-liner-sampaloc",
+        "operator_name": "Victory Liner, Inc. & Dagupan Bus Co.",
+        "terminal_name": "Victory Liner Sampaloc Terminal",
+        "address": "1310 España Blvd / 551 Earnshaw St, Sampaloc, Manila, 1008 Metro Manila",
+        "google_maps_place_id": "ChIJXR0AAAO2lzMRupkBeTpwOdI",
+        "contact_phone": "+63 998 591 5082 / +63 2 8842 8679",
+        "google_rating": {
+          "score": 4.3,
+          "review_count": 832
+        },
+        "pangasinan_destinations": [
+          "Dagupan City",
+          "Alaminos City",
+          "Bolinao",
+          "Lingayen"
+        ],
+        "schedule_summary": "Regular daily trips serving University Belt / España commuters to Dagupan and Western Pangasinan",
+        "grounding_sources": [
+          "https://ph.commutetour.com/travel/transport/bus/victory-liner-bus/dagupan-terminal/",
+          "https://ph.commutetour.com/travel/transport/bus/victory-liner-bus/alaminos-terminal/",
+          "https://ticketpitx.com/routes/pangasinan-dagupan"
+        ]
+      },
+      {
+        "terminal_id": "maria-de-leon-sampaloc",
+        "operator_name": "Maria De Leon Trans, Inc.",
+        "terminal_name": "Maria De Leon Bus Terminal Sampaloc",
+        "address": "Gelinos St corner Dapitan St (and 949 Oroquieta Rd), Sampaloc / Santa Cruz, Manila, Metro Manila",
+        "google_maps_place_id": "ChIJaZJfiQC2lzMRFMEBZK-nw8U",
+        "contact_phone": "+63 985 773 1187",
+        "google_rating": {
+          "score": 3.8,
+          "review_count": 66
+        },
+        "pangasinan_destinations": [
+          "Rosales (Carmen)",
+          "Urdaneta City",
+          "Binalonan",
+          "Pozorrubio",
+          "Sison"
+        ],
+        "schedule_summary": "Pass-through stops along MacArthur Highway on Ilocos Norte (Laoag/Pasuquin/Nueva Era) routes",
+        "grounding_sources": [
+          "https://en.wikipedia.org/wiki/List_of_bus_companies_of_the_Philippines"
+        ]
+      },
+      {
+        "terminal_id": "gv-florida-sampaloc",
+        "operator_name": "GV Florida Transport, Inc.",
+        "terminal_name": "GV Florida Bus Terminal Sampaloc",
+        "address": "569 M. Earnshaw St corner Lacson Ave, Sampaloc, Manila, 1015 Metro Manila",
+        "google_maps_place_id": "ChIJAyYsb63JlzMRXL811LXCvtQ",
+        "contact_phone": "+63 906 459 6858",
+        "google_rating": {
+          "score": 4.1,
+          "review_count": 748
+        },
+        "pangasinan_destinations": [
+          "Rosales (Carmen)",
+          "Urdaneta City",
+          "Binalonan",
+          "Pozorrubio",
+          "Sison"
+        ],
+        "schedule_summary": "Pass-through stops on Ilocos Norte bound trips",
+        "grounding_sources": [
+          "https://en.wikipedia.org/wiki/List_of_bus_companies_of_the_Philippines"
+        ]
+      }
+    ],
+    "caloocan_monumento": [
+      {
+        "terminal_id": "victory-liner-caloocan",
+        "operator_name": "Victory Liner, Inc.",
+        "terminal_name": "Victory Liner South Caloocan (Monumento) Terminal",
+        "address": "713 / 1695 Rizal Avenue Ext, Grace Park West, Caloocan, 1400 Metro Manila",
+        "google_maps_place_id": "ChIJyaOdiSu0lzMRnWhRyYe4HWM",
+        "contact_phone": "+63 2 8361 1506 / +63 917 842 5463",
+        "google_rating": {
+          "score": 4.4,
+          "review_count": 615
+        },
+        "pangasinan_destinations": [
+          "Dagupan City",
+          "Lingayen",
+          "Alaminos City",
+          "Bolinao",
+          "Urdaneta City",
+          "Rosales (Carmen)",
+          "Sison"
+        ],
+        "schedule_summary": "Daily northbound departures from Monumento to Dagupan, Lingayen, Alaminos, Bolinao, and Baguio",
+        "grounding_sources": [
+          "http://www.victoryliner.com/",
+          "https://ph.commutetour.com/travel/transport/bus/victory-liner-bus/dagupan-terminal/",
+          "https://ph.commutetour.com/travel/transport/bus/victory-liner-bus/alaminos-terminal/",
+          "https://ph.commutetour.com/travel/transport/bus/victory-liner-bus/bolinao-terminal/"
+        ]
+      }
+    ]
+  },
+  "regional_luzon_terminals_to_pangasinan": [
+    {
+      "terminal_id": "baguio-gov-pack-terminals",
+      "hub_city": "Baguio City, Benguet",
+      "operators": [
+        "Pangasinan Solid North Transit, Inc.",
+        "Victory Liner, Inc.",
+        "Dagupan Bus Co., Inc.",
+        "Five Star Bus Co."
+      ],
+      "terminal_name": "Gov. Pack Road Bus Terminals & Victory Liner Baguio Terminal (Utility Rd)",
+      "address": "CH5X+X7C, Gov. Pack Road (Solid North) & Utility Rd, Marcoville (Victory Liner), Baguio City, Benguet",
+      "google_maps_place_id": "ChIJOTYI47i3lzMRi_GckQs82VE",
+      "contact_phone": "+63 933 863 5433",
+      "google_rating": {
+        "score": 4.5,
+        "review_count": 264
+      },
+      "pangasinan_destinations": [
+        "Dagupan City",
+        "San Carlos City",
+        "Bolinao",
+        "Alaminos City",
+        "Lingayen",
+        "Manaoag",
+        "Sison",
+        "Pozorrubio",
+        "Binalonan",
+        "Urdaneta City",
+        "Villasis",
+        "Rosales (Carmen)",
+        "Tayug"
+      ],
+      "schedule_summary": "Open 24 hours; frequent hourly trips descending from Baguio to Central, Western, and Eastern Pangasinan",
+      "grounding_sources": [
+        "https://ph.commutetour.com/travel/transport/bus/victory-liner-bus/baguio-terminal/",
+        "https://12go.asia/en/travel/dagupan-bus-terminal/cubao-pangasinan-solid-north",
+        "https://ph.commutetour.com/ph/terminal/dagupan-pangasinan/"
+      ]
+    },
+    {
+      "terminal_id": "dau-mabalacat-terminal",
+      "hub_city": "Mabalacat City (Dau / Clark), Pampanga",
+      "operators": [
+        "Five Star Bus Co.",
+        "Pangasinan Solid North Transit, Inc.",
+        "Victory Liner, Inc.",
+        "Dagupan Bus Co., Inc.",
+        "Cisco Bus Co.",
+        "Viron Transit",
+        "Partas"
+      ],
+      "terminal_name": "Dau Mabalacat Common Bus Terminal & Victory Liner Dau Terminal",
+      "address": "R-9 / MacArthur Highway, Barangay Dau, Mabalacat City, Pampanga",
+      "google_maps_place_id": "ChIJpTOzpIntljMR5fNUOFfNRq8",
+      "google_rating": {
+        "score": 4.0,
+        "review_count": 467
+      },
+      "pangasinan_destinations": [
+        "All Pangasinan routes (Dagupan, Bolinao, Alaminos, Lingayen, San Carlos, Manaoag, Bayambang, Urdaneta, Rosales, Tayug, San Quintin, Sison)"
+      ],
+      "schedule_summary": "24-hour major Central Luzon stopover hub where almost all northbound Pangasinan buses from Cubao, Pasay, PITX, Avenida, Sampaloc, and Caloocan pick up passengers",
+      "grounding_sources": [
+        "https://www.rome2rio.com/s/Solid-North-Transit-Terminal-Cubao/Dagupan",
+        "https://ph.commutetour.com/travel/transport/bus/victory-liner-bus/dagupan-terminal/",
+        "https://www.reddit.com/r/Pangasinan/comments/1ofpnyf/any_bus_recommendations_from_dagupan_to_cubao/?tl=en"
+      ]
+    },
+    {
+      "terminal_id": "victory-liner-olongapo",
+      "hub_city": "Olongapo City, Zambales",
+      "operators": [
+        "Victory Liner, Inc."
+      ],
+      "terminal_name": "Victory Liner Olongapo Terminal",
+      "address": "10 Anonas St, East Bajac-Bajac, Olongapo City, 2200 Zambales",
+      "google_maps_place_id": "ChIJB6QX9xNxljMRTplhd-YsKIw",
+      "contact_phone": "+63 2 8842 8679",
+      "google_rating": {
+        "score": 4.4,
+        "review_count": 571
+      },
+      "pangasinan_destinations": [
+        "Alaminos City",
+        "Bolinao",
+        "Dagupan City",
+        "Lingayen",
+        "Infanta",
+        "Dasol",
+        "Burgos",
+        "Mabini",
+        "Sual"
+      ],
+      "schedule_summary": "Direct coastal Zambales-Pangasinan routes to Alaminos, Bolinao, Lingayen, and Dagupan (or transfer at Sta. Cruz, Zambales / Alaminos)",
+      "grounding_sources": [
+        "https://ph.commutetour.com/travel/transport/bus/victory-liner-bus/alaminos-terminal/",
+        "https://ph.commutetour.com/travel/transport/bus/victory-liner-bus/dagupan-terminal/"
+      ]
+    },
+    {
+      "terminal_id": "cabanatuan-central-terminal",
+      "hub_city": "Cabanatuan City, Nueva Ecija",
+      "operators": [
+        "Five Star Bus Co.",
+        "Victory Liner, Inc.",
+        "Cisco Bus Co.",
+        "Baliwag Transit"
+      ],
+      "terminal_name": "Cabanatuan City Central Transport Terminal",
+      "address": "FXC9+XJF, DS Garcia, Cabanatuan City, Nueva Ecija",
+      "google_maps_place_id": "ChIJrTnTC8MolzMRIiDnEKBm0zM",
+      "google_rating": {
+        "score": 4.0,
+        "review_count": 714
+      },
+      "pangasinan_destinations": [
+        "Dagupan City",
+        "Urdaneta City",
+        "Rosales (Carmen)",
+        "Villasis",
+        "Tayug",
+        "Umingan",
+        "San Quintin",
+        "Alaminos City",
+        "Bolinao"
+      ],
+      "schedule_summary": "Daily cross-provincial trips connecting Nueva Ecija to Eastern, Central, and Western Pangasinan (approx. 1h 35m to 3h travel time)",
+      "grounding_sources": [
+        "https://www.rome2rio.com/Bus/Cabanatuan-City/Dagupan",
+        "https://ph.commutetour.com/travel/transport/bus/victory-liner-bus/cabanatuan-terminal/",
+        "https://ph.commutetour.com/travel/transport/bus/five-star/"
+      ]
+    }
+  ]
+}

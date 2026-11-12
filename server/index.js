@@ -82,7 +82,8 @@ app.post('/api/recommend', async (req, res) => {
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 const { chatRecommend } = require('./agent.js');
-const { commuteVersion, isCommuteQuestion, fareFacts, fareAnswer, outOfScopeNote } = require('./commute.js');
+const { commuteVersion, isCommuteQuestion, isFareQuestion, fareFacts, fareAnswer, outOfScopeNote } = require('./commute.js');
+const { terminalsVersion, isTerminalQuestion, terminalFacts, terminalAnswer } = require('./terminals.js');
 const { sanitizeChatContext, profileHash } = require('./chatContext.js');
 app.post('/api/chat', async (req, res) => {
   try {
@@ -98,9 +99,10 @@ app.post('/api/chat', async (req, res) => {
     const info = datasetInfo();
     const sig = info.ready ? `${info.file}|${info.count}` : 'nodataset';
     // The LTFRB file's version rides in the key: a fare update can never be
-    // shadowed by an answer cached against yesterday's matrix. The profile
+    // shadowed by an answer cached against yesterday's matrix. The terminal
+    // directory version does the same for terminal answers. The profile
     // fingerprint rides along too, so Ana's itinerary is never served to Ben.
-    const key = `d:${sig}:${commuteVersion()}:${message}|${proxKey}|${profileHash(context, hasFix)}`;
+    const key = `d:${sig}:${commuteVersion()}:${terminalsVersion()}:${message}|${proxKey}|${profileHash(context, hasFix)}`;
     const tripBreaker = () => { aiDownUntil = Date.now() + AI_COOLDOWN_MS; };
     if (info.ready) {
       if (aiUsable()) {
@@ -109,6 +111,18 @@ app.post('/api/chat', async (req, res) => {
       }
       // A fare question does not need a model: the answer is in the LTFRB file,
       // so an AI outage must not turn "how much is the bus" into "I don't know".
+      // Terminal questions read the committed directory the same way, with a
+      // straight-line distance when a fix exists; an explicit fare still wins.
+      if (isTerminalQuestion(message) && !isFareQuestion(message)) {
+        const facts = terminalFacts(message, proximity);
+        if (facts) {
+          return res.json({
+            intent: 'commute',
+            answer: terminalAnswer(facts),
+            candidates: [], spotlight: null, sources: [], source: 'terminals',
+          });
+        }
+      }
       if (isCommuteQuestion(message)) {
         const facts = fareFacts(message);
         return res.json({

@@ -44,6 +44,29 @@ test('groundedChat hands the profile to the model, not just the builder', async 
   assert.match(seen, /Traveler profile: Ana\. Interests: Beaches\./);
 });
 
+test('terminal facts ride in the model payload, not just the fare block', async () => {
+  let seen = '';
+  const askFn = async (_system, payload) => {
+    seen = payload;
+    return JSON.stringify({ intent: 'commute', answer: 'ok', candidates: [] });
+  };
+  await groundedChat('Which terminal in Cubao goes to Bolinao?', '121.0485,14.6240', { askFn });
+  assert.match(seen, /TERMINAL FACTS/);
+  assert.match(seen, /Five Star Bus Co\. Cubao Terminal/);
+});
+
+test('an invented terminal phone is rebuilt from the directory rows', async () => {
+  const askFn = async () => JSON.stringify({
+    intent: 'commute',
+    answer: 'Call **Victory Liner Cubao** at +63 999 111 2222.',
+    candidates: [],
+  });
+  const out = await groundedChat('Which bus terminal is closest to me?', '121.0485,14.6240', { askFn });
+  assert.equal(out.intent, 'commute');
+  assert.doesNotMatch(out.answer, /999 111 2222/);
+  assert.match(out.answer, /Cubao/);
+});
+
 test('a request that matches nothing still gets the index to choose from', () => {
   const { text, hits } = buildContext('somewhere for a quiet anniversary', '120.341,16.043');
   assert.equal(hits.length, 0);

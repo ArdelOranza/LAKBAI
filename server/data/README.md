@@ -80,3 +80,28 @@ whose town is unknown is left without coordinates rather than guessed, and
 Mapbox geocodes it on first use instead.
 
 Nothing is invented: a card only shows what the file states.
+
+## Bus fares and terminals
+
+Two more committed files power the commute answers; they are not place records
+and never produce place cards:
+
+- `ltfrb-pangasinan-bus-fares.json` — the LTFRB/operator fare matrix. Fares are
+  recomputed from the file's own formulas (`server/commute.js`), rounded to
+  ₱0.25, and every fare answer carries the LTFRB disclaimer.
+- `terminals-to-pangasinan.json` — the terminal directory (Metro Manila
+  districts + Luzon regional hubs): operators, destinations served, address,
+  phone, rating and schedule per terminal. `last_verified` is used as the
+  dataset version.
+- `terminal-coords.json` — curated coordinates for every terminal above plus the
+  six Pangasinan departure hubs. The directory file has **no** coordinates, so
+  this table is what makes "closest terminal to me" possible. Each point is
+  tagged `exact` (mapped bus station), `approx` (address/landmark estimate) or
+  `town` (municipal centre, ranking only).
+
+`server/terminals.js` matches a question by origin area, operator or Pangasinan
+destination, ranks by straight-line distance from the request's GPS fix, and
+grounds the reply: a phone, rating or distance that is not in the rows is
+discarded and the answer is rebuilt. Fares always come from the LTFRB file, so
+the two sources can never contradict. Without a GPS fix no distance is claimed.
+

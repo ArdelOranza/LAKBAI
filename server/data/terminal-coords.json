@@ -1,0 +1,42 @@
+{
+  "_note": "Coordinates for every terminal in terminals-to-pangasinan.json plus the six Pangasinan departure hubs in the LTFRB file. Compiled from OpenStreetMap/Nominatim bus-station records and Mapbox address geocoding, then checked against known landmarks. precision: exact = mapped bus station/terminal, approx = address or landmark estimate, town = municipal centre (ranking only).",
+  "compiled": "2026-11-12",
+  "points": [
+    { "terminal_id": "five-star-cubao", "lat": 14.6238, "lng": 121.0490, "precision": "approx", "source": "plus-code + manual" },
+    { "terminal_id": "solid-north-cubao", "lat": 14.6236, "lng": 121.0485, "precision": "exact", "source": "osm" },
+    { "terminal_id": "dagupan-bus-cubao", "lat": 14.6246, "lng": 121.0484, "precision": "approx", "source": "address + manual" },
+    { "terminal_id": "victory-liner-cubao", "lat": 14.6241, "lng": 121.0483, "precision": "exact", "source": "osm" },
+    { "terminal_id": "cisco-bus-cubao", "lat": 14.6249, "lng": 121.0490, "precision": "exact", "source": "osm" },
+    { "terminal_id": "viron-transit-cubao", "lat": 14.6247, "lng": 121.0486, "precision": "approx", "source": "address + manual" },
+    { "terminal_id": "partas-cubao", "lat": 14.6202, "lng": 121.0473, "precision": "exact", "source": "osm" },
+    { "terminal_id": "genesis-joybus-cubao", "lat": 14.6247, "lng": 121.0485, "precision": "approx", "source": "address + manual" },
+
+    { "terminal_id": "five-star-pasay", "lat": 14.5311, "lng": 121.0040, "precision": "approx", "source": "tramo/aurora landmark" },
+    { "terminal_id": "victory-liner-pasay", "lat": 14.5392, "lng": 121.0071, "precision": "exact", "source": "osm" },
+    { "terminal_id": "partas-pasay", "lat": 14.5359, "lng": 121.0040, "precision": "approx", "source": "address" },
+
+    { "terminal_id": "pitx-paranaque", "lat": 14.5100, "lng": 120.9914, "precision": "exact", "source": "osm" },
+    { "terminal_id": "one-ayala-makati", "lat": 14.5505, "lng": 121.0279, "precision": "exact", "source": "osm" },
+
+    { "terminal_id": "five-star-bataan-transit-avenida", "lat": 14.6055, "lng": 120.9793, "precision": "approx", "source": "address" },
+    { "terminal_id": "philippine-rabbit-avenida", "lat": 14.6070, "lng": 120.9815, "precision": "approx", "source": "oroquieta/rizal landmark" },
+
+    { "terminal_id": "victory-liner-sampaloc", "lat": 14.6079, "lng": 120.9909, "precision": "approx", "source": "address" },
+    { "terminal_id": "maria-de-leon-sampaloc", "lat": 14.6132, "lng": 120.9883, "precision": "approx", "source": "address" },
+    { "terminal_id": "gv-florida-sampaloc", "lat": 14.6086, "lng": 120.9933, "precision": "approx", "source": "address" },
+
+    { "terminal_id": "victory-liner-caloocan", "lat": 14.6560, "lng": 120.9833, "precision": "exact", "source": "osm" },
+
+    { "terminal_id": "baguio-gov-pack-terminals", "lat": 16.4095, "lng": 120.5988, "precision": "approx", "source": "osm road + manual" },
+    { "terminal_id": "dau-mabalacat-terminal", "lat": 15.1784, "lng": 120.5893, "precision": "exact", "source": "osm" },
+    { "terminal_id": "victory-liner-olongapo", "lat": 14.8376, "lng": 120.2788, "precision": "exact", "source": "osm" },
+    { "terminal_id": "cabanatuan-central-terminal", "lat": 15.4724, "lng": 120.9690, "precision": "exact", "source": "osm" },
+
+    { "terminal_id": "PANG-TERM-DAGUPAN", "lat": 16.0433, "lng": 120.3431, "precision": "town", "source": "municipal centre" },
+    { "terminal_id": "PANG-TERM-ALAMINOS", "lat": 16.1600, "lng": 119.9800, "precision": "town", "source": "municipal centre" },
+    { "terminal_id": "PANG-TERM-BOLINAO", "lat": 16.3340, "lng": 119.8860, "precision": "town", "source": "municipal centre" },
+    { "terminal_id": "PANG-TERM-LINGAYEN", "lat": 16.0215, "lng": 120.2315, "precision": "town", "source": "municipal centre" },
+    { "terminal_id": "PANG-TERM-SANCARLOS", "lat": 15.9300, "lng": 120.3500, "precision": "town", "source": "municipal centre" },
+    { "terminal_id": "PANG-TERM-URDANETA-CARMEN", "lat": 15.9760, "lng": 120.5710, "precision": "town", "source": "municipal centre" }
+  ]
+}
