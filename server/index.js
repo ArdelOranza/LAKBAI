@@ -82,6 +82,7 @@ app.post('/api/recommend', async (req, res) => {
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 const { chatRecommend } = require('./agent.js');
+const { commuteVersion, isCommuteQuestion, fareFacts, fareAnswer, outOfScopeNote } = require('./commute.js');
 app.post('/api/chat', async (req, res) => {
   try {
     const message = boundedMessage(req);
@@ -91,12 +92,24 @@ app.post('/api/chat', async (req, res) => {
     const proxKey = p.length === 2 && p.every(Number.isFinite) ? p[0].toFixed(2) + ',' + p[1].toFixed(2) : '';
     const info = datasetInfo();
     const sig = info.ready ? `${info.file}|${info.count}` : 'nodataset';
-    const key = `d:${sig}:${message}|${proxKey}`;
+    // The LTFRB file's version rides in the key: a fare update can never be
+    // shadowed by an answer cached against yesterday's matrix.
+    const key = `d:${sig}:${commuteVersion()}:${message}|${proxKey}`;
     const tripBreaker = () => { aiDownUntil = Date.now() + AI_COOLDOWN_MS; };
     if (info.ready) {
       if (aiUsable()) {
         try { return res.json(await cached(key, AI_TTL_MS, () => groundedChat(message, proximity), { onStale: tripBreaker })); }
         catch (e) { tripBreaker(); console.warn('grounded chat failed:', e.message); }
+      }
+      // A fare question does not need a model: the answer is in the LTFRB file,
+      // so an AI outage must not turn "how much is the bus" into "I don't know".
+      if (isCommuteQuestion(message)) {
+        const facts = fareFacts(message);
+        return res.json({
+          intent: 'commute',
+          answer: facts ? fareAnswer(facts) : outOfScopeNote(message),
+          candidates: [], spotlight: null, sources: [], source: 'ltfrb',
+        });
       }
       return res.json(await localChat(message, proximity));
     }

@@ -6,11 +6,26 @@ const TOKEN = 'test-token';
 function respond(payload){
   return vi.fn(async () => ({ ok: true, json: async () => payload }));
 }
-function feature(text, regionText){
+function feature(text, regionText, placeType){
   const context = [];
   if (regionText) context.push({ id:'region.1', text: regionText });
   context.push({ id:'country.1', text:'Philippines' });
-  return { features: [{ text, context }] };
+  return { features: [{ text, context, place_type: placeType || ['place'] }] };
+}
+
+/** A street/address fix: the municipality is only in `context.place`. */
+function addressFeature(street, town, regionText){
+  return {
+    features: [{
+      text: street,
+      place_type: ['address'],
+      context: [
+        { id:'place.9', text: town },
+        { id:'region.1', text: regionText },
+        { id:'country.1', text:'Philippines' },
+      ],
+    }],
+  };
 }
 
 beforeEach(() => {
@@ -32,6 +47,18 @@ describe('reverseGeocode', () => {
     const label = await reverseGeocode(121.05, 14.63);
     expect(label).toBe('Quezon City');
     expect(label).not.toContain('Pangasinan');
+  });
+
+  it('names Dagupan from any street in it, not the barangay or street name', async () => {
+    const fetchMock = respond(addressFeature('Burgos Extension', 'Dagupan City', 'Pangasinan'));
+    vi.stubGlobal('fetch', fetchMock);
+    expect(await reverseGeocode(120.333, 16.039)).toBe('Dagupan City, Pangasinan');
+  });
+
+  it('falls back to the province when the fix is between towns', async () => {
+    const fetchMock = respond(feature('Pangasinan', null, ['region']));
+    vi.stubGlobal('fetch', fetchMock);
+    expect(await reverseGeocode(120.12, 16.2)).toBe('Pangasinan');
   });
 
   it('returns null and never fetches without a token', async () => {

@@ -8,10 +8,8 @@ import { saveFavorite, listFavorites } from '../store.js';
 import { haversineKm, formatDistance, driveMinutes } from '../geo.js';
 import { dragOffset, shouldDismiss } from '../sheetDrag.js';
 import { FALLBACK_CENTER } from '../App.jsx';
-import { directionsHref } from '../emergency.js';
 import { PrimaryBtn, PhotoPlaceholder } from '../ui.jsx';
 import { staticMapThumb, mapboxToken } from '../staticMap.js';
-import { openExternal } from '../extLinks.js';
 
 const VIBES = [
   [/beach|coast|island|sea|shore/i, 'Coastal Wonder', Waves],
@@ -26,7 +24,7 @@ function vibeFor(spot){
   return hit ? { label: hit[1], Icon: hit[2] } : { label: 'Local Spot', Icon: MapPin };
 }
 
-export default function SpotPopup({ spot, coords, pop, push, showToast, user, setTab }){
+export default function SpotPopup({ spot, coords, pop, push, showToast, user, setTab, openDirections }){
   const { user: authUser } = useAuth();
   const u = user || authUser;
   const [slide, setSlide] = useState(0);
@@ -201,8 +199,8 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
                 className="round-action"
                 data-testid="spot-directions"
                 aria-label="Directions"
-                disabled={!directionsHref(spot.lat, spot.lng)}
-                onClick={() => { const href = directionsHref(spot.lat, spot.lng); if (href) openExternal(href); }}
+                disabled={!Number.isFinite(Number(spot.lng)) || !Number.isFinite(Number(spot.lat))}
+                onClick={() => openDirections?.(spot)}
               >
                 <Navigation size={17}/>
               </button>

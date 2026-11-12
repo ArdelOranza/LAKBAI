@@ -37,12 +37,12 @@ function click(el){
   el.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
 }
 
-async function mountChat(){
+async function mountChat(extra = {}){
   const container = document.createElement('div');
   document.body.appendChild(container);
   const root = createRoot(container);
   await React.act(async () => {
-    root.render(<ChatTab user={{ id: 'u1' }} coords={{ lng: 120.2, lat: 16.0 }} push={() => {}} setTab={() => {}} showToast={() => {}} />);
+    root.render(<ChatTab user={{ id: 'u1' }} coords={{ lng: 120.2, lat: 16.0 }} push={() => {}} setTab={() => {}} showToast={() => {}} {...extra} />);
   });
   await React.act(async () => { await Promise.resolve(); });
   return { container, root };
@@ -123,6 +123,22 @@ describe('chat result sheet', () => {
     const text = container.textContent;
     expect(text).toContain('Saved to Trips');
     expect(text).toContain("I've added Bolinao Falls to your Trip");
+
+    await React.act(async () => root.unmount());
+    container.remove();
+  });
+
+  it('guides from a chat card inside the app instead of opening Google Maps', async () => {
+    const openDirections = vi.fn();
+    const { container, root } = await mountChat({ openDirections });
+    await ask(container);
+
+    const drive = container.querySelector('[aria-label="Drive to Patar White Sand Beach"]');
+    expect(drive).toBeTruthy();
+    await React.act(async () => { click(drive); });
+
+    expect(openDirections).toHaveBeenCalledTimes(1);
+    expect(openDirections.mock.calls[0][0]).toMatchObject({ name: 'Patar White Sand Beach' });
 
     await React.act(async () => root.unmount());
     container.remove();

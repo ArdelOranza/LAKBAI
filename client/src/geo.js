@@ -19,6 +19,36 @@ export function formatDistance(km){
   return km < 1 ? Math.round(km * 1000) + ' m' : km.toFixed(1) + ' km';
 }
 
+/**
+ * Position to show for a new GPS reading.
+ *
+ * Averaging every fix ever received makes the dot lag behind a moving car and
+ * keeps it biased by old, worse readings. Keep the newest fix, blend only
+ * lightly to kill jitter, and refuse teleports no vehicle could make when the
+ * reading itself is vague.
+ */
+export function nextFix(prev, fix, now = Date.now()){
+  if (!fix || !Number.isFinite(fix.lng) || !Number.isFinite(fix.lat)) return prev || null;
+  const accuracy = Number.isFinite(fix.accuracy) ? fix.accuracy : 999;
+  if (accuracy > 300) return prev || null;
+  if (!prev) return { lng: fix.lng, lat: fix.lat, accuracy, at: now };
+
+  const km = haversineKm(prev.lng, prev.lat, fix.lng, fix.lat) ?? 0;
+  const since = Number.isFinite(Number(prev.at)) ? now - Number(prev.at) : 0;
+  const seconds = Math.max(1, since / 1000);
+  const kmh = km / (seconds / 3600);
+  // 200 km/h is far beyond Pangasinan driving: that reading is a bad jump.
+  if (kmh > 200 && accuracy > 30) return prev;
+
+  const w = accuracy <= 25 ? 0.8 : accuracy <= 60 ? 0.6 : 0.4;
+  return {
+    lng: prev.lng + (fix.lng - prev.lng) * w,
+    lat: prev.lat + (fix.lat - prev.lat) * w,
+    accuracy,
+    at: now,
+  };
+}
+
 // Low-precision NOAA solar position (good to ~±2 min at this latitude).
 export function sunsetUTC(lng, lat, date){
   const start = Date.UTC(date.getUTCFullYear(), 0, 0);

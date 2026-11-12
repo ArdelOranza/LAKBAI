@@ -17,13 +17,23 @@ export async function reverseGeocode(lng, lat){
   if (cache.has(key)) return cache.get(key);
   let label = null;
   try {
-    const r = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?types=place&limit=1&access_token=${token}`);
+    // No `types` filter: in town this resolves the address with its municipality
+    // in context, and out in the fields it falls back to the region itself.
+    const r = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?limit=1&access_token=${token}`);
     if (r.ok){
       const data = await r.json();
       const f = data.features && data.features[0];
-      if (f && f.text){
-        const region = (f.context || []).find(c => String(c.id || '').startsWith('region.'));
-        label = region && region.text ? `${f.text}, ${region.text}` : f.text;
+      if (f){
+        const types = f.place_type || [];
+        const context = f.context || [];
+        const place = context.find(c => String(c.id || '').startsWith('place.'));
+        const region = context.find(c => String(c.id || '').startsWith('region.'));
+        const isRegion = types.includes('region');
+        // The municipality in context beats a street or barangay name for a fix
+        // in Dagupan; a rural fix has no town, so the region is the honest label.
+        const town = (isRegion ? null : (place && place.text) || f.text) || null;
+        const province = (region && region.text) || (isRegion ? f.text : null);
+        label = town && province ? `${town}, ${province}` : (town || province || null);
       }
     }
   } catch { /* offline or blocked: null keeps the last good label */ }

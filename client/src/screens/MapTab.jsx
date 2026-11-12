@@ -82,7 +82,7 @@ function declutterPins(root, detailed){
 }
 
 
-export default function MapTab({ coords, push, showToast, user, setTab }){
+export default function MapTab({ coords, push, showToast, user, setTab, openDirections }){
   const [radius, setRadius] = useState(5);
   const [filter, setFilter] = useState('All');
   // Seed from the same coords-keyed lookup the effect writes, not a legacy
@@ -320,7 +320,7 @@ export default function MapTab({ coords, push, showToast, user, setTab }){
         <LocateFixed size={20}/>
       </button>
 
-      {selectedSpot && <SpotPopup spot={selectedSpot} coords={coords} pop={() => setSelectedSpot(null)} push={push} setTab={setTab} showToast={showToast} user={user} />}
+      {selectedSpot && <SpotPopup spot={selectedSpot} coords={coords} pop={() => setSelectedSpot(null)} push={push} setTab={setTab} showToast={showToast} user={user} openDirections={openDirections} />}
     </div>
   );
 }

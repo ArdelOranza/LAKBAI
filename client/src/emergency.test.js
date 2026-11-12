@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { telHref, directionsHref, awayLabel } from './emergency.js';
+import { telHref, awayLabel } from './emergency.js';
 
 describe('telHref', () => {
   it('keeps short national hotlines dialable', () => {
@@ -19,18 +19,6 @@ describe('telHref', () => {
     expect(telHref('')).toBeNull();
     expect(telHref(null)).toBeNull();
     expect(telHref('—')).toBeNull();
-  });
-});
-
-describe('directionsHref', () => {
-  it('links to the exact point in driving mode and starts navigation', () => {
-    const href = directionsHref(16.03, 120.23);
-    expect(href).toBe('https://www.google.com/maps/dir/?api=1&destination=16.03,120.23&travelmode=driving&dir_action=navigate');
-  });
-
-  it('returns null without coordinates', () => {
-    expect(directionsHref(null, 120.23)).toBeNull();
-    expect(directionsHref(16.03, undefined)).toBeNull();
   });
 });
 

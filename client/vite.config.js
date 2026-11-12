@@ -1,5 +1,6 @@
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import fs from 'node:fs'
 import path from 'node:path'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -46,9 +47,22 @@ const pwa = VitePWA({
     }
   });
 
+// The shell is installed as an APK; shipping the download copy inside it would
+// add ~5 MB of dead weight (Profile hides the row natively), so drop it from the
+// mobile bundle before Capacitor copies dist into the Android assets.
+const omitDownloadedApk = {
+  name: 'lakbai-omit-downloaded-apk',
+  apply: 'build',
+  closeBundle() {
+    if (process.env.MOBILE_BUILD !== '1') return;
+    const apk = path.resolve(__dirname, 'dist/LakbAI.apk');
+    if (fs.existsSync(apk)) fs.rmSync(apk);
+  },
+};
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss(), ...(process.env.MOBILE_BUILD === '1' ? [] : [pwa])],
+  plugins: [react(), tailwindcss(), omitDownloadedApk, ...(process.env.MOBILE_BUILD === '1' ? [] : [pwa])],
   resolve: { alias: { '@': path.resolve(__dirname, './src') } },
   // SECURITY: envDir loads server secrets into the client build context, but only
   // variables prefixed with VITE_ are inlined into the browser bundle — everything

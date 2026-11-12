@@ -79,7 +79,7 @@ export default function Profile({ push, setTab, user, signOut }){
             <a className="menu-row" data-testid="menu-android" href="/LakbAI.apk" download="LakbAI.apk" style={{ textDecoration:'none' }}>
               <span className="mi"><Download size={18}/></span>
               Get the Android app
-              <span style={{ marginLeft:'auto', fontSize:11.5, fontWeight:600, color:'#64748B', letterSpacing:0 }}>v1.0.0</span>
+              <span style={{ marginLeft:'auto', fontSize:11.5, fontWeight:600, color:'#64748B', letterSpacing:0 }}>v1.1.0</span>
             </a>
           )}
         </div>

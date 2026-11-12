@@ -1,29 +1,16 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { supabase, configured } from './supabaseClient.js';
+import { friendlyAuthError } from './authErrors.js';
+import { isNativeApp, startGoogleSignIn, listenForAuthCallback, emailRedirectTo } from './nativeAuth.js';
 
-const Ctx = createContext({ user: null, loading: true, recovery: false, configured, signUp: async () => ({ error: 'Auth not configured' }), signInWithPassword: async () => ({ error: 'Auth not configured' }), signInWithGoogle: async () => ({ error: 'Auth not configured' }), resendConfirmation: async () => ({ error: 'Auth not configured' }), resetPassword: async () => ({ error: 'Auth not configured' }), updatePassword: async () => ({ error: 'Auth not configured' }), clearRecovery: () => {}, signOut: async () => {} });
+export { friendlyAuthError };
+
+const Ctx = createContext({ user: null, loading: true, recovery: false, authError: null, configured, signUp: async () => ({ error: 'Auth not configured' }), signInWithPassword: async () => ({ error: 'Auth not configured' }), signInWithGoogle: async () => ({ error: 'Auth not configured' }), resendConfirmation: async () => ({ error: 'Auth not configured' }), resetPassword: async () => ({ error: 'Auth not configured' }), updatePassword: async () => ({ error: 'Auth not configured' }), clearRecovery: () => {}, clearAuthError: () => {}, signOut: async () => {} });
 
 function isRecoveryHash(){
   if (typeof window === 'undefined') return false;
   try { return window.location.hash.includes('type=recovery'); } catch { return false; }
 }
-
-  // Sign-in/password-update handlers return friendly errors from AuthContext
-  // directly; screen-level try/catch wrappers call this too. Exported for screens.
-  export function friendlyAuthError(message){
-    const m = String(message || '');
-    if (/invalid login credentials|invalid password/i.test(m)) return 'Invalid email or password.';
-    if (/auth session missing/i.test(m)) return 'This link has expired or was already used. Request a new one.';
-    if (/email link is invalid|invalid.*otp|link.*expired|email link.*(expired|invalid)/i.test(m)) return 'This link has expired or was already used. Request a new one.';
-    if (/failed to fetch|network error|load failed/i.test(m)) return 'Network error — check your connection and try again.';
-    if (/rate limit|too many/i.test(m)) return 'Too many tries — wait a minute and try again.';
-    if (/user already registered/i.test(m)) return 'An account with this email already exists — try logging in.';
-    if (/email not confirmed|email_not_confirmed/i.test(m)) return 'Confirm your email first, then log in.';
-    if (/unable to validate email|invalid format/i.test(m)) return 'Enter a valid email address.';
-    if (/signup disabled|signups.*disabled/i.test(m)) return 'Sign-ups are closed — sign in instead.';
-    if (/password should be at least/i.test(m)) return 'Password must be at least 8 characters.';
-    return m;
-  }
 
 // Strip auth params (?code= / #access_token=...) once the SDK has exchanged them
 // so a refresh or back-button doesn't re-trigger sign-in/recovery.
@@ -47,6 +34,10 @@ export function AuthProvider({ children }){
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [recovery, setRecovery] = useState(false);
+  // A deep-link sign-in can fail after the traveler already left the app. Keep
+  // the reason so the shell can say what happened instead of silently showing
+  // the signed-out screens again.
+  const [authError, setAuthError] = useState(null);
   // Monotonic seq so the latest auth event wins: a slow/stale getSession
   // result can't clobber a SIGNED_IN that already arrived via onAuthStateChange.
   // Initial getSession is only adopted if no onAuthStateChange event has
@@ -84,6 +75,7 @@ export function AuthProvider({ children }){
         cleanAuthUrl();
         return { seq, session, event };
       }
+      if (session?.user) setAuthError(null);
       setUser(session?.user || null);
       setLoading(false);
       return { seq, session, event };
@@ -127,12 +119,35 @@ export function AuthProvider({ children }){
     // trap the traveler on a password form with no session.
     return () => { clearBoot(); sub.subscription.unsubscribe(); };
   }, []);
+
+  // The APK receives Google's answer as a deep link. This listener owns the
+  // session exchange; onAuthStateChange above then paints the signed-in app.
+  useEffect(() => {
+    if (!supabase || !isNativeApp()) return undefined;
+    let stop;
+    listenForAuthCallback(
+      supabase,
+      res => { if (res?.error) setAuthError(res.error); },
+      {
+        // Recovery must win over the SIGNED_IN event the exchange fires, or the
+        // traveler lands in the app instead of on the set-password screen.
+        onRecovery: () => {
+          recoveryRef.current = true;
+          recoveryFromEventRef.current = true;
+          setRecovery(true);
+          setLoading(false);
+        },
+      },
+    ).then(fn => { stop = fn; }).catch(() => {});
+    return () => { try { stop?.(); } catch { /* already removed */ } };
+  }, []);
   async function signUp(email, password){
     if (!supabase) return { error: 'Auth not configured — add Supabase keys to .env.' };
-    // Point the confirmation link at the deployment the person signed up on,
-    // not whatever Site URL the Supabase project happens to have configured.
-    const emailRedirectTo = typeof window !== 'undefined' ? window.location.origin : undefined;
-    const { data, error } = await supabase.auth.signUp({ email: String(email).trim(), password, options: { emailRedirectTo } });
+    // Point the confirmation link at the app the person signed up in: the
+    // website origin on the web, the app's own scheme inside the APK (where the
+    // WebView origin is https://localhost and no mailbox can open it).
+    const redirect = emailRedirectTo();
+    const { data, error } = await supabase.auth.signUp({ email: String(email).trim(), password, options: { emailRedirectTo: redirect } });
     if (error) return { error: friendlyAuthError(String(error.message || error)) };
     return data.session ? {} : { needsConfirm: true, detail: 'Check your email to confirm your account, then log in.' };
   }
@@ -143,8 +158,13 @@ export function AuthProvider({ children }){
   }
   // Full-page redirect to Google, then back to the app. Supabase picks the
   // session out of the return URL, so onAuthStateChange signs the traveler in.
+  // In the APK this stays inside the app: Custom Tab out, own scheme back in.
   async function signInWithGoogle(){
     if (!supabase) return { error: 'Auth not configured — add Supabase keys to .env.' };
+    if (isNativeApp()) {
+      try { return await startGoogleSignIn(supabase); }
+      catch (e) { return { error: friendlyAuthError(String(e?.message || e)) }; }
+    }
     const redirectTo = typeof window !== 'undefined' ? window.location.origin : undefined;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -155,13 +175,12 @@ export function AuthProvider({ children }){
   async function resendConfirmation(email){
     if (!supabase) return { error: 'Auth not configured — add Supabase keys to .env.' };
     if (!/^\S+@\S+\.\S+$/.test(String(email || '').trim())) return { error: 'Enter a valid email address.' };
-    const emailRedirectTo = typeof window !== 'undefined' ? window.location.origin : undefined;
-    const { error } = await supabase.auth.resend({ type: 'signup', email: String(email).trim(), options: { emailRedirectTo } });
+    const { error } = await supabase.auth.resend({ type: 'signup', email: String(email).trim(), options: { emailRedirectTo: emailRedirectTo() } });
     return error ? { error: friendlyAuthError(String(error.message || error)) } : { detail: 'Confirmation email sent again. Check your inbox and spam folder.' };
   }
   async function resetPassword(email){
     if (!supabase) return { error: 'Auth not configured — add Supabase keys to .env.' };
-    const { error } = await supabase.auth.resetPasswordForEmail(String(email).trim(), { redirectTo: window.location.origin });
+    const { error } = await supabase.auth.resetPasswordForEmail(String(email).trim(), { redirectTo: emailRedirectTo() });
     return error ? { error: friendlyAuthError(String(error.message || error)) } : { detail: 'Password reset link sent. Check your email.' };
   }
   async function updatePassword(password){
@@ -188,6 +207,7 @@ export function AuthProvider({ children }){
     else if (fromEvent) setUser(null);
   }
   async function signOut(){ if (supabase) await supabase.auth.signOut(); setUser(null); }
-  return <Ctx.Provider value={{ user, loading, recovery, configured, signUp, signInWithPassword, signInWithGoogle, resendConfirmation, resetPassword, updatePassword, clearRecovery, signOut }}>{children}</Ctx.Provider>;
+  const clearAuthError = () => setAuthError(null);
+  return <Ctx.Provider value={{ user, loading, recovery, authError, configured, signUp, signInWithPassword, signInWithGoogle, resendConfirmation, resetPassword, updatePassword, clearRecovery, clearAuthError, signOut }}>{children}</Ctx.Provider>;
 }
 export const useAuth = () => useContext(Ctx);

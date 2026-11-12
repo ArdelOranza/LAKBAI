@@ -4,7 +4,7 @@ import {
 } from 'lucide-react';
 import { FALLBACK_CENTER } from '../App.jsx';
 import { haversineKm } from '../geo.js';
-import { telHref, directionsHref, awayLabel } from '../emergency.js';
+import { telHref, awayLabel } from '../emergency.js';
 import { apiUrl } from '../apiBase.js';
 
 // Public national numbers plus the provincial disaster office. Nothing local is
@@ -14,10 +14,9 @@ const HOTLINES = [
   { name: 'Pangasinan PDRRMO', number: '(075) 542-6802', note: 'Provincial disaster response' },
 ];
 
-function PlaceRow({ place, icon:Icon }){
-  const href = directionsHref(place.lat, place.lng);
-  const body = (
-    <>
+function PlaceRow({ place, icon:Icon, openDirections }){
+  return (
+    <button type="button" className="emg-place" data-testid="emg-place" onClick={() => openDirections?.(place)}>
       <Icon size={17} className="emg-place-ico"/>
       <span className="emg-place-main">
         <b>{place.name}</b>
@@ -25,14 +24,11 @@ function PlaceRow({ place, icon:Icon }){
         {place.km != null && <span className="emg-place-dist">{awayLabel(place.km)}</span>}
       </span>
       <span className="emg-go"><ChevronRight size={15}/></span>
-    </>
+    </button>
   );
-  return href
-    ? <a className="emg-place" href={href} target="_blank" rel="noreferrer">{body}</a>
-    : <div className="emg-place">{body}</div>;
 }
 
-export default function Emergency({ coords, pop, showToast }){
+export default function Emergency({ coords, pop, showToast, openDirections }){
   const [data, setData] = useState(null);
   const [failed, setFailed] = useState(false);
   const at = coords && Number.isFinite(Number(coords.lng)) && Number.isFinite(Number(coords.lat)) ? `${coords.lng},${coords.lat}` : '';
@@ -118,7 +114,7 @@ export default function Emergency({ coords, pop, showToast }){
           {!data && !failed && <p className="shimmer" style={{ fontSize:13, margin:0 }}>Finding the closest hospitals...</p>}
           {data && !hospitals.length && <p className="emg-note">No hospitals listed nearby.</p>}
           <div className="emg-places">
-            {hospitals.map(h => <PlaceRow key={h.id || h.name} place={h} icon={Cross}/>)}
+            {hospitals.map(h => <PlaceRow key={h.id || h.name} place={h} icon={Cross} openDirections={openDirections}/>)}
           </div>
         </section>
 
@@ -127,7 +123,7 @@ export default function Emergency({ coords, pop, showToast }){
           {!data && !failed && <p className="shimmer" style={{ fontSize:13, margin:0 }}>Finding the closest stations...</p>}
           {data && !police.length && <p className="emg-note">No police stations listed nearby.</p>}
           <div className="emg-places">
-            {police.map(p => <PlaceRow key={p.id || p.name} place={p} icon={Shield}/>)}
+            {police.map(p => <PlaceRow key={p.id || p.name} place={p} icon={Shield} openDirections={openDirections}/>)}
           </div>
         </section>
 

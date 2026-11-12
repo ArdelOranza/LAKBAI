@@ -10,8 +10,8 @@ import { dateRange, bannerDate } from '../festival.js';
 import { feeLabel } from '../filters.js';
 import { haversineKm, formatDistance } from '../geo.js';
 import { PhotoPlaceholder } from '../ui.jsx';
-import { safeExternalUrl, openExternal } from '../extLinks.js';
-import { directionsHref } from '../emergency.js';
+import { safeExternalUrl } from '../extLinks.js';
+import { shareUrl } from '../siteLinks.js';
 
 const CAT_ICON = [
   [/beach|coast|island|sea|shore/i, Waves],
@@ -29,7 +29,7 @@ function editionText(a, b){
   return left + ' – ' + MONTHS[b.getMonth()] + ' ' + b.getDate();
 }
 
-export default function PlaceDetail({ place, coords, user, pop, showToast }){
+export default function PlaceDetail({ place, coords, user, pop, showToast, openDirections }){
   const { user: authUser } = useAuth();
   const u = user || authUser;
   const p = place || {};
@@ -68,7 +68,9 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
     showToast(saved ? 'Removed from Trip' : 'Added to Trip');
   }
   async function share(){
-    const url = window.location.href;
+    // Inside the APK window.location is https://localhost — share the public
+    // site instead, or the recipient gets a dead link.
+    const url = shareUrl();
     try {
       if (navigator.share) { await navigator.share({ title: p.name, url }); return; }
       await navigator.clipboard.writeText(url);
@@ -135,7 +137,7 @@ export default function PlaceDetail({ place, coords, user, pop, showToast }){
             className="chip"
             data-testid="directions-btn"
             style={{ flex:1, padding:12, display:'inline-flex', alignItems:'center', justifyContent:'center', gap:7, fontWeight:600 }}
-            onClick={() => { const href = directionsHref(p.lat, p.lng); if (href) openExternal(href); }}
+            onClick={() => openDirections?.(p)}
           >
             <Navigation size={15}/> Directions
           </button>

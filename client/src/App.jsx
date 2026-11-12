@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './AuthContext.jsx';
 import { Toast, TabBar, PrimaryBtn, TextField, useAutoToast } from './ui.jsx';
 import Logo from './logo.jsx';
 import { readLocalPrefs, loadPrefs } from './prefs.js';
+import { nextFix } from './geo.js';
 import { tabFromSearch } from './deepLink.js';
 import Splash from './screens/Splash.jsx';
 import SignUp from './screens/SignUp.jsx';
@@ -23,6 +24,7 @@ import Emergency from './screens/Emergency.jsx';
 import Itineraries from './screens/Itineraries.jsx';
 import MyReviews from './screens/MyReviews.jsx';
 import ItineraryView from './screens/ItineraryView.jsx';
+import RouteSheet from './screens/RouteSheet.jsx';
 
 export const FALLBACK_CENTER = { lng: 120.23, lat: 16.03 };
 
@@ -51,7 +53,7 @@ export default function App(){
 }
 
 function Shell(){
-  const { user, loading, recovery, updatePassword, clearRecovery, signOut } = useAuth();
+  const { user, loading, recovery, authError, clearAuthError, updatePassword, clearRecovery, signOut } = useAuth();
   const [tab, setTab] = useState('home');
   const [stack, setStack] = useState([]);
   const [authStage, setAuthStage] = useState(null);   // 'signup' | 'login' override while no session yet
@@ -59,9 +61,22 @@ function Shell(){
   const [prefsStage, setPrefsStage] = useState(false); // onboarding overlay after first signup
   const [toast, setToast] = useAutoToast(4000); // every toast self-dismisses
   const [coords, setCoords] = useState(FALLBACK_CENTER);
+  // In-app driving guidance replaces the old google.com/maps tab hand-off, so
+  // one sheet lives above every screen and any of them can open it.
+  const [routePlace, setRoutePlace] = useState(null);
+  const openDirections = place => { if (place) setRoutePlace(place); };
   const push = view => setStack(s => [...s, view]);
   const pop = () => setStack(s => s.slice(0, -1));
   const showToast = (text, kind = 'ok', detail) => setToast({ text, kind, detail });
+
+  // Signing in from a deep link can fail after the traveler already left the
+  // app (the Custom Tab closed on an error, or the URL is not allowlisted).
+  // Say why instead of dropping them on the signed-out screens unexplained.
+  useEffect(() => {
+    if (!authError) return;
+    setToast({ text: authError, kind: 'error' });
+    clearAuthError();
+  }, [authError, clearAuthError]);
 
   // PWA app shortcuts open `/?tab=map` etc. Land on that tab, then strip the
   // query so a refresh (and the browser history) stays clean.
@@ -78,25 +93,14 @@ function Shell(){
     if (typeof navigator.geolocation?.watchPosition !== 'function') return;
     // maximumAge 0 — never accept a browser-cached stale fix from a previous session.
     const OPTS = { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 };
-    let best = null; // best fix so far { lng, lat, accuracy }
+    let best = null; // last accepted fix { lng, lat, accuracy, at }
     const onOk = pos => {
       const { longitude, latitude, accuracy } = pos.coords || {};
-      if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return;
-      // Reject very poor fixes instead of snapping the map to a guessed point.
-      // IndoorWi-Fi / tower fixes often report accuracy > 300 m — worse than useless.
-      const acc = Number.isFinite(accuracy) ? accuracy : 999;
-      if (acc > 300) return; // keep waiting for a real fix; dot stays honest
-      // Smooth: average with the previous best, weighted by inverse accuracy.
-      // A single noisy fix then can't yank the dot 100 m.
-      if (best){
-        const wNew = 1 / Math.max(10, acc);
-        const wOld = 1 / Math.max(10, best.accuracy);
-        const lng = (best.lng * wOld + longitude * wNew) / (wOld + wNew);
-        const lat = (best.lat * wOld + latitude * wNew) / (wOld + wNew);
-        best = { lng, lat, accuracy: Math.min(best.accuracy, acc) };
-      } else {
-        best = { lng: longitude, lat: latitude, accuracy: acc };
-      }
+      const next = nextFix(best, { lng: longitude, lat: latitude, accuracy }, Date.now());
+      // The filter returns the previous fix unchanged when this reading is
+      // vague or an impossible jump, so the dot never lies about the position.
+      if (!next || next === best) return;
+      best = next;
       setCoords({ lng: best.lng, lat: best.lat, accuracy: best.accuracy });
     };
     const onErr = () => { /* keep fallback; a failed permission is not a fake pin */ };
@@ -177,7 +181,7 @@ function Shell(){
     setStack([]); setTab('home'); setPrefsStage(false); setAuthStage(null); setAuthNotice(null);
   };
   const top = stack[stack.length - 1];
-  const screenProps = { coords, push, pop, showToast, setTab: switchTab, user, signOut: doSignOut };
+  const screenProps = { coords, push, pop, showToast, setTab: switchTab, user, signOut: doSignOut, openDirections };
   let body;
   if (top?.name === 'search') body = <SearchResults query={top.query} {...screenProps}/>;
   else if (top?.name === 'browse') body = <Browse kind={top.kind} {...screenProps}/>;
@@ -200,6 +204,14 @@ function Shell(){
       <Toast toast={toast} onClose={() => setToast(null)} />
       {guard(body)}
       {!stack.length && <TabBar tab={tab} onTab={t => { setStack([]); setTab(t); }} />}
+      {routePlace && (
+        <RouteSheet
+          place={routePlace}
+          coords={coords}
+          hasFix={!(coords.lng === FALLBACK_CENTER.lng && coords.lat === FALLBACK_CENTER.lat)}
+          onClose={() => setRoutePlace(null)}
+        />
+      )}
     </div>
   );
 }

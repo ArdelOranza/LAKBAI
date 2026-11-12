@@ -7,7 +7,7 @@ import { recommend } from '../api.js';
 import { reverseGeocode } from '../geocode.js';
 import { FALLBACK_CENTER } from '../App.jsx';
 import { readLocalPrefs } from '../prefs.js';
-import { sessionGet, sessionSet } from '../sessionCache.js';
+import { readHomeCache, writeHomeCache, isStale } from '../homeCache.js';
 import { haversineKm, formatDistance } from '../geo.js';
 import { saveFavorite } from '../store.js';
 // User comes from the shell via props (App.jsx screenProps) — single source, no context shadow.
@@ -25,14 +25,24 @@ const QUICK = [
   ['Events', CalendarDays, { name:'events' }],
 ];
 
-// v2: the recommendation set now depends on where the traveler is.
-const REC_KEY = 'lakbai.rec.home.v2';
-const REC_AT_KEY = 'lakbai.rec.homeAt.v2';
+// The last good feed lives in localStorage (per account). Distance only matters
+// once we have a real fix — a cold launch starts at the province centre, and
+// treating that as "the traveler moved" is what made every launch show
+// "Finding hidden gems for you…" again.
+const FEED_MAX_KM = 8;
+function localFeed(user, coords, prefs){
+  const cached = readHomeCache(user, coords, prefs);
+  if (!cached) return null;
+  if (coords === FALLBACK_CENTER) return { places: cached.places, stale: isStale(cached, coords) };
+  const km = haversineKm(cached.at.lng, cached.at.lat, coords.lng, coords.lat);
+  if (km != null && km > FEED_MAX_KM) return { places: cached.places, stale: true };
+  return { places: cached.places, stale: isStale(cached, coords) };
+}
 
 export default function Home({ coords, push, showToast, setTab, user }){
   const [place, setPlace] = useState('Pangasinan');
   const [query, setQuery] = useState('');
-  const [recs, setRecs] = useState(sessionGet(REC_KEY) || []);
+  const [recs, setRecs] = useState(() => localFeed(user, coords, readLocalPrefs(user))?.places || []);
   const [busy, setBusy] = useState(false);
   const [event, setEvent] = useState(null);
   // Fallback banner: the next festival from the curated dataset, so the card is
@@ -62,12 +72,11 @@ export default function Home({ coords, push, showToast, setTab, user }){
   const locKey = coords === FALLBACK_CENTER ? 'fallback' : coords.lng.toFixed(2) + ',' + coords.lat.toFixed(2);
 
   useEffect(() => {
-    const cached = sessionGet(REC_KEY);
-    const at = sessionGet(REC_AT_KEY);
-    const far = !at || haversineKm(at.lng, at.lat, coords.lng, coords.lat) > 8;
-    if (cached && cached.length && !far) {
-      setRecs(cached);
-      setEvent(cached.find(p => p.festival && dateRange(p.festival)) || null);
+    const prefs = readLocalPrefs(user);
+    const cached = localFeed(user, coords, prefs);
+    if (cached && !cached.stale) {
+      setRecs(cached.places);
+      setEvent(cached.places.find(p => p.festival && dateRange(p.festival)) || null);
       setBusy(false);
       return undefined;
     }
@@ -75,21 +84,17 @@ export default function Home({ coords, push, showToast, setTab, user }){
     // Give the first real GPS fix a moment, so the plan is built for where the
     // user actually is instead of the province fallback centre.
     const wait = coords === FALLBACK_CENTER ? 2500 : 0;
-    // No usable cache for this spot (first visit, or the traveler moved): drop
-    // the previous town's picks straight away so they cannot read as this
-    // town's recommendations while the new request is in flight.
-    setRecs([]);
-    setEvent(null);
-    setBusy(true);
+    // Whatever is on screen stays on screen: a refresh must never blink the
+    // feed back to an empty shimmer, in any town.
+    setBusy(!cached);
     const timer = setTimeout(() => {
       setBusy(true);
-      recommend('top attractions, events and hidden gems', `${coords.lng},${coords.lat}`, readLocalPrefs(user))
+      recommend('top attractions, events and hidden gems', `${coords.lng},${coords.lat}`, prefs)
         .then(out => {
           if (!alive) return;
           const ps = out.places || [];
           setRecs(ps);
-          sessionSet(REC_KEY, ps);
-          sessionSet(REC_AT_KEY, { lng: coords.lng, lat: coords.lat });
+          writeHomeCache(user, coords, prefs, ps);
           setEvent(ps.find(p => p.festival && dateRange(p.festival)) || null);
         })
         .catch(e => { if (alive) showToast('Could not load recommendations', 'error', e.message); })

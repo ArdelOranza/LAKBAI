@@ -11,20 +11,20 @@ import { answerLead } from '../chatAnswer.js';
 import { latestThread, listThreads, saveThread, cleanMessages, cachedThreads } from '../chatStore.js';
 import { placeImage, mapboxToken } from '../staticMap.js';
 import { MdText } from '../mdText.jsx';
-import { openExternal } from '../extLinks.js';
-import { directionsHref } from '../emergency.js';
 import { saveFavorite, listFavorites } from '../store.js';
 import { haversineKm, formatDistance, driveMinutes } from '../geo.js';
+import { suggestionsFor } from '../chatSuggest.js';
+import { topicTabs } from '../chatTopics.js';
 import { PhotoPlaceholder } from '../ui.jsx';
 import Logo from '../logo.jsx';
 // import AiBackdrop from '../AiBackdrop.jsx'; // parked: the chat background stays plain
 
-const WELCOME = { id:'welcome', role:'ai', text:"Hi! I'm LakbAI. Ask me about the places in our verified Pangasinan list — food, tourist spots, fees, or a day trip. I answer from those records only, so nothing is made up." };
+const WELCOME = { id:'welcome', role:'ai', text:"Hi! I'm LakbAI. Ask me about the places in our verified Pangasinan list — food, tourist spots, fees, or a day trip — and about bus fares and terminals to any Pangasinan town. I answer from those records only, so nothing is made up. Bus fares are LTFRB guides, not live ticket prices; confirm with the conductor or LTFRB 1342." };
 const STARTERS = [
   'Tourist spots in Bayambang',
   'Where should I eat in Dagupan?',
   'Fees at Balungao zipline',
-  'Plan a day trip in Bayambang',
+  'Bus fare from Cubao to Dagupan',
 ];
 const MAP_TOKEN = mapboxToken();
 let uid = 0;
@@ -51,7 +51,7 @@ function distanceLine(km){
   return `${mins} ${mins === 1 ? 'min' : 'mins'} away • ${formatDistance(km)}`;
 }
 
-function ChatHero({ card, coords, user, showToast, push, saved, onSaved }){
+function ChatHero({ card, coords, user, showToast, push, saved, onSaved, openDirections }){
   const km = haversineKm(coords.lng, coords.lat, card.lng, card.lat);
   const img = placeImage(card, MAP_TOKEN);
   const place = card.spot || {
@@ -69,9 +69,8 @@ function ChatHero({ card, coords, user, showToast, push, saved, onSaved }){
   }
   function directions(e){
     e.stopPropagation();
-    const href = directionsHref(card.lat, card.lng);
-    if (!href) { push({ name:'detail', place }); return; }
-    openExternal(href);
+    if (!openDirections) { push({ name:'detail', place }); return; }
+    openDirections(place);
   }
 
   return (
@@ -183,7 +182,7 @@ function ChatRow({ card, coords, user, push, showToast, saved, onSaved }){
   );
 }
 
-export default function ChatTab({ user, coords, push, setTab, showToast }){
+export default function ChatTab({ user, coords, push, setTab, showToast, openDirections }){
   // Paint the saved conversation from the local mirror on the first frame.
   // Supabase is a background sync, never a gate: waiting on it made the thread
   // disappear into the welcome card on every tab switch / reload.
@@ -327,6 +326,9 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
       const cards = candidates.slice(0, 6).map(c => cardFor(c, spots));
       setMsgs(m => [...m.filter(x => !x.loading), {
         id:nid(), role:'ai', at:Date.now(),
+        // The intent is what decides which topic tab lights up and which chips
+        // come next, so it has to live on the message, not just in this call.
+        intent: out.intent || '',
         text: out.answer || 'I could not find that — ask me about Pangasinan travel.',
         cards,
       }]);
@@ -406,15 +408,13 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
   }
 
   const lastAi = [...msgs].reverse().find(m => m.role === 'ai' && !m.loading);
-  const followUp = lastAi?.cards?.[0]
-    ? [
-        { icon:Compass, label:'Plan a day here', send:'Plan a day trip to ' + lastAi.cards[0].name },
-        { icon:MapPin, label:'More like this', send:'Show me more places like ' + lastAi.cards[0].name },
-      ]
-    : [
-        { icon:Compass, label:'Beaches near me', send:'Best beaches near me' },
-        { icon:MapPin, label:'Festivals this month', send:'Which festivals are on this month?' },
-      ];
+  // Which chip makes sense next: another fare question after a fare answer,
+  // the place follow-ups after a place, a town bus prompt when the fix says so.
+  const CHIP_ICON = { plan: Compass, more: MapPin, beach: Compass, festival: Ticket, fare: Ticket, bus: Ticket, terminal: Navigation };
+  const followUp = suggestionsFor({ lastAi, coords }).map(s => ({
+    ...s,
+    icon: CHIP_ICON[s.id] || MapPin,
+  }));
 
   return (
     <main className="chat-screen">
@@ -560,6 +560,7 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
                             showToast={showToast}
                             saved={savedIds.has(list[0].id)}
                             onSaved={confirmSaved}
+                            openDirections={openDirections}
                           />
                           {shownRows.map(card => (
                             <ChatRow
@@ -602,6 +603,22 @@ export default function ChatTab({ user, coords, push, setTab, showToast }){
         </div>
 
         <div className="composer">
+          <div className="topic-tabs" role="tablist" aria-label="Chat topics">
+            {topicTabs({ lastAi, coords }).map(t => (
+              <button
+                key={t.id}
+                type="button"
+                role="tab"
+                aria-selected={t.active}
+                data-testid={'topic-' + t.id}
+                className={'topic-tab' + (t.active ? ' is-on' : '')}
+                onClick={() => send(t.send)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
           {starters && (
             <div className="starters">
               {STARTERS.map(s => (

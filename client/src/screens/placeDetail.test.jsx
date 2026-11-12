@@ -53,23 +53,24 @@ describe('PlaceDetail source links', () => {
   });
 });
 
-describe('PlaceDetail directions popup', () => {  it('opens the maps URL without leaking the opener reference', async () => {
+describe('PlaceDetail directions', () => {
+  it('asks the app for an in-app Mapbox route instead of opening Google Maps', async () => {
+    const openDirections = vi.fn();
     const container = document.createElement('div');
     document.body.appendChild(container);
     const root = createRoot(container);
     await React.act(async () => {
       root.render(
-        <PlaceDetail place={PLACE} coords={{ lng: 120, lat: 16 }} push={() => {}} pop={() => {}} showToast={() => {}} setTab={() => {}} user={{ id: 'u1' }}/>
+        <PlaceDetail place={PLACE} coords={{ lng: 120, lat: 16 }} push={() => {}} pop={() => {}} showToast={() => {}} setTab={() => {}} user={{ id: 'u1' }} openDirections={openDirections}/>
       );
     });
     const btn = container.querySelector('[data-testid="directions-btn"]');
     await React.act(async () => {
       btn.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
     });
-    expect(window.open).toHaveBeenCalledWith(
-      'https://www.google.com/maps/dir/?api=1&destination=16.1,120.1&travelmode=driving&dir_action=navigate',
-      '_blank', 'noopener,noreferrer'
-    );
+    expect(openDirections).toHaveBeenCalledTimes(1);
+    expect(openDirections.mock.calls[0][0]).toMatchObject({ id: 'p1', lng: 120.1, lat: 16.1 });
+    expect(window.open).not.toHaveBeenCalled();
     await React.act(async () => root.unmount());
     container.remove();
   });
