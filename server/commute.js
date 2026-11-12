@@ -8,6 +8,7 @@
 // chat layer may rephrase the facts, but every figure it prints has to come
 // from here — same rule the place records follow.
 const DATA = require('./data/ltfrb-pangasinan-bus-fares.json');
+const { unitFigures } = require('./figures.js');
 
 const META = DATA.dataset_metadata;
 const TOWNS = DATA.pangasinan_cities_and_municipalities_km_directory;
@@ -319,12 +320,21 @@ function groundCommuteAnswer(answer, facts){
   if (!text) return fail();
   const factsText = String(facts.text || '');
   const factsKey = keyOf(factsText);
-  const factsNumbers = numbersIn(factsText);
+  // The disclaimer's own figures (20%, hotline 1342, effective date) are ours,
+  // so echoing one of them is not an invention.
+  const factsNumbers = numbersIn(`${factsText}\n${DISCLAIMER}`);
 
   for (const n of numbersIn(text)){
     if (n < 10) continue; // list markers, "5 km walks" and small counts
     if (!factsNumbers.some(f => Math.abs(f - n) < 0.001)) return fail();
   }
+  // A number bound to a unit or a rating is a claim even below ten: the file
+  // carries no travel time, so "5 to 8 hours" must not survive.
+  for (const n of unitFigures(text)){
+    if (!factsNumbers.some(f => Math.abs(f - n) < 0.001)) return fail();
+  }
+  // The file has no departure times or frequencies, so any is an invention.
+  if (/\b(hourly|daily|every\s+\d+\s*(?:min|minute|hour|hr)s?|every\s+(?:hour|minute|day))\b/i.test(text)) return fail();
   const money = [...text.matchAll(/₱\s*([\d,]+(?:\.\d+)?)/g)].map(m => Number(m[1].replace(/,/g, '')));
   for (const a of money){
     if (Number.isFinite(a) && !factsNumbers.some(f => Math.abs(f - a) < 0.001)) return fail();

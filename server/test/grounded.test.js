@@ -166,3 +166,19 @@ test('an answer that only restates the rows is kept as written', async () => {
   });
   assert.equal(out.answer, "**Conrad's Dagupan** — 4.2★ from 185 reviews in Dagupan City.");
 });
+
+test('an invented rating or walking time in the prose is rebuilt from the rows', async () => {
+  // Both figures are below ten, where the old number check gave up policing, so
+  // a model could print a rating the file does not carry or a made-up walk.
+  const out = await groundedChat('food in Dagupan', '120.341,16.043', {
+    askFn: fake({
+      intent: 'food',
+      answer: "Conrad's Dagupan is rated 4.9 — a 5 minute walk from the plaza.",
+      candidates: [{ name: "Conrad's Dagupan" }],
+      sources: [],
+    }),
+  });
+  assert.doesNotMatch(out.answer, /4\.9/);
+  assert.doesNotMatch(out.answer, /5 minute walk/);
+  assert.match(out.answer, /Conrad's Dagupan/);
+});

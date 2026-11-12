@@ -97,3 +97,15 @@ test('no fix means no distance claimed and no Pangasinan-only narrowing', () => 
     'a location-less question must not be narrowed to the Pangasinan hubs',
   );
 });
+
+test('an invented rating in the terminal prose is rebuilt from the directory', () => {
+  const facts = terminalFacts('Which terminal in Cubao goes to Bolinao?', '121.0485,14.6240', true);
+  const madeUp = groundTerminalAnswer('**Victory Liner Cubao Terminal** is rated 4.9 stars.', facts);
+  assert.equal(madeUp.grounded, false);
+  assert.doesNotMatch(madeUp.answer, /4\.9/);
+
+  // The row's own rating still passes through untouched.
+  const real = facts.rows.find(r => r.rating && r.name === 'Victory Liner Cubao Terminal');
+  const ok = groundTerminalAnswer(`${real.name} is rated ${real.rating.score}★.`, facts);
+  assert.equal(ok.grounded, true);
+});

@@ -7,6 +7,7 @@ const assert = require('node:assert/strict');
 
 const {
   isCommuteQuestion, fareFacts, fareAnswer, fareFor, localRidesNote, DISCLAIMER,
+  groundCommuteAnswer,
 } = require('../commute.js');
 
 test('recognises a commuting question in English and Taglish', () => {
@@ -92,4 +93,18 @@ test('the prompt block names every figure the answer may use', () => {
   assert.match(facts.text, /FARE FACTS/);
   assert.match(facts.text, /583/);
   assert.match(facts.text, /Alaminos City/);
+});
+
+test('an invented travel time or departure schedule is rebuilt from the file', () => {
+  // The LTFRB file has no travel times and no frequencies; the model must not
+  // smuggle them in as prose. Both figures sit below ten, where the old number
+  // check gave up policing.
+  const facts = fareFacts('How much is the bus fare from Cubao to Dagupan?');
+  const withTime = groundCommuteAnswer(`The ride is about 5 to 8 hours. Ordinary is ₱${facts.fares.ordinary.regular}.`, facts);
+  assert.equal(withTime.grounded, false);
+  assert.doesNotMatch(withTime.answer, /5 to 8 hours/);
+
+  const withSchedule = groundCommuteAnswer('Buses leave the terminal hourly.', facts);
+  assert.equal(withSchedule.grounded, false);
+  assert.doesNotMatch(withSchedule.answer, /hourly/i);
 });

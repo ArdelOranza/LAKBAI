@@ -14,6 +14,7 @@ const {
 } = require('./dataset.js');
 const { isAttraction } = require('./attractions.js');
 const { parseProximity, nearestTown, haversineKm } = require('./location.js');
+const { unitFigures } = require('./figures.js');
 const { isCommuteQuestion, isFareQuestion, fareFacts, groundCommuteAnswer, outOfScopeNote } = require('./commute.js');
 const { isTerminalQuestion, terminalFacts, groundTerminalAnswer } = require('./terminals.js');
 
@@ -236,6 +237,11 @@ function groundAnswer(answer, intent, entries){
   // 1. every figure (price, rating, review count, year) must be in the rows
   for (const n of numbersIn(text)){
     if (n < 10) continue; // list markers and small counts are too noisy to police
+    if (!factNumbers.some(f => Math.abs(f - n) < 0.001)) return fallback;
+  }
+  // 1a. a number bound to a unit or a rating is a claim even below ten, so a
+  //     made-up "5 minute walk" or a "4.9" rating cannot slip through the skip.
+  for (const n of unitFigures(text)){
     if (!factNumbers.some(f => Math.abs(f - n) < 0.001)) return fallback;
   }
   // 1b. money amounts are attribute-bound: a price must appear in a fee

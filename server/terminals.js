@@ -9,6 +9,7 @@
  * matrix remains the only source of fares.
  */
 const { haversineKm, parseProximity } = require('./location.js');
+const { figuresIn, unitFigures } = require('./figures.js');
 
 const DIRECTORY = require('./data/terminals-to-pangasinan.json');
 const COORDS = require('./data/terminal-coords.json');
@@ -282,16 +283,20 @@ function groundTerminalAnswer(answer, facts){
   const allowedDigits = digits(allowed);
   const allowedMoney = new Set(extractMoney(allowed));
   const allowedKm = new Set(extractKm(allowed).map(n => n.toFixed(1)));
+  const allowedFigures = figuresIn(allowed);
 
   const badPhone = extractPhones(text).some(p => !allowedDigits.includes(digits(p)));
   const badMoney = extractMoney(text).some(m => !allowedMoney.has(m));
   const badKm = extractKm(text).some(n => !allowedKm.has(n.toFixed(1)));
+  // A rating or any unit-bound figure must come from the rows too: the old
+  // checks covered phone, price and km, so an invented "4.9 stars" slipped in.
+  const badFigure = unitFigures(text).some(n => !allowedFigures.some(a => Math.abs(a - n) < 0.001));
   const badName = boldNames(text).some(n => {
     const key = norm(n);
     return !facts.rows.some(r => norm(r.name).includes(key) || norm(r.area).includes(key));
   });
 
-  if (badPhone || badMoney || badKm || badName){
+  if (badPhone || badMoney || badKm || badFigure || badName){
     return { answer: terminalAnswer(facts), grounded: false };
   }
   return { answer: text, grounded: true };
