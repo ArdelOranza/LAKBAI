@@ -206,8 +206,11 @@ function rowLine(r){
   return parts.join('\n');
 }
 
-function terminalFacts(message, proximity){
-  const rows = matchTerminals(message, proximity);
+function terminalFacts(message, proximity, hasFix = true){
+  // With no fix the client sends its province fallback point, which must never
+  // be ranked as "where the traveler is" — drop it before matching.
+  const fix = hasFix === false ? '' : proximity;
+  const rows = matchTerminals(message, fix);
   if (!rows.length) return null;
   const hasDistance = rows.some(r => r.distanceKm != null);
   const text = [

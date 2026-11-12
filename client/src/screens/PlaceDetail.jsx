@@ -29,13 +29,13 @@ function editionText(a, b){
   return left + ' – ' + MONTHS[b.getMonth()] + ' ' + b.getDate();
 }
 
-export default function PlaceDetail({ place, coords, user, pop, showToast, openDirections }){
+export default function PlaceDetail({ place, coords, hasFix = true, user, pop, showToast, openDirections }){
   const { user: authUser } = useAuth();
   const u = user || authUser;
   const p = place || {};
   const [saved, setSaved] = useState(false);
   const [reviews, setReviews] = useState([]);
-  const km = haversineKm(coords.lng, coords.lat, p.lng, p.lat);
+  const km = hasFix ? haversineKm(coords.lng, coords.lat, p.lng, p.lat) : null;
   const photos = (p.photos && p.photos.length) ? p.photos : (p.photo ? [p.photo] : null);
   // U14-A: a place that only has a location still gets a real image — its static map.
   const heroPhoto = placeImage(p, mapboxToken(), { width: 600, height: 340 });

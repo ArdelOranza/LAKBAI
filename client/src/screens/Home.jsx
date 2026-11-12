@@ -8,7 +8,7 @@ import { reverseGeocode } from '../geocode.js';
 import { FALLBACK_CENTER } from '../App.jsx';
 import { readLocalPrefs } from '../prefs.js';
 import { readHomeCache, writeHomeCache, isStale } from '../homeCache.js';
-import { haversineKm, formatDistance } from '../geo.js';
+import { haversineKm, formatDistance, proximityOf } from '../geo.js';
 import { saveFavorite } from '../store.js';
 // User comes from the shell via props (App.jsx screenProps) — single source, no context shadow.
 import { dateRange, bannerDate } from '../festival.js';
@@ -39,7 +39,7 @@ function localFeed(user, coords, prefs){
   return { places: cached.places, stale: isStale(cached, coords) };
 }
 
-export default function Home({ coords, push, showToast, setTab, user }){
+export default function Home({ coords, hasFix = true, push, showToast, setTab, user }){
   const [place, setPlace] = useState('Pangasinan');
   const [query, setQuery] = useState('');
   const [recs, setRecs] = useState(() => localFeed(user, coords, readLocalPrefs(user))?.places || []);
@@ -89,7 +89,7 @@ export default function Home({ coords, push, showToast, setTab, user }){
     setBusy(!cached);
     const timer = setTimeout(() => {
       setBusy(true);
-      recommend('top attractions, events and hidden gems', `${coords.lng},${coords.lat}`, prefs)
+      recommend('top attractions, events and hidden gems', proximityOf(coords, hasFix), prefs)
         .then(out => {
           if (!alive) return;
           const ps = out.places || [];
@@ -223,7 +223,7 @@ export default function Home({ coords, push, showToast, setTab, user }){
                   : <PhotoPlaceholder size={26}/>}
                 <span className="chip" style={{ position:'absolute', left:8, top:8, fontSize:10.5, padding:'3px 9px' }}>{(p.categories && p.categories[0]) || 'Pangasinan'}</span>
                 <button className="chip" data-testid={'fav-' + p.id} aria-label={'Save ' + p.name} onClick={e => { e.stopPropagation(); fav(p); }} style={{ position:'absolute', right:8, top:8, width:30, height:30, padding:0, borderRadius:'50%', background:'var(--primary)', color:'#fff', border:'none', display:'grid', placeItems:'center' }}><Plus size={15}/></button>
-                {haversineKm(coords.lng, coords.lat, p.lng, p.lat) != null && (
+                {hasFix && haversineKm(coords.lng, coords.lat, p.lng, p.lat) != null && (
                   <span style={{ position:'absolute', left:8, bottom:8, fontSize:10.5, color:'#fff', background:'rgba(15,23,42,.55)', borderRadius:999, padding:'2px 8px', display:'inline-flex', alignItems:'center', gap:3 }}>
                     <MapPin size={11}/> {formatDistance(haversineKm(coords.lng, coords.lat, p.lng, p.lat))}
                   </span>

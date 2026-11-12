@@ -67,6 +67,14 @@ test('an invented terminal phone is rebuilt from the directory rows', async () =
   assert.match(out.answer, /Cubao/);
 });
 
+test('a terminal distance derived from the fallback point is rejected without a fix', async () => {
+  const out = await groundedChat('Which bus terminal is closest to me?', '120.23,16.03', {
+    hasFix: false,
+    askFn: fake({ intent: 'commute', answer: 'The closest is **Victory Liner Cubao** at 1.2 km.', candidates: [] }),
+  });
+  assert.doesNotMatch(out.answer, /\d+(?:\.\d+)?\s*km/i);
+});
+
 test('a request that matches nothing still gets the index to choose from', () => {
   const { text, hits } = buildContext('somewhere for a quiet anniversary', '120.341,16.043');
   assert.equal(hits.length, 0);

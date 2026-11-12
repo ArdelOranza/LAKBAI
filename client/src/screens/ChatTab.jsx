@@ -12,7 +12,7 @@ import { latestThread, listThreads, saveThread, cleanMessages, cachedThreads } f
 import { placeImage, mapboxToken } from '../staticMap.js';
 import { MdText } from '../mdText.jsx';
 import { saveFavorite, listFavorites } from '../store.js';
-import { haversineKm, formatDistance, driveMinutes } from '../geo.js';
+import { haversineKm, formatDistance, driveMinutes, proximityOf } from '../geo.js';
 import { suggestionsFor } from '../chatSuggest.js';
 import { topicTabs } from '../chatTopics.js';
 import { buildChatContext } from '../chatContext.js';
@@ -53,8 +53,8 @@ function distanceLine(km){
   return `${mins} ${mins === 1 ? 'min' : 'mins'} away • ${formatDistance(km)}`;
 }
 
-function ChatHero({ card, coords, user, showToast, push, saved, onSaved, openDirections }){
-  const km = haversineKm(coords.lng, coords.lat, card.lng, card.lat);
+function ChatHero({ card, coords, hasFix = true, user, showToast, push, saved, onSaved, openDirections }){
+  const km = hasFix ? haversineKm(coords.lng, coords.lat, card.lng, card.lat) : null;
   const img = placeImage(card, MAP_TOKEN);
   const place = card.spot || {
     id: card.id, name: card.name, lng: card.lng, lat: card.lat,
@@ -130,8 +130,8 @@ function ChatHero({ card, coords, user, showToast, push, saved, onSaved, openDir
   );
 }
 
-function ChatRow({ card, coords, user, push, showToast, saved, onSaved }){
-  const km = haversineKm(coords.lng, coords.lat, card.lng, card.lat);
+function ChatRow({ card, coords, hasFix = true, user, push, showToast, saved, onSaved }){
+  const km = hasFix ? haversineKm(coords.lng, coords.lat, card.lng, card.lat) : null;
   const img = placeImage(card, MAP_TOKEN);
   const place = card.spot || {
     id: card.id, name: card.name, lng: card.lng, lat: card.lat,
@@ -318,7 +318,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     try {
-      const out = await chat(q, coords ? `${coords.lng},${coords.lat}` : '', ctrl.signal, {
+      const out = await chat(q, proximityOf(coords, hasFix), ctrl.signal, {
         // Where they are travels as proximity; this adds who they are, what
         // they said they like, and their local time — built on every send so
         // the hour is never stale.
@@ -563,6 +563,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
                           <ChatHero
                             card={list[0]}
                             coords={coords}
+                            hasFix={hasFix}
                             user={user}
                             push={push}
                             showToast={showToast}
@@ -575,6 +576,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
                               key={card.id}
                               card={card}
                               coords={coords}
+                              hasFix={hasFix}
                               user={user}
                               push={push}
                               showToast={showToast}

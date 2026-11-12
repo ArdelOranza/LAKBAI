@@ -5,11 +5,11 @@ import { useAuth } from '../AuthContext.jsx';
 import { recommend, itineraryFromSaved } from '../api.js';
 import { readLocalPrefs } from '../prefs.js';
 import { sessionGet, sessionSet } from '../sessionCache.js';
-import { haversineKm, formatDistance, timeHint } from '../geo.js';
+import { haversineKm, formatDistance, timeHint, proximityOf } from '../geo.js';
 import { PrimaryBtn } from '../ui.jsx';
 import { placeImage, mapboxToken } from '../staticMap.js';
 
-export default function SavedTab({ coords, push, showToast }){
+export default function SavedTab({ coords, hasFix = true, push, showToast }){
   const { user } = useAuth();
   const [rows, setRows] = useState([]);
   const [suggs, setSuggs] = useState(sessionGet('lakbai.rec.sugg') || []);
@@ -18,7 +18,7 @@ export default function SavedTab({ coords, push, showToast }){
     let alive = true;
     listFavorites(user).then(res => { if (alive) setRows(res.data || []); });
     if (!suggs.length) {
-      recommend('hidden gems attractions near me', `${coords.lng},${coords.lat}`, readLocalPrefs(user))
+      recommend('hidden gems attractions near me', proximityOf(coords, hasFix), readLocalPrefs(user))
         .then(out => { const ps = (out.places || []).slice(0, 4); setSuggs(ps); sessionSet('lakbai.rec.sugg', ps); })
         .catch(() => { /* suggestions are optional */ });
     }
@@ -75,7 +75,7 @@ export default function SavedTab({ coords, push, showToast }){
               <b style={{ display:'block' }}>{row.name}</b>
               <p style={{ fontSize:12, color:'var(--muted-ink)', margin:'2px 0 0' }}>{(row.categories || [])[0] || 'Pangasinan'}</p>
               <div style={{ display:'flex', gap:6, marginTop:5, flexWrap:'wrap' }}>
-                {haversineKm(coords.lng, coords.lat, row.lng, row.lat) != null && <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:11.5, color:'var(--muted-ink)' }}><MapPin size={12}/> {formatDistance(haversineKm(coords.lng, coords.lat, row.lng, row.lat))}</span>}
+                {hasFix && haversineKm(coords.lng, coords.lat, row.lng, row.lat) != null && <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:11.5, color:'var(--muted-ink)' }}><MapPin size={12}/> {formatDistance(haversineKm(coords.lng, coords.lat, row.lng, row.lat))}</span>}
                 {suggestionLabels(row) && row.name && <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:11.5, color:'var(--primary)' }}><Compass size={12}/> {suggestionLabels(row)}</span>}
               </div>
             </div>

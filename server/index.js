@@ -114,7 +114,7 @@ app.post('/api/chat', async (req, res) => {
       // Terminal questions read the committed directory the same way, with a
       // straight-line distance when a fix exists; an explicit fare still wins.
       if (isTerminalQuestion(message) && !isFareQuestion(message)) {
-        const facts = terminalFacts(message, proximity);
+        const facts = terminalFacts(message, hasFix ? proximity : '');
         if (facts) {
           return res.json({
             intent: 'commute',

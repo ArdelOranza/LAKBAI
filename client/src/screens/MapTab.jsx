@@ -5,7 +5,7 @@ import { readLocalPrefs } from '../prefs.js';
 import { sessionGet, sessionSet } from '../sessionCache.js';
 import { matches } from '../filters.js';
 import { fetchSpots } from '../spots.js';
-import { haversineKm } from '../geo.js';
+import { haversineKm, proximityOf } from '../geo.js';
 import { FALLBACK_CENTER } from '../App.jsx';
 import { Map, MapMarker, MarkerContent } from '@/components/ui/map';
 import { Chip } from '../ui.jsx';
@@ -177,7 +177,7 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
     if (hit) setPlaces(hit); // instant paint, then live revalidation below
     let alive = true;
     setBusy(true);
-    recommend(`nearby Pangasinan attractions restaurants events within ${radius} km`, `${coords.lng},${coords.lat}`, readLocalPrefs(user))
+    recommend(`nearby Pangasinan attractions restaurants events within ${radius} km`, proximityOf(coords, hasFix), readLocalPrefs(user))
       .then(out => {
         if (!alive) return;
         const ps = out.places || [];

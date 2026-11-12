@@ -20,6 +20,23 @@ export function formatDistance(km){
 }
 
 /**
+ * The "lng,lat" string to send as proximity, or '' when there is no real fix.
+ *
+ * The app keeps a province-centre fallback in `coords` so the map still has a
+ * centre before GPS arrives. That fallback is not the traveler's position, so
+ * it must never be sent to the server as proximity — doing so ordered results
+ * around the fallback town and made "closest terminal" claim a fake distance.
+ * `hasFix === false` is the explicit "no location" signal; an omitted flag is
+ * treated as a fix so older callers keep working.
+ */
+export function proximityOf(coords, hasFix){
+  if (!coords || hasFix === false) return '';
+  const { lng, lat } = coords;
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) return '';
+  return `${lng},${lat}`;
+}
+
+/**
  * Position to show for a new GPS reading.
  *
  * Averaging every fix ever received makes the dot lag behind a moving car and

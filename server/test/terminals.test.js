@@ -85,3 +85,15 @@ test('terminal questions are recognised without hijacking fare questions', () =>
   assert.equal(isTerminalQuestion('How much is the bus fare from Cubao to Dagupan?'), false);
   assert.equal(isTerminalQuestion('Where should I eat in Dagupan?'), false);
 });
+
+test('no fix means no distance claimed and no Pangasinan-only narrowing', () => {
+  // The client sends its Lingayen-area fallback point when location is off;
+  // with hasFix false that point must be ignored, not treated as the traveler.
+  const facts = terminalFacts('Which bus terminal is closest to me?', '120.23,16.03', false);
+  assert.ok(facts);
+  assert.doesNotMatch(facts.text, /straight-line/);
+  assert.ok(
+    facts.rows.some(r => /Cubao|Pasay|PITX/.test(r.name)),
+    'a location-less question must not be narrowed to the Pangasinan hubs',
+  );
+});

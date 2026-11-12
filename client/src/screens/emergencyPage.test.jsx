@@ -18,6 +18,26 @@ describe('Emergency with missing coords', () => {
 });
 
 describe('Emergency hospital directions', () => {
+  it('never queries the fallback centre as the traveler location', async () => {
+    const fetchMock = vi.fn(async () => ({ ok: true, json: async () => ({ hospitals: [], police: [] }) }));
+    vi.stubGlobal('fetch', fetchMock);
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    await React.act(async () => {
+      root.render(<Emergency coords={{ lng: 120.23, lat: 16.03 }} pop={() => {}} showToast={() => {}} />);
+    });
+    await React.act(async () => { await Promise.resolve(); });
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(container.textContent).toContain('Location is off');
+
+    await React.act(async () => root.unmount());
+    container.remove();
+    vi.unstubAllGlobals();
+  });
+
   it('guides to a nearby hospital in the app instead of linking out to Google Maps', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => ({
       ok: true,
@@ -32,7 +52,7 @@ describe('Emergency hospital directions', () => {
     const root = createRoot(container);
 
     await React.act(async () => {
-      root.render(<Emergency coords={{ lng: 120.23, lat: 16.03 }} pop={() => {}} showToast={() => {}} openDirections={openDirections} />);
+      root.render(<Emergency coords={{ lng: 120.34, lat: 16.043 }} pop={() => {}} showToast={() => {}} openDirections={openDirections} />);
     });
     await React.act(async () => { await Promise.resolve(); });
     await React.act(async () => { await Promise.resolve(); });

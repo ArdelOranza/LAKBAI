@@ -3,7 +3,7 @@ import {
   ArrowLeft, Phone, Cross, Shield, LocateFixed, Info, ChevronRight,
 } from 'lucide-react';
 import { FALLBACK_CENTER } from '../App.jsx';
-import { haversineKm } from '../geo.js';
+import { haversineKm, proximityOf } from '../geo.js';
 import { telHref, awayLabel } from '../emergency.js';
 import { apiUrl } from '../apiBase.js';
 
@@ -31,11 +31,13 @@ function PlaceRow({ place, icon:Icon, openDirections }){
 export default function Emergency({ coords, pop, showToast, openDirections }){
   const [data, setData] = useState(null);
   const [failed, setFailed] = useState(false);
-  const at = coords && Number.isFinite(Number(coords.lng)) && Number.isFinite(Number(coords.lat)) ? `${coords.lng},${coords.lat}` : '';
   // Value compare like MapTab: reference equality breaks when the caller
   // passes a fresh fallback object (tests, another screen) — and on a safety
   // screen that would silently share fabricated coordinates.
   const hasFix = Boolean(coords && !(coords.lng === FALLBACK_CENTER.lng && coords.lat === FALLBACK_CENTER.lat));
+  // Only a real fix travels: the fallback centre must never be sent as "where
+  // the traveler is", or the nearest clinic/station would be the wrong one.
+  const at = hasFix ? proximityOf(coords) : '';
   useEffect(() => {
     if (!at) return undefined;
     let alive = true;

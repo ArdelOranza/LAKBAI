@@ -4,7 +4,7 @@ import { recommend } from '../api.js';
 import { readLocalPrefs } from '../prefs.js';
 import { sessionGet, sessionSet } from '../sessionCache.js';
 import { filterPlaces, feeLabel } from '../filters.js';
-import { haversineKm, formatDistance } from '../geo.js';
+import { haversineKm, formatDistance, proximityOf } from '../geo.js';
 import { Chip, PhotoPlaceholder } from '../ui.jsx';
 import { placeImage, mapboxToken } from '../staticMap.js';
 import { discoverPlaces } from '../discover.js';
@@ -39,7 +39,7 @@ function dedupePlaces(a, b){
 
 const KINDS = [['All','all'],['Places','places'],['Food','food'],['Events','events']];
 
-export default function SearchResults({ query, coords, push, pop, showToast, user }){
+export default function SearchResults({ query, coords, hasFix = true, push, pop, showToast, user }){
   const [text, setText] = useState(query);
   const [kind, setKind] = useState('all');
   const [results, setResults] = useState([]);
@@ -61,8 +61,8 @@ export default function SearchResults({ query, coords, push, pop, showToast, use
     setBusy(true);
     // Always fresh: dataset + Mapbox in parallel. Cache only written after.
     Promise.allSettled([
-      recommend(q, `${coords.lng},${coords.lat}`, readLocalPrefs(user)).catch(e => { showToast('Search failed', 'error', e.message); return { places: [] }; }),
-      discoverPlaces(q, `${coords.lng},${coords.lat}`).catch(() => []),
+      recommend(q, proximityOf(coords, hasFix), readLocalPrefs(user)).catch(e => { showToast('Search failed', 'error', e.message); return { places: [] }; }),
+      discoverPlaces(q, proximityOf(coords, hasFix)).catch(() => []),
     ]).then(async ([recRes, discRes]) => {
       if (!alive) return;
       const dsPlaces = (recRes.status === 'fulfilled' && recRes.value && recRes.value.places) || [];
@@ -127,7 +127,7 @@ export default function SearchResults({ query, coords, push, pop, showToast, use
         {busy && !shown.length && <p className="shimmer" style={{ fontSize:14, margin:0 }}>Searching...</p>}
         {!busy && !shown.length && <p data-testid="search-empty" style={{ color:'var(--muted-ink)', fontSize:14 }}>Nothing found — try another search.</p>}
         {shown.map(p => {
-          const dist = formatDistance(haversineKm(coords.lng, coords.lat, p.lng, p.lat));
+          const dist = hasFix ? formatDistance(haversineKm(coords.lng, coords.lat, p.lng, p.lat)) : '';
           const thumb = placeImage(p, mapboxToken());
           return (
             <article key={p.id} data-testid={p.source === 'mapbox' ? 'discover-row' : 'result-row'} className="result-card" onClick={() => push({ name:'detail', place:p })} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'detail', place:p }); } }}>

@@ -14,7 +14,7 @@ function happeningSoon(f, now){
   return f.starts - now <= 30 * DAY && f.ends >= now;
 }
 
-export default function Events({ coords, push, pop, showToast }){
+export default function Events({ coords, hasFix = true, push, pop, showToast }){
   const { user } = useAuth();
   const now = useMemo(() => new Date(), []);
   const [scope, setScope] = useState('All');
@@ -104,7 +104,7 @@ export default function Events({ coords, push, pop, showToast }){
           </p>
         )}
         {rows.map(f => {
-          const km = haversineKm(coords.lng, coords.lat, f.lng, f.lat);
+          const km = hasFix ? haversineKm(coords.lng, coords.lat, f.lng, f.lat) : null;
           return (
             <article
               key={f.id + f.starts.toISOString()}

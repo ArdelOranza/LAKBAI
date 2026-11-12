@@ -121,8 +121,11 @@ function indexLine(entry){
 
 /** Compact context block: full rows for the likely matches, a name index for the rest. */
 function buildContext(message, proximity, { profile = '', hasFix = true } = {}){
-  const hits = search(message, proximity, MAX_RECORDS);
   const here = parseProximity(proximity);
+  // With no fix the coordinates are the province fallback point, so they must
+  // not bias which rows read as "nearby" — only the request and profile matter.
+  const bias = hasFix === false ? null : here;
+  const hits = search(message, bias ? proximity : '', MAX_RECORDS);
   const all = allEntries();
   const lines = [`User request: ${message}`];
   // Facts about the person, always on its own labeled line so the model can
@@ -140,8 +143,8 @@ function buildContext(message, proximity, { profile = '', hasFix = true } = {}){
   const hitKeys = new Set(hits.map(h => h.id));
   const rest = all.filter(e => !hitKeys.has(e.id));
   if (rest.length){
-    const ordered = here
-      ? rest.slice().sort((a, b) => distance(a, here) - distance(b, here))
+    const ordered = bias
+      ? rest.slice().sort((a, b) => distance(a, bias) - distance(b, bias))
       : rest.slice().sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0));
     lines.push('', 'INDEX (every other row in the provided files):', ...ordered.slice(0, MAX_INDEX).map(indexLine));
   }
@@ -271,9 +274,13 @@ function groundAnswer(answer, intent, entries){
 
 async function ask(message, proximity, deps = {}){
   const askFn = deps.askFn || askModel;
+  const hasFix = deps.hasFix !== false;
+  // No fix means the coordinates are the province fallback: never let them be
+  // ranked as the traveler's position, for terminals or for place ordering.
+  const fix = hasFix ? proximity : '';
   const commute = isCommuteQuestion(message) ? fareFacts(message) : null;
-  const terminal = isTerminalQuestion(message) ? terminalFacts(message, proximity) : null;
-  const { text } = buildContext(message, proximity, { profile: deps.profile, hasFix: deps.hasFix });
+  const terminal = isTerminalQuestion(message) ? terminalFacts(message, fix) : null;
+  const { text } = buildContext(message, proximity, { profile: deps.profile, hasFix });
   // The fare rows ride along as verified facts for this one question; the
   // place rules stay exactly as they were for everything else. Terminal rows
   // join when the traveler is asking about terminals, so both can be answered
