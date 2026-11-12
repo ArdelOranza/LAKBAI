@@ -100,7 +100,10 @@ export default function ItineraryView({ plan, coords, pop, showToast }){
           const prevFav = prev && favBy[prev.name];
           const mineFav = favBy[s.name];
           const km = prevFav && prevFav.lng != null && mineFav && mineFav.lng != null ? haversineKm(prevFav.lng, prevFav.lat, mineFav.lng, mineFav.lat) : null;
-          const drive = km != null ? driveMinutes(km) : null;
+          // The server decides the drive leg so every stop on a generated plan
+          // shows it, not just the ones that happen to be saved. Older saved
+          // plans carry no leg, so fall back to the two saved pins.
+          const drive = Number.isFinite(s.legMinutes) ? s.legMinutes : (km != null ? driveMinutes(km) : null);
           return (
             <article key={s.placeId || s.name || i} data-testid="itin-row" style={{ border:'1px solid #EDF1F7', borderRadius:18, background:'#fff', overflow:'hidden' }}>
               <div style={{ position:'relative', height:120 }}>

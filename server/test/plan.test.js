@@ -12,6 +12,55 @@ const PLAN_JSON_STOPS = [
   { name: 'Umingan Town Plaza', hint: 'Umingan', arrive: '11:00', depart: '12:30', activities: ['Walk'] },
 ];
 
+const mins = v => { const [h, m] = String(v).split(':').map(Number); return h * 60 + m; };
+
+test('the schedule leaves real time to drive between far-apart stops', async () => {
+  // Each stop is within 50 km of the traveler, but the two are ~82 km apart.
+  // The model books them 10 minutes apart — the plan must insert the drive.
+  const AA = { id: 'a', name: 'Stop A', town: 'T', price: '', categories: [], lng: 120.00, lat: 16.20 };
+  const BB = { id: 'b', name: 'Stop B', town: 'T', price: '', categories: [], lng: 120.70, lat: 15.90 };
+  const fakeAgent = async () => ({
+    title: 'T',
+    stops: [
+      { name: 'Stop A', hint: 'T', arrive: '09:00', depart: '09:30', activities: ['x'] },
+      { name: 'Stop B', hint: 'T', arrive: '09:40', depart: '11:00', activities: ['y'] },
+    ],
+  });
+  const out = await planDay('day', 8, 9, { agentFn: fakeAgent, entries: [AA, BB], proximity: '120.34,16.043' });
+  assert.equal(out.schedule.length, 2);
+  const [a, b] = out.schedule;
+  assert.ok(b.legMinutes >= 60, `Stop B must carry a real drive leg, got ${b.legMinutes}`);
+  assert.ok(mins(b.arrive) - mins(a.depart) >= b.legMinutes, 'the gap must fit the drive');
+});
+
+test('stops are ordered nearest-first from the traveler', async () => {
+  const near = { id: 'n', name: 'Near', town: 'T', price: '', categories: [], lng: 120.35, lat: 16.05 };
+  const mid = { id: 'm', name: 'Mid', town: 'T', price: '', categories: [], lng: 120.40, lat: 16.10 };
+  const far = { id: 'f', name: 'Far', town: 'T', price: '', categories: [], lng: 120.60, lat: 16.20 };
+  const fakeAgent = async () => ({
+    title: 'T',
+    stops: [
+      { name: 'Far', arrive: '09:00', depart: '10:00', activities: [] },
+      { name: 'Near', arrive: '10:10', depart: '11:00', activities: [] },
+      { name: 'Mid', arrive: '11:10', depart: '12:00', activities: [] },
+    ],
+  });
+  const out = await planDay('day', 8, 9, { agentFn: fakeAgent, entries: [near, mid, far], proximity: '120.34,16.043' });
+  assert.deepEqual(out.schedule.map(s => s.name), ['Near', 'Mid', 'Far']);
+});
+
+test('stops that no longer fit the day are dropped', async () => {
+  const rows = [0, 1, 2, 3].map(i => ({ id: 's' + i, name: 'Stop ' + i, town: 'T', price: '', categories: [], lng: 120.34 + i * 0.01, lat: 16.043 }));
+  const fakeAgent = async () => ({
+    title: 'T',
+    stops: rows.map(r => ({ name: r.name, arrive: '09:00', depart: '10:30', activities: [] })),
+  });
+  const out = await planDay('day', 4, 9, { agentFn: fakeAgent, entries: rows, proximity: '120.34,16.043' });
+  const end = 9 * 60 + 4 * 60;
+  assert.ok(out.schedule.length < rows.length, 'not every stop fits a 4-hour day');
+  for (const s of out.schedule) assert.ok(mins(s.depart) <= end, 'no stop may end after the window');
+});
+
 test('unverifiable stops are dropped, times kept', async () => {
   const fakeAgent = async () => ({
     title: 'Alaminos food day',

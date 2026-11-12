@@ -11,6 +11,82 @@ const NOTHING_NEAR = 'No verified places within 50 km of your location.';
 
 const keyOf = name => String(name || '').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
 
+// The itinerary's clock is built here, never trusted to the model: the model
+// picks the places, the server decides when the traveler can actually be there.
+// A leg costs the straight-line gap at a conservative provincial road speed,
+// and each stop keeps the dwell the model intended (or a sensible default).
+const LEG_SPEED_KMH = 35;
+const MIN_LEG_MIN = 2;
+const MIN_DWELL_MIN = 10;
+const MAX_DWELL_MIN = 240;
+const DEFAULT_DWELL_MIN = 45;
+
+const clock = v => (typeof v === 'string' && /^([01]?\d|2[0-3]):[0-5]\d$/.test(v.trim())) ? v.trim() : null;
+const toMins = v => { const [h, m] = v.split(':').map(Number); return h * 60 + m; };
+const label = m => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+
+function legMinutes(km){
+  if (!Number.isFinite(km) || km < 0.05) return 0;
+  return Math.max(MIN_LEG_MIN, Math.round((km / LEG_SPEED_KMH) * 60));
+}
+
+/** How long the traveler stays: the model's own gap, clamped, else a default. */
+function dwellFor(stop){
+  const arrive = clock(stop.arrive), depart = clock(stop.depart);
+  if (arrive && depart){
+    const d = toMins(depart) - toMins(arrive);
+    if (d >= MIN_DWELL_MIN && d <= MAX_DWELL_MIN) return d;
+  }
+  return DEFAULT_DWELL_MIN;
+}
+
+/** Nearest-first from where the traveler is, so the drive never zig-zags. */
+function orderStops(stops, from){
+  const remaining = stops.slice();
+  const ordered = [];
+  let here = from;
+  while (remaining.length){
+    let best = 0;
+    let bestKm = Infinity;
+    for (let i = 0; i < remaining.length; i++){
+      const km = haversineKm(here.lng, here.lat, Number(remaining[i].lng), Number(remaining[i].lat));
+      if (Number.isFinite(km) && km < bestKm){ bestKm = km; best = i; }
+    }
+    const [next] = remaining.splice(best, 1);
+    ordered.push({ ...next, legKm: bestKm });
+    here = { lng: Number(next.lng), lat: Number(next.lat) };
+  }
+  return ordered;
+}
+
+/** Replace the model's clock with one the traveler can actually drive. */
+function buildSchedule(stops, traveler, hours, startHour){
+  const start = startHour * 60;
+  const end = start + hours * 60;
+  const schedule = [];
+  let cursor = start;
+  for (const s of orderStops(stops, traveler)){
+    const leg = legMinutes(s.legKm);
+    const arrive = cursor + leg;
+    const depart = arrive + dwellFor(s);
+    if (depart > end) break; // the rest of the day no longer fits — drop it
+    schedule.push({
+      placeId: s.id,
+      name: s.name,
+      town: s.town || '',
+      arrive: label(arrive),
+      depart: label(depart),
+      activities: Array.isArray(s.activities) ? s.activities : [],
+      fees: s.price || '',
+      lng: Number(s.lng),
+      lat: Number(s.lat),
+      legMinutes: leg,
+    });
+    cursor = depart;
+  }
+  return schedule;
+}
+
 function parsePlan(raw){
   let obj;
   try { obj = JSON.parse(extractJson(raw)); } catch { throw Object.assign(new Error('Could not parse plan JSON'), { status: 502 }); }
@@ -67,7 +143,7 @@ async function planDay(message, hours, startHour = 9, deps = {}){
   const searchFn = deps.searchFn || searchPlaces;
   const plan = await agentFn(message, hours, startHour);
   const seen = new Set();
-  const schedule = [];
+  const picked = [];
 
   // With the dataset installed, a stop is verified by name against the rows.
   // A name that is not there is dropped, exactly like the chat candidates.
@@ -84,37 +160,17 @@ async function planDay(message, hours, startHour = 9, deps = {}){
           return ek.includes(k) || k.includes(ek);
         });
       if (!entry || seen.has(entry.id)) continue;
-      // Validate times: HH:MM 24h, inside the requested window, depart after
-      // arrive. Anything else is dropped rather than shown as a real time.
-      const t = v => (typeof v === 'string' && /^([01]?\d|2[0-3]):[0-5]\d$/.test(v.trim())) ? v.trim() : null;
-      const arrive = t(s.arrive), depart = t(s.depart);
-      const mins = v => { const [h, m] = v.split(':').map(Number); return h * 60 + m; };
-      const start = startHour * 60, end = start + hours * 60;
-      if (!arrive || !depart || mins(arrive) < start || mins(depart) > end || mins(depart) <= mins(arrive)) continue;
       seen.add(entry.id);
-      schedule.push({
-        placeId: entry.id,
-        name: entry.name,
-        arrive,
-        depart,
-        activities: Array.isArray(s.activities) ? s.activities : [],
-        fees: entry.price || '',
-      });
+      picked.push({ ...entry, arrive: s.arrive, depart: s.depart, activities: s.activities });
     }
     // Empty schedule is a real signal, not a success: the caller must not
     // present a title-only plan as if stops had been found.
-    return { title: plan.title, schedule };
+    return { title: plan.title, schedule: buildSchedule(picked, traveler, hours, startHour) };
   }
 
-  // Non-dataset branch: same time validation as the dataset branch above.
-  // Model-provided times are never trusted blindly, and hits outside the
-  // traveler's radius are dropped instead of being scheduled.
-  for (const s of plan.stops) {
-    const t = v => (typeof v === 'string' && /^([01]?\d|2[0-3]):[0-5]\d$/.test(v.trim())) ? v.trim() : null;
-    const arrive = t(s.arrive), depart = t(s.depart);
-    const mins = v => { const [h, m] = v.split(':').map(Number); return h * 60 + m; };
-    const start = startHour * 60, end = start + hours * 60;
-    if (!arrive || !depart || mins(arrive) < start || mins(depart) > end || mins(depart) <= mins(arrive)) continue;
+  // Non-dataset branch: the model's names are resolved through live search and
+  // must land inside the traveler's radius before they are scheduled.
+  for (const s of plan.stops){
     let hits;
     try { hits = await searchFn(`${s.name} ${s.hint || ''} Pangasinan`); }
     catch { continue; }
@@ -122,8 +178,8 @@ async function planDay(message, hours, startHour = 9, deps = {}){
       && haversineKm(traveler.lng, traveler.lat, Number(h.lng), Number(h.lat)) <= MAX_PLAN_KM);
     if (!hit) continue;
     seen.add(hit.id);
-    schedule.push({ placeId: hit.id, name: hit.name, arrive, depart, activities: Array.isArray(s.activities) ? s.activities : [] });
+    picked.push({ ...hit, arrive: s.arrive, depart: s.depart, activities: s.activities });
   }
-  return { title: plan.title, schedule };
+  return { title: plan.title, schedule: buildSchedule(picked, traveler, hours, startHour) };
 }
 module.exports = { planDay, parsePlan, MAX_PLAN_KM };
