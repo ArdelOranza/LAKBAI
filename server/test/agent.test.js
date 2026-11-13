@@ -124,6 +124,34 @@ test('chatRecommend retries without tools on 502', async () => {
     global.fetch = realFetch;
   }
 });
+test('a hung provider is cut off instead of hanging the plan', async () => {
+  // A provider that never answers used to leave fetch pending forever; the
+  // client gave up at 60s. The timeout must surface as a non-retryable 504 so
+  // the caller can fall through immediately.
+  const { callGeminiForPlan } = require('../agent.js');
+  const realFetch = global.fetch;
+  global.fetch = (url, init = {}) => new Promise((_, reject) => {
+    if (init.signal){
+      if (init.signal.aborted) return reject(init.signal.reason);
+      init.signal.addEventListener('abort', () => reject(init.signal.reason), { once: true });
+    }
+  }); // never resolves on its own
+  process.env.GEMINI_API_KEY = 'test-key';
+  try {
+    await assert.rejects(
+      () => Promise.race([
+        callGeminiForPlan('sys', 'msg', { timeoutMs: 20 }),
+        new Promise((_, reject) => setTimeout(
+          () => reject(new Error('callGeminiForPlan did not time out')), 1000,
+        )),
+      ]),
+      e => e.status === 504,
+    );
+  } finally {
+    global.fetch = realFetch;
+  }
+});
+
 test('chatRecommend retries without tools on 429', async () => {
   const { chatRecommend } = require('../agent.js');
   const good = '{"intent":"food","answer":"a","candidates":[],"spotlight":null,"sources":[]}';

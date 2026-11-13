@@ -42,7 +42,7 @@ async function callGemini(payload, useTools, model){
   if (!key) { const e = new Error('Missing GEMINI_API_KEY'); e.status = 503; throw e; }
   const body = { system_instruction: { parts: [{ text: SYSTEM }] }, contents: [{ parts: [{ text: payload }] }], generationConfig: { responseMimeType: 'application/json' } };
   if (useTools) body.tools = [{ google_search: {} }];
-  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {
+  const r = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   });
   if (!r.ok) { const e = new Error('Gemini error ' + r.status); e.status = r.status || 502; throw e; }  const data = await r.json();
@@ -51,7 +51,7 @@ async function callGemini(payload, useTools, model){
 async function callDeepSeek(payload){
   const key = process.env.DEEPSEEK_API_KEY;
   if (!key) { const e = new Error('Missing DEEPSEEK_API_KEY'); e.status = 503; throw e; }
-  const r = await fetch('https://api.deepseek.com/chat/completions', {
+  const r = await fetchWithTimeout('https://api.deepseek.com/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
     body: JSON.stringify({
@@ -66,6 +66,26 @@ async function callDeepSeek(payload){
   if (!r.ok) { const e = new Error('DeepSeek error ' + r.status); e.status = r.status || 502; throw e; }
   const data = await r.json();
   return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+}
+// A provider that never answers is cut off, and the timeout is deliberately
+// not retryable (504 is absent from RETRYABLE): retrying an identical request
+// only doubles the wait before the next provider is tried.
+const MODEL_TIMEOUT_MS = 30000;
+function timedOut(ms){
+  return Object.assign(new Error(`model request timed out after ${Math.round(ms / 1000)}s`), { status: 504 });
+}
+/** fetch with a hard timeout so a hung provider can't hang the API. */
+async function fetchWithTimeout(url, init = {}, ms = MODEL_TIMEOUT_MS){
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(timedOut(ms)), ms);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } catch (e) {
+    if (e && (e.name === 'AbortError' || e.status === 504)) throw timedOut(ms);
+    throw e;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 const RETRYABLE = [400, 429, 500, 502, 503];
 function busyErr(){
@@ -113,13 +133,14 @@ async function runSteps(wait, steps){
 }
 async function callGeminiForPlan(sys, msg, opts = {}){
   const wait = opts.wait || (ms => new Promise(r => setTimeout(r, ms)));
+  const ms = opts.timeoutMs || MODEL_TIMEOUT_MS;
   const attempt = async () => {
     const key = process.env.GEMINI_API_KEY;
     if (!key) { const e = new Error('Missing GEMINI_API_KEY'); e.status = 503; throw e; }
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${PRIMARY_MODEL}:generateContent?key=${key}`, {
+    const r = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/${PRIMARY_MODEL}:generateContent?key=${key}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ system_instruction: { parts: [{ text: sys }] }, contents: [{ parts: [{ text: `Trip request: ${msg}` }] }], generationConfig: { responseMimeType: 'application/json' } })
-    });
+    }, ms);
     if (!r.ok) { const e = new Error('Gemini error ' + r.status); e.status = r.status || 502; throw e; }
     const data = await r.json();
     return data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
@@ -127,7 +148,7 @@ async function callGeminiForPlan(sys, msg, opts = {}){
   const ds = async () => {
     const key = process.env.DEEPSEEK_API_KEY;
     if (!key) { const e = new Error('Missing DEEPSEEK_API_KEY'); e.status = 503; throw e; }
-    const r = await fetch('https://api.deepseek.com/chat/completions', {
+    const r = await fetchWithTimeout('https://api.deepseek.com/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
       body: JSON.stringify({
@@ -138,7 +159,7 @@ async function callGeminiForPlan(sys, msg, opts = {}){
         ],
         response_format: { type: 'json_object' }
       })
-    });
+    }, ms);
     if (!r.ok) { const e = new Error('DeepSeek error ' + r.status); e.status = r.status || 502; throw e; }
     const data = await r.json();
     return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';

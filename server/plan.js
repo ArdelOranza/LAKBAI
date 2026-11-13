@@ -136,9 +136,16 @@ async function planDay(message, hours, startHour = 9, deps = {}){
       ? `You plan a Pangasinan day trip of ${h} hours starting ${s}:00. ${where} Use ONLY the places in this list and copy every name exactly as written — do not add a place that is not here:\n${placeList(rows)}\nJSON only: {"title":"...","stops":[{"name":"exact name from the list","hint":"town","arrive":"HH:MM","depart":"HH:MM","activities":["..."]}]}. All times inside the ${h}-hour window starting ${s}:00.`
       : `You plan a Pangasinan day trip of ${h} hours starting ${s}:00. ${where} JSON only: {"title":"...","stops":[{"name":"exact place","hint":"town","arrive":"HH:MM","depart":"HH:MM","activities":["..."]}]}. Real places within 50 km only, all times inside the ${h}-hour window starting ${s}:00.`;
     let raw;
-    try { raw = await require('./agent.js').callGeminiForPlan(sys, msg); }
-    catch { raw = await require('./groq.js').callGroq(sys, msg); }
-    return parsePlan(raw);
+    try {
+      // An empty 200 is not an answer either, so parse inside the try: any
+      // failure (timeout, empty content, unparseable JSON) must reach Groq.
+      // 20s keeps the whole chain inside the client's 60s request budget.
+      raw = await require('./agent.js').callGeminiForPlan(sys, msg, { timeoutMs: 20000 });
+      return parsePlan(raw);
+    } catch {
+      raw = await require('./groq.js').callGroq(sys, msg);
+      return parsePlan(raw);
+    }
   });
   const searchFn = deps.searchFn || searchPlaces;
   const plan = await agentFn(message, hours, startHour);

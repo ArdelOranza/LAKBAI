@@ -151,6 +151,53 @@ test('plan falls back to deepseek when gemini is throttled', async () => {
   }
 });
 
+test('an empty Gemini reply falls through to Groq instead of failing the plan', async () => {
+  // A 200 with no candidate content is not an answer, but it is also not a
+  // thrown error. It used to be returned as '', parsed outside the fallback
+  // try, and surfaced as a 502 with Groq never asked.
+  const realFetch = global.fetch;
+  const urls = [];
+  const planJson = '{"title":"Groq day","stops":[]}';
+  global.fetch = async (url) => {
+    const u = String(url);
+    urls.push(u);
+    if (u.includes('api.groq.com')) {
+      return { ok: true, json: async () => ({ choices: [{ message: { content: planJson } }] }) };
+    }
+    return { ok: true, json: async () => ({ candidates: [] }) };
+  };
+  const hadGroq = process.env.GROQ_API_KEY;
+  const hadDeepSeek = process.env.DEEPSEEK_API_KEY;
+  process.env.GROQ_API_KEY = 'test-key';
+  process.env.GEMINI_API_KEY = 'test-key';
+  delete process.env.DEEPSEEK_API_KEY;
+  try {
+    const out = await planDay('food day', 4, 9, { searchFn: async () => [], proximity: '120.23,16.03' });
+    assert.equal(out.title, 'Groq day');
+    assert.ok(urls.some(u => u.includes('api.groq.com')), 'Groq must be tried after an empty Gemini reply');
+  } finally {
+    global.fetch = realFetch;
+    if (hadGroq === undefined) delete process.env.GROQ_API_KEY; else process.env.GROQ_API_KEY = hadGroq;
+    if (hadDeepSeek === undefined) delete process.env.DEEPSEEK_API_KEY; else process.env.DEEPSEEK_API_KEY = hadDeepSeek;
+  }
+});
+
+test('malformed model stops are skipped instead of crashing the plan', async () => {
+  // Models do occasionally emit null or bare strings in an array. The
+  // dataset-less branch read s.name without a guard and returned a 500.
+  const fakeAgent = async () => ({
+    title: 'T',
+    stops: [null, 'not an object', { name: 'Patar Beach', hint: 'Bolinao', arrive: '09:00', depart: '10:30', activities: [] }],
+  });
+  const fakeSearch = async q => q.startsWith('Patar')
+    ? [{ id: 'p1', name: 'Patar Beach', lng: 119.79, lat: 16.12, address: '', categories: [] }]
+    : [];
+  const out = await planDay('day', 4, 9, {
+    agentFn: fakeAgent, searchFn: fakeSearch, entries: [], proximity: AT_PATAR,
+  });
+  assert.deepEqual(out.schedule.map(s => s.name), ['Patar Beach']);
+});
+
 test('plan prompt carries the time window and the 50 km radius', async () => {
   const realFetch = global.fetch;
   let body = '';
