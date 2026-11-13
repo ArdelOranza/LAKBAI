@@ -95,9 +95,9 @@ Bump both `versionCode` / `versionName` in
 
 | | |
 |---|---|
-| Version | 1.1.0 (versionCode 2) |
-| Size | 4,997,364 bytes |
-| SHA-256 | `BEF7EE4EFF2B7DA93A2E7EAE0FEB0AA196D0794ADA46922A27314E233931E242` |
+| Version | 1.2.0 (versionCode 3) |
+| Size | 4,997,872 bytes |
+| SHA-256 | `A7B235A3B63A527E54686C2CE86F334162FE729C19684B84DA21B7DBFB9DC386` |
 | Signer | `CN=LakbAI, O=LakbAI, L=Lingayen, ST=Pangasinan, C=PH` |
 
 The same file is served at `client/public/LakbAI.apk` and downloaded from the
