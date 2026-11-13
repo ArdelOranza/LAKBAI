@@ -111,6 +111,36 @@ test('an invented rating in the terminal prose is rebuilt from the directory', (
   assert.equal(ok.grounded, true);
 });
 
+test('an invented departure time or frequency is rebuilt from the directory', () => {
+  // The rows carry real schedules, but a model can still add a plausible time
+  // or cadence from memory ("6:00 AM every hour"). Times and cadence words are
+  // therefore claims too, not just phones, prices and ratings.
+  const facts = terminalFacts('bus schedule to Dagupan', '121.0485,14.6240', true);
+  for (const madeUp of [
+    'Buses leave Cubao at 6:00 AM every hour.',
+    'Trips depart at 7:30 PM daily.',
+  ]){
+    const g = groundTerminalAnswer(madeUp, facts);
+    assert.equal(g.grounded, false, madeUp);
+    assert.doesNotMatch(g.answer, /6:00 AM|7:30 PM/, madeUp);
+  }
+
+  // What the directory does list still passes through untouched.
+  const real = groundTerminalAnswer('Five Star runs Dagupan trips from 12:00 AM to 11:00 PM.', facts);
+  assert.equal(real.grounded, true);
+});
+
+test('a named origin that does not serve the destination is not back-filled', () => {
+  // PITX's row lists no Anda route. Returning PITX's other schedules would
+  // read as a route that does not exist.
+  assert.equal(terminalFacts('PITX terminal schedule to Anda', '', true), null);
+  // The same origin with a destination it does serve still resolves.
+  const ok = terminalFacts('PITX terminal schedule to Bolinao', '', true);
+  assert.ok(ok);
+  assert.equal(ok.rows.length, 1);
+  assert.match(ok.rows[0].destinations.join(' '), /Bolinao/);
+});
+
 test('a schedule question about a town is a terminal question, not a fare one', () => {
   // The directory carries a schedule for every terminal, so "bus schedule to
   // Dagupan" must reach it. It used to fall through to the fare path (and thus

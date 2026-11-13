@@ -197,9 +197,11 @@ function matchTerminals(message, proximity, limit = 5){
       const key = norm(d);
       return key.includes(want) || (wantBase.length > 2 && key.includes(wantBase));
     }));
-    // Only narrow when the destination actually matches; otherwise keep the
-    // area/nearest set instead of returning nothing.
+    // Only narrow when the destination actually matches. A named origin that
+    // has no row serving that destination must not be back-filled with its
+    // unrelated schedules — that reads as a route which does not exist.
     if (serving.length) rows = serving;
+    else if (areas.length) return [];
   }
 
   if (here){
@@ -290,6 +292,23 @@ function extractKm(text){
   return [...String(text).matchAll(/(\d+(?:\.\d+)?)\s*km\b/gi)].map(m => Number(m[1]));
 }
 
+/** Minutes since midnight for "6 PM" / "6:30 PM", else null. */
+function clockMins(token){
+  const m = /^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i.exec(String(token).trim());
+  if (!m) return null;
+  const hour = (Number(m[1]) % 12) + (/PM/i.test(m[3]) ? 12 : 0);
+  return hour * 60 + Number(m[2] || 0);
+}
+const CLOCK = /\b\d{1,2}(?::\d{2})?\s*(?:AM|PM)\b/gi;
+const clockTimes = text => [...String(text || '').matchAll(CLOCK)].map(m => clockMins(m[0])).filter(n => n != null);
+
+// Cadence words are schedule claims too. "every hour" and "hourly" are one
+// claim, so both normalise to a single key before comparing with the rows.
+const FREQUENCY = /\b(?:hourly|daily|every\s+(?:hour|day))\b/gi;
+const freqKey = s => String(s).toLowerCase().replace(/\s+/g, ' ').trim()
+  .replace(/^every hour$/, 'hourly')
+  .replace(/^every day$/, 'daily');
+
 function boldNames(text){
   return [...String(text).matchAll(/\*\*([^*]+)\*\*/g)].map(m => m[1]);
 }
@@ -314,12 +333,18 @@ function groundTerminalAnswer(answer, facts){
   // A rating or any unit-bound figure must come from the rows too: the old
   // checks covered phone, price and km, so an invented "4.9 stars" slipped in.
   const badFigure = unitFigures(text).some(n => !allowedFigures.some(a => Math.abs(a - n) < 0.001));
+  // A clock time ("6:00 AM") and a cadence ("hourly", "daily") are schedule
+  // claims: the rows carry real times and wording, so anything else is invented.
+  const allowedTimes = new Set(clockTimes(allowed));
+  const badClock = clockTimes(text).some(t => !allowedTimes.has(t));
+  const allowedLower = allowed.toLowerCase();
+  const badFrequency = [...text.matchAll(FREQUENCY)].some(m => !allowedLower.includes(freqKey(m[0])));
   const badName = boldNames(text).some(n => {
     const key = norm(n);
     return !facts.rows.some(r => norm(r.name).includes(key) || norm(r.area).includes(key));
   });
 
-  if (badPhone || badMoney || badKm || badFigure || badName){
+  if (badPhone || badMoney || badKm || badFigure || badClock || badFrequency || badName){
     return { answer: terminalAnswer(facts), grounded: false };
   }
   return { answer: text, grounded: true };
