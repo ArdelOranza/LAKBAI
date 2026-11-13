@@ -182,3 +182,16 @@ test('an invented rating or walking time in the prose is rebuilt from the rows',
   assert.doesNotMatch(out.answer, /5 minute walk/);
   assert.match(out.answer, /Conrad's Dagupan/);
 });
+
+test('a town schedule question is answered from the terminal directory, never as a fare', async () => {
+  // An empty model answer forces the deterministic terminal answer, so the test
+  // pins the routing without depending on how the model phrased a schedule.
+  const out = await groundedChat('bus schedule to Dagupan', '121.0485,14.6240', {
+    askFn: fake({ intent: 'commute', answer: '', candidates: [], sources: [] }),
+    hasFix: true,
+  });
+  assert.equal(out.source, 'terminals');
+  assert.doesNotMatch(out.answer, /LTFRB provincial bus guide/);
+  assert.match(out.answer, /Five Star Bus Co\. Cubao Terminal|Dagupan Bus Terminal Cubao/);
+  assert.match(out.answer, /Dagupan: 12:00 AM/);
+});

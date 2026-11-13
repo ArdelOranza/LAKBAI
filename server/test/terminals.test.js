@@ -7,6 +7,7 @@ const {
   TERMINALS, matchTerminals, terminalFacts, terminalAnswer,
   groundTerminalAnswer, isTerminalQuestion, terminalsVersion,
 } = require('../terminals.js');
+const { isFareQuestion } = require('../commute.js');
 
 test('every listed terminal has a plausible Philippine coordinate', () => {
   assert.equal(TERMINALS.length, 29);
@@ -108,4 +109,35 @@ test('an invented rating in the terminal prose is rebuilt from the directory', (
   const real = facts.rows.find(r => r.rating && r.name === 'Victory Liner Cubao Terminal');
   const ok = groundTerminalAnswer(`${real.name} is rated ${real.rating.score}★.`, facts);
   assert.equal(ok.grounded, true);
+});
+
+test('a schedule question about a town is a terminal question, not a fare one', () => {
+  // The directory carries a schedule for every terminal, so "bus schedule to
+  // Dagupan" must reach it. It used to fall through to the fare path (and thus
+  // a fare table) because a bare town name never matched "Dagupan City".
+  for (const q of [
+    'bus schedule to Dagupan',
+    'what time do buses leave for Dagupan',
+    'when does the bus to Alaminos depart',
+    'how often do buses run to Lingayen',
+  ]){
+    assert.equal(isTerminalQuestion(q), true, q);
+    assert.equal(isFareQuestion(q), false, q);
+  }
+  // A non-transport question that merely names the town stays a place question.
+  assert.equal(isTerminalQuestion('what time is the festival in Dagupan'), false);
+  assert.equal(isTerminalQuestion('Where should I eat in Dagupan?'), false);
+});
+
+test('a town schedule question returns the terminals that serve it, with schedules', () => {
+  const facts = terminalFacts('bus schedule to Dagupan', '121.0485,14.6240', true);
+  assert.ok(facts);
+  assert.ok(facts.rows.length > 0);
+  for (const r of facts.rows){
+    assert.ok(
+      r.destinations.some(d => /dagupan/i.test(d)),
+      `${r.name} should serve Dagupan`,
+    );
+  }
+  assert.match(facts.text, /schedule:/);
 });

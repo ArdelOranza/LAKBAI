@@ -126,21 +126,40 @@ const DEST_NAMES = [...new Set(
     .filter(d => d.length > 2 && !/^all /i.test(d)),
 )].sort((a, b) => b.length - a.length);
 
+// A bare town name ("Dagupan") must reach its directory name ("Dagupan City").
+// Each destination is matched by its full name and, when it ends in "City", by
+// the bare town name; the full name is what the matcher returns so narrowing
+// still uses the directory's own spelling.
+const DEST_MATCHERS = DEST_NAMES.map(name => {
+  const base = name.replace(/\s+City$/i, '').trim();
+  const variants = base && base !== name ? [name, base] : [name];
+  return { name, re: new RegExp('\\b(?:' + variants.map(escapeRe).join('|') + ')\\b', 'i') };
+}).sort((a, b) => b.name.length - a.name.length);
+
 const STRONG_TERMINAL = /\b(terminal|terminals|bus station|sakayan|sasakay)\b/i;
-const SOFT_TERMINAL = /\b(contact|phone|hotline|address|schedule|operating hours|what time)\b/i;
+const SOFT_TERMINAL = /\b(contact|phone|hotline|address|schedule|timetable|departures?|depart|operating hours|what time|first trip|last trip|how often do (?:the )?bus(?:es)?|bus(?:es)? (?:leave|run|depart))\b/i;
+// A town name appears in lots of questions ("what time is the festival in
+// Dagupan"), so a destination-only match also needs bus/trip wording.
+const BUS_CONTEXT = /\b(bus|buses|terminal|terminals|sakayan|sasakay|trip|trips|biyahe|depart|departure|schedule|timetable|coach)\b/i;
 const OPERATOR_WORDS = /\b(victory liner|five star|solid north|dagupan bus|partas|cisco|viron|genesis|joybus|philippine rabbit|maria de leon|gv florida|bataan transit|saulog)\b/i;
 
 function destinationIn(text){
   const s = String(text || '');
-  return DEST_NAMES.find(name => new RegExp('\\b' + escapeRe(name) + '\\b', 'i').test(s)) || '';
+  const hit = DEST_MATCHERS.find(m => m.re.test(s));
+  return hit ? hit.name : '';
 }
 
 function isTerminalQuestion(text){
   const t = String(text || '');
   if (!t.trim()) return false;
   if (STRONG_TERMINAL.test(t)) return true;
-  const named = AREA_LIST.some(a => a.re.test(t)) || OPERATOR_WORDS.test(t) || !!destinationIn(t);
-  return SOFT_TERMINAL.test(t) && named;
+  const area = AREA_LIST.some(a => a.re.test(t));
+  const operator = OPERATOR_WORDS.test(t);
+  const dest = destinationIn(t);
+  if (!SOFT_TERMINAL.test(t) || !(area || operator || dest)) return false;
+  // Destination-only matches must be about buses, not any town question.
+  if (!area && !operator && !BUS_CONTEXT.test(t)) return false;
+  return true;
 }
 
 function nearestHubKm(here){
@@ -173,7 +192,11 @@ function matchTerminals(message, proximity, limit = 5){
   const dest = destinationIn(text);
   if (dest){
     const want = norm(dest);
-    const serving = rows.filter(r => r.destinations.some(d => norm(d).includes(want)));
+    const wantBase = norm(dest.replace(/\s+City$/i, ''));
+    const serving = rows.filter(r => r.destinations.some(d => {
+      const key = norm(d);
+      return key.includes(want) || (wantBase.length > 2 && key.includes(wantBase));
+    }));
     // Only narrow when the destination actually matches; otherwise keep the
     // area/nearest set instead of returning nothing.
     if (serving.length) rows = serving;
