@@ -16,4 +16,10 @@ describe('ChatTab', () => {
     expect(html).toContain("Hi! I&#x27;m LakbAI");
     expect(html).toContain('data-testid="chat-input"');
   });
+
+  it('caps the composer at the server message limit', () => {
+    // The API answers 400 "Message too long." past 500 characters; the input
+    // must not let the traveler get there in the first place.
+    expect(html).toMatch(/maxlength="500"/i);
+  });
 });

@@ -16,6 +16,7 @@ import { haversineKm, formatDistance, driveMinutes, proximityOf } from '../geo.j
 import { suggestionsFor } from '../chatSuggest.js';
 import { topicTabs } from '../chatTopics.js';
 import { buildChatContext } from '../chatContext.js';
+import { MAX_MESSAGE, clampMessage } from '../chatLimits.js';
 import { readLocalPrefs } from '../prefs.js';
 import { PhotoPlaceholder } from '../ui.jsx';
 import Logo from '../logo.jsx';
@@ -306,7 +307,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
 
   const abortRef = useRef(null);
   async function send(text){
-    const q = String(text ?? input).trim();
+    const q = clampMessage(text ?? input);
     if (!q || busy) return;
     setInput('');
     setStarters(false);
@@ -407,7 +408,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
     const r = new S();
     recogRef.current = r;
     r.lang = 'en-PH';
-    r.onresult = e => { setListening(false); setInput(e.results[0][0].transcript); inputRef.current?.focus(); };
+    r.onresult = e => { setListening(false); setInput(String(e.results[0][0].transcript || '').slice(0, MAX_MESSAGE)); inputRef.current?.focus(); };
     r.onerror = () => { setListening(false); showToast('Microphone unavailable', 'error'); };
     r.onend = () => setListening(false); // recognizer ended with no result — don't stick
     setListening(true);
@@ -655,6 +656,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
               aria-label="Ask a follow up question"
               value={input}
               onChange={e => setInput(e.target.value)}
+              maxLength={MAX_MESSAGE}
               onKeyDown={e => { if (e.key === 'Enter') send(); }}
               placeholder="Ask a follow up question...."
               className="c-input"
