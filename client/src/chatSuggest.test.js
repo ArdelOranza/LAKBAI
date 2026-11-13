@@ -37,6 +37,15 @@ describe('suggestionsFor', () => {
     expect(labels(list)).toContain('Festivals this month');
   });
 
+  it('does not name the fallback town when there is no GPS fix', () => {
+    // The Lingayen-area fallback centre is not where the traveler is, so it must
+    // not become a "Bus from Cubao to Lingayen" chip.
+    const FALLBACK = { lng: 120.23, lat: 16.03 };
+    const list = suggestionsFor({ coords: FALLBACK, hasFix: false });
+    expect(labels(list)).not.toContain('Bus from Cubao to Lingayen');
+    expect(labels(list)).toContain('Beaches near me');
+  });
+
   it('never repeats a chip and never returns more than four', () => {
     const list = suggestionsFor({
       lastAi: { intent: 'commute', cards: [{ name: 'Patar White Sand Beach' }] },

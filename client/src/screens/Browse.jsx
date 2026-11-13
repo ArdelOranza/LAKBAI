@@ -15,10 +15,13 @@ const COPY = {
   beaches: { verb: 'Beaches', sub: 'Coastal sands and beauties', empty: 'No beaches match this filter yet.' },
 };
 
-export default function Browse({ kind = 'beaches', coords, push, pop, showToast }){
+export default function Browse({ kind = 'beaches', coords, hasFix = true, push, pop, showToast }){
   const { user } = useAuth();
   const copy = COPY[kind] || COPY.beaches;
   const facets = kind === 'dining' ? DINING_FACETS : BEACH_FACETS;
+  // The fallback centre is not the traveler's position: without a fix, choose a
+  // neutral default town and never render a distance measured from it.
+  const fix = hasFix ? coords : null;
   const [spots, setSpots] = useState([]);
   const [town, setTown] = useState(null);
   const [facet, setFacet] = useState('All');
@@ -31,7 +34,7 @@ export default function Browse({ kind = 'beaches', coords, push, pop, showToast 
       .then(list => {
         if (!alive) return;
         setSpots(list || []);
-        setTown(nearestTown(list, coords, kind));
+        setTown(nearestTown(list, fix, kind));
       })
       .catch(() => { if (alive) setSpots([]); })
       .finally(() => { if (alive) setBusy(false); });
@@ -39,7 +42,7 @@ export default function Browse({ kind = 'beaches', coords, push, pop, showToast 
   }, [kind]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const towns = townsFor(spots, kind);
-  const rows = town ? browseRows(spots, { kind, town, facet, coords }) : [];
+  const rows = town ? browseRows(spots, { kind, town, facet, coords: fix }) : [];
 
   async function add(p, e){
     e.stopPropagation();

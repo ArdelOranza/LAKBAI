@@ -35,9 +35,9 @@ const DEFAULT = [
 
 /**
  * Up to four chips for the current state.
- * @param {{ lastAi?: { intent?: string, cards?: Array<{name: string}> }, coords?: {lng:number, lat:number} }} state
+ * @param {{ lastAi?: { intent?: string, cards?: Array<{name: string}> }, coords?: {lng:number, lat:number}, hasFix?: boolean }} state
  */
-export function suggestionsFor({ lastAi, coords } = {}){
+export function suggestionsFor({ lastAi, coords, hasFix = true } = {}){
   const out = [];
   const add = chip => {
     if (!chip || out.length >= MAX) return;
@@ -56,7 +56,9 @@ export function suggestionsFor({ lastAi, coords } = {}){
     add({ id: 'more', label: 'More like this', send: 'Show me more places like ' + card.name });
   }
 
-  const town = nearestTown(coords);
+  // Without a fix `coords` is the province fallback centre, not the traveler's
+  // town, so it must not become a "Bus from Cubao to <town>" chip.
+  const town = hasFix === false ? null : nearestTown(coords);
   if (town){
     add({
       id: 'bus',

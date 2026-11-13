@@ -419,7 +419,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
   // Which chip makes sense next: another fare question after a fare answer,
   // the place follow-ups after a place, a town bus prompt when the fix says so.
   const CHIP_ICON = { plan: Compass, more: MapPin, beach: Compass, festival: Ticket, fare: Ticket, bus: Ticket, terminal: Navigation };
-  const followUp = suggestionsFor({ lastAi, coords }).map(s => ({
+  const followUp = suggestionsFor({ lastAi, coords, hasFix }).map(s => ({
     ...s,
     icon: CHIP_ICON[s.id] || MapPin,
   }));
@@ -614,7 +614,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
 
         <div className="composer">
           <div className="topic-tabs" role="tablist" aria-label="Chat topics">
-            {topicTabs({ lastAi, coords }).map(t => (
+            {topicTabs({ lastAi, coords, hasFix }).map(t => (
               <button
                 key={t.id}
                 type="button"

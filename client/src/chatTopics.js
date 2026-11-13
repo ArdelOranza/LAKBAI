@@ -63,11 +63,13 @@ function questionFor(id, place, town){
 
 /**
  * Five tabs, each with the question it would send right now.
- * @param {{ lastAi?: { intent?: string, cards?: Array<{name: string}> }, coords?: {lng:number, lat:number} }} state
+ * @param {{ lastAi?: { intent?: string, cards?: Array<{name: string}> }, coords?: {lng:number, lat:number}, hasFix?: boolean }} state
  */
-export function topicTabs({ lastAi, coords } = {}){
+export function topicTabs({ lastAi, coords, hasFix = true } = {}){
   const place = lastAi?.cards?.[0]?.name || '';
-  const town = nearestTown(coords);
+  // Without a fix, `coords` is the province fallback centre — not the town the
+  // traveler is in — so the chips must stay province-wide rather than name it.
+  const town = hasFix === false ? null : nearestTown(coords);
   const active = ACTIVE[String(lastAi?.intent || '')] || null;
   return TOPICS.map(t => ({
     ...t,
