@@ -2,6 +2,11 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
 vi.mock('./store.js', () => ({
   listPlans: vi.fn(async () => ({ data: [] })),
@@ -34,5 +39,15 @@ describe('Profile → Android app download', () => {
     window.Capacitor = { isNativePlatform: () => true };
     const html = renderToString(<Profile {...props} />);
     expect(html).not.toContain('data-testid="menu-android"');
+  });
+
+  it('shows the same version the Android build ships', () => {
+    // The README promises this row and build.gradle agree; without this guard a
+    // version bump that missed one of them shipped a label nobody verified.
+    const gradle = fs.readFileSync(path.join(repoRoot, 'mobile/android/app/build.gradle'), 'utf8');
+    const version = /versionName\s+"([^"]+)"/.exec(gradle)?.[1];
+    expect(version).toMatch(/^\d+\.\d+\.\d+$/);
+    const html = renderToString(<Profile {...props} />);
+    expect(html).toContain(`v${version}`);
   });
 });
