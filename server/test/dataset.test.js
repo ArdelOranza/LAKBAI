@@ -1,10 +1,16 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
+const fs = require('fs');
+const os = require('os');
 
 process.env.LAKBAI_DATA = path.join(__dirname, 'fixtures', 'dataset.json');
+const overlayFile = path.join(os.tmpdir(), 'lakbai-dataset-photos-' + process.pid + '.json');
+process.env.LAKBAI_ADMIN_PHOTOS_FILE = overlayFile;
+try { fs.unlinkSync(overlayFile); } catch { /* fresh */ }
 
 const { datasetInfo, allEntries, localChat, localRecommend, search, parseRating, normalize, pickList, NO_MATCH } = require('../dataset.js');
+const { setPhotos } = require('../adminPhotos.js');
 
 test('the installed dataset is detected and normalised', () => {
   const info = datasetInfo();
@@ -174,4 +180,15 @@ test('a named town narrows the results to that town', () => {
   const out = search('places in Manaoag', '120.341,16.043');
   assert.ok(out.length > 0);
   assert.ok(out.every(e => e.town === 'Manaoag'));
+});
+
+test('admin restaurant photos reach dataset entries immediately', () => {
+  const before = allEntries().find(e => e.id === 'conrads');
+  assert.deepEqual(before.photos, []);
+  setPhotos('conrads', ['https://example.com/conrad.jpg', 'https://example.com/conrad-2.jpg']);
+  const after = allEntries().find(e => e.id === 'conrads');
+  assert.deepEqual(after.photos, ['https://example.com/conrad.jpg', 'https://example.com/conrad-2.jpg']);
+  // clearing brings the dataset back to its own (empty) list
+  setPhotos('conrads', []);
+  assert.deepEqual(allEntries().find(e => e.id === 'conrads').photos, []);
 });

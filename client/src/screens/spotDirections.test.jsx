@@ -13,6 +13,7 @@ vi.mock('../AuthContext.jsx', () => ({
 }));
 vi.mock('../staticMap.js', () => ({
   staticMapThumb: () => null,
+  placeImage: () => null,
   mapboxToken: () => 'pk.test',
 }));
 

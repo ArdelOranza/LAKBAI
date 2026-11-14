@@ -39,6 +39,8 @@ export default function PlaceDetail({ place, coords, hasFix = true, user, pop, s
   const photos = (p.photos && p.photos.length) ? p.photos : (p.photo ? [p.photo] : null);
   // U14-A: a place that only has a location still gets a real image — its static map.
   const heroPhoto = placeImage(p, mapboxToken(), { width: 600, height: 340 });
+  // Wikimedia images are free-licensed but need attribution: link to the file page.
+  const photoCredit = p.photoSource === 'wikimedia' && p.photoPage ? safeExternalUrl(p.photoPage) : '';
   const when = bannerDate(p)
     || (p.festival ? dateRange(p.festival) : null)
     || (p.starts instanceof Date ? editionText(p.starts, p.ends) : null);
@@ -97,6 +99,18 @@ export default function PlaceDetail({ place, coords, hasFix = true, user, pop, s
           <span data-testid="photo-count" style={{ position:'absolute', left:14, bottom:14, display:'inline-flex', alignItems:'center', gap:5, background:'rgba(10,37,64,.62)', color:'#fff', borderRadius:8, padding:'4px 9px', fontSize:10.5, fontWeight:600 }}>
             <Camera size={11}/> {photos.length} {photos.length === 1 ? 'Photo' : 'Photos'}
           </span>
+        )}
+
+        {photoCredit && (
+          <a
+            data-testid="photo-credit"
+            href={photoCredit}
+            target="_blank"
+            rel="noreferrer noopener"
+            style={{ position:'absolute', right:14, bottom:14, background:'rgba(10,37,64,.62)', color:'#fff', borderRadius:8, padding:'4px 9px', fontSize:10.5, fontWeight:600, textDecoration:'none' }}
+          >
+            Photo: Wikimedia Commons
+          </a>
         )}
       </div>
 

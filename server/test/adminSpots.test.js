@@ -8,6 +8,9 @@ const os = require('os');
 const tmpFile = path.join(os.tmpdir(), 'lakbai-admin-spots-' + process.pid + '.json');
 process.env.LAKBAI_ADMIN_FILE = tmpFile;
 try { fs.unlinkSync(tmpFile); } catch { /* fresh */ }
+const spotPhotosFile = path.join(os.tmpdir(), 'lakbai-admin-spot-photos-' + process.pid + '.json');
+process.env.LAKBAI_SPOT_PHOTOS_FILE = spotPhotosFile;
+try { fs.unlinkSync(spotPhotosFile); } catch { /* fresh */ }
 
 const { listSpots, getSpot, createSpot, updateSpot, deleteSpot, validateSpot, requireAdmin } = require('../adminSpots.js');
 
@@ -53,6 +56,27 @@ test('deleteSpot hides a base spot and validateSpot rejects empty names', () => 
   assert.ok(!listSpots().some(s => s.id === base.id));
   assert.throws(() => validateSpot({ name: '  ', town: '' }), /name|town/i);
   assert.throws(() => updateSpot('missing-id', { name: 'x' }), /not found|Not found/i);
+});
+
+test('wikimedia photos fill empty spots, admin photos still win', () => {
+  resetFile({ patches: {}, added: [], deleted: [] });
+  const id = 'patar-beach-bolinao';
+  fs.writeFileSync(spotPhotosFile, JSON.stringify({ photos: {
+    [id]: { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/w/patar.jpg', page: 'https://commons.wikimedia.org/wiki/File:Patar_Beach.jpg' },
+  } }));
+  const filled = listSpots().find(s => s.id === id);
+  assert.deepEqual(filled.photos, ['https://upload.wikimedia.org/wikipedia/commons/thumb/w/patar.jpg']);
+  assert.equal(filled.photoSource, 'wikimedia');
+  assert.equal(filled.photoPage, 'https://commons.wikimedia.org/wiki/File:Patar_Beach.jpg');
+  // a curated/admin photo must win over the Wikimedia mapping
+  updateSpot(id, { photos: ['https://example.com/admin.jpg'] });
+  const admin = listSpots().find(s => s.id === id);
+  assert.deepEqual(admin.photos, ['https://example.com/admin.jpg']);
+  assert.equal(admin.photoSource, 'json');
+  // a spot with no mapping keeps the map fallback
+  const bare = listSpots().find(s => s.id !== id && !(s.photos || []).length);
+  assert.ok(bare, 'an unmapped empty spot exists');
+  assert.equal(bare.photoSource, 'mapbox');
 });
 
 test('requireAdmin guards by x-admin-token', () => {

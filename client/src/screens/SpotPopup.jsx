@@ -9,7 +9,7 @@ import { haversineKm, formatDistance, driveMinutes } from '../geo.js';
 import { dragOffset, shouldDismiss } from '../sheetDrag.js';
 import { FALLBACK_CENTER } from '../App.jsx';
 import { PrimaryBtn, PhotoPlaceholder } from '../ui.jsx';
-import { staticMapThumb, mapboxToken } from '../staticMap.js';
+import { placeImage, mapboxToken } from '../staticMap.js';
 
 const VIBES = [
   [/beach|coast|island|sea|shore/i, 'Coastal Wonder', Waves],
@@ -35,10 +35,11 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
   const dragYRef = useRef(0);
   const trackRef = useRef(null);
   const photos = (spot.photos && spot.photos.length) ? spot.photos : null;
-  // U14-A: located spot with no photos gallery still shows its static map instead of icons.
+  // U14-A: located spot with no photos gallery still shows a real image — the
+  // Wikimedia photo when one exists, otherwise its static map — never icons.
   const gallery = photos || (() => {
-    const thumb = staticMapThumb(spot.lng, spot.lat, mapboxToken(), { width: 600, height: 340 });
-    return thumb ? [thumb] : null;
+    const img = placeImage(spot, mapboxToken(), { width: 600, height: 340 });
+    return img ? [img] : null;
   })();
   const count = gallery ? gallery.length : 3; // placeholder dots when there is no image
   // Distance is only meaningful with a real fix — measuring from the fallback

@@ -41,23 +41,42 @@ domain can reach `/api/admin/*` with the token header.
 
 ## What you can do (from the admin domain)
 
-- Search/filter all curated Pangasinan spots (name, town, district, categories)
-- Edit a site: name, town, district 1–6, categories, blurb, lng/lat, **real photo URLs**
-- **Find real photo (Wikimedia)**, create/delete sites, “missing photos” filter
+Two tabs, **Tourist spots** and **Restaurants**:
 
-Edits persist in `server/data/admin-spots.json`, merged over `server/spots.js`
-on read. The traveller app picks them up immediately via `GET /api/spots`.
-Hierarchy everywhere: JSON → Wikimedia → Mapbox.
+- Search/filter all curated Pangasinan spots (name, town, district, categories)
+- Edit a site: name, town, district 1–6, categories, blurb, lng/lat, **photos**
+- Add photos as **separate rows** — one URL per field, with a live preview, plus
+  add/remove buttons. Save sends the whole list as an array.
+- **Find real photo (Wikimedia)**, create/delete sites, “missing photos” filter
+- Pick any of the 78-restaurant dataset rows and attach photos the same way
+
+Edits persist in gitignored runtime files, layered over the committed source:
+
+| Catalogue | Source (read-only) | Admin overlay |
+|---|---|---|
+| Tourist spots | `server/spots.js` | `server/data/admin-spots.json` |
+| Restaurants | `server/data/places.json` | `server/data/admin-photos.json` |
+
+The traveller app picks both up immediately. An admin photo always wins; an
+empty photo list removes the overlay entry. Otherwise tourist spots fall back to
+the precomputed Wikimedia map (`server/data/spot-photos.json`, rebuilt with
+`node scripts/fetch-spot-photos.mjs`) and then to the Mapbox static map.
+Restaurants show photos or a placeholder — they never get an invented image.
 
 ## Endpoints
 
 | Endpoint | Auth | Purpose |
 |---|---|---|
-| `GET /api/admin/spots` | token | list merged catalogue |
+| `GET /api/admin/spots` | token | list merged tourist-spot catalogue |
 | `POST /api/admin/spots` | token | create |
 | `PUT /api/admin/spots/:id` | token | edit name/town/coords/photos |
 | `DELETE /api/admin/spots/:id` | token | remove |
 | `POST /api/admin/photos/find` | token | `{name,town,lng,lat}` → real Wikimedia photo |
+| `GET /api/admin/places` | token | list the restaurant dataset (read-only fields + photos) |
+| `PUT /api/admin/places/:id/photos` | token | `{photos:[url,…]}` → saved overlay; `[]` clears |
+
+Photo URLs must be `http(s)`; the API caps a list at 20 and answers 404 for an
+unknown restaurant id.
 
 Keep the admin domain unlisted (no links from the traveller app, `noindex`
 meta) and change `ADMIN_TOKEN` in production.

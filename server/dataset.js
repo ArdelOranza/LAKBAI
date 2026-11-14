@@ -14,6 +14,7 @@ const { searchPlaces, inBox } = require('./places.js');
 const { haversineKm, parseProximity } = require('./location.js');
 const { isAttraction } = require('./attractions.js');
 const { SPOTS } = require('./spots.js');
+const adminPhotos = require('./adminPhotos.js');
 const { decodePlusCode } = require('./pluscode.js');
 
 const DATA_DIR = path.join(__dirname, 'data');
@@ -323,6 +324,8 @@ function normalize(raw, index, kind = '', fileTag = ''){
     id: str(raw.id || raw.place_id || raw.placeId) || `${fileTag ? fileTag + '-' : ''}${name}-${town}-${index}`.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
     name,
     town,
+    kind,
+    source: fileTag,
     address,
     categories,
     lat,
@@ -358,23 +361,28 @@ function readEntries(){
   const sig = files.map(f => {
     try { return f + ':' + fs.statSync(f).mtimeMs; } catch { return f + ':0'; }
   }).join('|');
-  if (cache.sig === sig) return cache.entries;
-  const entries = [];
-  for (const file of files){
-    let raw;
-    try { raw = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { continue; }
-    const list = pickList(raw);
-    const kind = !Array.isArray(raw) && raw && typeof raw === 'object'
-      ? Object.keys(raw).find(k => raw[k] === list) || ''
-      : '';
-    const fileTag = path.basename(file, path.extname(file));
-    list.forEach((item, i) => {
-      const entry = normalize(item, i, kind, fileTag);
-      if (entry) entries.push(entry);
-    });
+  if (cache.sig !== sig){
+    const entries = [];
+    for (const file of files){
+      let raw;
+      try { raw = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { continue; }
+      const list = pickList(raw);
+      const kind = !Array.isArray(raw) && raw && typeof raw === 'object'
+        ? Object.keys(raw).find(k => raw[k] === list) || ''
+        : '';
+      const fileTag = path.basename(file, path.extname(file));
+      list.forEach((item, i) => {
+        const entry = normalize(item, i, kind, fileTag);
+        if (entry) entries.push(entry);
+      });
+    }
+    cache = { sig, entries };
   }
-  cache = { sig, entries };
-  return entries;
+  // Admin photo edits are applied on every read, so they show up immediately
+  // without restarting or touching the committed dataset.
+  const overlay = adminPhotos.allPhotos();
+  if (!Object.keys(overlay).length) return cache.entries;
+  return cache.entries.map(e => overlay[e.id] ? { ...e, photos: overlay[e.id].photos.slice() } : e);
 }
 
 function datasetInfo(){

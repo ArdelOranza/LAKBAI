@@ -42,7 +42,7 @@ app.get('/api/emergency', async (req, res) => {
 });
 const { recommend } = require('./verify.js');
 const { cached } = require('./aiCache.js');
-const { datasetInfo, localChat, localRecommend } = require('./dataset.js');
+const { datasetInfo, localChat, localRecommend, allEntries } = require('./dataset.js');
 const { groundedChat, groundedRecommend } = require('./grounded.js');
 const AI_TTL_MS = Number(process.env.AI_TTL_MS) || 15 * 60000;
 // LAKBAI_AI=off → answer straight from the dataset with no model call at all.
@@ -161,6 +161,7 @@ app.post('/api/plan', async (req, res) => {
 const { searchPlaces } = require('./places.js');
 const { SPOTS } = require('./spots.js');
 const adminStore = require('./adminSpots.js');
+const adminPhotos = require('./adminPhotos.js');
 const { findPhoto } = require('./photos.js');
 
 // --- real-photo hierarchy: 1 JSON → 2 Wikimedia → 3 Mapbox (client fallback)
@@ -232,6 +233,29 @@ app.put('/api/admin/spots/:id', adminStore.requireAdmin, (req, res) => {
 app.delete('/api/admin/spots/:id', adminStore.requireAdmin, (req, res) => {
   try { res.json(adminStore.deleteSpot(req.params.id)); }
   catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
+// --- restaurant photos: the committed dataset stays read-only, photos live in
+// the admin overlay and are layered on by dataset.js at read time.
+function restaurantRows(){
+  return allEntries()
+    .filter(e => e.kind === 'restaurants')
+    .map(e => ({
+      id: e.id, name: e.name, town: e.town, address: e.address,
+      categories: e.categories, rating: e.rating, reviews: e.reviews, photos: e.photos,
+    }));
+}
+app.get('/api/admin/places', adminStore.requireAdmin, (req, res) => {
+  try { res.json({ places: restaurantRows() }); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+app.put('/api/admin/places/:id/photos', adminStore.requireAdmin, (req, res) => {
+  try {
+    const id = String(req.params.id);
+    const exists = allEntries().some(e => e.id === id && e.kind === 'restaurants');
+    if (!exists) return res.status(404).json({ error: 'Place not found: ' + id });
+    res.json({ place: adminPhotos.setPhotos(id, (req.body || {}).photos) });
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 app.post('/api/admin/photos/find', adminStore.requireAdmin, async (req, res) => {
   try {

@@ -38,4 +38,6 @@ export const api = {
   update: (id, data) => req(`/api/admin/spots/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(data) }),
   remove: (id) => req(`/api/admin/spots/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   findPhoto: (payload) => req('/api/admin/photos/find', { method: 'POST', body: JSON.stringify(payload) }),
+  places: () => req('/api/admin/places'),
+  setPhotos: (id, photos) => req(`/api/admin/places/${encodeURIComponent(id)}/photos`, { method: 'PUT', body: JSON.stringify({ photos }) }),
 };

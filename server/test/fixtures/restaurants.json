@@ -1,0 +1,13 @@
+{
+  "restaurants": [
+    {
+      "id": "ChIJtest1",
+      "name": "Test Resto",
+      "municipality": "Dagupan City",
+      "address": "28QF+PX4, Dagupan City, Pangasinan",
+      "rating": "4.5/5 from 10 reviews",
+      "lat": 16.043,
+      "lng": 120.341
+    }
+  ]
+}

@@ -7,6 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 const { SPOTS } = require('./spots.js');
+const { photoFor } = require('./spotPhotos.js');
 
 function dataFile(){
   return process.env.LAKBAI_ADMIN_FILE || path.join(__dirname, 'data', 'admin-spots.json');
@@ -122,7 +123,16 @@ function listSpots(){
   const added = doc.added
     .filter(s => s && s.id && !deleted.has(s.id))
     .map(tagged);
-  return [...patched, ...added];
+  return [...patched, ...added].map(withWikimedia);
+}
+
+/** Wikimedia fills only empty spots: a curated/admin photo always wins, and a
+ *  spot with no photo mapping keeps the Mapbox fallback (client-side). */
+function withWikimedia(s){
+  if ((s.photos || []).length) return s;
+  const p = photoFor(s.id);
+  if (!p) return s;
+  return { ...s, photos: [p.src], photo: p.src, photoSource: 'wikimedia', photoPage: p.page };
 }
 
 function getSpot(id){

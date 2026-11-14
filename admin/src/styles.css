@@ -43,8 +43,10 @@ body{margin:0;font-family:Inter,system-ui,sans-serif;background:#fff;color:#111;
 .input{width:100%;border:1px solid #e5e5e5;border-radius:8px;padding:8px 10px;font-size:14px;background:#fff;outline:none}
 .input:focus{border-color:#111}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.photo-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
-.photo-links a{font-size:12px;color:#111;text-decoration:underline}
+.photo-rows{display:flex;flex-direction:column;gap:8px;margin:8px 0}
+.photo-row{display:flex;gap:8px;align-items:center}
+.photo-row .input{flex:1;min-width:0}
+.photo-thumb{width:56px;height:40px;object-fit:cover;border-radius:6px;background:#f2f2f2;flex:0 0 auto}
 .empty{border:1px solid #eee;border-radius:10px;background:#fff;padding:24px;color:#888;font-size:14px}
 .error{color:#111;font-size:13px;margin:12px 0}
 @media (max-width:900px){ .workspace{grid-template-columns:1fr} .list{max-height:38vh} }

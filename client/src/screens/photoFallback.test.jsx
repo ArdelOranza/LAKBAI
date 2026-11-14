@@ -73,6 +73,31 @@ describe('PlaceDetail hero', () => {
     expect(html).toContain('https://real/cove.jpg');
     expect(html).not.toMatch(MAPBOX_LINE);
   });
+
+  it('a Wikimedia hero links back to the Commons file for attribution', () => {
+    const page = 'https://commons.wikimedia.org/wiki/File:Patar_Beach.jpg';
+    const html = render(
+      <PlaceDetail
+        place={photoless({ photos: ['https://upload.wikimedia.org/wikipedia/commons/thumb/p/patar.jpg'], photoSource: 'wikimedia', photoPage: page })}
+        coords={{ lng: 120, lat: 16 }} push={() => {}} pop={() => {}} showToast={() => {}} setTab={() => {}} user={{ id: 'u1' }}
+      />
+    );
+    expect(html).toContain('upload.wikimedia.org');
+    const credit = html.match(/<a[^>]*data-testid="photo-credit"[^>]*>/);
+    expect(credit, 'credit link present').not.toBeNull();
+    expect(credit[0]).toContain(page);
+    expect(html).not.toMatch(MAPBOX_LINE);
+  });
+
+  it('a non-Wikimedia photo shows no Commons credit', () => {
+    const html = render(
+      <PlaceDetail
+        place={photoless({ photos: ['https://real/cove.jpg'], photoSource: 'json' })}
+        coords={{ lng: 120, lat: 16 }} push={() => {}} pop={() => {}} showToast={() => {}} setTab={() => {}} user={{ id: 'u1' }}
+      />
+    );
+    expect(html).not.toContain('data-testid="photo-credit"');
+  });
 });
 
 describe('list card thumbs', () => {
@@ -122,6 +147,16 @@ describe('SpotPopup gallery', () => {
     const h = await mount(<SpotPopup spot={photoless({ id: 'sp2', photos: ['https://real/a.jpg', 'https://real/b.jpg'], categories: ['Beach'], blurb: '' })} coords={{ lng: 120.1, lat: 16.1 }} pop={() => {}} push={() => {}} showToast={() => {}} setTab={() => {}}/>);
     expect(h.container.innerHTML).toContain('https://real/a.jpg');
     expect(h.container.innerHTML).toContain('2 Photos');
+    await h.unmount();
+  });
+
+  it('a Wikimedia photo on the bare photo field shows in the sheet, not the map', async () => {
+    const h = await mount(<SpotPopup
+      spot={photoless({ id: 'sp3', photos: [], photo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/t/tambobong.jpg', photoSource: 'wikimedia', categories: ['Beach'], blurb: '' })}
+      coords={{ lng: 120.1, lat: 16.1 }} pop={() => {}} push={() => {}} showToast={() => {}} setTab={() => {}}
+    />);
+    expect(h.container.innerHTML).toContain('upload.wikimedia.org');
+    expect(h.container.innerHTML).not.toMatch(MAPBOX_LINE);
     await h.unmount();
   });
 });
