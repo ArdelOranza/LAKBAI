@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Search, Mic, Star, MapPin, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Search, Mic, Star, MapPin, ChevronRight, Compass } from 'lucide-react';
 import { recommend } from '../api.js';
 import { readLocalPrefs } from '../prefs.js';
 import { sessionGet, sessionSet } from '../sessionCache.js';
@@ -143,7 +143,9 @@ export default function SearchResults({ query, coords, hasFix = true, push, pop,
               </div>
 
               <div className="result-main">
-                {p.source === 'mapbox' && <span data-testid="discover-tag" className="result-fee" style={{ background:'#E7F0FE', color:'var(--primary)' }}>Discovered</span>}
+                {p.source === 'mapbox' && (
+                  <span data-testid="discover-tag" className="result-tag"><Compass size={10} strokeWidth={2.6}/>Discovered</span>
+                )}
                 {p.fees != null && <span className="result-fee">{feeLabel(p.fees)}</span>}
                 <b className="result-name">{p.name}</b>
                 <p className="result-addr">{p.address || (p.hint ? p.hint + ', Pangasinan' : 'Pangasinan')}</p>

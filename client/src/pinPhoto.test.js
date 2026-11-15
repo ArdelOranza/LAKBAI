@@ -23,9 +23,16 @@ describe('pinPhoto', () => {
     expect(pinPhoto({ photo: CURATED }, true)).toBe(CURATED);
   });
 
-  it('shrinks a Wikimedia thumbnail down to pin size', () => {
-    expect(pinPhoto({ photos: [WIKI_960] }, true)).toContain('/128px-');
+  it('shrinks a Wikimedia thumbnail to a valid pin-size bucket', () => {
+    expect(pinPhoto({ photos: [WIKI_960] }, true)).toContain('/120px-');
     expect(pinPhoto({ photos: [WIKI_960] }, true)).not.toContain('/960px-');
+    // 128 px is not a Wikimedia bucket: it returns 400 and the pin loses its
+    // photo, so the rewrite must stay on a real bucket.
+    expect(pinPhoto({ photos: [WIKI_960] }, true)).not.toContain('/128px-');
+    // The API serves the newer thumb.wikimedia.org host too.
+    const THUMB_HOST = 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Abagatanen_Beach.jpg/960px-Abagatanen_Beach.jpg?utm_source=commons';
+    expect(pinPhoto({ photos: [THUMB_HOST] }, true)).toContain('/120px-');
+    expect(pinPhoto({ photos: [THUMB_HOST] }, true)).toContain('thumb.wikimedia.org');
   });
 
   it('leaves an admin/curated photo URL alone', () => {

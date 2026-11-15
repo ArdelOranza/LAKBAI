@@ -173,45 +173,51 @@ li{margin:6px 0}
 .shimmer{color:var(--muted-ink);font-weight:500}
 /* map pins (rendered through mapcn MarkerContent) — small name pills instead of icons */
 .userdot{width:18px;height:18px;border-radius:50%;background:var(--primary);border:3px solid #fff;box-shadow:0 0 0 6px rgba(0,102,255,.22);animation:pulse 2s ease-in-out infinite}
-/* map pins — Google-Maps-style teardrop, name as a map label below it */
-.spot-pin{position:relative;display:flex;flex-direction:column;align-items:center;background:none;border:none;padding:0;box-shadow:none;color:var(--ink);font-size:11px;font-weight:600;letter-spacing:0;line-height:1.2;white-space:nowrap;text-align:center;transition:opacity .18s ease,transform .18s ease}
+/* map pins — two Google-style states on one coordinate: a compact POI dot when
+   the map is zoomed out, a round photo bubble once the street is readable. */
+.spot-pin{position:relative;display:flex;flex-direction:column;align-items:center;background:none;border:none;padding:0;box-shadow:none;color:var(--ink);font-size:12px;font-weight:500;letter-spacing:0;line-height:1.22;white-space:nowrap;text-align:center;transition:opacity .18s ease,transform .18s ease}
 .spot-pin:active{transform:scale(.96)}
 /* Colliding pins yield instead of stacking into an unreadable pile. */
 .spot-pin.is-hidden{opacity:0;pointer-events:none;transform:scale(.78)}
-.pin-drop{position:relative;display:block;width:32px;height:38px;filter:drop-shadow(0 3px 5px rgba(15,23,42,.30));transform-origin:50% 100%;transition:transform .2s ease,filter .2s ease;animation:pin-drop-in .34s cubic-bezier(.2,.7,.3,1) backwards}
-.pin-drop svg{display:block;width:100%;height:100%}
-.pin-drop path{fill:var(--primary);stroke:#fff;stroke-width:1.4;paint-order:stroke fill}
-/* The head is the white disc; the glyph sits under the photo so a broken
-   image reveals the category instead of leaving an empty pin. */
-.pin-head{position:absolute;left:50%;top:14%;transform:translateX(-50%);width:56%;aspect-ratio:1/1;display:grid;place-items:center;overflow:hidden;border-radius:50%;background:#fff;color:var(--primary)}
-.pin-glyph{display:block;width:72%;height:72%}
+/* Google's dots are small but never hard to tap: a 40 px hit area around a
+   24 px disc. */
+.spot-pin:not(.bubble)::before{content:'';position:absolute;left:50%;top:50%;width:40px;height:40px;transform:translate(-50%,-50%);border-radius:50%}
+.pin-dot{position:relative;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--primary);border:2.5px solid #fff;color:#fff;box-shadow:0 1px 4px rgba(15,23,42,.35);overflow:hidden;transition:transform .2s ease,box-shadow .2s ease;animation:pin-drop-in .3s cubic-bezier(.2,.7,.3,1) backwards}
+.pin-glyph{display:block;width:62%;height:62%}
 .pin-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.pin-drop.has-photo .pin-head{border:2px solid #fff;box-shadow:0 1px 3px rgba(15,23,42,.35);background:#E7EDF5}
-.spot-pin:hover .pin-drop{transform:translateY(-1px) scale(1.05)}
-.spot-pin.active .pin-drop{transform:translateY(-1px) scale(1.12);filter:drop-shadow(0 5px 9px rgba(10,37,64,.42))}
-.spot-pin.active .pin-drop path{fill:#0A2540}
-.spot-pin.active .pin-head{color:#0A2540}
-.spot-pin.active .pin-drop.has-photo .pin-head{border-color:#0A2540;box-shadow:0 0 0 3px rgba(10,37,64,.18)}
-.spot-pin.discover .pin-drop path{fill:#fff;stroke:#64748B}
-.spot-pin.discover .pin-glyph{color:#64748B}
+/* Close view: Google's round photo bubble, centred on the spot, no tail. */
+.pin-bubble{position:relative;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:#fff;border:3px solid #fff;overflow:hidden;color:var(--primary);box-shadow:0 2px 7px rgba(15,23,42,.42);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;animation:pin-drop-in .3s cubic-bezier(.2,.7,.3,1) backwards}
+.pin-bubble.has-photo{background:#E7EDF5}
+.spot-pin:hover .pin-dot{transform:scale(1.08)}
+.spot-pin.active .pin-dot{transform:scale(1.12);box-shadow:0 0 0 4px rgba(10,37,64,.18),0 3px 8px rgba(10,37,64,.35)}
+.spot-pin:hover .pin-bubble{transform:translateY(-1px) scale(1.04)}
+.spot-pin.active .pin-bubble{transform:scale(1.08);border-color:#0A2540;box-shadow:0 0 0 3px rgba(10,37,64,.18),0 5px 12px rgba(10,37,64,.4)}
+.spot-pin.discover .pin-dot{background:#fff;border-color:#94A3B8;color:#64748B}
+.spot-pin.bubble.discover .pin-bubble{color:#64748B}
 /* A selected pin owns the map: its full name rises above neighbouring pins. */
 .maplibregl-marker:has(.spot-pin.active){z-index:6}
-/* Far zoom keeps the pins but not the photo faces: 80 photos at city zoom are
-   noise and bandwidth. The 1 km view lets the head carry a real picture. */
-.pins-far .pin-drop{width:26px;height:30px}
-/* The name hangs under the pin like a map label — no white billboard, no
-   photo thumbnail (a tiny map inside the map reads as a second pin). */
-.pin-name{position:absolute;top:calc(100% + 2px);left:50%;transform:translateX(-50%);max-width:132px;background:none;border:none;border-radius:0;padding:0 2px;box-shadow:none;overflow:hidden;text-overflow:ellipsis;font-size:10.5px;font-weight:650;color:#1F2937;letter-spacing:-.01em;text-shadow:0 0 2px #fff,0 0 3px #fff,0 1px 2px rgba(255,255,255,.95),0 -1px 2px rgba(255,255,255,.95);opacity:1;pointer-events:none;transition:opacity .18s ease,transform .18s ease}
-.spot-pin.active .pin-name{color:#0A2540;font-weight:700;max-width:190px;white-space:normal;font-size:11.5px;line-height:1.15}
+/* The name is a map label, sized like Google's POI labels (12 px, weight 500)
+   with a white halo instead of a card, so it reads on any map colour.
+   width:max-content keeps it on one line: an absolutely positioned label is
+   otherwise clamped to the 24-38 px marker box and wraps after one word. */
+.pin-name{position:absolute;top:calc(100% + 3px);left:50%;transform:translateX(-50%);width:max-content;max-width:150px;background:none;border:none;border-radius:0;padding:0 2px;box-shadow:none;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:500;color:#202124;letter-spacing:0;line-height:1.22;text-shadow:0 0 2px #fff,0 0 3px #fff,0 1px 2px rgba(255,255,255,.95),0 -1px 2px rgba(255,255,255,.95);opacity:1;pointer-events:none;transition:opacity .18s ease,transform .18s ease}
+.spot-pin.active .pin-name{color:#0A2540;font-weight:700;max-width:200px;white-space:normal;font-size:12.5px;line-height:1.18}
 .spot-pin.discover .pin-name{color:#475569}
-/* Far zoom: the pin stays, its name waits until the map is close enough to
+/* Close view: the name sits to the right of the bubble, like Google's POI
+   labels, instead of hanging under a dot. */
+.spot-pin.bubble .pin-name{top:50%;left:calc(100% + 8px);transform:translateY(-50%);max-width:158px;white-space:normal;text-align:left;font-size:12.5px;line-height:1.2;font-weight:500}
+/* A pin near the right edge flips its label to the left, like Google, instead
+   of having the name cut off by the map edge. */
+.spot-pin.bubble.label-left .pin-name{left:auto;right:calc(100% + 8px);text-align:right}
+.spot-pin.bubble.active .pin-name{max-width:188px;font-weight:700}
+/* Far zoom: the dot stays, its name waits until the map is close enough to
    read it. Both states are the same DOM node, so the label fades instead of
    popping. */
 .pins-far .pin-name,.spot-pin.label-hidden .pin-name{opacity:0;transform:translate(-50%,-3px)}
 .pins-far .spot-pin:hover .pin-name,.pins-far .spot-pin.active .pin-name{opacity:1;transform:translate(-50%,0)}
-@keyframes pin-drop-in{0%{opacity:0;transform:translateY(-14px) scale(.82)}70%{opacity:1;transform:translateY(2px) scale(1.04)}100%{opacity:1;transform:none}}
+@keyframes pin-drop-in{0%{opacity:0;transform:translateY(-10px) scale(.82)}70%{opacity:1;transform:translateY(2px) scale(1.05)}100%{opacity:1;transform:none}}
 @media (prefers-reduced-motion: reduce){
-  .pin-drop{animation:none}
+  .pin-dot,.pin-bubble{animation:none}
 }
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
 .spot-sheet{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(430px,100vw);background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -12px 40px rgba(10,37,64,.22);z-index:30;max-height:86vh;display:flex;flex-direction:column;padding-bottom:calc(78px + var(--safe-bottom));overflow:hidden}
@@ -320,13 +326,17 @@ li{margin:6px 0}
 .chip-flat:hover{background:none;color:var(--primary)}
 .chip-flat.active{background:var(--primary);border-color:var(--primary);color:#fff;padding:7px 17px}
 .result-list{display:grid;gap:12px;padding:10px 20px 28px}
-.result-card{display:flex;align-items:center;gap:12px;padding:9px;background:#fff;border:1px solid #F1F5F9;border-radius:16px;cursor:pointer;box-shadow:0 8px 20px -18px rgba(15,23,42,.55);transition:box-shadow .16s ease}
-.result-card:hover{box-shadow:0 12px 26px -18px rgba(15,23,42,.65)}
-.result-thumb{position:relative;width:86px;height:86px;flex:0 0 86px;border-radius:11px;overflow:hidden;background:#EDF1F7}
+.result-card{display:flex;align-items:center;gap:13px;padding:10px;background:#fff;border:1px solid #EEF2F7;border-radius:18px;cursor:pointer;box-shadow:0 8px 20px -18px rgba(15,23,42,.55);transition:box-shadow .16s ease,transform .16s ease,border-color .16s ease}
+.result-card:hover{transform:translateY(-1px);border-color:#E3EAF3;box-shadow:0 14px 28px -20px rgba(15,23,42,.7)}
+.result-thumb{position:relative;width:84px;height:84px;flex:0 0 84px;border-radius:13px;overflow:hidden;background:#EDF1F7}
 .result-thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .result-rating{position:absolute;left:6px;top:6px;display:inline-flex;align-items:center;gap:3px;background:#fff;color:var(--primary);border-radius:7px;padding:2px 6px;font-size:10px;font-weight:800;box-shadow:0 2px 6px rgba(10,37,64,.16)}
 .result-main{flex:1;min-width:0}
 .result-fee{display:block;font-size:11px;font-weight:500;color:#8B98A9;line-height:1.4}
+/* Source chip: a compact pill above the name. As a block it stretched into a
+   full-width blue bar that drowned the card. */
+.result-tag{align-self:flex-start;display:inline-flex;align-items:center;gap:3px;margin:0 0 4px;padding:2px 8px 2px 6px;border-radius:999px;background:#EEF3FF;color:var(--primary);font-size:10px;font-weight:700;letter-spacing:.03em;line-height:1.6}
+.result-tag svg{flex:0 0 auto;opacity:.85}
 .result-name{display:block;font-size:16.5px;font-weight:600;letter-spacing:-.01em;line-height:1.25;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .result-addr{margin:2px 0 0;font-size:12.5px;color:var(--muted-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .result-dist{margin:6px 0 0;font-size:12px;color:var(--muted-ink);display:inline-flex;align-items:center;gap:4px}

@@ -119,15 +119,14 @@ describe('MapTab discovered pins', () => {
     await h.unmount();
   });
 
-  it('drives the pin tip onto the coordinate, not the pin centre', async () => {
+  it('centres every marker on its coordinate, dot and bubble alike', async () => {
     const h = await mount();
     const pins = h.container.querySelectorAll('button.spot-pin').length;
-    // MapLibre defaults to anchor="center"; a teardrop drawn that way points
-    // ~15 px below the real place at city zoom.
     expect(pins).toBeGreaterThan(0);
-    const anchored = new Set(markers.filter(m => m.anchor === 'bottom').map(m => `${m.longitude},${m.latitude}`));
-    expect(anchored.size).toBe(pins);
-    expect(markers.filter(m => m.anchor && m.anchor !== 'bottom').length).toBe(0);
+    // Both states are round marks centred on the spot: a teardrop anchored
+    // "bottom" floats the tip above the place and reads as a swarm of balloons
+    // at city zoom.
+    expect(markers.filter(m => m.anchor).every(m => m.anchor === 'center')).toBe(true);
     await h.unmount();
   });
 
@@ -146,14 +145,19 @@ describe('MapTab discovered pins', () => {
       chip.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
     });
     const pin = h.container.querySelector('button.spot-pin[aria-label="Sunset Grill"]');
+    expect(pin.className).toContain('bubble');
+    expect(pin.closest('[data-marker]').getAttribute('data-anchor')).toBe('center');
+    expect(pin.querySelector('.pin-dot')).toBeNull();
+    expect(pin.querySelector('.pin-bubble')).not.toBeNull();
     const img = pin.querySelector('img.pin-photo');
     expect(img).not.toBeNull();
     expect(img.getAttribute('src')).toContain('upload.wikimedia.org');
     // A 960 px thumbnail per pin would be megabytes for one neighbourhood.
-    expect(img.getAttribute('src')).toContain('/128px-');
+    expect(img.getAttribute('src')).toContain('/120px-');
     // A place without a photo keeps its category glyph, not an empty head.
     const beach = h.container.querySelector('button.spot-pin[aria-label="Dataset Beach"]');
     expect(beach.querySelector('img')).toBeNull();
+    expect(beach.querySelector('.pin-bubble')).not.toBeNull();
     expect(beach.querySelector('.pin-glyph')).not.toBeNull();
     await h.unmount();
   });
@@ -200,7 +204,7 @@ describe('MapTab discovered pins', () => {
   it('far zoom keeps the pin and its name in the DOM so the label can fade', async () => {
     const h = await mount(); // default radius 5 km → zoom 11.5
     expect(h.container.firstElementChild.className).toContain('pins-far');
-    expect(h.container.querySelectorAll('.pin-drop').length)
+    expect(h.container.querySelectorAll('.pin-dot').length)
       .toBe(h.container.querySelectorAll('button.spot-pin').length);
     const pin = h.container.querySelector('button.spot-pin');
     expect(pin.getAttribute('aria-label')).toBe('Dataset Beach');

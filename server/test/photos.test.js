@@ -1,94 +1,117 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { relevant, pickPhoto, findPhoto, findCommonsPhoto } = require('../photos.js');
-test('relevant matches place words, rejects random files', () => {
-  assert.equal(relevant('File:Patar Beach, Bolinao.jpg', 'Patar Beach', 'Bolinao'), true);
-  assert.equal(relevant('File:Lucap, Alaminos, Pangasinan - panoramio (1).jpg', 'Hundred Islands', 'Alaminos'), false);
+const { strictRelevant, findPhoto, findCommonsPhoto } = require('../photos.js');
+
+const pages = (...titles) => ({ query: { pages: Object.fromEntries(
+  titles.map((t, i) => [i + 1, { title: t, thumbnail: { source: 'http://x/' + i + '.jpg' } }])
+) } });
+
+function respondWith(data, calls = []){
+  return async url => {
+    calls.push(String(url));
+    return { ok: true, json: async () => data };
+  };
+}
+
+test('strictRelevant keeps the feature noun, not just the town', () => {
+  // "beach" must survive tokenising, or every Lingayen file matches.
+  assert.equal(strictRelevant('File:Estanza Beach, Lingayen, Pangasinan.jpg', 'Estanza Beach'), true);
+  assert.equal(strictRelevant('File:5772Estanza, Lingayen, Pangasinan 31.jpg', 'Estanza Beach'), false);
+  assert.equal(strictRelevant('File:Sunset at Lingayen Capitol.jpg', 'Lingayen Beach'), false);
 });
-test('pickPhoto skips thumbless and irrelevant pages', () => {
-  const data = { query: { pages: {
-    1: { title: 'File:Random road.jpg', thumbnail: { source: 'http://x/1.jpg' } },
-    2: { title: 'File:Patar Beach aerial.jpg' },
-    3: { title: 'File:Patar Beach shoreline.jpg', thumbnail: { source: 'http://x/3.jpg' } }
-  } } };
-  const out = pickPhoto(data, 'Patar Beach', 'Bolinao');
-  assert.equal(out.src, 'http://x/3.jpg');
-  assert.ok(out.page.includes('Patar'));
-});
-test('findPhoto returns null when nothing relevant', async () => {
-  const fake = async () => ({ ok: true, json: async () => ({ query: { pages: {
-    9: { title: 'File:Somewhere else.jpg', thumbnail: { source: 'http://x/9.jpg' } }
-  } } }) });
-  const out = await findPhoto('Hundred Islands', 'Alaminos', 119.95, 16.21, { fetch: fake });
+
+test('findPhoto rejects a barangay photo dump that only matches the town', async () => {
+  // The reported bug: "Estanza Beach" showed a house from the 5772Estanza
+  // Commons series, because only "estanza" was required to match.
+  const fake = respondWith(pages('File:5772Estanza, Lingayen, Pangasinan 31.jpg'));
+  const out = await findPhoto('Estanza Beach', 'Lingayen', 120.23, 16.02, { fetch: fake });
   assert.equal(out, null);
 });
-test('google image search wins when CSE is configured', async () => {
+
+test('findPhoto rejects a landmark photo for a beach', async () => {
+  const fake = respondWith(pages(
+    'File:Sunset at Lingayen Capitol.jpg',
+    'File:Urduja-Lingayen-Sep1982.jpg'
+  ));
+  const out = await findPhoto('Lingayen Beach', 'Lingayen', 120.23, 16.02, { fetch: fake });
+  assert.equal(out, null);
+});
+
+test('findPhoto accepts a file that names the place and its feature', async () => {
+  const fake = respondWith(pages(
+    'File:5772Estanza, Lingayen, Pangasinan 31.jpg',
+    'File:Estanza Beach, Lingayen, Pangasinan.jpg'
+  ));
+  const out = await findPhoto('Estanza Beach', 'Lingayen', 120.23, 16.02, { fetch: fake });
+  assert.equal(out.src, 'http://x/1.jpg');
+  assert.ok(out.page.includes('Estanza%20Beach'));
+});
+
+test('findPhoto rejects a house even when every name token is in the title', async () => {
+  const fake = respondWith(pages('File:Lingayen Beach house.jpg', 'File:Estanza Beach interior.jpg'));
+  assert.equal(await findPhoto('Lingayen Beach', 'Lingayen', 120.2, 16.0, { fetch: fake }), null);
+});
+
+test('findPhoto never calls Google image search', async () => {
   const calls = [];
-  const fake = async (url) => {
-    calls.push(String(url));
-    if (String(url).includes('customsearch')) {
-      return { ok: true, json: async () => ({ items: [{ link: 'http://g/patar.jpg', image: { contextLink: 'http://g/page' } }] }) };
-    }
-    throw new Error('wikimedia must not run');
-  };
   const hadCx = process.env.GOOGLE_CSE_ID;
   const hadKey = process.env.GEMINI_API_KEY;
   process.env.GOOGLE_CSE_ID = 'test-cx';
   process.env.GEMINI_API_KEY = 'test-key';
-  const { findPhoto } = require('../photos.js');
   try {
-    const out = await findPhoto('Patar Beach', 'Bolinao', 119.79, 16.12, { fetch: fake });
-    assert.equal(out.src, 'http://g/patar.jpg');
+    const fake = respondWith(pages('File:Estanza Beach, Lingayen.jpg'), calls);
+    const out = await findPhoto('Estanza Beach', 'Lingayen', 120.23, 16.02, { fetch: fake });
+    assert.equal(out.src, 'http://x/0.jpg');
     assert.equal(calls.length, 1);
+    assert.ok(calls.every(u => u.includes('commons.wikimedia.org')), calls.join(', '));
+    assert.ok(calls.every(u => !u.includes('customsearch')), calls.join(', '));
   } finally {
     if (hadCx === undefined) delete process.env.GOOGLE_CSE_ID; else process.env.GOOGLE_CSE_ID = hadCx;
-    if (hadKey === undefined) delete process.env.GEMINI_API_KEY;
+    if (hadKey === undefined) delete process.env.GEMINI_API_KEY; else process.env.GEMINI_API_KEY = hadKey;
   }
 });
-test('findPhoto prefers name match over nearby', async () => {
+
+test('findPhoto searches names only and never geosearches', async () => {
   const calls = [];
-  const fake = async (url) => {
-    calls.push(String(url));
-    if (String(url).includes('generator=search')) {
-      return { ok: true, json: async () => ({ query: { pages: {
-        7: { title: 'File:Patar Beach, Bolinao.jpg', thumbnail: { source: 'http://x/name.jpg' } }
-      } } }) };
-    }
-    throw new Error('geosearch must not run');
-  };
+  const fake = respondWith(pages(), calls);
   const out = await findPhoto('Patar Beach', 'Bolinao', 119.79, 16.12, { fetch: fake });
-  assert.equal(out.src, 'http://x/name.jpg');
-  assert.equal(calls.length, 1);
+  assert.equal(out, null);
+  assert.equal(calls.length, 1, calls.join(', '));
+  const q = new URL(calls[0]).searchParams.get('gsrsearch');
+  // intitle: keeps barangay photo dumps out of the result set. Full-text
+  // search ranked "2657Poblacion, Lingayen..." above "Lingayen Beach.jpg".
+  assert.equal(q, 'intitle:patar intitle:beach Bolinao');
+  assert.equal(new URL(calls[0]).searchParams.get('generator'), 'search');
+  assert.ok(!calls[0].includes('geosearch'), calls[0]);
+  assert.ok(!calls[0].includes('ggscoord'), calls[0]);
 });
+
 test('findCommonsPhoto rejects a different numbered feature', async () => {
-  const fake = async () => ({ ok: true, json: async () => ({ query: { pages: {
-    1: { title: 'File:Bolinao Falls 2.jpg', thumbnail: { source: 'http://x/2.jpg' } },
-    2: { title: 'File:Bolinao Falls 1.jpg', thumbnail: { source: 'http://x/1.jpg' } },
-  } } }) });
+  const fake = respondWith(pages(
+    'File:Bolinao Falls 2.jpg',
+    'File:Bolinao Falls 1.jpg'
+  ));
   const out = await findCommonsPhoto('Bolinao Falls 1', 'Bolinao', undefined, undefined, { fetch: fake });
   assert.equal(out.src, 'http://x/1.jpg');
 });
 
 test('findCommonsPhoto rejects an unnumbered title for a numbered feature', async () => {
-  const fake = async () => ({ ok: true, json: async () => ({ query: { pages: {
-    1: { title: 'File:Bolinao Falls, Pangasinan.jpg', thumbnail: { source: 'http://x/falls.jpg' } },
-    2: { title: 'File:Bolinao Falls, Pangasinan (2).jpg', thumbnail: { source: 'http://x/falls2.jpg' } },
-  } } }) });
+  const fake = respondWith(pages(
+    'File:Bolinao Falls, Pangasinan.jpg',
+    'File:Bolinao Falls, Pangasinan (2).jpg'
+  ));
   const out = await findCommonsPhoto('Bolinao Falls 1', 'Bolinao', undefined, undefined, { fetch: fake });
   assert.equal(out, null);
 });
 
 test('findCommonsPhoto never calls Google image search', async () => {
   const calls = [];
-  const fake = async (url) => {
-    calls.push(String(url));
-    return { ok: true, json: async () => ({ query: { pages: {} } }) };
-  };
   const hadCx = process.env.GOOGLE_CSE_ID;
   const hadKey = process.env.GEMINI_API_KEY;
   process.env.GOOGLE_CSE_ID = 'test-cx';
   process.env.GEMINI_API_KEY = 'test-key';
   try {
+    const fake = respondWith(pages(), calls);
     const out = await findCommonsPhoto('Patar Beach', 'Bolinao', 119.79, 16.12, { fetch: fake });
     assert.equal(out, null);
     assert.ok(calls.length >= 1);
@@ -99,40 +122,10 @@ test('findCommonsPhoto never calls Google image search', async () => {
   }
 });
 
-test('findCommonsPhoto rejects unrelated nearby files', async () => {
-  const fake = async (url) => {
-    if (String(url).includes('generator=search')) {
-      return { ok: true, json: async () => ({ query: { pages: {
-        1: { title: 'File:Unrelated road.jpg', thumbnail: { source: 'http://x/no.jpg' } },
-      } } }) };
-    }
-    return { ok: true, json: async () => ({ query: { pages: {
-      2: { title: 'File:Balungao town hall.jpg', thumbnail: { source: 'http://x/hall.jpg' } },
-    } } }) };
-  };
-  const out = await findCommonsPhoto('Municipality Park', 'Balungao', 120.8, 15.9, { fetch: fake });
-  assert.equal(out, null);
-});
-
 test('findCommonsPhoto surfaces rate limiting so callers can back off', async () => {
   const fake = async () => ({ ok: false, status: 429, json: async () => ({}) });
   await assert.rejects(
     () => findCommonsPhoto('Patar Beach', 'Bolinao', undefined, undefined, { fetch: fake }),
     /rate|429/i
   );
-});
-
-test('findPhoto falls back to nearby when name misses', async () => {
-  const fake = async (url) => {
-    if (String(url).includes('generator=search')) {
-      return { ok: true, json: async () => ({ query: { pages: {
-        8: { title: 'File:Unrelated road.jpg', thumbnail: { source: 'http://x/no.jpg' } }
-      } } }) };
-    }
-    return { ok: true, json: async () => ({ query: { pages: {
-      9: { title: 'File:Patar Beach shoreline.jpg', thumbnail: { source: 'http://x/geo.jpg' } }
-    } } }) };
-  };
-  const out = await findPhoto('Patar Beach', 'Bolinao', 119.79, 16.12, { fetch: fake });
-  assert.equal(out.src, 'http://x/geo.jpg');
 });

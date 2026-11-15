@@ -24,15 +24,19 @@ function firstPhoto(place){
 
 /**
  * Wikimedia thumbnail at 960 px is far too heavy for an 18 px pin head.
- * The same file is served at any width by swapping the thumb segment; a
- * non-thumb Wikimedia URL falls back to Special:FilePath with a width.
+ * The same file is served at a bucket width by swapping the thumb segment.
+ * Wikimedia only accepts its standard buckets (120/250/500/960…), so 128 px
+ * — the obvious "pin size" — returns HTTP 400 and the pin falls back to the
+ * glyph. 120 px is the smallest valid bucket and still 3x the bubble size.
+ * A non-thumb Wikimedia URL falls back to Special:FilePath with a width.
  */
 function pinSized(url){
-  if (!/^https?:\/\/(upload\.)?wikimedia\.org\//i.test(url)) return url;
+  // Wikimedia serves thumbs from upload.wikimedia.org and thumb.wikimedia.org.
+  if (!/^https?:\/\/(?:[a-z0-9-]+\.)?wikimedia\.org\//i.test(url)) return url;
   const thumb = url.match(/^(.+\/thumb\/[^/]+\/[^/]+\/[^/]+\/)(\d+)px-(.+)$/i);
-  if (thumb) return `${thumb[1]}128px-${thumb[3]}`;
+  if (thumb) return `${thumb[1]}120px-${thumb[3]}`;
   const file = url.match(/\/wikipedia\/commons\/[^/]+\/[^/]+\/([^/?#]+)$/i);
-  if (file) return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(decodeURIComponent(file[1]))}?width=128`;
+  if (file) return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(decodeURIComponent(file[1]))}?width=120`;
   return url;
 }
 

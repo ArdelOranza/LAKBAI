@@ -41,18 +41,17 @@ function glyphFor(place){
 }
 
 /**
- * Google-Maps-style teardrop marker. The white head carries either the
- * place's real photo (close view only) or its category glyph. The glyph sits
- * behind the image, so a broken photo reveals it instead of drawing a blank.
+ * Google-Maps-style marker, two states on the same map coordinate:
+ *  - far zoom: a compact round POI dot, so 80 of them stay readable;
+ *  - close view: a round photo bubble with the name to the right.
+ * Both are centred on the spot (anchor="center"), and the glyph sits behind
+ * the image so a broken photo reveals the category instead of a blank disc.
  */
-function PinDrop({ photo, Glyph }){
-  return (
-    <span className={'pin-drop' + (photo ? ' has-photo' : '')} aria-hidden="true">
-      <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false">
-        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z"/>
-      </svg>
-      <span className="pin-head">
-        {Glyph && <Glyph className="pin-glyph" size={12} strokeWidth={2.5}/>}
+function PinMark({ photo, Glyph, bubble }){
+  if (bubble){
+    return (
+      <span className={'pin-bubble' + (photo ? ' has-photo' : '')} aria-hidden="true">
+        {Glyph && <Glyph className="pin-glyph" size={18} strokeWidth={2.3}/>}
         {photo && (
           <img
             className="pin-photo"
@@ -60,10 +59,27 @@ function PinDrop({ photo, Glyph }){
             alt=""
             loading="lazy"
             decoding="async"
+            referrerPolicy="no-referrer"
             onError={e => { e.currentTarget.style.display = 'none'; }}
           />
         )}
       </span>
+    );
+  }
+  return (
+    <span className={'pin-dot' + (photo ? ' has-photo' : '')} aria-hidden="true">
+      {Glyph && <Glyph className="pin-glyph" size={13} strokeWidth={2.6}/>}
+      {photo && (
+        <img
+          className="pin-photo"
+          src={photo}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onError={e => { e.currentTarget.style.display = 'none'; }}
+        />
+      )}
     </span>
   );
 }
@@ -100,6 +116,10 @@ function declutterPins(root, detailed){
     if (!detailed) continue;
     const name = pin.querySelector('.pin-name');
     if (!name) continue;
+    // Flip a label that would run past the right edge of the map, then measure
+    // where it actually landed before deciding whether it collides.
+    pin.classList.remove('label-left');
+    if (name.getBoundingClientRect().right > root.getBoundingClientRect().right - 6) pin.classList.add('label-left');
     const label = name.getBoundingClientRect();
     if (!label.width) continue;
     if (keptNames.some(b => overlaps(label, b, 1)) || keptPins.some(b => b !== box && overlaps(label, b, 0))) pin.classList.add('label-hidden');
@@ -299,10 +319,10 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
         {filtered.map(p => {
           const Glyph = glyphFor(p);
           return (
-            <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} anchor="bottom" onClick={() => push({ name:'detail', place:p })}>
+            <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} anchor="center" onClick={() => push({ name:'detail', place:p })}>
               <MarkerContent>
-                <button type="button" className="spot-pin" data-pin="rec" title={p.name} aria-label={p.name}>
-                  <PinDrop photo={pinPhoto(p, detailed)} Glyph={Glyph}/>
+                <button type="button" className={'spot-pin' + (detailed ? ' bubble' : '')} data-pin="rec" title={p.name} aria-label={p.name}>
+                  <PinMark photo={pinPhoto(p, detailed)} Glyph={Glyph} bubble={detailed}/>
                   <span className="pin-name">{shortName(p.name)}</span>
                 </button>
               </MarkerContent>
@@ -313,10 +333,10 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
           const active = selectedSpot && selectedSpot.id === s.id;
           const Glyph = glyphFor(s);
           return (
-            <MapMarker key={'spot-' + s.id} longitude={s.lng} latitude={s.lat} anchor="bottom" onClick={() => selectSpot(s)}>
+            <MapMarker key={'spot-' + s.id} longitude={s.lng} latitude={s.lat} anchor="center" onClick={() => selectSpot(s)}>
               <MarkerContent>
-                <button className={'spot-pin' + (active ? ' active' : '')} data-pin="spot" title={s.name} aria-label={s.name}>
-                  <PinDrop photo={pinPhoto(s, detailed)} Glyph={Glyph}/>
+                <button className={'spot-pin' + (detailed ? ' bubble' : '') + (active ? ' active' : '')} data-pin="spot" title={s.name} aria-label={s.name}>
+                  <PinMark photo={pinPhoto(s, detailed)} Glyph={Glyph} bubble={detailed}/>
                   <span className="pin-name">{active ? s.name : shortName(s.name)}</span>
                 </button>
               </MarkerContent>
@@ -326,10 +346,10 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
         {filteredDiscover.map(p => {
           const Glyph = glyphFor(p);
           return (
-            <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} anchor="bottom" onClick={() => push({ name:'detail', place:p })}>
+            <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} anchor="center" onClick={() => push({ name:'detail', place:p })}>
               <MarkerContent>
-                <button type="button" className="spot-pin discover" data-pin="discover" title={p.name + ' — discovered via Mapbox'} aria-label={p.name}>
-                  <PinDrop photo={pinPhoto(p, detailed)} Glyph={Glyph}/>
+                <button type="button" className={'spot-pin discover' + (detailed ? ' bubble' : '')} data-pin="discover" title={p.name + ' — discovered via Mapbox'} aria-label={p.name}>
+                  <PinMark photo={pinPhoto(p, detailed)} Glyph={Glyph} bubble={detailed}/>
                   <span className="pin-name">{shortName(p.name)}</span>
                 </button>
               </MarkerContent>
