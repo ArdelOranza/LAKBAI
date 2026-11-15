@@ -1,0 +1,877 @@
+{
+  "dataset_title": "pangasinan-5towns — tourist_spots",
+  "province": "Pangasinan",
+  "region_admin": "Ilocos Region (Region I), Philippines",
+  "last_verified": "2026-11-15",
+  "source_note": "Imported by scripts/import-dataset.js from pangasinan-5towns. Gallery images and third-party review quotes were removed on import.",
+  "total_entries": 28,
+  "ai_category_taxonomy": [
+    {
+      "category_name": "Filipino & Seafood Family Dining",
+      "category_slug": "filipino_seafood_family_dining",
+      "count": 30,
+      "default_subcategories": [
+        "filipino-cuisine",
+        "seafood",
+        "family-restaurant",
+        "casual-dining"
+      ]
+    },
+    {
+      "category_name": "Korean BBQ, Japanese & Asian Dining",
+      "category_slug": "korean_japanese_asian_dining",
+      "count": 18,
+      "default_subcategories": [
+        "asian-cuisine",
+        "japanese-ramen-sushi",
+        "korean-bbq",
+        "persian-halal"
+      ]
+    },
+    {
+      "category_name": "Italian, Pizza, Pasta & Western",
+      "category_slug": "italian_pizza_pasta_western",
+      "count": 17,
+      "default_subcategories": [
+        "pizza-pasta",
+        "western-steaks-wings",
+        "bistro-dining"
+      ]
+    },
+    {
+      "category_name": "Specialty Cafés, Bakeries & Milk Tea",
+      "category_slug": "specialty_cafes_bakeries_milk_tea",
+      "count": 63,
+      "default_subcategories": [
+        "coffee-shop",
+        "specialty-cafe",
+        "bakeshop-pastries",
+        "milk-tea"
+      ]
+    },
+    {
+      "category_name": "Restobars, Grills & Late-Night Dining",
+      "category_slug": "restobars_grills_late_night",
+      "count": 16,
+      "default_subcategories": [
+        "restobar",
+        "inihaw-grill",
+        "live-music",
+        "food-park"
+      ]
+    },
+    {
+      "category_name": "Eat-All-You-Can Buffets",
+      "category_slug": "eat_all_you_can_buffets",
+      "count": 5,
+      "default_subcategories": [
+        "buffet",
+        "eat-all-you-can",
+        "group-dining"
+      ]
+    },
+    {
+      "category_name": "Fast Food & Highway Transit Stops",
+      "category_slug": "fast_food_highway_transit_stops",
+      "count": 17,
+      "default_subcategories": [
+        "fast-food",
+        "drive-thru",
+        "24-hour-dining",
+        "highway-stopover"
+      ]
+    },
+    {
+      "category_name": "Hotels, Resorts, Inns & Staycations",
+      "category_slug": "hotels_resorts_inns_staycations",
+      "count": 34,
+      "default_subcategories": [
+        "hotel",
+        "resort-pool",
+        "transient-inn",
+        "staycation"
+      ]
+    }
+  ],
+  "tourist_spots": [
+    {
+      "id": "pangasinan-5towns-052",
+      "name": "Levo Hotel",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Brgy. San Vicente Rd, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ~₱2,929/night for 2 adults (includes outdoor pool, fitness center, hot tub, free Wi-Fi, and parking)",
+      "description": "Modern 3-star upscale hotel along Brgy. San Vicente Road in Urdaneta City, widely praised as one of the cleanest and most well-appointed hotels in Eastern Pangasinan with scenic rice field views, an outdoor pool, fitness gym, and an in-house restaurant.",
+      "what_to_do": [
+        "Stay in modern 3-star rooms with scenic rice field views",
+        "Use the outdoor swimming pool, hot tub, and fitness center",
+        "Enjoy hotel breakfast and full dining at the on-site restaurant"
+      ],
+      "rating": 4.4,
+      "total_review_count": 293,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Levo Hotel (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Levo+Hotel+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Levo Hotel Official Website",
+          "url": "http://www.levohotel.com/"
+        },
+        {
+          "title": "Booking.com – Levo Hotel Urdaneta",
+          "url": "https://www.booking.com/city/ph/binalonan.html"
+        }
+      ],
+      "lat": 15.97915,
+      "lng": 120.56785
+    },
+    {
+      "id": "pangasinan-5towns-053",
+      "name": "Saroju's Farmview Hotel",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Nancamaliran East, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ~₱3,100/night for 2 adults (with free breakfast, free parking, free drinking water, swimming pool, and no check-in deposit)",
+      "description": "Peaceful farm-view boutique hotel in Brgy. Nancamaliran East, Urdaneta City, offering spacious air-conditioned rooms, a scenic veranda overlooking green farmland, an outdoor swimming pool, hot tub, spa services, and complimentary breakfast.",
+      "what_to_do": [
+        "Relax on the veranda with sunrise and sunset farm views",
+        "Swim in the outdoor pool and enjoy free breakfast",
+        "Book pet-friendly, smoke-free family rooms with ample parking"
+      ],
+      "rating": 4.3,
+      "total_review_count": 71,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Saroju's Farmview Hotel (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Saroju%27s+Farmview+Hotel+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Saroju's Farmview Hotel Booking Portal",
+          "url": "https://sarojusfarmviewhotel.my.canva.site/booking?fbclid=IwAR0FIQqiPjBdOKdJ9yuy2mXMxpy_kHF6Ib9I9UPbMZU3k4tWH1JFXFekDt0"
+        }
+      ],
+      "lat": 15.9684,
+      "lng": 120.5892
+    },
+    {
+      "id": "pangasinan-5towns-054",
+      "name": "Goldland Spring Resort and Hotel",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Cayambanan Rd, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ~₱1,455/night for 2 adults via RedDoorz; 24-hour front desk, pool, and free parking",
+      "description": "Budget-friendly 1-star hotel and spring resort along Cayambanan Road in Urdaneta City, operating 24 hours with outdoor swimming pools, air-conditioned rooms, and pet-friendly policies.",
+      "what_to_do": [
+        "Book budget overnight stays via RedDoorz",
+        "Use the outdoor swimming pools and function areas",
+        "Enjoy 24-hour check-in convenience in western Urdaneta City"
+      ],
+      "rating": 3.6,
+      "total_review_count": 116,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Goldland Spring Resort and Hotel (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Goldland+Spring+Resort+and+Hotel+Urdaneta+City+Pangasinan&query_place_id=ChIJVyzroSY-kTMRRX8rhnXTIIw"
+        },
+        {
+          "title": "RedDoorz – Goldland Spring Resort and Hotel Urdaneta",
+          "url": "https://www.reddoorz.com/en-ph/hotel/philippines/pangasinan/city-of-urdaneta/cayambanan/goldland-spring-resort-and-hotel-urdaneta-pangasinan"
+        }
+      ],
+      "lat": 15.9841,
+      "lng": 120.5312
+    },
+    {
+      "id": "pangasinan-5towns-055",
+      "name": "Good Shepherd Apartelle",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "R-9 (MacArthur Hwy), Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ~₱2,908/night for 2 adults (includes free Wi-Fi, free parking, and 24-hour security)",
+      "description": "Highly rated apartelle along R-9 (MacArthur Highway) in Urdaneta City known for its spotless rooms, nighttime security guard, friendly receptionists, and convenient proximity to local eateries.",
+      "what_to_do": [
+        "Stay in clean, guarded apartelle rooms along the highway",
+        "Park securely on-site with nighttime guard supervision",
+        "Walk to nearby Urdaneta City restaurants and transit stops"
+      ],
+      "rating": 4.6,
+      "total_review_count": 42,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Good Shepherd Apartelle (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Good+Shepherd+Apartelle+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.975109,
+      "lng": 120.570374
+    },
+    {
+      "id": "pangasinan-5towns-056",
+      "name": "Premiére Hotel Urdaneta",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "2H4X+F9M, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ~₱4,958/night for spacious executive rooms",
+      "description": "Upscale hotel in Urdaneta City offering spacious, modern, well-maintained rooms, comfortable beds, and attentive front-desk hospitality.",
+      "what_to_do": [
+        "Book spacious, modern air-conditioned rooms",
+        "Relax in quiet, comfortable bedding for business or family trips"
+      ],
+      "rating": 4.1,
+      "total_review_count": 41,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Premiére Hotel Urdaneta (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Premi%C3%A9re+Hotel+Urdaneta+Urdaneta+City+Pangasinan&query_place_id=ChIJKThSQQAVkTMRFdeCbhwcMmI"
+        }
+      ],
+      "lat": 16.006187,
+      "lng": 120.598437
+    },
+    {
+      "id": "pangasinan-5towns-057",
+      "name": "Amor Building - Urdaneta City (Amor Hotel)",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Doña Loleng Subdivision, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ~₱1,561/night for 2 adults via Agoda",
+      "description": "Quiet residential transient hotel inside Doña Loleng Subdivision in Urdaneta City, favored by families and travelers seeking clean, affordable overnight lodging away from highway noise.",
+      "what_to_do": [
+        "Book budget-friendly transient rooms for family stays",
+        "Enjoy a quiet residential subdivision setting in Urdaneta City"
+      ],
+      "rating": 4.4,
+      "total_review_count": 14,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Amor Building - Urdaneta City (Amor Hotel) (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Amor+Building+-+Urdaneta+City+%28Amor+Hotel%29+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Agoda – Amor Building Urdaneta City",
+          "url": "https://www.agoda.com/amor-building-urdaneta-city/hotel/urdaneta-ph.html"
+        }
+      ],
+      "lat": 15.975102,
+      "lng": 120.568659
+    },
+    {
+      "id": "pangasinan-5towns-058",
+      "name": "D' Little Egg Hostel (RedDoorz @ D'Little Egg Hostel)",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "XHWH+G49, Anonas East St, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ₱1,391–₱1,398/night for 2 adults",
+      "description": "Practical, budget-friendly hostel and RedDoorz partner property along Anonas East Street in Urdaneta City catering to coworkers, backpackers, and solo travelers.",
+      "what_to_do": [
+        "Book low-cost overnight hostel rooms in Brgy. Anonas",
+        "Access nearby Urdaneta Bypass Road and northern highway routes"
+      ],
+      "rating": 3.6,
+      "total_review_count": 5,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – D' Little Egg Hostel (RedDoorz @ D'Little Egg Hostel) (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=D%27+Little+Egg+Hostel+%28RedDoorz+%40+D%27Little+Egg+Hostel%29+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.996313,
+      "lng": 120.577812
+    },
+    {
+      "id": "pangasinan-5towns-059",
+      "name": "The Aetrium Resort Hotel",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Zone 3, Pedro T. Orata, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Resort Hotel Rate: Includes free breakfast, free Wi-Fi, free parking, outdoor pool, hot tub, fitness center, spa, and rooftop bar",
+      "description": "5.0-rated boutique resort hotel in Zone 3, Brgy. Pedro T. Orata, Urdaneta City featuring American Modern-styled rooms, an outdoor swimming pool, karaoke rooms, fitness center, spa, and a rooftop bar with a panoramic farm view.",
+      "what_to_do": [
+        "Swim in the outdoor resort pool and book family staycations",
+        "Enjoy the rooftop bar overlooking Urdaneta's farmland",
+        "Sing karaoke and relax in American Modern guest rooms"
+      ],
+      "rating": 5,
+      "total_review_count": 5,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – The Aetrium Resort Hotel (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=The+Aetrium+Resort+Hotel+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.975742,
+      "lng": 120.569975
+    },
+    {
+      "id": "pangasinan-5towns-060",
+      "name": "Mark's Hotel",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "XHQJ+2Q6, Cayambanan Rd, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Standard Hotel & Pool Rate: Includes outdoor pool, hot tub, on-site restaurant, acoustic bar, free parking, and breakfast options",
+      "description": "Relaxed hotel along Cayambanan Road in Urdaneta City featuring simply furnished rooms, an outdoor swimming pool, an on-site restaurant, and an evening bar that hosts live acoustic bands and visiting Urdaneta fiesta performers.",
+      "what_to_do": [
+        "Stay in comfortable rooms with outdoor pool access",
+        "Watch live acoustic band performances at the hotel bar",
+        "Order breakfast and Filipino meals at the on-site restaurant"
+      ],
+      "rating": 4,
+      "total_review_count": 110,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Mark's Hotel (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Mark%27s+Hotel+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.987562,
+      "lng": 120.581937
+    },
+    {
+      "id": "pangasinan-5towns-061",
+      "name": "Springland Hotel & Resort",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "XHXC+GRP, West St, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Resort & Hotel Rate: Multi-night room packages with outdoor pool, hot tub, on-site restaurant, Wi-Fi, and free parking",
+      "description": "Family-friendly hotel and resort on West Street in Urdaneta City offering outdoor swimming pools, hot tub facilities, an on-site dining room, and warm hospitality.",
+      "what_to_do": [
+        "Book multi-night resort stays with family and friends",
+        "Swim in the outdoor pool and dine at the resort restaurant"
+      ],
+      "rating": 4.2,
+      "total_review_count": 43,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Springland Hotel & Resort (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Springland+Hotel+%26+Resort+Urdaneta+City+Pangasinan&query_place_id=ChIJX3oZ5DE-kTMR1EJmU0W2r60"
+        }
+      ],
+      "lat": 15.998812,
+      "lng": 120.572062
+    },
+    {
+      "id": "pangasinan-5towns-062",
+      "name": "Dampa Poolside Events & Accommodation",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Jacob Street, Purok 4, Brgy. Nancayasan, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Staycation & Event Rate: Poolside rooms with strong AC & Wi-Fi (note: extra towel/blanket fee ₱50)",
+      "description": "Poolside staycation and events venue on Jacob Street in Purok 4, Brgy. Nancayasan, Urdaneta City, situated a short walk from Dampa Sa Pangasinan Seafood Restaurant and SM City Urdaneta Central.",
+      "what_to_do": [
+        "Book poolside rooms for overnight staycations or birthday events",
+        "Walk to nearby Dampa Sa Pangasinan for seafood buffets"
+      ],
+      "rating": 3.7,
+      "total_review_count": 18,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Dampa Poolside Events & Accommodation (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Dampa+Poolside+Events+%26+Accommodation+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Dampa Poolside Events & Accommodation Facebook",
+          "url": "https://hi-in.facebook.com/Dampa-Poolside-Events-and-Accommodation-108876441661753/posts/?ref=page_internal"
+        }
+      ],
+      "lat": 15.962445,
+      "lng": 120.573834
+    },
+    {
+      "id": "pangasinan-5towns-079",
+      "name": "Golden Sunrise Hotel I by RedDoorz",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "WJCX+GRX, Brgy. Casanicolasan, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ₱891–₱1,151/night for 2 adults (includes Wi-Fi and AC)",
+      "description": "Budget highway hotel in Brgy. Casanicolasan, Rosales affiliated with RedDoorz, offering affordable air-conditioned overnight rooms near Carmen and Balungao corridors.",
+      "what_to_do": [
+        "Book budget rooms under ₱1,200/night in Rosales",
+        "Use as a transit stopover near Carmen East and TPLEX Rosales"
+      ],
+      "rating": 3.1,
+      "total_review_count": 48,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Golden Sunrise Hotel I by RedDoorz (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Golden+Sunrise+Hotel+I+by+RedDoorz+Rosales+Pangasinan&query_place_id=ChIJxaqqqjo6kTMRJlzmPS1pw0M"
+        },
+        {
+          "title": "RedDoorz – Golden Sunrise Hotel I Rosales",
+          "url": "https://www.reddoorz.com/en-ph/hotel/philippines/pangasinan/rosales/casanicolasan/golden-sunrise-hotel-i"
+        }
+      ],
+      "lat": 15.921313,
+      "lng": 120.649562
+    },
+    {
+      "id": "pangasinan-5towns-080",
+      "name": "RedDoorz @ JJ & Kaye Apartment Pangasinan",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Brgy. Carmen, Rosales, 2441 Pangasinan (540m from SM City Rosales)",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ~₱931/night for 2 adults",
+      "description": "Top-rated 4.9-star budget apartment hotel in Brgy. Carmen, Rosales located just 540 meters from SM City Rosales, providing clean apartment-style lodging for travelers and shoppers.",
+      "what_to_do": [
+        "Stay within a 5-minute walk (540m) of SM City Rosales",
+        "Book affordable apartment units starting around ₱931/night"
+      ],
+      "rating": 4.9,
+      "total_review_count": 14,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – RedDoorz @ JJ & Kaye Apartment Pangasinan (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=RedDoorz+%40+JJ+%26+Kaye+Apartment+Pangasinan+Rosales+Pangasinan&query_place_id=ChIJ5xTQ6cA5kTMRm3T3DioUSFs"
+        },
+        {
+          "title": "RedDoorz – JJ & Kaye Apartment Rosales",
+          "url": "https://www.reddoorz.com/en-ph/hotel/philippines/pangasinan/rosales/carmen/reddoorz-jj-kaye-apartment"
+        },
+        {
+          "title": "Traveloka – Hotels Near SM City Rosales",
+          "url": "https://www.traveloka.com/en-ph/hotel/philippines/landmark/sm-city-rosales-91510314592094"
+        }
+      ],
+      "lat": 15.880662,
+      "lng": 120.602388
+    },
+    {
+      "id": "pangasinan-5towns-081",
+      "name": "Cockers Inn Rosales",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "VJJ2+84R, MacArthur Highway, Carmen, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ~₱1,000–₱1,800/night for standard air-conditioned rooms",
+      "description": "Convenient roadside inn right along MacArthur Highway in Brgy. Carmen, Rosales near SM City Rosales and the Carmen bus terminal hub.",
+      "what_to_do": [
+        "Check in for overnight highway transit stays in Carmen, Rosales",
+        "Access nearby SM City Rosales and 24-hour bus terminals"
+      ],
+      "rating": 3.5,
+      "total_review_count": 31,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Cockers Inn Rosales (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Cockers+Inn+Rosales+Rosales+Pangasinan"
+        },
+        {
+          "title": "Traveloka – Best Hotels Near SM City Rosales",
+          "url": "https://www.traveloka.com/en-ph/hotel/philippines/landmark/sm-city-rosales-91510314592094"
+        }
+      ],
+      "lat": 15.880812,
+      "lng": 120.600312
+    },
+    {
+      "id": "pangasinan-5towns-082",
+      "name": "Casa Rosal Resort and Events Center",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "West Diversion Road, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Venue & Resort Rate: Poolside event rentals and overnight guest rooms for 2+ adults",
+      "description": "Resort and events center located along West Diversion Road in Rosales, Pangasinan offering private pool gatherings, reception venues, and overnight guest accommodations.",
+      "what_to_do": [
+        "Book private resort events and celebrations along West Diversion Road",
+        "Stay overnight in family-friendly resort rooms"
+      ],
+      "rating": 4.2,
+      "total_review_count": 10,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Casa Rosal Resort and Events Center (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Casa+Rosal+Resort+and+Events+Center+Rosales+Pangasinan&query_place_id=ChIJm6G9Zfc5kTMRsTwib58-LoA"
+        }
+      ],
+      "lat": 15.8953,
+      "lng": 120.633363
+    },
+    {
+      "id": "pangasinan-5towns-116",
+      "name": "Bergamo Hotel Lingayen",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Torres-Bugallon Ave, Poblacion, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ~₱1,759–₱2,900/night (includes indoor pool, restaurant, bar, free Wi-Fi, and Smart TV)",
+      "description": "Highly rated 3-star hotel in Poblacion, Lingayen (8.7–8.9 Excellent on Agoda across 310+ reviews) offering an indoor swimming pool, on-site restaurant and bar, Family Executive Rooms, fast Wi-Fi, and 24-hour front desk service.",
+      "what_to_do": [
+        "Book Family Executive Rooms equipped with Smart TVs and fast Wi-Fi",
+        "Swim in the indoor pool and dine at the on-site hotel restaurant"
+      ],
+      "rating": 4.3,
+      "total_review_count": 190,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Bergamo Hotel Lingayen (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Bergamo+Hotel+Lingayen+Lingayen+Pangasinan&query_place_id=ChIJ0xiidmBekTMRdEib5I09URc"
+        },
+        {
+          "title": "Agoda – Top Hotels in Lingayen",
+          "url": "https://www.agoda.com/en-au/city/lingayen-ph.html"
+        }
+      ],
+      "lat": 16.023446,
+      "lng": 120.232212
+    },
+    {
+      "id": "pangasinan-5towns-117",
+      "name": "YRS Resort",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Baywalk Sitio Aliguas, Brgy. Libsong East, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ~₱1,500–₱2,496/night (Rated 9.0 Exceptional on Agoda)",
+      "description": "4.6-star beachfront resort along the Baywalk in Sitio Aliguas, Libsong East, Lingayen (rated 9.0 Exceptional on Agoda with 322 reviews), known for its spotless hallways, spacious rooms, and direct access to the Lingayen-Binmaley beach stretch.",
+      "what_to_do": [
+        "Stay in clean, spacious rooms right along the Lingayen-Binmaley Baywalk",
+        "Walk directly to the beach for sunset views"
+      ],
+      "rating": 4.6,
+      "total_review_count": 47,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – YRS Resort (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=YRS+Resort+Lingayen+Pangasinan&query_place_id=ChIJcXnRwwRfkTMR0OUlTGH4DWI"
+        },
+        {
+          "title": "Agoda – YRS Resort Lingayen",
+          "url": "https://www.agoda.com/en-au/city/lingayen-ph.html"
+        }
+      ],
+      "lat": 16.03637,
+      "lng": 120.242212
+    },
+    {
+      "id": "pangasinan-5towns-118",
+      "name": "Baywalk Paradise Inn",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Salvacion Extension Baywalk, Brgy. Maniboc / Pangapisan Sur, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ~₱1,900–₱2,289/night (includes free Wi-Fi and complimentary parking)",
+      "description": "4.5-star beachfront inn along Salvacion Extension Baywalk in Maniboc, Lingayen offering comfortable air-conditioned rooms, free Wi-Fi, free on-site parking, and friendly staff.",
+      "what_to_do": [
+        "Book affordable beachfront rooms along Lingayen Baywalk",
+        "Take advantage of complimentary parking and free Wi-Fi"
+      ],
+      "rating": 4.5,
+      "total_review_count": 19,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Baywalk Paradise Inn (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Baywalk+Paradise+Inn+Lingayen+Pangasinan&query_place_id=ChIJcTarpFlfkTMRtvIOkPgSnAI"
+        },
+        {
+          "title": "Agoda – Cheap Hotels in Lingayen",
+          "url": "https://www.agoda.com/theme/cheap-hotels/city/lingayen-ph.html"
+        }
+      ],
+      "lat": 16.03454,
+      "lng": 120.205942
+    },
+    {
+      "id": "pangasinan-5towns-119",
+      "name": "Star Monica Hotel, Resorts and Restaurant",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Tarlac - Pangasinan Rd, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Buffet Rate: ₱180/person on weekdays, ₱200/person on weekends; Hotel rooms & resort pools available",
+      "description": "Popular hotel, swimming resort, and budget buffet restaurant along Tarlac-Pangasinan Road in Lingayen, famous for its ultra-affordable ₱180 weekday / ₱200 weekend eat-all-you-can Filipino buffet.",
+      "what_to_do": [
+        "Avail of the ₱180 weekday or ₱200 weekend eat-all-you-can buffet",
+        "Book family resort swimming and hotel rooms along Tarlac-Pangasinan Road"
+      ],
+      "rating": 3.8,
+      "total_review_count": 333,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Star Monica Hotel, Resorts and Restaurant (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Star+Monica+Hotel%2C+Resorts+and+Restaurant+Lingayen+Pangasinan&query_place_id=ChIJCzqDaOxekTMRreJET5hYglo"
+        }
+      ],
+      "lat": 16.022578,
+      "lng": 120.231529
+    },
+    {
+      "id": "pangasinan-5towns-120",
+      "name": "MC Hotel Lingayen",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Solis Street, Poblacion, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ~₱1,500–₱2,500/night (Deluxe Rooms with hot/cold shower, cable TV, free Wi-Fi)",
+      "description": "4-story 3-star town-center business hotel on Solis Street in Poblacion, Lingayen, located within walking distance of the Lingayen public market, fast-food chains, bus terminals, and municipal offices.",
+      "what_to_do": [
+        "Stay in town-center Deluxe Rooms for business or academic trips",
+        "Walk to Poblacion Lingayen restaurants, banks, and transit hubs"
+      ],
+      "rating": 4.1,
+      "total_review_count": 82,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – MC Hotel Lingayen (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=MC+Hotel+Lingayen+Lingayen+Pangasinan"
+        },
+        {
+          "title": "MC Hotel Lingayen Official Facebook",
+          "url": "https://www.facebook.com/mchotellingayen?mibextid=JRoKGi"
+        }
+      ],
+      "lat": 16.023877,
+      "lng": 120.231714
+    },
+    {
+      "id": "pangasinan-5towns-121",
+      "name": "The President Hotel Lingayen",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "26HM+R25, Maramba Blvd, Brgy. Maniboc, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ~₱1,500–₱2,800/night (includes pool, Wi-Fi, AC, and free parking)",
+      "description": "Historic landmark hotel along Maramba Boulevard in Maniboc, Lingayen famously associated with former President Fidel V. Ramos, offering heritage charm, a swimming pool, and proximity to the Capitol complex.",
+      "what_to_do": [
+        "Stay along Maramba Boulevard near the Capitol and Instant Venue Café",
+        "Unwind by the hotel swimming pool"
+      ],
+      "rating": 3.7,
+      "total_review_count": 218,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – The President Hotel Lingayen (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=The+President+Hotel+Lingayen+Lingayen+Pangasinan&query_place_id=ChIJv4clwGhekTMRcd9T1UgpPhQ"
+        }
+      ],
+      "lat": 16.029562,
+      "lng": 120.232563
+    },
+    {
+      "id": "pangasinan-5towns-122",
+      "name": "VillaMar Ramos Resort",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Baywalk, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ~₱2,805/night for beachfront resort stays",
+      "description": "Beachside resort right along the Lingayen Baywalk area, offering overnight accommodations and coastal access a few minutes from Lingayen town proper.",
+      "what_to_do": [
+        "Book beachside rooms along the popular Lingayen Baywalk"
+      ],
+      "rating": 3.6,
+      "total_review_count": 5,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – VillaMar Ramos Resort (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=VillaMar+Ramos+Resort+Lingayen+Pangasinan&query_place_id=ChIJxxj7y21fkTMRgIkbkfGfq0Y"
+        }
+      ],
+      "lat": 16.032894,
+      "lng": 120.231988
+    },
+    {
+      "id": "pangasinan-5towns-123",
+      "name": "Capandanan Cottages",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Don Pastor Moran Street, Brgy. Capandanan, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Cottage Rate: ~₱1,500–₱2,500/night",
+      "description": "5.0-star boutique cottage accommodation on Don Pastor Moran Street in Brgy. Capandanan, Lingayen, offering peaceful private cottages near the coast.",
+      "what_to_do": [
+        "Book peaceful private cottages in Brgy. Capandanan, Lingayen"
+      ],
+      "rating": 5,
+      "total_review_count": 8,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Capandanan Cottages (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Capandanan+Cottages+Lingayen+Pangasinan"
+        },
+        {
+          "title": "Agoda – Top Hotels & Cottages in Lingayen",
+          "url": "https://www.agoda.com/en-au/city/lingayen-ph.html"
+        }
+      ],
+      "lat": 16.0236,
+      "lng": 120.231302
+    },
+    {
+      "id": "pangasinan-5towns-154",
+      "name": "Ranch-O-Tel Guesthouse",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Brgy. San Nicolas, Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Villa/Guesthouse Rate: ~₱9,310/night (includes free breakfast, outdoor pool, hot tub, free Wi-Fi, pet-friendly)",
+      "description": "Relaxing private guesthouse and pool resort in Brgy. San Nicolas, Villasis offering an outdoor swimming pool, hot tub, complimentary breakfast, free Wi-Fi, and pet-friendly accommodations.",
+      "what_to_do": [
+        "Book a private pool guesthouse staycation in Brgy. San Nicolas",
+        "Enjoy complimentary breakfast, hot tub access, and pet-friendly grounds"
+      ],
+      "rating": 3.7,
+      "total_review_count": 3,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Ranch-O-Tel Guesthouse (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Ranch-O-Tel+Guesthouse+Villasis+Pangasinan"
+        }
+      ],
+      "lat": 15.906258,
+      "lng": 120.586247
+    },
+    {
+      "id": "pangasinan-5towns-155",
+      "name": "Casa Mia Apartments Villasis",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Apartment Rate: ~₱1,800–₱3,200/night (Scored 9.2/10 Superb on Booking.com)",
+      "description": "Highly rated modern apartment staycation in Villasis, Pangasinan, earning a 9.2/10 guest score on Booking.com for its clean self-catering units and convenient access to MacArthur Highway.",
+      "what_to_do": [
+        "Book apartment-style overnight lodging in Villasis via Booking.com"
+      ],
+      "rating": 4.6,
+      "total_review_count": 15,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Casa Mia Apartments Villasis (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Casa+Mia+Apartments+Villasis+Villasis+Pangasinan"
+        },
+        {
+          "title": "Booking.com – Casa Mia Apartments Villasis",
+          "url": "https://www.booking.com/city/ph/binalonan.html"
+        }
+      ],
+      "lat": 15.900913,
+      "lng": 120.586838
+    },
+    {
+      "id": "pangasinan-5towns-173",
+      "name": "Ruperto's Inland Resort and Restaurant",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Binalonan - Dagupan Hwy (near TPLEX Binalonan Exit), Brgy. Linmansangan, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Pool Entrance: ₱150–₱250; Overnight Hotel Rooms: ₱2,200–₱4,500/night; Restaurant platters ₱250–₱600",
+      "description": "Premier inland resort, hotel, and events venue situated near the TPLEX Binalonan Exit along the Binalonan-Dagupan Highway, featuring outdoor swimming pools, fitness facilities, hotel rooms, and an in-house restaurant famous for Pancit and Pork Skewers.",
+      "what_to_do": [
+        "Check into air-conditioned resort rooms right off the TPLEX Binalonan Exit",
+        "Dine on Pancit and grilled Pork Skewers at Ruperto's Restaurant",
+        "Swim in the outdoor pools and host events in the convention pavilions"
+      ],
+      "rating": 4.1,
+      "total_review_count": 250,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Ruperto's Inland Resort and Restaurant (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Ruperto%27s+Inland+Resort+and+Restaurant+Binalonan+Pangasinan&query_place_id=ChIJCVt8uv0UkTMRncxGnrZFRcg"
+        },
+        {
+          "title": "Ruperto's Inland Resort Official Website",
+          "url": "https://www.rupertos.ph/"
+        },
+        {
+          "title": "Trip.com – Ruperto's Restaurant and Resort",
+          "url": "https://www.trip.com/hotels/binalonan-hotel-detail-26588682/ruperto-s-restaurant-and-resort/"
+        }
+      ],
+      "lat": 16.045204,
+      "lng": 120.577804
+    },
+    {
+      "id": "pangasinan-5towns-174",
+      "name": "Binalonan Transient / Guest House (Pension Glaydie)",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Brgy. Santiago, Binalonan, 2436 Pangasinan (near WCC Binalonan)",
+      "has_fee": true,
+      "fee_in_venue": "Nightly Room Rate: ~₱2,674/night for 2 adults (Scored 8.8/10 Excellent on Booking.com across 51 reviews)",
+      "description": "Top-rated guesthouse and transient inn in Brgy. Santiago, Binalonan near World Citi Colleges (WCC), offering clean air-conditioned family rooms with a small kitchenette, hot and cold showers, flat-screen TV, free Wi-Fi, and on-site dining.",
+      "what_to_do": [
+        "Book family rooms with a small kitchenette near WCC Binalonan",
+        "Enjoy free Wi-Fi, free parking, and airport shuttle options"
+      ],
+      "rating": 4.1,
+      "total_review_count": 35,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Binalonan Transient / Guest House (Pension Glaydie) (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Binalonan+Transient+%2F+Guest+House+%28Pension+Glaydie%29+Binalonan+Pangasinan&query_place_id=ChIJ65tkRW4VkTMRpncj6fopvw8"
+        },
+        {
+          "title": "Booking.com – Binalonan Transient / Pension Glaydie",
+          "url": "https://www.booking.com/city/ph/binalonan.html"
+        }
+      ],
+      "lat": 16.048425,
+      "lng": 120.595125
+    },
+    {
+      "id": "pangasinan-5towns-175",
+      "name": "The Bamboo Orange Staycation",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Hotels, Resorts, Inns & Staycations",
+      "location": "Zone 3, Brgy. Mangcasuy, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Staycation Rate: ~₱2,000–₱3,500/night (includes swimming pool, hot tub, free Wi-Fi, free parking, pet-friendly)",
+      "description": "4.5-star cozy private staycation and pool villa in Zone 3, Brgy. Mangcasuy, Binalonan featuring an outdoor pool, hot tub, air-conditioned rooms, free Wi-Fi, and pet-friendly grounds.",
+      "what_to_do": [
+        "Book a cozy family staycation with pool access in Brgy. Mangcasuy"
+      ],
+      "rating": 4.5,
+      "total_review_count": 20,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – The Bamboo Orange Staycation (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=The+Bamboo+Orange+Staycation+Binalonan+Pangasinan"
+        }
+      ],
+      "lat": 16.055124,
+      "lng": 120.588193
+    }
+  ]
+}

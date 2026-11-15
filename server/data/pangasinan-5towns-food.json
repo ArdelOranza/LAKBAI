@@ -1,0 +1,4036 @@
+{
+  "dataset_title": "pangasinan-5towns — restaurants",
+  "province": "Pangasinan",
+  "region_admin": "Ilocos Region (Region I), Philippines",
+  "last_verified": "2026-11-15",
+  "source_note": "Imported by scripts/import-dataset.js from pangasinan-5towns. Gallery images and third-party review quotes were removed on import.",
+  "total_entries": 150,
+  "ai_category_taxonomy": [
+    {
+      "category_name": "Filipino & Seafood Family Dining",
+      "category_slug": "filipino_seafood_family_dining",
+      "count": 30,
+      "default_subcategories": [
+        "filipino-cuisine",
+        "seafood",
+        "family-restaurant",
+        "casual-dining"
+      ]
+    },
+    {
+      "category_name": "Korean BBQ, Japanese & Asian Dining",
+      "category_slug": "korean_japanese_asian_dining",
+      "count": 18,
+      "default_subcategories": [
+        "asian-cuisine",
+        "japanese-ramen-sushi",
+        "korean-bbq",
+        "persian-halal"
+      ]
+    },
+    {
+      "category_name": "Italian, Pizza, Pasta & Western",
+      "category_slug": "italian_pizza_pasta_western",
+      "count": 17,
+      "default_subcategories": [
+        "pizza-pasta",
+        "western-steaks-wings",
+        "bistro-dining"
+      ]
+    },
+    {
+      "category_name": "Specialty Cafés, Bakeries & Milk Tea",
+      "category_slug": "specialty_cafes_bakeries_milk_tea",
+      "count": 63,
+      "default_subcategories": [
+        "coffee-shop",
+        "specialty-cafe",
+        "bakeshop-pastries",
+        "milk-tea"
+      ]
+    },
+    {
+      "category_name": "Restobars, Grills & Late-Night Dining",
+      "category_slug": "restobars_grills_late_night",
+      "count": 16,
+      "default_subcategories": [
+        "restobar",
+        "inihaw-grill",
+        "live-music",
+        "food-park"
+      ]
+    },
+    {
+      "category_name": "Eat-All-You-Can Buffets",
+      "category_slug": "eat_all_you_can_buffets",
+      "count": 5,
+      "default_subcategories": [
+        "buffet",
+        "eat-all-you-can",
+        "group-dining"
+      ]
+    },
+    {
+      "category_name": "Fast Food & Highway Transit Stops",
+      "category_slug": "fast_food_highway_transit_stops",
+      "count": 17,
+      "default_subcategories": [
+        "fast-food",
+        "drive-thru",
+        "24-hour-dining",
+        "highway-stopover"
+      ]
+    },
+    {
+      "category_name": "Hotels, Resorts, Inns & Staycations",
+      "category_slug": "hotels_resorts_inns_staycations",
+      "count": 34,
+      "default_subcategories": [
+        "hotel",
+        "resort-pool",
+        "transient-inn",
+        "staycation"
+      ]
+    }
+  ],
+  "restaurants": [
+    {
+      "id": "pangasinan-5towns-003",
+      "name": "Kuya J Restaurant - SM City Urdaneta Central",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "Ground Floor, SM City Urdaneta Central, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱400–₱900 per person (Kuya J Crispy Pata, Kare-Kare, Grilled Scallops, Ube Halo-Halo Espesyal)",
+      "description": "Popular casual Filipino restaurant at SM City Urdaneta Central serving crispy pata, peanut Kare-Kare, grilled scallops, and signature shaved-ice Halo-Halo Espesyal.",
+      "what_to_do": [
+        "Order Kuya J Crispy Pata, Kare-Kare, and Halo-Halo Espesyal",
+        "Dine with family inside SM City Urdaneta Central"
+      ],
+      "rating": 4.4,
+      "total_review_count": 185,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Kuya J Restaurant - SM City Urdaneta Central (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Kuya+J+Restaurant+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Kuya J – SM Urdaneta Branch Page",
+          "url": "https://kuyaj.ph/branches/sm-urdaneta/"
+        }
+      ],
+      "lat": 15.971373,
+      "lng": 120.572626
+    },
+    {
+      "id": "pangasinan-5towns-004",
+      "name": "BIGGANG : Ihaw-Ihaw & Fastfood",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "Urdaneta Bypass Road, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱120–₱500 (Inihaw na Hito, Inihaw na Bangus, Pork BBQ, Pancit Canton Bilao, Lomi & Halo-Halo)",
+      "description": "Well-ventilated indoor and outdoor grill and fast-food restaurant along Urdaneta Bypass Road with 171 reviews, known for its affordable lutong-bahay dishes, Inihaw na Hito, Inihaw na Bangus, Lomi, and Bilao Fiesta sets open until 10:00 PM.",
+      "what_to_do": [
+        "Order Inihaw na Hito, Inihaw na Bangus, Lomi, and Halo-Halo",
+        "Book Set A Family Platter or Set B Bilao Fiesta for groups"
+      ],
+      "rating": 4.2,
+      "total_review_count": 171,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – BIGGANG : Ihaw-Ihaw & Fastfood (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=BIGGANG+%3A+Ihaw-Ihaw+%26+Fastfood+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.978361,
+      "lng": 120.582529
+    },
+    {
+      "id": "pangasinan-5towns-005",
+      "name": "Kainan sa Kamalig - Bypass Road",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "Urdaneta Bypass Road, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱500 (Native Filipino grill platters, Pinakbet, Sinigang, Bilao meals)",
+      "description": "Rustic barn-style (kamalig) Filipino family restaurant along the Urdaneta Bypass Road serving traditional grilled meats, seafood, and Ilocano-Pangasinan vegetable dishes.",
+      "what_to_do": [
+        "Dine in native kamalig cottages along Urdaneta Bypass Road"
+      ],
+      "rating": 4.1,
+      "total_review_count": 52,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Kainan sa Kamalig - Bypass Road (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Kainan+sa+Kamalig+-+Bypass+Road+Urdaneta+City+Pangasinan&query_place_id=ChIJ25rmujI-kTMRkeQpSUqyYKs"
+        }
+      ],
+      "lat": 15.977136,
+      "lng": 120.582508
+    },
+    {
+      "id": "pangasinan-5towns-006",
+      "name": "Max's Restaurant - SM City Urdaneta Central",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "SM City Urdaneta Central, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱400–₱1,000 (Sarap-to-the-Bones Fried Chicken, Sizzling Tofu, Kare-Kare, Lumpiang Ubód)",
+      "description": "Classic Filipino family restaurant at SM City Urdaneta Central serving Max's signature fried chicken, Sizzling Tofu, Kare-Kare, and Caramel Bars.",
+      "what_to_do": [
+        "Order Max's Fried Chicken, Sizzling Tofu, and Kare-Kare for family gatherings"
+      ],
+      "rating": 4.2,
+      "total_review_count": 95,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Max's Restaurant - SM City Urdaneta Central (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Max%27s+Restaurant+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Max's Restaurant Official Delivery Portal",
+          "url": "https://delivery.maxschicken.com/"
+        }
+      ],
+      "lat": 15.971593,
+      "lng": 120.570826
+    },
+    {
+      "id": "pangasinan-5towns-007",
+      "name": "Lanmar's Seafood Restaurant",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "MacArthur Hwy, Brgy. Tulong, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱500 (Boneless Bangus, Bulalo, Kambing Dishes, Seafood Kare-Kare)",
+      "description": "Casual highway seafood and Filipino restaurant along MacArthur Highway in Brgy. Tulong, Urdaneta City (near the Villasis boundary), offering lutong-bahay seafood, bulalo, and goat meat dishes.",
+      "what_to_do": [
+        "Order Bulalo, Kambing specialties, and grilled Bangus in Brgy. Tulong"
+      ],
+      "rating": 4.2,
+      "total_review_count": 15,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Lanmar's Seafood Restaurant (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Lanmar%27s+Seafood+Restaurant+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.938633,
+      "lng": 120.580639
+    },
+    {
+      "id": "pangasinan-5towns-008",
+      "name": "Uson Pigar Pigar Urdaneta City",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "Calle Garcia / Calle Sison, Poblacion, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱120–₱400 (Signature Sizzling Beef Pigar-Pigar with Cabbage, Deep-Fried Innards, Rice)",
+      "description": "Iconic 24-hour Pangasinan street-food restaurant on Calle Garcia / Calle Sison in Urdaneta City with 133 reviews, serving tender, freshly stir-fried beef Pigar-Pigar around the clock.",
+      "what_to_do": [
+        "Order sizzling beef Pigar-Pigar 24 hours a day in downtown Urdaneta"
+      ],
+      "rating": 4.2,
+      "total_review_count": 133,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Uson Pigar Pigar Urdaneta City (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Uson+Pigar+Pigar+Urdaneta+City+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Wanderlog – Best Restaurants in Urdaneta",
+          "url": "https://wanderlog.com/list/geoCategory/1593849/where-to-eat-the-best-restaurants-in-urdaneta"
+        }
+      ],
+      "lat": 15.975532,
+      "lng": 120.569852
+    },
+    {
+      "id": "pangasinan-5towns-009",
+      "name": "City Deluxe Restaurant Urdaneta",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "Pentagon Building, Honeymoon St, Poblacion, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱500 (Miki Bihon Guisado ₱188, Korean Beef, Chopsuey, Pancit)",
+      "description": "Long-running town-center Filipino-Chinese restaurant in the Pentagon Building on Honeymoon Street in Urdaneta City with 133 reviews, serving Miki Bihon Guisado (₱188), Korean Beef, and group bilao platters.",
+      "what_to_do": [
+        "Order Miki Bihon Guisado (₱188) and Filipino-Chinese family dishes"
+      ],
+      "rating": 3.7,
+      "total_review_count": 133,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – City Deluxe Restaurant Urdaneta (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=City+Deluxe+Restaurant+Urdaneta+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.976211,
+      "lng": 120.568928
+    },
+    {
+      "id": "pangasinan-5towns-010",
+      "name": "Dampa Sa Pangasinan - Seafood's Restaurant and Catering Services",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Eat-All-You-Can Buffets",
+      "location": "Purok 4, Brgy. Nancayasan, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Buffet & Menu Rate: ₱599/person Eat-All-You-Can Buffet; Short-order seafood platters ₱300–₱900",
+      "description": "Spacious seafood buffet and short-order restaurant along MacArthur Highway in Purok 4, Brgy. Nancayasan, Urdaneta City with 475 reviews, offering an eat-all-you-can seafood, pork, beef, and vegetable buffet plus short-order paluto trays.",
+      "what_to_do": [
+        "Feast on the ₱599 eat-all-you-can seafood and meat buffet",
+        "Order short-order seafood platters for large family gatherings"
+      ],
+      "rating": 3.8,
+      "total_review_count": 475,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Dampa Sa Pangasinan - Seafood's Restaurant and Catering Services (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Dampa+Sa+Pangasinan+-+Seafood%27s+Restaurant+and+Catering+Services+Urdaneta+City+Pangasinan&query_place_id=ChIJm-pDPP0-kTMRhtUsxWio1tU"
+        }
+      ],
+      "lat": 15.960926,
+      "lng": 120.571954
+    },
+    {
+      "id": "pangasinan-5towns-011",
+      "name": "Cabalen - SM City Urdaneta Central",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Eat-All-You-Can Buffets",
+      "location": "XHCC+9PF, Ground Floor, SM City Urdaneta Central, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Buffet Rate: ₱498–₱598/person All-You-Can-Eat Kapampangan & Filipino Buffet",
+      "description": "Well-known Kapampangan and Filipino all-you-can-eat buffet restaurant at SM City Urdaneta Central offering kare-kare, sisig, lechon paksiw, seafood, and native kakanin desserts.",
+      "what_to_do": [
+        "Enjoy unlimited Kapampangan kare-kare, sisig, and Filipino desserts"
+      ],
+      "rating": 3.5,
+      "total_review_count": 87,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Cabalen - SM City Urdaneta Central (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Cabalen+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.970937,
+      "lng": 120.571812
+    },
+    {
+      "id": "pangasinan-5towns-012",
+      "name": "Balay Senyang Resort & Hotel Buffet",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Eat-All-You-Can Buffets",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Buffet Rate: ₱299–₱349/person Eat-All-You-Can Filipino Buffet; Resort pool & rooms available",
+      "description": "Popular local resort, hotel, and budget eat-all-you-can buffet destination in Urdaneta City offering a ₱299–₱349 Filipino buffet spread alongside swimming pool facilities.",
+      "what_to_do": [
+        "Avail of the ₱299–₱349 Filipino eat-all-you-can buffet",
+        "Combine family buffet dining with a poolside resort outing"
+      ],
+      "rating": 4.1,
+      "total_review_count": 45,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Balay Senyang Resort & Hotel Buffet (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Balay+Senyang+Resort+%26+Hotel+Buffet+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Balay Senyang Official Facebook",
+          "url": "https://www.facebook.com/BalaySenyang"
+        }
+      ],
+      "lat": 15.975441,
+      "lng": 120.570962
+    },
+    {
+      "id": "pangasinan-5towns-013",
+      "name": "Mangan Ta - Urdaneta City",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Eat-All-You-Can Buffets",
+      "location": "Zone 6, Brgy. Nancayasan, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Buffet Rate: ₱299–₱399/person Eat-All-You-Can Buffet with Lechon, Seafood & Pinakbet",
+      "description": "Value-packed eat-all-you-can Filipino buffet along MacArthur Highway in Zone 6, Brgy. Nancayasan, Urdaneta City featuring roast lechon, seafood, pinakbet, and home-style viands.",
+      "what_to_do": [
+        "Feast on unlimited lechon, seafood, and pinakbet at a budget buffet price"
+      ],
+      "rating": 3.8,
+      "total_review_count": 6,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Mangan Ta - Urdaneta City (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Mangan+Ta+-+Urdaneta+City+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.961972,
+      "lng": 120.572668
+    },
+    {
+      "id": "pangasinan-5towns-014",
+      "name": "Wani Asian Cuisine",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Eat-All-You-Can Buffets",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Buffet Rate: ₱499/person Unlimited Shabu-Shabu Hotpot & Asian Buffet",
+      "description": "Asian fusion hotpot and buffet restaurant in Urdaneta City offering a ₱499 unlimited shabu-shabu, dimsum, and Asian buffet spread.",
+      "what_to_do": [
+        "Enjoy the ₱499 unlimited shabu-shabu hotpot and Asian buffet"
+      ],
+      "rating": 4.3,
+      "total_review_count": 38,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Wani Asian Cuisine (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Wani+Asian+Cuisine+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.975102,
+      "lng": 120.571347
+    },
+    {
+      "id": "pangasinan-5towns-015",
+      "name": "Janchi Korean Restaurant Urdaneta",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Korean BBQ, Japanese & Asian Dining",
+      "location": "Zone 6, Brgy. Nancayasan, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Buffet Rate: ₱499–₱599/person Unlimited Samgyupsal, Korean Hotpot & Side Dish Buffet + Self-Photobooth",
+      "description": "4.6-star Korean barbecue and hotpot buffet restaurant in Zone 6, Brgy. Nancayasan, Urdaneta City with 111 reviews, featuring high-grade pork and beef cuts, a Korean side-dish buffet bar, and an on-site self-photobooth.",
+      "what_to_do": [
+        "Grill unlimited high-grade samgyupsal with hotpot and Korean buffet sides",
+        "Take group photos at the in-house Korean self-photobooth"
+      ],
+      "rating": 4.6,
+      "total_review_count": 111,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Janchi Korean Restaurant Urdaneta (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Janchi+Korean+Restaurant+Urdaneta+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Janchi Korean Restaurant Facebook",
+          "url": "https://www.facebook.com/janchikoreanrestaurant"
+        }
+      ],
+      "lat": 15.960677,
+      "lng": 120.57214
+    },
+    {
+      "id": "pangasinan-5towns-016",
+      "name": "Botejyu - SM City Urdaneta Central",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Korean BBQ, Japanese & Asian Dining",
+      "location": "XHCF+C9F, Ground Floor, SM City Urdaneta Central, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱350–₱900 (Tender Pork Tonkatsu, Beef Sukiyaki Omelette Curry Rice, Okonomiyaki, Ramen)",
+      "description": "4.6-star authentic Japanese restaurant at SM City Urdaneta Central with 204 reviews, praised for its Tender Pork Tonkatsu, Beef Sukiyaki Omelette Curry Rice, Okonomiyaki, and attentive service.",
+      "what_to_do": [
+        "Order Tender Pork Tonkatsu with Miso Soup or Beef Sukiyaki Omelette Curry Rice"
+      ],
+      "rating": 4.6,
+      "total_review_count": 204,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Botejyu - SM City Urdaneta Central (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Botejyu+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Botejyu Philippines Official Website",
+          "url": "https://botejyu.com.ph/"
+        }
+      ],
+      "lat": 15.971062,
+      "lng": 120.573437
+    },
+    {
+      "id": "pangasinan-5towns-017",
+      "name": "Hagemu Sushi and Ramen Bar",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Korean BBQ, Japanese & Asian Dining",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱200–₱600 (Tonkotsu Ramen, Aburi Sushi Rolls, Katsudon, Gyoza)",
+      "description": "Popular local Japanese sushi and ramen bar in Urdaneta City serving rich ramen bowls, specialty maki rolls, sashimi, and donburi rice bowls.",
+      "what_to_do": [
+        "Order specialty sushi boats and steaming Japanese ramen bowls"
+      ],
+      "rating": 4.5,
+      "total_review_count": 88,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Hagemu Sushi and Ramen Bar (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Hagemu+Sushi+and+Ramen+Bar+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.974748,
+      "lng": 120.569961
+    },
+    {
+      "id": "pangasinan-5towns-018",
+      "name": "Fusion Sushi Steak Bar",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Korean BBQ, Japanese & Asian Dining",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱250–₱800 (Sizzling Steaks, Japanese Sushi Platter, Teppanyaki & Ramen)",
+      "description": "Japanese-Western fusion restaurant in Urdaneta City combining fresh sushi rolls and sashimi with sizzling steaks and teppanyaki plates.",
+      "what_to_do": [
+        "Pair specialty sushi rolls with sizzling steak plates"
+      ],
+      "rating": 4.4,
+      "total_review_count": 64,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Fusion Sushi Steak Bar (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Fusion+Sushi+Steak+Bar+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.976334,
+      "lng": 120.569999
+    },
+    {
+      "id": "pangasinan-5towns-020",
+      "name": "Ling Nam Urdaneta",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Korean BBQ, Japanese & Asian Dining",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱180–₱500 (Authentic Cantonese Beef Wanton Noodles, Asado Siopao, Congee)",
+      "description": "Urdaneta City branch of the heritage Binondo Cantonese noodle house Ling Nam, serving signature Beef Wanton Mami, oversized Asado Siopao, and Cantonese dimsum.",
+      "what_to_do": [
+        "Order signature Cantonese Beef Wanton Noodles and Asado Siopao"
+      ],
+      "rating": 4.3,
+      "total_review_count": 42,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Ling Nam Urdaneta (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Ling+Nam+Urdaneta+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.976292,
+      "lng": 120.571438
+    },
+    {
+      "id": "pangasinan-5towns-021",
+      "name": "Dookki - SM City Urdaneta Central",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Korean BBQ, Japanese & Asian Dining",
+      "location": "2nd Floor, SM City Urdaneta Central, Poblacion, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Buffet Rate: ₱499/person Unlimited Korean Topokki Hotpot, Fried Chicken, Japchae & Fishcake Bar",
+      "description": "Interactive DIY Korean tteokbokki (topokki) hotpot buffet on the 2nd floor of SM City Urdaneta Central offering unlimited rice cakes, Korean fried chicken, japchae, ramyeon, and custom hotpot sauces.",
+      "what_to_do": [
+        "Cook DIY unlimited Korean Topokki hotpot and eat unlimited Korean fried chicken"
+      ],
+      "rating": 3.3,
+      "total_review_count": 19,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Dookki - SM City Urdaneta Central (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Dookki+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Dookki Global Official Website",
+          "url": "https://global.dookki.co.kr/"
+        }
+      ],
+      "lat": 15.970638,
+      "lng": 120.570204
+    },
+    {
+      "id": "pangasinan-5towns-022",
+      "name": "Kyukyu Ramen 99 - SM City Urdaneta Central",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Korean BBQ, Japanese & Asian Dining",
+      "location": "SM City Urdaneta Central, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱99–₱300 (₱99 Ramen, Ichiban Ramen, Takoyaki, Gyoza & Rice Bowls)",
+      "description": "Budget-friendly Japanese ramen counter at SM City Urdaneta Central famous for its ₱99 starting ramen bowls, gyoza, and katsu sets.",
+      "what_to_do": [
+        "Order budget-friendly ₱99 Tonkotsu Ramen and Gyoza inside SM Urdaneta"
+      ],
+      "rating": 4.2,
+      "total_review_count": 55,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Kyukyu Ramen 99 - SM City Urdaneta Central (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Kyukyu+Ramen+99+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.970039,
+      "lng": 120.572919
+    },
+    {
+      "id": "pangasinan-5towns-023",
+      "name": "Samgyeop Masarap - SM City Urdaneta Central",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Korean BBQ, Japanese & Asian Dining",
+      "location": "SM City Urdaneta Central, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Buffet Rate: ₱499–₱599/person Unlimited Korean BBQ Pork & Beef with Cheese Fondue",
+      "description": "Mall-based unlimited Korean barbecue restaurant inside SM City Urdaneta Central serving marinated pork belly, beef bulgogi, and Korean banchan.",
+      "what_to_do": [
+        "Grill unlimited Korean pork and beef at SM City Urdaneta Central"
+      ],
+      "rating": 4.1,
+      "total_review_count": 48,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Samgyeop Masarap - SM City Urdaneta Central (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Samgyeop+Masarap+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.97187,
+      "lng": 120.569574
+    },
+    {
+      "id": "pangasinan-5towns-024",
+      "name": "Yakiniku199 Korean Buffet Samgyupsal",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Korean BBQ, Japanese & Asian Dining",
+      "location": "362 MacArthur Hwy, Poblacion, Urdaneta City, 2428 Pangasinan (former Pares Retiro)",
+      "has_fee": true,
+      "fee_in_venue": "Buffet Rate: ₱199–₱299/person Ultra-Budget Korean Samgyupsal & Buffet",
+      "description": "Budget Korean samgyupsal and buffet along MacArthur Highway in Poblacion, Urdaneta City offering one of the lowest-priced unlimited grill rates in town.",
+      "what_to_do": [
+        "Avail of the budget ₱199+ Korean samgyupsal buffet along MacArthur Highway"
+      ],
+      "rating": 2.4,
+      "total_review_count": 60,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Yakiniku199 Korean Buffet Samgyupsal (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Yakiniku199+Korean+Buffet+Samgyupsal+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.973852,
+      "lng": 120.570476
+    },
+    {
+      "id": "pangasinan-5towns-025",
+      "name": "Classic Savory - SM City Urdaneta Central",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Korean BBQ, Japanese & Asian Dining",
+      "location": "XHCC+8QX, SM City Urdaneta Central, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱250–₱1,500 (Classic Savory Chicken, Miki Bihon Binondo, Creamy Pork Cutlets)",
+      "description": "Filipino-Chinese family restaurant at SM City Urdaneta Central serving Classic Savory fried chicken, Miki Bihon Binondo, kikiam, and Black Pot Incredi-Bowls.",
+      "what_to_do": [
+        "Order Classic Savory Chicken and Miki Bihon Binondo at SM Urdaneta"
+      ],
+      "rating": 2.8,
+      "total_review_count": 16,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Classic Savory - SM City Urdaneta Central (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Classic+Savory+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.970812,
+      "lng": 120.571937
+    },
+    {
+      "id": "pangasinan-5towns-026",
+      "name": "Bella Isabella Authentic Italian Cafe & Restaurant",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Italian, Pizza, Pasta & Western",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱300–₱900 (Wood-fired/Artisan Italian Pizzas, Handmade Pasta, Risotto, Espresso)",
+      "description": "Authentic Italian café and restaurant in Urdaneta City crafting traditional Italian thin-crust pizzas, al-dente pastas, and espresso desserts.",
+      "what_to_do": [
+        "Order authentic Italian thin-crust pizzas and pasta dishes"
+      ],
+      "rating": 4.5,
+      "total_review_count": 74,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Bella Isabella Authentic Italian Cafe & Restaurant (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Bella+Isabella+Authentic+Italian+Cafe+%26+Restaurant+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Bella Isabella Official Website",
+          "url": "http://www.bellaisabella.net/"
+        }
+      ],
+      "lat": 15.973586,
+      "lng": 120.569334
+    },
+    {
+      "id": "pangasinan-5towns-027",
+      "name": "Fratelli Pizza & Pasta",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Italian, Pizza, Pasta & Western",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱200–₱650 (Brick-oven style Pizzas, Creamy Carbonara, Baked Ziti, Buffalo Wings)",
+      "description": "Homegrown Italian-style pizzeria and pasta house in Urdaneta City popular with families and barkadas for freshly baked pizzas and pasta platters.",
+      "what_to_do": [
+        "Share freshly baked Fratelli pizzas and pasta platters with friends"
+      ],
+      "rating": 4.4,
+      "total_review_count": 62,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Fratelli Pizza & Pasta (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Fratelli+Pizza+%26+Pasta+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.974034,
+      "lng": 120.571137
+    },
+    {
+      "id": "pangasinan-5towns-029",
+      "name": "Primo's Bistro & Café",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Italian, Pizza, Pasta & Western",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱250–₱750 (Western bistro steaks, pasta, gourmet sandwiches, artisan cakes & coffee)",
+      "description": "Popular bistro, café, and bakeshop in Urdaneta City serving Western comfort entrees, pasta, sandwiches, and signature cakes.",
+      "what_to_do": [
+        "Order bistro steak plates, pasta, and custom bakeshop cakes"
+      ],
+      "rating": 4.5,
+      "total_review_count": 58,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Primo's Bistro & Café (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Primo%27s+Bistro+%26+Caf%C3%A9+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Primo's Bistro & Café Official Website",
+          "url": "https://primosbistrocafebakeshop.com/"
+        }
+      ],
+      "lat": 15.97492,
+      "lng": 120.56833
+    },
+    {
+      "id": "pangasinan-5towns-030",
+      "name": "Shakey's Pizza Parlor Urdaneta",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Italian, Pizza, Pasta & Western",
+      "location": "MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱400–₱1,200 (Manager's Choice Thin Crust Pizza, Chicken 'n' Mojos, Skilletti)",
+      "description": "Urdaneta City branch of Shakey's Pizza Parlor along MacArthur Highway serving signature Thin Crust pizzas, fried chicken, and Mojos.",
+      "what_to_do": [
+        "Order Manager's Choice Thin Crust Pizza and Bucket of Chicken 'n' Mojos"
+      ],
+      "rating": 4.1,
+      "total_review_count": 112,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Shakey's Pizza Parlor Urdaneta (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Shakey%27s+Pizza+Parlor+Urdaneta+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Shakey's Pizza Philippines",
+          "url": "https://www.shakeyspizza.ph/"
+        }
+      ],
+      "lat": 15.975886,
+      "lng": 120.568803
+    },
+    {
+      "id": "pangasinan-5towns-031",
+      "name": "Angel's Pizza Urdaneta (CB Mall)",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Italian, Pizza, Pasta & Western",
+      "location": "CB Mall, MacArthur Hwy, Brgy. Nancayasan, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱300–₱900 (Creamy Spinach Dip Pizza, Double Decker Promo)",
+      "description": "High-demand Angel's Pizza branch at CB Mall Urdaneta famous across Pangasinan for its Creamy Spinach Dip Pizza and APC Double Decker buy-one-take-one pizza deals.",
+      "what_to_do": [
+        "Order the famous Creamy Spinach Dip Pizza at CB Mall Urdaneta"
+      ],
+      "rating": 4.4,
+      "total_review_count": 89,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Angel's Pizza Urdaneta (CB Mall) (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Angel%27s+Pizza+Urdaneta+%28CB+Mall%29+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Angel's Pizza Official Website",
+          "url": "https://www.angelspizza.com.ph/"
+        }
+      ],
+      "lat": 15.97704,
+      "lng": 120.569238
+    },
+    {
+      "id": "pangasinan-5towns-032",
+      "name": "Beyond The Crust",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Italian, Pizza, Pasta & Western",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱180–₱550 (Handcrafted loaded pizzas, pasta & wings)",
+      "description": "Local artisan pizzeria in Urdaneta City known for its generously topped pizzas, pasta, and baked wings.",
+      "what_to_do": [
+        "Order handcrafted loaded pizzas in Urdaneta City"
+      ],
+      "rating": 4.6,
+      "total_review_count": 34,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Beyond The Crust (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Beyond+The+Crust+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.973593,
+      "lng": 120.571309
+    },
+    {
+      "id": "pangasinan-5towns-033",
+      "name": "Elcazo Bistro and Cafe",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Brgy. San Vicente, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱120–₱500 (Better Nut Be Latte, Cafe Vienna ₱130, Iced Latte, Fresh Pastries, Free High-Speed Wi-Fi)",
+      "description": "4.7-star neighborhood bistro and coffee shop along MacArthur Highway in Brgy. San Vicente, Urdaneta City with 131 reviews, opening at 6:00 AM daily with free high-speed Wi-Fi, signature Better Nut Be Latte, Cafe Vienna (₱130), and fresh pastries.",
+      "what_to_do": [
+        "Try the signature Better Nut Be Latte or Cafe Vienna (₱130)",
+        "Work on a laptop with free high-speed Wi-Fi from 6:00 AM to 11:00 PM"
+      ],
+      "rating": 4.7,
+      "total_review_count": 131,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Elcazo Bistro and Cafe (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Elcazo+Bistro+and+Cafe+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "RJD Explorer – Coffee Shops in Urdaneta City",
+          "url": "https://www.rjdexplorer.com/coffee-shops-in-urdaneta-city/"
+        }
+      ],
+      "lat": 15.978236,
+      "lng": 120.569822
+    },
+    {
+      "id": "pangasinan-5towns-034",
+      "name": "Bo's Coffee Urdaneta",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "XHRC+PCP, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱130–₱500 (Caffè Americano, Cold White Brew, Philippine Origin Drip Coffee, Cakes)",
+      "description": "Spacious, standalone Bo's Coffee branch in Urdaneta City with 289 reviews and a wide parking lot, favored by students and professionals for studying, remote work, and Philippine-origin espresso drinks.",
+      "what_to_do": [
+        "Work or study from 7:00 AM to 10:00 PM with spacious parking",
+        "Order Caffè Americano, Froccino, and breakfast platters"
+      ],
+      "rating": 4.2,
+      "total_review_count": 289,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Bo's Coffee Urdaneta (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Bo%27s+Coffee+Urdaneta+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Bo's Coffee Urdaneta Official Facebook",
+          "url": "https://www.facebook.com/boscoffeeurdaneta1"
+        }
+      ],
+      "lat": 15.991812,
+      "lng": 120.571062
+    },
+    {
+      "id": "pangasinan-5towns-035",
+      "name": "Cup of Arc",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Bypass Road, Brgy. Nancayasan, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱140–₱500 (Toffee Butterscotch Espresso ₱200, Specialty Iced Lattes, Pastries)",
+      "description": "4.6-star architectural specialty café along Urdaneta Bypass Road in Brgy. Nancayasan with 80 reviews, known for its strong, balanced espresso drinks like the Toffee Butterscotch Latte (₱200) and fresh pastries.",
+      "what_to_do": [
+        "Order the Toffee Butterscotch Espresso (₱200) and artisan pastries",
+        "Work on a laptop along Urdaneta Bypass Road"
+      ],
+      "rating": 4.6,
+      "total_review_count": 80,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Cup of Arc (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Cup+of+Arc+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "RJD Explorer – Coffee Shops in Urdaneta City",
+          "url": "https://www.rjdexplorer.com/coffee-shops-in-urdaneta-city/"
+        }
+      ],
+      "lat": 15.976835,
+      "lng": 120.582372
+    },
+    {
+      "id": "pangasinan-5towns-036",
+      "name": "Blyss Cafe",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Anonas East St, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱140–₱500 (Spanish Latte ₱150, Sea Salt Latte, Hojicha Latte, Medium or Dark Roast Bean Choice; Extra Espresso Shot ₱40)",
+      "description": "4.6-star specialty coffee shop on Anonas East Street in Urdaneta City with 47 reviews, offering a choice between medium and dark roast beans, Sea Salt Latte, Spanish Latte (₱150), Hojicha, and free Wi-Fi.",
+      "what_to_do": [
+        "Choose between medium and dark roast beans for your Sea Salt Latte or Spanish Latte (₱150)",
+        "Try the Hojicha Latte and enjoy free Wi-Fi on Anonas East Street"
+      ],
+      "rating": 4.6,
+      "total_review_count": 47,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Blyss Cafe (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Blyss+Cafe+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "RJD Explorer – Coffee Shops in Urdaneta City",
+          "url": "https://www.rjdexplorer.com/coffee-shops-in-urdaneta-city/"
+        }
+      ],
+      "lat": 15.990066,
+      "lng": 120.576757
+    },
+    {
+      "id": "pangasinan-5towns-037",
+      "name": "Unwnd Cafe - Urdaneta",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Brgy. Pinmaludpod / Poblacion, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱500 (Vanilla Coconut Latte ₱268, Oat Milk Mocha ₱255, Brownies & Cookies)",
+      "description": "4.5-star minimalist café in Urdaneta City with 40 reviews, celebrated for its Coconut Collection (Vanilla Coconut Latte ₱268), Oat Side Oat Milk Mocha (₱255), fudgy brownies, and cookies.",
+      "what_to_do": [
+        "Order the Vanilla Coconut Latte (₱268) or Oat Milk Mocha (₱255) with brownies"
+      ],
+      "rating": 4.5,
+      "total_review_count": 40,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Unwnd Cafe - Urdaneta (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Unwnd+Cafe+-+Urdaneta+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Foodpanda – Unwnd Cafe Urdaneta",
+          "url": "https://www.foodpanda.ph/restaurant/w747/unwnd-cafe-pinmaludpod-urdaneta"
+        }
+      ],
+      "lat": 15.974503,
+      "lng": 120.571203
+    },
+    {
+      "id": "pangasinan-5towns-038",
+      "name": "Arapaap Café",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱400 (Handcrafted iced lattes, non-coffee blends, waffles & pasta)",
+      "description": "Cozy local coffee shop in Urdaneta City ('Arapaap' meaning dream in Ilocano) serving specialty coffee, frappes, and light snacks.",
+      "what_to_do": [
+        "Order handcrafted iced lattes and snacks in a dreamy, relaxed space"
+      ],
+      "rating": 4.6,
+      "total_review_count": 32,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Arapaap Café (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Arapaap+Caf%C3%A9+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.974671,
+      "lng": 120.569121
+    },
+    {
+      "id": "pangasinan-5towns-039",
+      "name": "Silver Spoon Café",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "XHFC+7F8, MacArthur Hwy, Poblacion, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱130–₱500 (Silver Spoon Clubhouse, Caramel Macchiato, Pasta Aligue, Tuna Pasta, Red Velvet Cake)",
+      "description": "Established café and restaurant along MacArthur Highway in Urdaneta City with 123 reviews, serving its best-selling Silver Spoon Clubhouse sandwich, Pasta Aligue, Caramel Macchiato, and Red Velvet cake from 1:00 PM to 10:00 PM.",
+      "what_to_do": [
+        "Order the Silver Spoon Clubhouse, Pasta Aligue, and Red Velvet Cake"
+      ],
+      "rating": 4.1,
+      "total_review_count": 123,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Silver Spoon Café (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Silver+Spoon+Caf%C3%A9+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "RJD Explorer – Coffee Shops in Urdaneta City",
+          "url": "https://www.rjdexplorer.com/coffee-shops-in-urdaneta-city/"
+        }
+      ],
+      "lat": 15.973187,
+      "lng": 120.571187
+    },
+    {
+      "id": "pangasinan-5towns-040",
+      "name": "Snow Cream Cafe Urdaneta City",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱350 (Korean Bingsu / Snow Ice Desserts, Milk Tea, Iced Coffee & Snacks)",
+      "description": "Dessert café in Urdaneta City specializing in shaved snow-cream bingsu bowls, fruit teas, milk teas, and savory student snacks.",
+      "what_to_do": [
+        "Cool off with shaved snow-cream dessert bowls and milk tea"
+      ],
+      "rating": 4.5,
+      "total_review_count": 28,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Snow Cream Cafe Urdaneta City (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Snow+Cream+Cafe+Urdaneta+City+Urdaneta+City+Pangasinan&query_place_id=ChIJ8QZ56V1BkTMR0TSYkrFCoOA"
+        }
+      ],
+      "lat": 15.973821,
+      "lng": 120.571112
+    },
+    {
+      "id": "pangasinan-5towns-041",
+      "name": "OH TASTE Events Place Cafe and Restaurant",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱600 (Specialty coffee, all-day rice meals, pasta & event catering)",
+      "description": "Combined café, family restaurant, and intimate events venue in Urdaneta City serving handcrafted drinks and Filipino-Western comfort meals.",
+      "what_to_do": [
+        "Dine on café meals or book intimate family celebrations"
+      ],
+      "rating": 4.6,
+      "total_review_count": 25,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – OH TASTE Events Place Cafe and Restaurant (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=OH+TASTE+Events+Place+Cafe+and+Restaurant+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.976474,
+      "lng": 120.569524
+    },
+    {
+      "id": "pangasinan-5towns-042",
+      "name": "Mountain Blend - SM City Urdaneta Central",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "XHCC+FX8, SM City Urdaneta Central, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱140–₱350 (Alpine White Choco Frappe ₱240, Gold Miners Caramel Frappe ₱260, Toasted Marshmallow Frappe, Bibingka)",
+      "description": "4.8-star cordillera-inspired café inside SM City Urdaneta Central serving Gold Miners Caramel Frappe (₱260), Alpine White Choco Frappe (₱240), Toasted Marshmallow Frappe, and warm bibingka.",
+      "what_to_do": [
+        "Try the Gold Miners Caramel Frappe (₱260) or Toasted Marshmallow Frappe with bibingka"
+      ],
+      "rating": 4.8,
+      "total_review_count": 17,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Mountain Blend - SM City Urdaneta Central (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Mountain+Blend+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Mountain Blend Official Facebook",
+          "url": "https://www.facebook.com/profile.php?id=100086331518451&mibextid=ZbWKwL"
+        }
+      ],
+      "lat": 15.971187,
+      "lng": 120.572437
+    },
+    {
+      "id": "pangasinan-5towns-043",
+      "name": "Cafe Amadito",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Sacred Heart Subdivision / Poblacion, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱120–₱400 (Artisan espresso lattes, rice bowls, sandwiches & pastries)",
+      "description": "Cozy neighborhood café in the Sacred Heart area of Urdaneta City offering specialty coffee, all-day breakfast bowls, and Foodpanda delivery.",
+      "what_to_do": [
+        "Order artisan iced coffee and breakfast bowls in Sacred Heart Urdaneta"
+      ],
+      "rating": 4.7,
+      "total_review_count": 29,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Cafe Amadito (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Cafe+Amadito+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Foodpanda – Cafe Amadito Urdaneta",
+          "url": "https://www.foodpanda.ph/restaurant/jc5g/cafe-amadito-sacred-heart-urdaneta"
+        }
+      ],
+      "lat": 15.975613,
+      "lng": 120.571302
+    },
+    {
+      "id": "pangasinan-5towns-044",
+      "name": "Antonino's Restobar",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Restobars, Grills & Late-Night Dining",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱200–₱600 (Sizzling pulutan platters, grilled meats, beer buckets & live acoustic sets)",
+      "description": "Popular evening restobar in Urdaneta City serving sizzling Filipino bar chow, ice-cold beer buckets, cocktails, and live music.",
+      "what_to_do": [
+        "Order sizzling sisig and beer buckets while listening to live music"
+      ],
+      "rating": 4.3,
+      "total_review_count": 46,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Antonino's Restobar (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Antonino%27s+Restobar+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.97591,
+      "lng": 120.568915
+    },
+    {
+      "id": "pangasinan-5towns-045",
+      "name": "Amnesia Resto Bar",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Restobars, Grills & Late-Night Dining",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱200–₱700 (Bar platters, cocktails, draft/bottled beer & DJ/live band nights)",
+      "description": "Vibrant nightlife restobar and lounge in Urdaneta City hosting live bands, DJ nights, cocktail towers, and group pulutan platters.",
+      "what_to_do": [
+        "Enjoy late-night live bands, cocktails, and bar bites with friends"
+      ],
+      "rating": 4.2,
+      "total_review_count": 39,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Amnesia Resto Bar (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Amnesia+Resto+Bar+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Amnesia Resto Bar Official Facebook",
+          "url": "https://www.facebook.com/amnesia.urdaneta"
+        }
+      ],
+      "lat": 15.97457,
+      "lng": 120.568183
+    },
+    {
+      "id": "pangasinan-5towns-046",
+      "name": "Arrubayan Restobar & Cafe",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Restobars, Grills & Late-Night Dining",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱500 (Daytime coffee & rice meals; evening grilled pulutan & beers)",
+      "description": "Dual-concept Ilocano-named ('Arrubayan' meaning backyard/front yard) café by day and laid-back restobar by night in Urdaneta City.",
+      "what_to_do": [
+        "Hang out in a backyard-style café and evening restobar in Urdaneta City"
+      ],
+      "rating": 4.4,
+      "total_review_count": 31,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Arrubayan Restobar & Cafe (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Arrubayan+Restobar+%26+Cafe+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.976134,
+      "lng": 120.569873
+    },
+    {
+      "id": "pangasinan-5towns-047",
+      "name": "Gazebo Restaurant and Bar",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Restobars, Grills & Late-Night Dining",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱200–₱600 (Open-air gazebo dining, grilled seafood & meats, cold beers)",
+      "description": "Relaxed gazebo-style restaurant and bar in Urdaneta City offering private open-air pavilions, Filipino grilled dishes, and evening drinks.",
+      "what_to_do": [
+        "Dine in breezy private gazebos over grilled platters and cold drinks"
+      ],
+      "rating": 4.2,
+      "total_review_count": 44,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Gazebo Restaurant and Bar (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Gazebo+Restaurant+and+Bar+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.975683,
+      "lng": 120.569233
+    },
+    {
+      "id": "pangasinan-5towns-048",
+      "name": "Sound and Groove Family KTV & Restobar",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Restobars, Grills & Late-Night Dining",
+      "location": "Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "KTV & Menu Rate: Consumable KTV room packages ₱1,000–₱3,000+ with pancit, crispy pata, sisig & drinks",
+      "description": "Family KTV lounge and restobar in Urdaneta City featuring private air-conditioned karaoke rooms with consumable Filipino food and drink bundles.",
+      "what_to_do": [
+        "Rent a private Family KTV room with consumable food and drink platters"
+      ],
+      "rating": 4.3,
+      "total_review_count": 37,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Sound and Groove Family KTV & Restobar (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Sound+and+Groove+Family+KTV+%26+Restobar+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Wanderlog – Sound and Groove Urdaneta",
+          "url": "https://wanderlog.com/place/details/3309037/sound-and-groove"
+        }
+      ],
+      "lat": 15.975851,
+      "lng": 120.569842
+    },
+    {
+      "id": "pangasinan-5towns-049",
+      "name": "Burger King - SM City Urdaneta Central",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "Ground Floor, SM City Urdaneta Central, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱120–₱450 (Flame-Grilled Whopper, 4-Cheese Whopper, Onion Rings, Iced Coffee)",
+      "description": "Popular flame-grilled burger chain on the ground floor of SM City Urdaneta Central along MacArthur Highway serving Whoppers, X-tra Long Chicken, and onion rings.",
+      "what_to_do": [
+        "Order a flame-grilled Whopper or 4-Cheese Whopper at SM City Urdaneta Central"
+      ],
+      "rating": 4.3,
+      "total_review_count": 142,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Burger King - SM City Urdaneta Central (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Burger+King+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Wanderlog – Burger King SM City Urdaneta",
+          "url": "https://wanderlog.com/place/details/3207232/burger-king-sm-city-urdaneta"
+        }
+      ],
+      "lat": 15.972107,
+      "lng": 120.570116
+    },
+    {
+      "id": "pangasinan-5towns-050",
+      "name": "Jollibee Urdaneta Nancayasan (24/7 Drive-Thru)",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "Along MacArthur Hwy, Brgy. Nancayasan (in front of CSI Warehouse), Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱60–₱500 (Chickenjoy, Jolly Spaghetti, Burger Steak, 24/7 Drive-Thru)",
+      "description": "Major 24-hour Jollibee branch and drive-thru along MacArthur Highway in Brgy. Nancayasan (across from CSI Warehouse) in Urdaneta City with 455+ verified reviews.",
+      "what_to_do": [
+        "Stop 24/7 for Chickenjoy and Jolly Spaghetti across from CSI Warehouse"
+      ],
+      "rating": 3.9,
+      "total_review_count": 455,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Jollibee Urdaneta Nancayasan (24/7 Drive-Thru) (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Jollibee+Urdaneta+Nancayasan+%2824%2F7+Drive-Thru%29+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Jollibee Official Store Link",
+          "url": "https://jollibee.onelink.me/U65H/googlebusinessprofile"
+        }
+      ],
+      "lat": 15.962021,
+      "lng": 120.573252
+    },
+    {
+      "id": "pangasinan-5towns-063",
+      "name": "Starbucks Coffee - SM City Urdaneta Central",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "XHCC+FPF, Ground Floor, SM City Urdaneta Central, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱500 per person (Triple Mocha Frappuccino, Caramel Macchiato, Caffè Mocha, and pastries)",
+      "description": "Popular ground-floor coffeehouse at SM City Urdaneta Central along MacArthur Highway, serving handcrafted espresso, Triple Mocha Frappuccinos, teas, and breakfast pastries in a cozy, laptop-friendly environment.",
+      "what_to_do": [
+        "Order signature Caramel Macchiato or Triple Mocha Frappuccino",
+        "Work on a laptop or meet friends at the ground floor of SM Urdaneta"
+      ],
+      "rating": 4.4,
+      "total_review_count": 531,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Starbucks Coffee - SM City Urdaneta Central (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Starbucks+Coffee+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Starbucks Philippines Official Website",
+          "url": "http://starbucks.ph/"
+        }
+      ],
+      "lat": 15.971187,
+      "lng": 120.571812
+    },
+    {
+      "id": "pangasinan-5towns-064",
+      "name": "PICKUP COFFEE - Magic Mall Urdaneta",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Magic Mall Annex, Alexander St., Poblacion, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱50–₱150 per drink (Iced Auro Tsokolatte ₱115, espresso-based iced lattes)",
+      "description": "Fast, budget-friendly coffee kiosk and takeout counter at Magic Mall Annex on Alexander Street in Poblacion, Urdaneta City, beloved by students and commuters for its smooth Iced Auro Tsokolatte and espresso blends.",
+      "what_to_do": [
+        "Grab an Iced Auro Tsokolatte (₱115) or signature iced latte",
+        "Pick up quick, affordable caffeine along Alexander Street"
+      ],
+      "rating": 4.6,
+      "total_review_count": 53,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – PICKUP COFFEE - Magic Mall Urdaneta (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=PICKUP+COFFEE+-+Magic+Mall+Urdaneta+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "PICKUP COFFEE Store Locations",
+          "url": "https://pickup-coffee.com/pickup-store-locations/"
+        }
+      ],
+      "lat": 15.976164,
+      "lng": 120.566237
+    },
+    {
+      "id": "pangasinan-5towns-065",
+      "name": "Dunkin' - Urdaneta Drive-Thru",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "XH7F+V7J, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱45–₱350 (Doughnuts, Bunwiches, and brewed coffee)",
+      "description": "24-hour Dunkin' café and drive-thru along MacArthur Highway in Urdaneta City, offering fresh doughnuts, savory bunwiches, and coffee with convenient drive-thru and dine-in seating.",
+      "what_to_do": [
+        "Order toasted Bunwiches and classic doughnuts 24/7",
+        "Use the convenient MacArthur Highway drive-thru lane"
+      ],
+      "rating": 4.6,
+      "total_review_count": 49,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Dunkin' - Urdaneta Drive-Thru (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Dunkin%27+-+Urdaneta+Drive-Thru+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.964687,
+      "lng": 120.573187
+    },
+    {
+      "id": "pangasinan-5towns-066",
+      "name": "Red Ribbon - Magic Mall Urdaneta",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Magic Mall, Alexander St, Poblacion, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱46–₱800+ (Ube Mamon Singles ₱46, Black Forest & Chocolate Dedication Cakes, Empanadas)",
+      "description": "Popular Filipino bakeshop inside Magic Mall Urdaneta on Alexander Street, specializing in celebration cakes, Ube Mamon chiffon pastries, butter mamon, and savory rolls.",
+      "what_to_do": [
+        "Buy Ube Mamon Singles (₱46) and celebration cakes for take-home",
+        "Pay conveniently with debit or NFC mobile payments"
+      ],
+      "rating": 4.3,
+      "total_review_count": 24,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Red Ribbon - Magic Mall Urdaneta (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Red+Ribbon+-+Magic+Mall+Urdaneta+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.976763,
+      "lng": 120.568172
+    },
+    {
+      "id": "pangasinan-5towns-067",
+      "name": "1822 Cafe Urdaneta",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "XHH8+GHC, Brgy. San Vicente Rd, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱70–₱350 (Okinawa Traditional Milk Tea ₱70, iced coffee, snacks)",
+      "description": "Casual student-friendly coffee and milk tea lounge along Brgy. San Vicente Road in Urdaneta City, serving Okinawa milk tea, iced espresso drinks, and light snacks until 10:00 PM.",
+      "what_to_do": [
+        "Order Okinawa Traditional Milk Tea (₱70) and iced coffee",
+        "Hang out with classmates in a casual air-conditioned lounge"
+      ],
+      "rating": 3.8,
+      "total_review_count": 10,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – 1822 Cafe Urdaneta (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=1822+Cafe+Urdaneta+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "1822 Cafe Facebook Page",
+          "url": "https://www.facebook.com/profile.php?id=100075940702770&mibextid=LQQJ4d"
+        }
+      ],
+      "lat": 15.978813,
+      "lng": 120.566437
+    },
+    {
+      "id": "pangasinan-5towns-068",
+      "name": "FourteaSix Milktea Shop Urdaneta Branch 1",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "XHPC+3R2, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱60–₱250 (Milk tea, Caffè Mocha, and small plates)",
+      "description": "Cozy local milk tea and coffee shop in Urdaneta City serving Caffè Mocha, pearl milk teas, and merienda snacks for students and groups.",
+      "what_to_do": [
+        "Order Caffè Mocha, milk tea, and merienda snacks",
+        "Dine in or take out budget-friendly drinks"
+      ],
+      "rating": 4.8,
+      "total_review_count": 5,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – FourteaSix Milktea Shop Urdaneta Branch 1 (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=FourteaSix+Milktea+Shop+Urdaneta+Branch+1+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.985188,
+      "lng": 120.572062
+    },
+    {
+      "id": "pangasinan-5towns-069",
+      "name": "Hubby’s Tea House 茶馆 - Urdaneta City",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "320 57, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱80–₱300 (Milk teas, fruit teas, coffee, and brunch bites)",
+      "description": "Cozy tea house and café in Urdaneta City popular with college students and groups for its wide tea selection, coffee, and casual brunch and lunch bites.",
+      "what_to_do": [
+        "Try specialty fruit teas, milk teas, and coffee",
+        "Enjoy casual brunch or lunch with friends"
+      ],
+      "rating": 4.7,
+      "total_review_count": 9,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Hubby’s Tea House 茶馆 - Urdaneta City (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Hubby%E2%80%99s+Tea+House+%E8%8C%B6%E9%A6%86+-+Urdaneta+City+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.97366,
+      "lng": 120.569303
+    },
+    {
+      "id": "pangasinan-5towns-070",
+      "name": "Domino's Pizza - Urdaneta",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Italian, Pizza, Pasta & Western",
+      "location": "MacArthur Highway cor. Sison St, Poblacion, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱160–₱1,500 (2 Classic Regular Pizzas promo ₱319, Baked Chicken Kickers ₱375)",
+      "description": "Popular international pizza parlor at the corner of MacArthur Highway and Sison Street in Urdaneta City, known for freshly baked hand-tossed pizzas, Baked Chicken Kickers, and weekday two-pizza bundle promos.",
+      "what_to_do": [
+        "Avail of the 2 Classic Regular Pizzas promo (₱319)",
+        "Order Baked Chicken Kickers (₱375) for takeout or delivery"
+      ],
+      "rating": 4.4,
+      "total_review_count": 65,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Domino's Pizza - Urdaneta (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Domino%27s+Pizza+-+Urdaneta+Urdaneta+City+Pangasinan"
+        }
+      ],
+      "lat": 15.976404,
+      "lng": 120.568361
+    },
+    {
+      "id": "pangasinan-5towns-071",
+      "name": "Pizza Hut Urdaneta",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Italian, Pizza, Pasta & Western",
+      "location": "XHFC+FF4, MacArthur Hwy, Poblacion, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱250–₱1,000 (Mega Crunch Supreme Pizza ₱455, Pan Pizza, Pasta)",
+      "description": "Dine-in, takeout, and delivery pizza restaurant along MacArthur Highway in Poblacion, Urdaneta City serving signature Stuffed Crust, Mega Crunch Pizza, wings, and pasta until midnight.",
+      "what_to_do": [
+        "Order the Mega Crunch Supreme Pizza (₱455) or Pan Pizza",
+        "Dine in or order late-night pizza delivery until 12:00 AM"
+      ],
+      "rating": 4,
+      "total_review_count": 14,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Pizza Hut Urdaneta (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Pizza+Hut+Urdaneta+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Pizza Hut Philippines Official Website",
+          "url": "https://www.pizzahut.com.ph/"
+        }
+      ],
+      "lat": 15.973688,
+      "lng": 120.571187
+    },
+    {
+      "id": "pangasinan-5towns-072",
+      "name": "Kenny Rogers Roasters - CB Mall Urdaneta",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Italian, Pizza, Pasta & Western",
+      "location": "CB Mall, MacArthur Hwy, Brgy. Nancayasan, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱250–₱900 (Classic Rotisserie Roasted Chicken, Corn Muffins, Ribs)",
+      "description": "Well-loved rotisserie restaurant at CB Mall along MacArthur Highway in Urdaneta City, famous for its herb-roasted chicken, signature corn muffins, ribs, and healthy side dishes.",
+      "what_to_do": [
+        "Order Roasted Chicken plates with signature Corn Muffins",
+        "Dine in with family at CB Mall along MacArthur Highway"
+      ],
+      "rating": 3.9,
+      "total_review_count": 61,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Kenny Rogers Roasters - CB Mall Urdaneta (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Kenny+Rogers+Roasters+-+CB+Mall+Urdaneta+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Kenny Rogers Roasters Philippines",
+          "url": "http://www.kennys.com.ph/"
+        }
+      ],
+      "lat": 15.97872,
+      "lng": 120.571373
+    },
+    {
+      "id": "pangasinan-5towns-073",
+      "name": "Greenwich - Magic Mall Urdaneta",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Italian, Pizza, Pasta & Western",
+      "location": "Ground Floor, Magic Mall, Alexander St, Poblacion, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱500 (Overload Pizza, Creamy Lasagna, Chicken & Pizza Meal)",
+      "description": "Popular pizza and pasta fast-casual chain on the ground floor of Magic Mall on Alexander Street in Urdaneta City, serving cheesy Overload pizzas, creamy lasagna, and combo meals.",
+      "what_to_do": [
+        "Order the Pizza, Chicken, Rice & Lasagna combo meal",
+        "Grab a quick lunch on the ground floor of Magic Mall Urdaneta"
+      ],
+      "rating": 4,
+      "total_review_count": 16,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Greenwich - Magic Mall Urdaneta (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Greenwich+-+Magic+Mall+Urdaneta+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Greenwich Philippines Online Ordering",
+          "url": "https://order.greenwich.com.ph/"
+        }
+      ],
+      "lat": 15.9753,
+      "lng": 120.566153
+    },
+    {
+      "id": "pangasinan-5towns-074",
+      "name": "Chowking Urdaneta (MacArthur Highway 24/7)",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "MacArthur Hwy, Poblacion / Nancayasan, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱99–₱500 (Chao Fan with Siomai ₱99, Beef Wonton Mami ₱210, Halo-Halo Supreme)",
+      "description": "24-hour Chinese-Filipino fast-food restaurant with drive-thru and dedicated motorcycle/car parking along MacArthur Highway in Urdaneta City, serving Chao Fan, Beef Wonton Mami, Lauriat meals, and Halo-Halo.",
+      "what_to_do": [
+        "Order Chao Fan with Steamed Siomai (₱99) or Beef Wonton Mami (₱210)",
+        "Stop by 24/7 via dine-in or drive-thru along MacArthur Highway"
+      ],
+      "rating": 3.5,
+      "total_review_count": 270,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Chowking Urdaneta (MacArthur Highway 24/7) (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Chowking+Urdaneta+%28MacArthur+Highway+24%2F7%29+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Chowking Delivery Official Portal",
+          "url": "http://www.chowkingdelivery.com/"
+        }
+      ],
+      "lat": 15.959869,
+      "lng": 120.574352
+    },
+    {
+      "id": "pangasinan-5towns-075",
+      "name": "Chowking - Magic Mall Urdaneta",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "Level 1, Magic Mall, Alexander St, Poblacion, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱99–₱500 (Pancit Canton ₱99, Siomai Spicy Chao Fan w/ Drink ₱181)",
+      "description": "Newly opened Chowking branch on Level 1 of Magic Mall along Alexander Street in downtown Urdaneta City, offering Chinese dimsum, Pancit Canton, and Spicy Chao Fan.",
+      "what_to_do": [
+        "Order Siomai Spicy Chao Fan with Drink (₱181) or Pancit Canton (₱99)",
+        "Dine in with family while shopping at Magic Mall Urdaneta"
+      ],
+      "rating": 4.3,
+      "total_review_count": 66,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Chowking - Magic Mall Urdaneta (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Chowking+-+Magic+Mall+Urdaneta+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Chowking Delivery Official Portal",
+          "url": "http://www.chowkingdelivery.com/"
+        }
+      ],
+      "lat": 15.975377,
+      "lng": 120.564788
+    },
+    {
+      "id": "pangasinan-5towns-076",
+      "name": "KFC - SM City Urdaneta Central",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "Unit 163, 164 & 165B, SM City Urdaneta Central, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱500 (Original Recipe & Hot & Crispy Chicken, Zinger, Regular Macaroni Salad ₱89)",
+      "description": "Mall branch of KFC at SM City Urdaneta Central along MacArthur Highway, serving signature fried chicken buckets, Zinger burgers, famous bowls, and macaroni salad.",
+      "what_to_do": [
+        "Order Hot & Crispy Chicken combo meals and Macaroni Salad (₱89)",
+        "Enjoy quick counter service inside SM City Urdaneta Central"
+      ],
+      "rating": 4.3,
+      "total_review_count": 62,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – KFC - SM City Urdaneta Central (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=KFC+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "KFC Philippines Store Locator – SM Urdaneta",
+          "url": "https://www.kfc.com.ph/en/store-locator/kfc_sm_urdaneta"
+        }
+      ],
+      "lat": 15.971141,
+      "lng": 120.570442
+    },
+    {
+      "id": "pangasinan-5towns-077",
+      "name": "Mang Inasal - SM City Urdaneta Central",
+      "municipality_or_city": "Urdaneta City",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "G/F SM City Urdaneta Central, MacArthur Hwy, Urdaneta City, 2428 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱800 (Chicken Inasal Paa/Pecho with Unlimited Rice, 4 Pcs Pecho Large Bundle ₱791)",
+      "description": "High-demand ground-floor Mang Inasal branch at SM City Urdaneta Central serving charcoal-grilled Chicken Inasal with chicken oil, unlimited rice, Pork BBQ, and Extra Creamy Halo-Halo.",
+      "what_to_do": [
+        "Dine on grilled Chicken Inasal Pecho or Paa with unlimited rice",
+        "Order the 4-Piece Pecho family bundle (₱791) and Halo-Halo"
+      ],
+      "rating": 4,
+      "total_review_count": 96,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Mang Inasal - SM City Urdaneta Central (Urdaneta City)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Mang+Inasal+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
+        },
+        {
+          "title": "Mang Inasal Delivery Official Website",
+          "url": "http://manginasaldelivery.com.ph/"
+        }
+      ],
+      "lat": 15.969539,
+      "lng": 120.570207
+    },
+    {
+      "id": "pangasinan-5towns-083",
+      "name": "Gerry's SM City Rosales (Gerry's Grill)",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "Unit 101-102A, Ground Floor, SM City Rosales, Carmen East, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱500–₱1,000 per person (Inihaw na Pusit, Beef Kare-Kare, Crispy Pata, Dinakdakan, Kangkong Chips)",
+      "description": "Flagship family restaurant and grill at the ground floor of SM City Rosales with 1,815+ verified reviews and a 4.8★ rating, famous for its 30-minute serving time guarantee, sizzling Sisig, grilled Pampano and baby squid, and Beef Kare-Kare.",
+      "what_to_do": [
+        "Order Grilled Baby Squid, Crispy Pata, Beef Kare-Kare, and Dinakdakan",
+        "Experience their 30-minute serving time guarantee with family groups"
+      ],
+      "rating": 4.8,
+      "total_review_count": 1815,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Gerry's SM City Rosales (Gerry's Grill) (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Gerry%27s+SM+City+Rosales+%28Gerry%27s+Grill%29+Rosales+Pangasinan&query_place_id=ChIJTaOqOnQ5kTMR6JUPUR85oEA"
+        }
+      ],
+      "lat": 15.881429,
+      "lng": 120.600921
+    },
+    {
+      "id": "pangasinan-5towns-084",
+      "name": "Kuya J Restaurant - SM City Rosales",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "Ground Floor, SM City Rosales, MacArthur Hwy, Carmen East, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱500–₱1,000 per person (Kuya J Crispy Pata, Kare-Kare, Bangus Sinigang, Ube Halo-Halo Espesyal)",
+      "description": "Popular casual Filipino family restaurant inside SM City Rosales serving crispy pata, peanut-rich Kare-Kare, Bangus Sinigang, lumpiang shanghai, and signature Ube Halo-Halo Espesyal.",
+      "what_to_do": [
+        "Order Kuya J Kare-Kare, Crispy Fried Chicken, and Bangus Sinigang",
+        "Finish your meal with their signature shaved-ice Halo-Halo Espesyal"
+      ],
+      "rating": 4.5,
+      "total_review_count": 477,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Kuya J Restaurant - SM City Rosales (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Kuya+J+Restaurant+-+SM+City+Rosales+Rosales+Pangasinan&query_place_id=ChIJXbQ9OnQ5kTMRZLopQgHwtpU"
+        },
+        {
+          "title": "Kuya J Official Website",
+          "url": "http://www.kuyaj.ph/"
+        },
+        {
+          "title": "Restaurant Guru – Top Restaurants in Rosales",
+          "url": "https://restaurantguru.com/Rosales"
+        }
+      ],
+      "lat": 15.882038,
+      "lng": 120.602339
+    },
+    {
+      "id": "pangasinan-5towns-086",
+      "name": "Uson Pigar-Pigar Carmen-Rosales Branch",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "VJF3+25G, MacArthur Hwy, Carmen, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱500 (Pigar-Pigar, Relyenong Bangus ₱340, Pork Embutido ₱220, Butcheron ₱210, Dagupan Boneless Bangus ₱150.10)",
+      "description": "Authentic Pangasinan highway eatery along MacArthur Highway in Carmen, Rosales serving sizzling stir-fried beef Pigar-Pigar with cabbage, Dagupan boneless bangus, relyenong bangus, and crispy butcheron.",
+      "what_to_do": [
+        "Order sizzling beef Pigar-Pigar and Dagupan Boneless Bangus (₱150.10)",
+        "Take home Relyenong Bangus (₱340) and Butcheron (₱210)"
+      ],
+      "rating": 4.7,
+      "total_review_count": 43,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Uson Pigar-Pigar Carmen-Rosales Branch (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Uson+Pigar-Pigar+Carmen-Rosales+Branch+Rosales+Pangasinan&query_place_id=ChIJzRTFtCA5kTMRSGCi3d6CTmU"
+        }
+      ],
+      "lat": 15.872563,
+      "lng": 120.602937
+    },
+    {
+      "id": "pangasinan-5towns-088",
+      "name": "Takoyadon - SM City Rosales",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Korean BBQ, Japanese & Asian Dining",
+      "location": "Stall #5 Food Court, SM City Rosales, Carmen East, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱120–₱350 (Gyudon, Yakisoba, Tsukimi Udon, Takoyaki)",
+      "description": "4.9-star Japanese food court stall at SM City Rosales praised by 100+ diners for its rich broth Tsukimi Udon, flavorful Gyudon beef bowls, Yakisoba, and fast, friendly service.",
+      "what_to_do": [
+        "Order the Tsukimi Udon, Gyudon beef rice bowl, and Yakisoba",
+        "Enjoy budget-friendly Japanese comfort food inside SM City Rosales"
+      ],
+      "rating": 4.9,
+      "total_review_count": 100,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Takoyadon - SM City Rosales (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Takoyadon+-+SM+City+Rosales+Rosales+Pangasinan&query_place_id=ChIJP26UkzY5kTMRGWg3bSBXi6U"
+        }
+      ],
+      "lat": 15.881513,
+      "lng": 120.599847
+    },
+    {
+      "id": "pangasinan-5towns-089",
+      "name": "Botejyu - SM City Rosales",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Korean BBQ, Japanese & Asian Dining",
+      "location": "VJH2+MJJ, Ground Floor, SM City Rosales, MacArthur Hwy, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱350–₱900 (Okonomiyaki, Takoyaki, Karaage, Pork Katsu Curry, Diced Beef Garlic Steak Rice Bowl, Ramen)",
+      "description": "Authentic Japanese gourmet restaurant at SM City Rosales serving Osaka-style Okonomiyaki, Takoyaki, crispy chicken Karaage, Pork Katsu Curry, ramen, and fresh sushi.",
+      "what_to_do": [
+        "Order Chicken Karaage, Pork Katsu Curry, and Diced Beef Garlic Steak Rice Bowl",
+        "Dine on authentic Japanese Okonomiyaki and ramen at SM Rosales"
+      ],
+      "rating": 4.4,
+      "total_review_count": 93,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Botejyu - SM City Rosales (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Botejyu+-+SM+City+Rosales+Rosales+Pangasinan&query_place_id=ChIJWYF1fqM5kTMRYEkOW9nFD7o"
+        },
+        {
+          "title": "Botejyu Philippines Official Website",
+          "url": "https://www.botejyu.com.ph/"
+        }
+      ],
+      "lat": 15.879188,
+      "lng": 120.601562
+    },
+    {
+      "id": "pangasinan-5towns-091",
+      "name": "Farmland Kambingan at Pasalubong",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "VJF3+H8Q, MacArthur Hwy, Carmen, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱450 (Papaitan, Kalderetang Kambing, Hot Noodles, Bagoong & Daing Pasalubong)",
+      "description": "Classic highway stopover eatery and pasalubong center in Carmen, Rosales where bus commuters and motorists stop for hot goat meat stews (kambingan), noodles, Pangasinan bagoong, dried fish (daing), and local sweets.",
+      "what_to_do": [
+        "Eat hot kambingan dishes and noodles after a long highway drive",
+        "Shop for Pangasinan bagoong, daing, and local sweets for pasalubong"
+      ],
+      "rating": 3.9,
+      "total_review_count": 69,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Farmland Kambingan at Pasalubong (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Farmland+Kambingan+at+Pasalubong+Rosales+Pangasinan&query_place_id=ChIJF-IAnGE5kTMReLY9hIQLH9g"
+        }
+      ],
+      "lat": 15.873938,
+      "lng": 120.603312
+    },
+    {
+      "id": "pangasinan-5towns-092",
+      "name": "Urban Cusina Rosales",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "41 General Luna St, Poblacion, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱70–₱350 (Chicksilog ₱105, Cheese Quesadilla ₱70, Laing, Embutido)",
+      "description": "4.9-star women-owned comfort food café and restaurant at 41 General Luna Street in Poblacion, Rosales, offering Chicksilog, Laing, Embutido, Cheese Quesadillas, free Wi-Fi, and pet-friendly indoor/outdoor seating.",
+      "what_to_do": [
+        "Order Chicksilog (₱105), Laing, Embutido, and Cheese Quesadilla (₱70)",
+        "Enjoy free Wi-Fi and pet-friendly dining in Poblacion, Rosales"
+      ],
+      "rating": 4.9,
+      "total_review_count": 8,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Urban Cusina Rosales (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Urban+Cusina+Rosales+Rosales+Pangasinan"
+        },
+        {
+          "title": "Urban Cusina Official Website",
+          "url": "https://urbancusina.com/"
+        }
+      ],
+      "lat": 15.895275,
+      "lng": 120.633909
+    },
+    {
+      "id": "pangasinan-5towns-094",
+      "name": "Mama Car's Resto & Bakeshop Cafe",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "MacArthur Hwy, Carmen West, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱500 (Hamburgers, rice meals, freshly baked breads, and coffee)",
+      "description": "All-day roadside restaurant and bakeshop café along MacArthur Highway in Carmen West, Rosales, open daily from 10:00 AM to 10:00 PM serving Filipino meals, burgers, pastries, and coffee.",
+      "what_to_do": [
+        "Order freshly baked pastries, hamburgers, and Filipino lunch plates",
+        "Stop along MacArthur Highway in Carmen West for coffee and snacks"
+      ],
+      "rating": 4.4,
+      "total_review_count": 11,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Mama Car's Resto & Bakeshop Cafe (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Mama+Car%27s+Resto+%26+Bakeshop+Cafe+Rosales+Pangasinan&query_place_id=ChIJuTgIngU5kTMRDggHfPEYMzM"
+        }
+      ],
+      "lat": 15.884732,
+      "lng": 120.600594
+    },
+    {
+      "id": "pangasinan-5towns-095",
+      "name": "Bo's Coffee Rosales",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Pangasinan - Nueva Ecija Rd, Brgy. San Bartolome, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱130–₱500 (Philippine Origin Brewed Coffee, Froccino, Pastries & Pasta)",
+      "description": "Tranquil stand-alone Bo's Coffee branch along the Pangasinan-Nueva Ecija Road in San Bartolome, Rosales, prized by road-trippers and remote workers for its spacious seating, Philippine highland coffee beans, and pastries.",
+      "what_to_do": [
+        "Sip Philippine-origin espresso and Froccino blends",
+        "Take a relaxing road-trip coffee break along Pangasinan-Nueva Ecija Road"
+      ],
+      "rating": 4.5,
+      "total_review_count": 191,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Bo's Coffee Rosales (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Bo%27s+Coffee+Rosales+Rosales+Pangasinan"
+        }
+      ],
+      "lat": 15.8894,
+      "lng": 120.612873
+    },
+    {
+      "id": "pangasinan-5towns-096",
+      "name": "Precious Treats",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Purok 1, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱120–₱500 (Shortbread Toffee ₱140, Banana Loaf Classic ₱150, Choco Berries Cake, Signature Coffee)",
+      "description": "5.0-star homegrown café and artisan bakeshop in Purok 1, Rosales with 63 glowing reviews, renowned for its rich signature coffee, Choco Berries cake, Banana Loaf Classic (₱150), Shortbread Toffee (₱140), and custom cakes.",
+      "what_to_do": [
+        "Order their signature coffee with Choco Berries Cake or Muffins",
+        "Take home a Banana Loaf Classic (₱150) or Shortbread Toffee (₱140)"
+      ],
+      "rating": 5,
+      "total_review_count": 63,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Precious Treats (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Precious+Treats+Rosales+Pangasinan&query_place_id=ChIJ10GCYgk7kTMRPJrOU-ouUPU"
+        },
+        {
+          "title": "Precious Treats Rosales Official Facebook",
+          "url": "https://www.facebook.com/share/1JRUNP7a3B/"
+        }
+      ],
+      "lat": 15.896384,
+      "lng": 120.63185
+    },
+    {
+      "id": "pangasinan-5towns-097",
+      "name": "Cafe Victoria Kindred",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Victoria Square, MacArthur Hwy, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱600 (Specialty coffee, all-day brunch plates, pasta & pastries)",
+      "description": "Aesthetic café and restaurant at Victoria Square along MacArthur Highway in Rosales, earning a 4.8★ rating for its warm ambiance, handcrafted espresso drinks, and hearty comfort meals.",
+      "what_to_do": [
+        "Enjoy specialty coffee and brunch plates at Victoria Square",
+        "Stop by along MacArthur Highway for a cozy café meal"
+      ],
+      "rating": 4.8,
+      "total_review_count": 42,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Cafe Victoria Kindred (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Cafe+Victoria+Kindred+Rosales+Pangasinan"
+        },
+        {
+          "title": "Cafe Victoria Kindred Official Facebook",
+          "url": "https://www.facebook.com/cafevictoriakindred"
+        }
+      ],
+      "lat": 15.894358,
+      "lng": 120.631928
+    },
+    {
+      "id": "pangasinan-5towns-098",
+      "name": "Brewlliant Cafe",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "The Brewlliant’s House, Brgy. San Pedro East, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱350 (Banoffee Chimp Latte ₱165, iced coffee, pastries)",
+      "description": "Calm, homey neighborhood coffee shop in Brgy. San Pedro East, Rosales known for creative lattes like the Banoffee Chimp Latte (₱165), affordable pastries, and welcoming baristas.",
+      "what_to_do": [
+        "Try the signature Banoffee Chimp Latte (₱165)",
+        "Relax in a quiet residential café setting in San Pedro East"
+      ],
+      "rating": 4.8,
+      "total_review_count": 33,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Brewlliant Cafe (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Brewlliant+Cafe+Rosales+Pangasinan"
+        },
+        {
+          "title": "Brewlliant Cafe Official Facebook",
+          "url": "https://www.facebook.com/profile.php?id=61552479201834"
+        }
+      ],
+      "lat": 15.89456,
+      "lng": 120.628367
+    },
+    {
+      "id": "pangasinan-5towns-099",
+      "name": "The Coffee Lounge - SM City Rosales",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "SM City Rosales, MacArthur Hwy, Carmen East, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱120–₱400 (Brewed coffee, iced lattes, cakes & pastries)",
+      "description": "Cozy coffee shop inside SM City Rosales serving espresso drinks, blended frappes, and cakes for mall shoppers looking for a quiet afternoon coffee break.",
+      "what_to_do": [
+        "Enjoy post-lunch coffee and pastries inside SM City Rosales",
+        "Relax in air-conditioned lounge seating"
+      ],
+      "rating": 4.4,
+      "total_review_count": 16,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – The Coffee Lounge - SM City Rosales (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=The+Coffee+Lounge+-+SM+City+Rosales+Rosales+Pangasinan&query_place_id=ChIJ8bECIvA5kTMRrpj8Z1vdhao"
+        }
+      ],
+      "lat": 15.880071,
+      "lng": 120.602584
+    },
+    {
+      "id": "pangasinan-5towns-100",
+      "name": "0864 Brewing Café",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Brgy. Carmay East, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱90–₱300 (Handcrafted iced coffee, non-coffee blends, snacks)",
+      "description": "4.8-star indie coffee shop in Brgy. Carmay East, Rosales serving freshly brewed espresso beverages and light snacks.",
+      "what_to_do": [
+        "Order handcrafted iced lattes and cold brews in Carmay East"
+      ],
+      "rating": 4.8,
+      "total_review_count": 5,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – 0864 Brewing Café (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=0864+Brewing+Caf%C3%A9+Rosales+Pangasinan&query_place_id=ChIJMdNPq8Y7kTMR8W1LyHO6wQs"
+        },
+        {
+          "title": "0864 Brewing Café Facebook",
+          "url": "http://www.facebook.com/profile.php?id=100084394122031"
+        }
+      ],
+      "lat": 15.891921,
+      "lng": 120.629351
+    },
+    {
+      "id": "pangasinan-5towns-101",
+      "name": "LA BREW CAFE",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "31 San Antonio St, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱80–₱250 (Specialty iced coffees and snacks)",
+      "description": "5.0-star neighborhood coffee bar at 31 San Antonio Street in Rosales serving affordable specialty coffee and snacks.",
+      "what_to_do": [
+        "Grab an iced latte along San Antonio Street in Rosales"
+      ],
+      "rating": 5,
+      "total_review_count": 2,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – LA BREW CAFE (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=LA+BREW+CAFE+Rosales+Pangasinan&query_place_id=ChIJ2TWycgA7kTMRmmhHTRkO3gE"
+        }
+      ],
+      "lat": 15.895093,
+      "lng": 120.632379
+    },
+    {
+      "id": "pangasinan-5towns-102",
+      "name": "1822 Cafe - Rosales",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "VJF3+758, R-9 (MacArthur Hwy), Carmen, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱70–₱300 (Milk tea, iced coffee, late-night snacks)",
+      "description": "High-ceilinged, cozy late-night hangout café along R-9 in Rosales, popular with groups looking for a neat evening spot for coffee and milk tea.",
+      "what_to_do": [
+        "Chill late at night over coffee and milk tea in Rosales"
+      ],
+      "rating": 3.5,
+      "total_review_count": 4,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – 1822 Cafe - Rosales (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=1822+Cafe+-+Rosales+Rosales+Pangasinan&query_place_id=ChIJUYS7QAA5kTMR9aac3atdaEY"
+        }
+      ],
+      "lat": 15.873188,
+      "lng": 120.602937
+    },
+    {
+      "id": "pangasinan-5towns-103",
+      "name": "Greenwich - SM City Rosales",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Italian, Pizza, Pasta & Western",
+      "location": "Ground Floor, SM City Rosales, Km 171 MacArthur Hwy, Carmen East, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱500 (2 Medium Thin Crust Pizzas under ₱500, Lasagna Supreme, Crispy Glazed Wings)",
+      "description": "Reliable ground-floor pizza and pasta parlor at SM City Rosales with plenty of seating, fast table service, and value pizza bundles.",
+      "what_to_do": [
+        "Order the 2 Medium Thin Crust Pizzas bundle (under ₱500) and Lasagna",
+        "Dine in with family at the ground floor of SM City Rosales"
+      ],
+      "rating": 4.3,
+      "total_review_count": 178,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Greenwich - SM City Rosales (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Greenwich+-+SM+City+Rosales+Rosales+Pangasinan"
+        },
+        {
+          "title": "Greenwich Philippines Online Ordering",
+          "url": "https://order.greenwich.com.ph/"
+        }
+      ],
+      "lat": 15.882507,
+      "lng": 120.600232
+    },
+    {
+      "id": "pangasinan-5towns-104",
+      "name": "Shakey's Pizza Parlor - SM City Rosales",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Italian, Pizza, Pasta & Western",
+      "location": "VJH2+WRM, SM City Rosales, MacArthur Hwy, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱400–₱1,500 (Thin Crust Pizza, Chick 'n' Mojos, Carbonara)",
+      "description": "Full-service pizza restaurant at SM City Rosales serving Shakey's Thin Crust pizza, fried chicken, and potato Mojos.",
+      "what_to_do": [
+        "Order family-sized Thin Crust Pizza and Chick 'n' Mojos"
+      ],
+      "rating": 2.3,
+      "total_review_count": 44,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Shakey's Pizza Parlor - SM City Rosales (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Shakey%27s+Pizza+Parlor+-+SM+City+Rosales+Rosales+Pangasinan"
+        },
+        {
+          "title": "Shakey's Pizza Philippines",
+          "url": "http://www.shakeyspizza.ph/"
+        }
+      ],
+      "lat": 15.879812,
+      "lng": 120.602062
+    },
+    {
+      "id": "pangasinan-5towns-105",
+      "name": "Jollibee - SM City Rosales (24/7)",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "VHJX+W2M, Along MacArthur Hwy, SM City Rosales, Carmen, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱56–₱500 (1-Pc Chickenjoy + Half Jolly Spaghetti Super Meal ₱207, 1-Pc Chickenjoy w/ Soup ₱160, Yumburger ₱56)",
+      "description": "High-volume 24-hour Jollibee drive-thru and dine-in branch along MacArthur Highway at SM City Rosales with 677+ verified reviews and spacious parking for northbound and southbound travelers.",
+      "what_to_do": [
+        "Order the Chickenjoy Super Meal (₱207) or Jolly Spaghetti 24/7",
+        "Use the 24-hour drive-thru lane and spacious Carmen parking lot"
+      ],
+      "rating": 4.1,
+      "total_review_count": 677,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Jollibee - SM City Rosales (24/7) (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Jollibee+-+SM+City+Rosales+%2824%2F7%29+Rosales+Pangasinan&query_place_id=ChIJ06uLPnM5kTMRWwMATVHytrs"
+        },
+        {
+          "title": "Jollibee Official Store Link",
+          "url": "https://jollibee.onelink.me/U65H/googlebusinessprofile"
+        }
+      ],
+      "lat": 15.882312,
+      "lng": 120.597562
+    },
+    {
+      "id": "pangasinan-5towns-106",
+      "name": "McDonald's Carmen Rosales (24/7 Drive-Thru)",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "24 Pangasinan - Nueva Ecija Rd (Carmen Junction), Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱80–₱500 (Chicken McDo, Big Mac, McCafé Coffee, All-Day Pancakes)",
+      "description": "Landmark 24/7 McDonald's branch with drive-thru and dual-side parking near the Carmen Bridge junction along 24 Pangasinan-Nueva Ecija Road in Rosales, backed by 777+ reviews.",
+      "what_to_do": [
+        "Stop 24/7 for breakfast pancakes, McCafé coffee, or late-night Chicken McDo",
+        "Use the fast drive-thru lane at the Carmen Rosales junction"
+      ],
+      "rating": 4.1,
+      "total_review_count": 777,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – McDonald's Carmen Rosales (24/7 Drive-Thru) (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=McDonald%27s+Carmen+Rosales+%2824%2F7+Drive-Thru%29+Rosales+Pangasinan&query_place_id=ChIJEQUl23I5kTMRekL2R1P4YHY"
+        },
+        {
+          "title": "McDonald's Philippines Store Locator",
+          "url": "https://www.mcdonalds.com.ph/store-locator"
+        }
+      ],
+      "lat": 15.88764,
+      "lng": 120.613541
+    },
+    {
+      "id": "pangasinan-5towns-107",
+      "name": "KFC - SM City Rosales",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "Ground Floor, SM City Rosales, Carmen East, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱600 (Bucket of Chicken, Zinger Burger, Sisig Rice Bowl, Mushroom Soup)",
+      "description": "Ground-floor KFC restaurant with drive-thru and dine-in at SM City Rosales serving freshly cooked Original Recipe and Hot & Crispy fried chicken.",
+      "what_to_do": [
+        "Order freshly cooked KFC fried chicken buckets and Zinger meals",
+        "Pay via card or NFC tap at the ground floor of SM City Rosales"
+      ],
+      "rating": 3.9,
+      "total_review_count": 107,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – KFC - SM City Rosales (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=KFC+-+SM+City+Rosales+Rosales+Pangasinan&query_place_id=ChIJm1FTJXQ5kTMRwG1C5EpXt5g"
+        },
+        {
+          "title": "KFC Philippines Store Locator – SM City Rosales",
+          "url": "https://www.kfc.com.ph/en/store-locator/kfc_sm_city_rosales"
+        }
+      ],
+      "lat": 15.880162,
+      "lng": 120.602721
+    },
+    {
+      "id": "pangasinan-5towns-108",
+      "name": "Mang Inasal - SM City Rosales",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "G/F, SM City Rosales, MacArthur Hwy, Carmen East, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱500 (Chicken Inasal with Unlimited Rice, Pork BBQ, Palabok, Halo-Halo)",
+      "description": "Ground-floor Mang Inasal branch at SM City Rosales serving grilled Chicken Inasal, Pork BBQ skewers, Palabok, and creamy Halo-Halo.",
+      "what_to_do": [
+        "Order Chicken Inasal Paa or Pecho with unlimited rice",
+        "Pair your grilled meal with Extra Creamy Halo-Halo"
+      ],
+      "rating": 3.4,
+      "total_review_count": 88,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Mang Inasal - SM City Rosales (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Mang+Inasal+-+SM+City+Rosales+Rosales+Pangasinan&query_place_id=ChIJH8Pj2GA5kTMRqOQVim9MJow"
+        },
+        {
+          "title": "Mang Inasal Delivery Official Website",
+          "url": "http://manginasaldelivery.com.ph/"
+        }
+      ],
+      "lat": 15.883109,
+      "lng": 120.602609
+    },
+    {
+      "id": "pangasinan-5towns-109",
+      "name": "Classic Savory - SM City Rosales",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "SM City Rosales, MacArthur Hwy, Carmen East, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱300–₱1,500 (Classic Savory Chicken, Savory Fried Rice, Lumpiang Shanghai, Black Pot Beef Stew)",
+      "description": "Filipino-Chinese family restaurant inside SM City Rosales serving signature Classic Savory fried chicken, Savory Fried Rice, Lumpiang Shanghai, and Incredi-Bowl combo meals.",
+      "what_to_do": [
+        "Order Classic Savory Chicken with Savory Fried Rice and Lumpiang Shanghai"
+      ],
+      "rating": 2.1,
+      "total_review_count": 24,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Classic Savory - SM City Rosales (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Classic+Savory+-+SM+City+Rosales+Rosales+Pangasinan&query_place_id=ChIJZ1KeM3Q5kTMRupqpKgUKhcI"
+        }
+      ],
+      "lat": 15.879945,
+      "lng": 120.602609
+    },
+    {
+      "id": "pangasinan-5towns-110",
+      "name": "Point and Grill - Rosales",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Restobars, Grills & Late-Night Dining",
+      "location": "VJH3+947, Carmen East, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱139–₱450 (₱139 Promo Meals like Kare-Kareng Gulay, Pigar-Pigar, Sizzling Sisig, Mami)",
+      "description": "Casual roadside grill in Carmen East, Rosales offering ₱139 promo meals, Pigar-Pigar, Lechon Kawali, Sizzling Sisig, and merienda mami.",
+      "what_to_do": [
+        "Order Pigar-Pigar or ₱139 promo rice meals"
+      ],
+      "rating": 2,
+      "total_review_count": 12,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Point and Grill - Rosales (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Point+and+Grill+-+Rosales+Rosales+Pangasinan&query_place_id=ChIJqd4Osm05kTMRDlZt-Sh0Pgc"
+        }
+      ],
+      "lat": 15.878438,
+      "lng": 120.602812
+    },
+    {
+      "id": "pangasinan-5towns-111",
+      "name": "McDonald's - SM City Rosales",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "Carmen - Poblacion Rosales National Rd (SM City Rosales), Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱80–₱400 (Chicken McNuggets, Burger McDo, Fries, McFlurry)",
+      "description": "Mall-based McDonald's branch along the Carmen-Poblacion Rosales National Road inside SM City Rosales open daily from 10:00 AM to 9:00 PM.",
+      "what_to_do": [
+        "Grab Chicken McNuggets, fries, and McFlurry while shopping at SM Rosales"
+      ],
+      "rating": 3.5,
+      "total_review_count": 34,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – McDonald's - SM City Rosales (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=McDonald%27s+-+SM+City+Rosales+Rosales+Pangasinan&query_place_id=ChIJA9I1N3Q5kTMRwL9G300gMyI"
+        },
+        {
+          "title": "McDonald's Store Locator #388",
+          "url": "https://www.mcdonalds.com.ph/store-locator?utm_source=google&utm_medium=organic&utm_campaign=GMB&utm_content=mcdph_388"
+        }
+      ],
+      "lat": 15.883004,
+      "lng": 120.60047
+    },
+    {
+      "id": "pangasinan-5towns-112",
+      "name": "Jollibee - Coloma St. Poblacion Rosales",
+      "municipality_or_city": "Rosales",
+      "region": "Eastern Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "VJWH+5FV, Coloma St, Poblacion, Rosales, 2441 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱60–₱400 (Chickenjoy, Jolly Spaghetti, Burger Steak, Iced Tea)",
+      "description": "Town-proper Jollibee branch on Coloma Street in Poblacion, Rosales serving classic Chickenjoy, Jolly Spaghetti, and Yumburgers to town residents and market shoppers.",
+      "what_to_do": [
+        "Order Chickenjoy and Jolly Spaghetti in Poblacion, Rosales"
+      ],
+      "rating": 5,
+      "total_review_count": 1,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Jollibee - Coloma St. Poblacion Rosales (Rosales)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Jollibee+-+Coloma+St.+Poblacion+Rosales+Rosales+Pangasinan&query_place_id=ChIJgxkbQgA7kTMRdKMX2aIMsRg"
+        }
+      ],
+      "lat": 15.895437,
+      "lng": 120.628687
+    },
+    {
+      "id": "pangasinan-5towns-124",
+      "name": "Naro Cafe • Coffee + Kitchen & Bar",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Lingayen Beach Baywalk, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱1,000 (Spanish Latte, Beach Latte, Caramel Macchiato, Bulalo, Grilled Boneless Bangus, Ginisang Talaba, 12-inch Pizza)",
+      "description": "Iconic two-story beachfront specialty café, kitchen, and bar directly facing Lingayen Beach Baywalk, blending modern native architecture with upstairs sea-view dining, precision-steamed lattes, and full Filipino seafood and meat platters.",
+      "what_to_do": [
+        "Dine on the second-floor deck overlooking Lingayen Beach",
+        "Order the Spanish Latte, Beach Latte, Grilled Boneless Bangus, and Bulalo"
+      ],
+      "rating": 4.3,
+      "total_review_count": 250,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Naro Cafe • Coffee + Kitchen & Bar (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Naro+Cafe+%E2%80%A2+Coffee+%2B+Kitchen+%26+Bar+Lingayen+Pangasinan"
+        }
+      ],
+      "lat": 16.035296,
+      "lng": 120.231834
+    },
+    {
+      "id": "pangasinan-5towns-129",
+      "name": "G&G Samgyupsal Grill and Restobar",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Korean BBQ, Japanese & Asian Dining",
+      "location": "Baywalk, Poblacion, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱199–₱499 per person (Unlimited Samgyupsal pork, chicken & Korean side dishes)",
+      "description": "Beachfront Korean BBQ grill and restobar along the Lingayen Baywalk offering unlimited samgyupsal meat sets, flavorful Korean side dishes, and cold drinks.",
+      "what_to_do": [
+        "Grill unlimited pork and chicken samgyupsal by the Lingayen Baywalk",
+        "Enjoy Korean side dishes and evening restobar drinks with friends"
+      ],
+      "rating": 3.9,
+      "total_review_count": 68,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – G&G Samgyupsal Grill and Restobar (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=G%26G+Samgyupsal+Grill+and+Restobar+Lingayen+Pangasinan"
+        },
+        {
+          "title": "G&G Samgyupsal Grill and Restobar Facebook",
+          "url": "https://www.facebook.com/profile.php?id=100057634142115&mibextid=LQQJ4d"
+        }
+      ],
+      "lat": 16.03574,
+      "lng": 120.233609
+    },
+    {
+      "id": "pangasinan-5towns-130",
+      "name": "Chatanoga Grill Seafoods & Restaurant",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "26QP+2V5, Baywalk, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱500 (Mixed Seafoods Salpicao ₱350, Dinakdakan ₱300, Clubhouse Sandwich ₱150, Sizzling Sisig)",
+      "description": "Open-air seafood grill and beer garden along the Lingayen Baywalk open from 12:00 PM to midnight, serving Mixed Seafoods Salpicao (₱350), Dinakdakan (₱300), pancit, and sizzling pork sisig.",
+      "what_to_do": [
+        "Order Mixed Seafoods Salpicao (₱350), Dinakdakan (₱300), and Pancit",
+        "Enjoy seaside grilled seafood and cold beer until midnight"
+      ],
+      "rating": 3.7,
+      "total_review_count": 43,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Chatanoga Grill Seafoods & Restaurant (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Chatanoga+Grill+Seafoods+%26+Restaurant+Lingayen+Pangasinan&query_place_id=ChIJuZwy35pfkTMRSyuHihnzmq0"
+        }
+      ],
+      "lat": 16.037562,
+      "lng": 120.237188
+    },
+    {
+      "id": "pangasinan-5towns-131",
+      "name": "Nanay Remy's Foodhouse",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "Alvear II, Poblacion, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱400 (Pork/Chicken BBQ skewers, Pinakbet, Fried Chicken, French Fries)",
+      "description": "4.6-star nipa-hut-style coastal foodhouse along Alvear II in Poblacion, Lingayen, loved by locals for serving some of the best and most affordable grilled barbecue and pinakbet near the beach.",
+      "what_to_do": [
+        "Order smoky charcoal-grilled BBQ and Pinakbet in a beachside nipa hut"
+      ],
+      "rating": 4.6,
+      "total_review_count": 20,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Nanay Remy's Foodhouse (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Nanay+Remy%27s+Foodhouse+Lingayen+Pangasinan"
+        }
+      ],
+      "lat": 16.021434,
+      "lng": 120.23226
+    },
+    {
+      "id": "pangasinan-5towns-132",
+      "name": "Blvnk Coffee - Roastery and Slow Bar",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Maramba Blvd, Poblacion, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱120–₱350 (Blvnkpink Coffee ₱190, Blvnk Matcha ₱170, Vietnamese Coffee)",
+      "description": "4.9-star third-wave coffee roastery and slow bar on Maramba Boulevard in Lingayen with 61 reviews, roasting fresh coffee beans in-house and crafting signature drinks like Blvnkpink Coffee (₱190), Blvnk Matcha (₱170), and strong Vietnamese coffee.",
+      "what_to_do": [
+        "Order freshly roasted pour-over, Vietnamese Coffee, or Blvnkpink Coffee (₱190)",
+        "Experience Lingayen's premier specialty coffee roastery on Maramba Blvd"
+      ],
+      "rating": 4.9,
+      "total_review_count": 61,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Blvnk Coffee - Roastery and Slow Bar (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Blvnk+Coffee+-+Roastery+and+Slow+Bar+Lingayen+Pangasinan"
+        },
+        {
+          "title": "Blvnk Coffee Official Facebook",
+          "url": "https://www.facebook.com/blvnkcoffee"
+        }
+      ],
+      "lat": 16.026469,
+      "lng": 120.231553
+    },
+    {
+      "id": "pangasinan-5towns-133",
+      "name": "Bo's Coffee Lingayen",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Alvear East, Poblacion, Lingayen, 2401 Pangasinan (near PSU Lingayen)",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱130–₱450 (Caffè Latte ₱145, Cold White Brew, Froccino, Cakes & Pasta)",
+      "description": "4.6-star coffeehouse oasis along Alvear East in Poblacion, Lingayen near Pangasinan State University (PSU), popular with students, faculty, and professionals for its strong Philippine coffee and air-conditioned study tables.",
+      "what_to_do": [
+        "Order a Caffè Latte (₱145) or Froccino near PSU Lingayen",
+        "Study or work on a laptop in a quiet air-conditioned space"
+      ],
+      "rating": 4.6,
+      "total_review_count": 125,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Bo's Coffee Lingayen (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Bo%27s+Coffee+Lingayen+Lingayen+Pangasinan&query_place_id=ChIJURVM6bFfkTMRSB996y61JoI"
+        }
+      ],
+      "lat": 16.023667,
+      "lng": 120.230609
+    },
+    {
+      "id": "pangasinan-5towns-134",
+      "name": "Mankape Lingayen",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "37 Ramos St (Buddha Annex), Poblacion West, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱120–₱500 (Matcha Oat Latte, Sea-Salt Latte with Oat Milk, Wintermelon Milk Tea, Banana Bread & Brownies)",
+      "description": "Homegrown Pangasinan third-wave café at 37 Ramos Street in Poblacion West, Lingayen, loved for its Matcha Oat Latte, Sea-Salt Oat Milk Latte, milk teas, and freshly baked banana bread.",
+      "what_to_do": [
+        "Order the Matcha Oat Latte or Sea-Salt Latte with Oat Milk",
+        "Pair your drink with Banana Bread, Brownies, or Wintermelon Milk Tea"
+      ],
+      "rating": 4,
+      "total_review_count": 54,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Mankape Lingayen (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Mankape+Lingayen+Lingayen+Pangasinan&query_place_id=ChIJ5TCZOtJfkTMRA1dD0CnqEqU"
+        }
+      ],
+      "lat": 16.023968,
+      "lng": 120.230318
+    },
+    {
+      "id": "pangasinan-5towns-135",
+      "name": "Anea Cafe - Lingayen Capitol Beachside Park",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Beachside Park, Capitol Compound, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱400 (Specialty iced coffee, comfort meals, pastries)",
+      "description": "4.6-star scenic café nestled inside the Beachside Park of the Pangasinan Capitol Compound in Lingayen, offering specialty coffee and comfort food with a view of the park and beach.",
+      "what_to_do": [
+        "Sip iced coffee with a view at the Capitol Beachside Park",
+        "Order comfort food and pastries after strolling the Capitol grounds"
+      ],
+      "rating": 4.6,
+      "total_review_count": 39,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Anea Cafe - Lingayen Capitol Beachside Park (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Anea+Cafe+-+Lingayen+Capitol+Beachside+Park+Lingayen+Pangasinan&query_place_id=ChIJveyhPBxfkTMRZxlglRQA2jQ"
+        }
+      ],
+      "lat": 16.029937,
+      "lng": 120.230427
+    },
+    {
+      "id": "pangasinan-5towns-136",
+      "name": "G, coffee.",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Maramba Blvd / Alvear St, Poblacion, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱90–₱300 (Affordable espresso lattes, non-coffee drinks, snacks)",
+      "description": "4.9-star neighborhood coffee shop along Maramba Boulevard in Lingayen, within walking distance of Lingayen Beach and the baywalk, praised for its affordable, consistently smooth coffee.",
+      "what_to_do": [
+        "Grab an affordable iced coffee before walking to Lingayen Beach"
+      ],
+      "rating": 4.9,
+      "total_review_count": 22,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – G, coffee. (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=G%2C+coffee.+Lingayen+Pangasinan&query_place_id=ChIJFUSa4dFfkTMR59lfwjNbvOw"
+        }
+      ],
+      "lat": 16.025933,
+      "lng": 120.232516
+    },
+    {
+      "id": "pangasinan-5towns-137",
+      "name": "Instant Venue Café",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Beside The President Hotel, Maramba Blvd, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱120–₱350 (Spanish Latte ₱130, Ube Latte ₱160, pastries)",
+      "description": "4.9-star hidden-gem coffee shop beside The President Hotel along Maramba Boulevard in Lingayen, celebrated by local coffee enthusiasts for its Spanish Latte (₱130) and Ube Latte (₱160).",
+      "what_to_do": [
+        "Order the Spanish Latte (₱130) or Ube Latte (₱160) on Maramba Blvd"
+      ],
+      "rating": 4.9,
+      "total_review_count": 16,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Instant Venue Café (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Instant+Venue+Caf%C3%A9+Lingayen+Pangasinan&query_place_id=ChIJt1r3epZDkTMRsbN9JIydAXk"
+        }
+      ],
+      "lat": 16.027084,
+      "lng": 120.233013
+    },
+    {
+      "id": "pangasinan-5towns-138",
+      "name": "The Bean Co - Lingayen",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Alvear East, Poblacion, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱90–₱250 (Cold Brew ₱100, Spanish Latte, Tsokolatera)",
+      "description": "5.0-star specialty coffee gem on Alvear East in Poblacion, Lingayen, earning rave reviews for its ₱100 Cold Brew, Spanish Latte, and rich Tsokolatera.",
+      "what_to_do": [
+        "Try the Cold Brew (₱100), Spanish Latte, and Tsokolatera"
+      ],
+      "rating": 5,
+      "total_review_count": 12,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – The Bean Co - Lingayen (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=The+Bean+Co+-+Lingayen+Lingayen+Pangasinan"
+        },
+        {
+          "title": "The Bean Co Lingayen Official Facebook",
+          "url": "https://www.facebook.com/profile.php?id=61568629007066"
+        }
+      ],
+      "lat": 16.023754,
+      "lng": 120.229737
+    },
+    {
+      "id": "pangasinan-5towns-139",
+      "name": "YALLA Cafe",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Alvear II, Poblacion, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱300 (Spanish Latte ₱120, Cappuccino, Espresso)",
+      "description": "4.8-star artisan café along Alvear II in Lingayen crafting budget-friendly Spanish Lattes (₱120), cappuccinos, and espresso drinks.",
+      "what_to_do": [
+        "Order a freshly pulled Spanish Latte (₱120) or Cappuccino"
+      ],
+      "rating": 4.8,
+      "total_review_count": 9,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – YALLA Cafe (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=YALLA+Cafe+Lingayen+Pangasinan&query_place_id=ChIJVWrqPLFfkTMRPqaX2Yf0Ev8"
+        }
+      ],
+      "lat": 16.023604,
+      "lng": 120.232527
+    },
+    {
+      "id": "pangasinan-5towns-140",
+      "name": "CH² Coffee",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "26CH+6RX, Rizal Avenue Extension, Poblacion, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱250 (Spanish Latte ₱130, Iced Americano)",
+      "description": "4.8-star neighborhood coffee bar on Rizal Avenue Extension in Poblacion, Lingayen offering quality espresso drinks like its ₱130 Spanish Latte at student-friendly prices.",
+      "what_to_do": [
+        "Order the ₱130 Spanish Latte on Rizal Avenue Extension"
+      ],
+      "rating": 4.8,
+      "total_review_count": 4,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – CH² Coffee (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=CH%C2%B2+Coffee+Lingayen+Pangasinan&query_place_id=ChIJWU3eFABfkTMRFUEe0XB-QRo"
+        }
+      ],
+      "lat": 16.020562,
+      "lng": 120.229563
+    },
+    {
+      "id": "pangasinan-5towns-141",
+      "name": "Mango Avenue Lingayen",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Alvear East, Poblacion, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱80–₱250 (Best-selling Mango Graham Shake, Milk Tea, Snacks)",
+      "description": "4.6-star student-favorite refreshment café with free Wi-Fi on Alvear East in Poblacion, Lingayen, famous for its signature Mango Graham drink and milk tea.",
+      "what_to_do": [
+        "Order the best-selling Mango Graham shake and milk tea",
+        "Relax with free Wi-Fi near PSU Lingayen"
+      ],
+      "rating": 4.6,
+      "total_review_count": 17,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Mango Avenue Lingayen (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Mango+Avenue+Lingayen+Lingayen+Pangasinan&query_place_id=ChIJFyqihFtfkTMR9FhcmgAHjZ0"
+        }
+      ],
+      "lat": 16.022214,
+      "lng": 120.230724
+    },
+    {
+      "id": "pangasinan-5towns-142",
+      "name": "Clickeat Cafe Baay-Lingayen",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "0332 Avenida Rizal East Rd, Baay / Poblacion, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱450 (Pancit Malabon, Batangas Lomi, Baked Macaroni, Seafood Paella, Silog, Chicken Wings, Milk Tea & Coffee)",
+      "description": "All-around café and comfort food hub at 0332 Avenida Rizal East Road in Lingayen serving Pancit Malabon, Batangas Lomi, Seafood Paella, all-day silog breakfasts, chicken wings, coffee, and smoothies from 10:00 AM to 10:00 PM.",
+      "what_to_do": [
+        "Order Batangas Lomi, Pancit Malabon, or Baked Macaroni with iced coffee"
+      ],
+      "rating": 4.1,
+      "total_review_count": 8,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Clickeat Cafe Baay-Lingayen (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Clickeat+Cafe+Baay-Lingayen+Lingayen+Pangasinan&query_place_id=ChIJz9av4gRfkTMRULYWIRTqwTA"
+        }
+      ],
+      "lat": 16.020641,
+      "lng": 120.227639
+    },
+    {
+      "id": "pangasinan-5towns-143",
+      "name": "JRJ’s Honey Cup Cafe",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "26HM+G5C, RMB Realty Bldg, Maramba Blvd, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱80–₱350 (Milk tea, coffee, refreshers, muffins, rice meals)",
+      "description": "Family-friendly café in the RMB Realty Building along Maramba Boulevard in Lingayen serving milk tea, coffee, fruit refreshers, muffins, and light meals until 11:00 PM.",
+      "what_to_do": [
+        "Stop by Maramba Boulevard for milk tea, muffins, and evening coffee"
+      ],
+      "rating": 4,
+      "total_review_count": 4,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – JRJ’s Honey Cup Cafe (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=JRJ%E2%80%99s+Honey+Cup+Cafe+Lingayen+Pangasinan&query_place_id=ChIJxeh05vVfkTMRkLVXjdsNZ-4"
+        },
+        {
+          "title": "JRJ's Honey Cup Cafe Facebook",
+          "url": "https://www.facebook.com/profile.php?id=100063661975839&mibextid=ZbWKwL"
+        }
+      ],
+      "lat": 16.028812,
+      "lng": 120.232938
+    },
+    {
+      "id": "pangasinan-5towns-144",
+      "name": "I LOVE MILKTEA Lingayen",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "19 Avenida Rizal East Rd, Poblacion, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱75–₱220 (Choco Mousse Milk Tea, Rock Salt & Cheese series, snacks)",
+      "description": "5.0-star student milk tea lounge at 19 Avenida Rizal East Road in Poblacion, Lingayen, known for its Choco Mousse and Rock Salt & Cheese milk tea series.",
+      "what_to_do": [
+        "Try the Choco Mousse Milk Tea with Rock Salt & Cheese foam"
+      ],
+      "rating": 5,
+      "total_review_count": 2,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – I LOVE MILKTEA Lingayen (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=I+LOVE+MILKTEA+Lingayen+Lingayen+Pangasinan&query_place_id=ChIJCanEUrFfkTMRLBViuP6nKBM"
+        }
+      ],
+      "lat": 16.020599,
+      "lng": 120.229434
+    },
+    {
+      "id": "pangasinan-5towns-145",
+      "name": "BigBrew - PSU Lingayen",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "26HG+XWQ, Alvear East, Brgy. Maniboc, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱29–₱90 (Okinawa Big, Green Apple Lemon Brusko, Praf, Iced Coffee)",
+      "description": "Budget student milk tea and iced coffee stand along Alvear East right outside Pangasinan State University (PSU) Lingayen Campus.",
+      "what_to_do": [
+        "Grab budget ₱29–₱49 milk teas and iced coffees outside PSU Lingayen"
+      ],
+      "rating": 2.3,
+      "total_review_count": 3,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – BigBrew - PSU Lingayen (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=BigBrew+-+PSU+Lingayen+Lingayen+Pangasinan"
+        }
+      ],
+      "lat": 16.029937,
+      "lng": 120.227313
+    },
+    {
+      "id": "pangasinan-5towns-146",
+      "name": "Bayside Bistro Lingayen",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Restobars, Grills & Late-Night Dining",
+      "location": "Brgy. Maniboc, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱500 (Bistro rice meals, pulutan platters, desserts)",
+      "description": "5.0-star casual bistro in Brgy. Maniboc, Lingayen open daily from 3:00 PM to 11:00 PM serving dinner plates, small bites, and desserts near the coast.",
+      "what_to_do": [
+        "Dine on afternoon and evening bistro plates in Brgy. Maniboc"
+      ],
+      "rating": 5,
+      "total_review_count": 3,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Bayside Bistro Lingayen (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Bayside+Bistro+Lingayen+Lingayen+Pangasinan"
+        }
+      ],
+      "lat": 16.029543,
+      "lng": 120.22666
+    },
+    {
+      "id": "pangasinan-5towns-147",
+      "name": "Aj's Baywalk Bar & Grill",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Restobars, Grills & Late-Night Dining",
+      "location": "Baywalk, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱500 (Sizzling Sisig, Chicken Fingers, Billiards & Live Music)",
+      "description": "Late-night beachside bar and grill along the Lingayen Baywalk open from 4:00 PM until 3:00 AM, offering billiards tables, evening live music, cold beers, and bar chow.",
+      "what_to_do": [
+        "Play billiards and listen to live evening music along the Baywalk",
+        "Order bar bites and cold beers open until 3:00 AM"
+      ],
+      "rating": 3,
+      "total_review_count": 2,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Aj's Baywalk Bar & Grill (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Aj%27s+Baywalk+Bar+%26+Grill+Lingayen+Pangasinan&query_place_id=ChIJ-7zT5wdfkTMRbAaJGqaOwKg"
+        }
+      ],
+      "lat": 16.032947,
+      "lng": 120.234393
+    },
+    {
+      "id": "pangasinan-5towns-148",
+      "name": "Villa Plaza Foodpark Lingayen",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Restobars, Grills & Late-Night Dining",
+      "location": "26CH+7R4, Poblacion, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱400 (Wonton Noodles, Char Kway Teow, Grilled Skewers, Beer)",
+      "description": "Open-air night food park in Poblacion, Lingayen operating from 5:00 PM to 2:00 AM with multiple food stalls serving noodles, street food, grilled platters, and cold beer.",
+      "what_to_do": [
+        "Explore multiple evening food stalls open until 2:00 AM in Poblacion"
+      ],
+      "rating": 3.7,
+      "total_review_count": 3,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Villa Plaza Foodpark Lingayen (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Villa+Plaza+Foodpark+Lingayen+Lingayen+Pangasinan&query_place_id=ChIJ6XraKPNfkTMRxEBGrH862mE"
+        }
+      ],
+      "lat": 16.020687,
+      "lng": 120.229563
+    },
+    {
+      "id": "pangasinan-5towns-149",
+      "name": "Mang Inasal - Lingayen Public Market",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "Poblacion (near Lingayen Public Market), Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱500 (Chicken Inasal Paa/Pecho with Unlimited Rice, Pork BBQ, Crema de Leche Halo-Halo)",
+      "description": "Bustling Mang Inasal branch in Poblacion, Lingayen with 725+ reviews and a 4.4★ rating, famous for its juicy grilled Chicken Inasal, Pork BBQ, Palabok, and Crema de Leche Halo-Halo.",
+      "what_to_do": [
+        "Order Chicken Inasal with unlimited rice and Crema de Leche Halo-Halo"
+      ],
+      "rating": 4.4,
+      "total_review_count": 725,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Mang Inasal - Lingayen Public Market (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Mang+Inasal+-+Lingayen+Public+Market+Lingayen+Pangasinan&query_place_id=ChIJPTAns2FekTMRjXWNDNKtgrY"
+        }
+      ],
+      "lat": 16.023197,
+      "lng": 120.230633
+    },
+    {
+      "id": "pangasinan-5towns-150",
+      "name": "McDonald's Lingayen (24/7 Drive-Thru)",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "Vicente Solis St, National Rd, Poblacion, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱80–₱500 (Sulit-Busog 1-Pc Chicken McDo Meal w/ Drink ₱110, Big Mac, McCafé)",
+      "description": "24-hour McDonald's restaurant and drive-thru at Vicente Solis Street along the National Road in Lingayen, backed by 516+ verified reviews.",
+      "what_to_do": [
+        "Grab a ₱110 Sulit-Busog Chicken McDo Meal 24 hours a day",
+        "Use the drive-thru or dine-in along Vicente Solis Street"
+      ],
+      "rating": 4,
+      "total_review_count": 516,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – McDonald's Lingayen (24/7 Drive-Thru) (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=McDonald%27s+Lingayen+%2824%2F7+Drive-Thru%29+Lingayen+Pangasinan&query_place_id=ChIJ1SmryWFekTMRku0mp3S6pR0"
+        },
+        {
+          "title": "McDonald's Store Locator #549 – Lingayen",
+          "url": "https://www.mcdonalds.com.ph/store-locator?utm_source=google&utm_medium=organic&utm_campaign=GMB&utm_content=mcdph_549"
+        }
+      ],
+      "lat": 16.022235,
+      "lng": 120.231333
+    },
+    {
+      "id": "pangasinan-5towns-151",
+      "name": "Jollibee Lingayen",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "Avenida Rizal cor. Ramos & Soriano St, Poblacion, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱60–₱500 (Chickenjoy, Jolly Spaghetti, Yumburger, Peach Mango Pie)",
+      "description": "Long-standing Jollibee branch at the corner of Avenida Rizal and Ramos Street in Poblacion, Lingayen, featuring a drive-thru, kids' mini playground, and 392+ reviews.",
+      "what_to_do": [
+        "Order Chickenjoy and Jolly Spaghetti in downtown Lingayen",
+        "Use the drive-thru at Avenida Rizal corner Ramos Street"
+      ],
+      "rating": 3.8,
+      "total_review_count": 392,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Jollibee Lingayen (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Jollibee+Lingayen+Lingayen+Pangasinan&query_place_id=ChIJbWhwP2FekTMRQwrGoZ3ekcE"
+        },
+        {
+          "title": "Jollibee Official Store Link",
+          "url": "https://jollibee.onelink.me/U65H/googlebusinessprofile"
+        }
+      ],
+      "lat": 16.022437,
+      "lng": 120.229357
+    },
+    {
+      "id": "pangasinan-5towns-152",
+      "name": "Minute Burger Lingayen (24/7)",
+      "municipality_or_city": "Lingayen",
+      "region": "Western / Central Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "26CJ+CJJ, Poblacion, Lingayen, 2401 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱40–₱150 (Buy-1-Take-1 Black Pepper Burger, Double Chicken Time)",
+      "description": "5.0-star 24-hour burger stand in Poblacion, Lingayen serving freshly grilled Buy-1-Take-1 Black Pepper Burgers and Bigtime Sandwiches to students and night-shift workers.",
+      "what_to_do": [
+        "Order Buy-1-Take-1 Black Pepper Burgers open 24 hours"
+      ],
+      "rating": 5,
+      "total_review_count": 2,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Minute Burger Lingayen (24/7) (Lingayen)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Minute+Burger+Lingayen+%2824%2F7%29+Lingayen+Pangasinan&query_place_id=ChIJKZI4ZkxfkTMRhwr08fxy2SE"
+        }
+      ],
+      "lat": 16.021062,
+      "lng": 120.231562
+    },
+    {
+      "id": "pangasinan-5towns-156",
+      "name": "BC.G Cafe (BC.G Specialty Coffee)",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "House Of CHEEER Bldg, MacArthur Hwy, Brgy. San Nicolas, Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱400 (Single-origin/custom-bean Espresso, Iced Americano, Egg Tarts, Waffles, Croissants)",
+      "description": "4.8-star neighborhood specialty coffee shop in the House of CHEEER Building along MacArthur Highway in San Nicolas, Villasis, where guests can choose their preferred coffee beans and pair them with freshly baked egg tarts, waffles, and croissants.",
+      "what_to_do": [
+        "Choose your preferred coffee beans for a custom iced latte or Americano",
+        "Order freshly baked Egg Tarts, Waffles, and Croissants"
+      ],
+      "rating": 4.8,
+      "total_review_count": 26,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – BC.G Cafe (BC.G Specialty Coffee) (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=BC.G+Cafe+%28BC.G+Specialty+Coffee%29+Villasis+Pangasinan&query_place_id=ChIJ3ZO-SwA5kTMRSZC35WCBxsc"
+        }
+      ],
+      "lat": 15.907637,
+      "lng": 120.585249
+    },
+    {
+      "id": "pangasinan-5towns-157",
+      "name": "Island Joe's Coffee Lounge",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "26 Provincial Road, Brgy. Barraca, Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱400 (Caramel Macchiato, Fruit Shakes, Milk Tea, Crepes, Sandwiches & Pasta)",
+      "description": "5.0-star aesthetic café and Airbnb lounge at 26 Provincial Road in Brgy. Barraca, Villasis (5 minutes from Villasis Public Market), offering Caramel Macchiato, fruit shakes, milk teas, crepes, pastas, board games/toys, and spacious parking.",
+      "what_to_do": [
+        "Order Caramel Macchiato, crepes, fruit shakes, and pasta in Brgy. Barraca",
+        "Relax with free Wi-Fi, board games, and outdoor seating"
+      ],
+      "rating": 5,
+      "total_review_count": 9,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Island Joe's Coffee Lounge (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Island+Joe%27s+Coffee+Lounge+Villasis+Pangasinan&query_place_id=ChIJgRqjg8w5kTMRNmt1YPxSQpo"
+        },
+        {
+          "title": "Island Joe's Coffee Lounge Official Facebook",
+          "url": "https://www.facebook.com/profile.php?id=61555503074491"
+        }
+      ],
+      "lat": 15.899191,
+      "lng": 120.582278
+    },
+    {
+      "id": "pangasinan-5towns-158",
+      "name": "Hidden Gem Cafe Villasis",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "VHRH+PG8, Santo Domingo St, Poblacion, Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱90–₱350 (Handcrafted iced coffee, frappes, waffles & snacks)",
+      "description": "5.0-star cozy neighborhood café on Santo Domingo Street in Villasis with 10 verified 5-star reviews, prized for its quiet atmosphere and handcrafted coffee drinks.",
+      "what_to_do": [
+        "Unwind over handcrafted iced coffee on Santo Domingo Street"
+      ],
+      "rating": 5,
+      "total_review_count": 10,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Hidden Gem Cafe Villasis (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Hidden+Gem+Cafe+Villasis+Villasis+Pangasinan"
+        },
+        {
+          "title": "Hidden Gem Cafe Official Facebook",
+          "url": "https://www.facebook.com/share/1DX5FkVMne/"
+        }
+      ],
+      "lat": 15.891812,
+      "lng": 120.578812
+    },
+    {
+      "id": "pangasinan-5towns-159",
+      "name": "Thursday Cafe",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "048 Provincial Road, Brgy. Barraca, Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱300 (Signature Croffles ₱140, Espresso Lattes, Matcha)",
+      "description": "5.0-star boutique café along the Provincial Road in Brgy. Barraca, Villasis known for its freshly pressed Croffles (₱140) and specialty iced beverages.",
+      "what_to_do": [
+        "Order freshly pressed Croffles (₱140) and iced espresso drinks"
+      ],
+      "rating": 5,
+      "total_review_count": 5,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Thursday Cafe (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Thursday+Cafe+Villasis+Pangasinan&query_place_id=ChIJrTj2Ut85kTMRnBPvwci2-cc"
+        }
+      ],
+      "lat": 15.900125,
+      "lng": 120.582645
+    },
+    {
+      "id": "pangasinan-5towns-160",
+      "name": "Café Eduardo",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Gen. Luna St, Poblacion Zone 3, Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱90–₱350 (Freshly pulled Espresso, Iced Lattes, Pastries & Pasta)",
+      "description": "Established town-proper coffee shop on General Luna Street in Poblacion Zone 3, Villasis with 29 reviews, praised for its rich espresso and welcoming atmosphere for catching up with friends.",
+      "what_to_do": [
+        "Order freshly pulled espresso and iced lattes on Gen. Luna Street",
+        "Catch up with friends in Poblacion Zone 3, Villasis"
+      ],
+      "rating": 4.3,
+      "total_review_count": 29,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Café Eduardo (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Caf%C3%A9+Eduardo+Villasis+Pangasinan&query_place_id=ChIJybl-rUg5kTMRGQv26QFrMys"
+        }
+      ],
+      "lat": 15.902621,
+      "lng": 120.586473
+    },
+    {
+      "id": "pangasinan-5towns-161",
+      "name": "Villa Faustrella Cafe",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "VGHQ+7M9, Zone 3, Brgy. Amamperez, Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱90–₱350 (Iced coffee, milk tea, merienda plates)",
+      "description": "Scenic rural garden café in Zone 3, Brgy. Amamperez, Villasis offering coffee, milk tea, and snacks in a peaceful setting along the western Villasis corridor.",
+      "what_to_do": [
+        "Stop by Brgy. Amamperez for a peaceful garden coffee break"
+      ],
+      "rating": 4.3,
+      "total_review_count": 7,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Villa Faustrella Cafe (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Villa+Faustrella+Cafe+Villasis+Pangasinan&query_place_id=ChIJxzzG2c85kTMRfgupjhjeJ-U"
+        }
+      ],
+      "lat": 15.878187,
+      "lng": 120.539187
+    },
+    {
+      "id": "pangasinan-5towns-162",
+      "name": "Tea Talker - Unzad Villasis",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Villasis - Malasiqui Rd, Brgy. Unzad, Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱65–₱250 (Okinawa Milk Tea, Frappes, Brewed Coffee, Snacks)",
+      "description": "5.0-star women-owned milk tea and coffee shop along the Villasis-Malasiqui Road in Brgy. Unzad, Villasis, offering free Wi-Fi, Okinawa milk tea, frappes, drive-through/curbside pickup, and outdoor seating.",
+      "what_to_do": [
+        "Order Okinawa Milk Tea, frappes, and snacks in Brgy. Unzad",
+        "Enjoy free Wi-Fi and outdoor seating along Villasis-Malasiqui Road"
+      ],
+      "rating": 5,
+      "total_review_count": 4,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Tea Talker - Unzad Villasis (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Tea+Talker+-+Unzad+Villasis+Villasis+Pangasinan&query_place_id=ChIJ47XSyCNHkTMRulyGF7nt-v0"
+        },
+        {
+          "title": "Tea Talker Cafe Official Facebook",
+          "url": "https://www.facebook.com/teatalkercafe?mibextid=ZbWKwL"
+        }
+      ],
+      "lat": 15.896571,
+      "lng": 120.562659
+    },
+    {
+      "id": "pangasinan-5towns-163",
+      "name": "The Boulevard Cafe Villasis",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "WGGP+8JF, Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱60–₱300 (Empanadas, Milk Tea, Coffee, Street Food platters, Beer)",
+      "description": "4.6-star open-air nature-vibe café and snack hub in Villasis serving crispy empanadas, milk tea, coffee, street food snacks, and cold drinks.",
+      "what_to_do": [
+        "Order crispy empanadas, milk tea, and street food in a breezy nature setting"
+      ],
+      "rating": 4.6,
+      "total_review_count": 14,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – The Boulevard Cafe Villasis (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=The+Boulevard+Cafe+Villasis+Villasis+Pangasinan&query_place_id=ChIJna2Vvls5kTMR3xEbOsKQ0xc"
+        }
+      ],
+      "lat": 15.925813,
+      "lng": 120.536562
+    },
+    {
+      "id": "pangasinan-5towns-164",
+      "name": "Rhoan's Bake Spot",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Zone 1, Sterling Village, Poblacion, Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱250–₱2,500+ (Bento Cakes, Custom Buttercream & Fondant Cakes, Cupcakes)",
+      "description": "5.0-star custom cake studio and bakeshop in Zone 1, Sterling Village, Poblacion, Villasis crafting bento cakes, money-pulling birthday cakes, number cakes, and cupcakes.",
+      "what_to_do": [
+        "Order custom bento cakes, birthday cakes, and cupcakes for takeout"
+      ],
+      "rating": 5,
+      "total_review_count": 1,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Rhoan's Bake Spot (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Rhoan%27s+Bake+Spot+Villasis+Pangasinan&query_place_id=ChIJ6eT6njM5kTMRfiknbe2cBls"
+        },
+        {
+          "title": "Rhoan's Bake Spot Official Facebook",
+          "url": "https://www.facebook.com/rhoanbakespot/"
+        }
+      ],
+      "lat": 15.900615,
+      "lng": 120.589071
+    },
+    {
+      "id": "pangasinan-5towns-165",
+      "name": "Tal-Talon Food Park",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Restobars, Grills & Late-Night Dining",
+      "location": "Villasis - Malasiqui Highway (Boundary of Brgy. Barraca & Brgy. Unzad), Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱80–₱400 (Grilled meats, Green Papaya Salad, snacks, coffee & late-night bites)",
+      "description": "4.8-star family-friendly open-air food park along the Villasis-Malasiqui Highway at the boundary of Brgy. Barraca and Brgy. Unzad, featuring multiple food and drink stalls, rice-field views, and a spacious children's playground open daily from 6:00 AM to 10:00 PM.",
+      "what_to_do": [
+        "Sample diverse food stalls while kids play at the on-site playground",
+        "Hang out with friends over snacks and drinks overlooking the rice fields"
+      ],
+      "rating": 4.8,
+      "total_review_count": 5,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Tal-Talon Food Park (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Tal-Talon+Food+Park+Villasis+Pangasinan&query_place_id=ChIJlx42jns5kTMR049vgGQz51U"
+        }
+      ],
+      "lat": 15.897011,
+      "lng": 120.582894
+    },
+    {
+      "id": "pangasinan-5towns-166",
+      "name": "Piaz Food Park",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Restobars, Grills & Late-Night Dining",
+      "location": "2009 Villasis - Asingan Road, Brgy. Piaz (Plaza), Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱80–₱350 (Noodles, Char Kway Teow, grilled street food, milk tea & snacks)",
+      "description": "Community food and beverage park along the Villasis-Asingan Road in Brgy. Piaz, Villasis (operated by Somera Opiniano Commercial Leasing OPC), hosting local micro-food businesses in a pet-friendly, wheelchair-accessible compound.",
+      "what_to_do": [
+        "Stop along the Villasis-Asingan Road in Brgy. Piaz for local food stalls"
+      ],
+      "rating": 4.5,
+      "total_review_count": 5,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Piaz Food Park (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Piaz+Food+Park+Villasis+Pangasinan"
+        },
+        {
+          "title": "Piaz Food Park Official Facebook",
+          "url": "https://web.facebook.com/piazfoodparkofficial"
+        }
+      ],
+      "lat": 15.917366,
+      "lng": 120.59986
+    },
+    {
+      "id": "pangasinan-5towns-167",
+      "name": "Euroamasian Bar and Grill",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Restobars, Grills & Late-Night Dining",
+      "location": "Petron Villasis Compound, MacArthur Hwy, Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱500 (Hamburgers, grilled pulutan, beer & spirits)",
+      "description": "Evening bar and grill located at the Petron Villasis compound along MacArthur Highway, open Wednesday through Saturday from 6:00 PM to midnight serving burgers, grilled platters, and cold beers.",
+      "what_to_do": [
+        "Enjoy evening burgers, grilled bar food, and cold beers along MacArthur Highway"
+      ],
+      "rating": 4,
+      "total_review_count": 1,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Euroamasian Bar and Grill (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Euroamasian+Bar+and+Grill+Villasis+Pangasinan&query_place_id=ChIJs9ACdBQ5kTMRMe3bHhgROoA"
+        }
+      ],
+      "lat": 15.899541,
+      "lng": 120.588108
+    },
+    {
+      "id": "pangasinan-5towns-168",
+      "name": "Homies Kusina - Villasis",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "Zone 4, 50, Brgy. Lipay, Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱400 (Unlimited Wings including Chili Cheese flavor, Filipino rice meals)",
+      "description": "Women-owned casual Filipino eatery and wing joint in Zone 4, Brgy. Lipay, Villasis, offering unlimited flavored chicken wings (such as Chili Cheese) and lutong-bahay Filipino meals.",
+      "what_to_do": [
+        "Order Unlimited Chicken Wings (Chili Cheese) and Filipino rice meals in Brgy. Lipay"
+      ],
+      "rating": 3.5,
+      "total_review_count": 4,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Homies Kusina - Villasis (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Homies+Kusina+-+Villasis+Villasis+Pangasinan&query_place_id=ChIJ-7N5u8U5kTMReDnpSxh7H-I"
+        }
+      ],
+      "lat": 15.906836,
+      "lng": 120.612741
+    },
+    {
+      "id": "pangasinan-5towns-169",
+      "name": "Kubo Villasis",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "WH4M+WW9, MacArthur Hwy, Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱80–₱300 (Affordable Filipino delicacies, rice meals & merienda)",
+      "description": "5.0-star casual native kubo eatery along MacArthur Highway in Villasis founded in 2021, serving affordable Filipino delicacies and lunch plates Tuesday through Saturday.",
+      "what_to_do": [
+        "Dine on budget-friendly Filipino delicacies along MacArthur Highway in Villasis"
+      ],
+      "rating": 5,
+      "total_review_count": 2,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Kubo Villasis (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Kubo+Villasis+Villasis+Pangasinan"
+        }
+      ],
+      "lat": 15.907313,
+      "lng": 120.584812
+    },
+    {
+      "id": "pangasinan-5towns-170",
+      "name": "Maria Amor Eatery",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "WG8V+9WF, Villasis - Malasiqui Rd, Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱70–₱250 (Smoky Pork Dinakdakan, Pinakbet, Ilocano/Pangasinan turo-turo)",
+      "description": "Well-known local roadside eatery along the Villasis-Malasiqui Road in Villasis with 24 reviews, praised for its authentic smoky pork Dinakdakan and vegetable Pinakbet.",
+      "what_to_do": [
+        "Order smoky Pork Dinakdakan and fresh Pinakbet for brunch or lunch"
+      ],
+      "rating": 4,
+      "total_review_count": 24,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Maria Amor Eatery (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Maria+Amor+Eatery+Villasis+Pangasinan&query_place_id=ChIJ-21nG7o4kTMRg3aqIVboPZw"
+        }
+      ],
+      "lat": 15.915938,
+      "lng": 120.544813
+    },
+    {
+      "id": "pangasinan-5towns-171",
+      "name": "Mang Inasal - Villasis",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "MacArthur Hwy / Poblacion, Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱150–₱500 (Chicken Inasal Paa & Grilled Liempo Solo Fiesta ₱433, Unlimited Rice, Halo-Halo)",
+      "description": "Popular town-center Mang Inasal branch in Villasis with 285+ reviews and a 4.4★ rating, commended by locals for faster order dispatch than neighboring towns and hot, freshly grilled Chicken Inasal.",
+      "what_to_do": [
+        "Order Chicken Inasal Paa & Grilled Liempo Solo Fiesta (₱433) with unlimited rice"
+      ],
+      "rating": 4.4,
+      "total_review_count": 285,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Mang Inasal - Villasis (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Mang+Inasal+-+Villasis+Villasis+Pangasinan"
+        },
+        {
+          "title": "Mang Inasal Delivery Official Website",
+          "url": "http://manginasaldelivery.com.ph/"
+        }
+      ],
+      "lat": 15.901963,
+      "lng": 120.587261
+    },
+    {
+      "id": "pangasinan-5towns-172",
+      "name": "McDonald's Villasis (24/7 Drive-Thru)",
+      "municipality_or_city": "Villasis",
+      "region": "Eastern Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "132 R-9 (MacArthur Hwy), Poblacion, Villasis, 2427 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱79–₱500 (Under-₱100 Cyclist Combo Meals, Chicken McNuggets, Oreo & Matcha McFlurry)",
+      "description": "24-hour McDonald's restaurant and drive-thru at 132 R-9 (MacArthur Highway) in Villasis, a favorite pit stop for Pangasinan cyclists, motorists, and families with 82+ verified reviews.",
+      "what_to_do": [
+        "Stop 24/7 for under-₱100 combo meals, Chicken McDo, and Matcha/Oreo McFlurry",
+        "Use the MacArthur Highway drive-thru or cyclist-friendly parking lot"
+      ],
+      "rating": 3.8,
+      "total_review_count": 82,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – McDonald's Villasis (24/7 Drive-Thru) (Villasis)",
+          "url": "https://www.google.com/maps/search/?api=1&query=McDonald%27s+Villasis+%2824%2F7+Drive-Thru%29+Villasis+Pangasinan&query_place_id=ChIJ0191MAA5kTMRM2IRhqR3ST4"
+        },
+        {
+          "title": "McDonald's Store Locator #1010 – Villasis",
+          "url": "https://www.mcdonalds.com.ph/store-locator?utm_source=google&utm_medium=organic&utm_campaign=GMB&utm_content=mcdph_1010"
+        }
+      ],
+      "lat": 15.900227,
+      "lng": 120.587755
+    },
+    {
+      "id": "pangasinan-5towns-178",
+      "name": "Mashiso 2.0 Korean Resto",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Korean BBQ, Japanese & Asian Dining",
+      "location": "2HVP+H9M, REI Building 2, MacArthur Hwy, Binalonan, 2436 Pangasinan (near BIWAD)",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱199–₱399 (Unlimited Samgyupsal @ ₱279 with kimchi, cucumber & radish side dishes)",
+      "description": "Budget-friendly Korean BBQ restaurant in the REI Building 2 along MacArthur Highway in Binalonan (near BIWAD), popular with college students and groups for its ₱279 unlimited samgyupsal and fresh kimchi, cucumber, and radish salads.",
+      "what_to_do": [
+        "Avail of the ₱279 Unlimited Samgyupsal with Korean side dishes"
+      ],
+      "rating": 4.2,
+      "total_review_count": 41,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Mashiso 2.0 Korean Resto (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Mashiso+2.0+Korean+Resto+Binalonan+Pangasinan&query_place_id=ChIJNxp6A5UVkTMRIXkrSVtH8vE"
+        }
+      ],
+      "lat": 16.043937,
+      "lng": 120.585937
+    },
+    {
+      "id": "pangasinan-5towns-180",
+      "name": "TDZ HeBrews Cafe",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "2HWP+FG5, Gas Station Compound, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱400 (Specialty brewed coffee, frappes, hamburgers, pasta & snacks)",
+      "description": "4.6-star independent coffee shop uniquely tucked inside a gas station compound in Binalonan with 85 reviews, offering a quiet, cozy study and hangout space open until 11:00 PM.",
+      "what_to_do": [
+        "Unwind or work on a laptop until 11:00 PM with specialty coffee and burgers"
+      ],
+      "rating": 4.6,
+      "total_review_count": 85,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – TDZ HeBrews Cafe (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=TDZ+HeBrews+Cafe+Binalonan+Pangasinan&query_place_id=ChIJe3XAs7IVkTMRdUmR7px2GfQ"
+        }
+      ],
+      "lat": 16.046187,
+      "lng": 120.586312
+    },
+    {
+      "id": "pangasinan-5towns-181",
+      "name": "BIKER BREWINGS",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Rooftop, K Ignacio Building, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱400 (Flavored Chicken Wings, Iced Coffee, Rooftop snacks)",
+      "description": "5.0-star rooftop coffee shop and wing bar atop the K Ignacio Building in Binalonan with 42 glowing reviews, popular with cyclists, riders, and students for its flavored chicken wings and open-air rooftop vibe.",
+      "what_to_do": [
+        "Dine on flavored chicken wings and iced coffee on the K Ignacio Building rooftop"
+      ],
+      "rating": 5,
+      "total_review_count": 42,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – BIKER BREWINGS (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=BIKER+BREWINGS+Binalonan+Pangasinan"
+        }
+      ],
+      "lat": 16.047822,
+      "lng": 120.593112
+    },
+    {
+      "id": "pangasinan-5towns-182",
+      "name": "Artisan Cafè Binalonan",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "3H3Q+W4Q, R-9 (MacArthur Hwy), Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱120–₱500 (Ube Pastillas Coffee ₱150, Avocado Frappe ₱145, Spanish Latte, Garlic Butter Chicken Wings ₱210, All-Day Breakfast)",
+      "description": "4.5-star women-owned, student-loved café along R-9 in Binalonan featuring air-conditioned and rooftop seating, free Wi-Fi, signature Ube Pastillas Coffee (₱150), Spanish Latte, and Garlic Butter Chicken Wings (₱210).",
+      "what_to_do": [
+        "Order the Ube Pastillas Coffee (₱150), Spanish Latte, and Garlic Butter Wings (₱210)",
+        "Study with free Wi-Fi or relax on the rooftop deck"
+      ],
+      "rating": 4.5,
+      "total_review_count": 25,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Artisan Cafè Binalonan (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Artisan+Caf%C3%A8+Binalonan+Binalonan+Pangasinan&query_place_id=ChIJNaoPeAAVkTMR-kfsZmZ77yc"
+        }
+      ],
+      "lat": 16.054813,
+      "lng": 120.587812
+    },
+    {
+      "id": "pangasinan-5towns-183",
+      "name": "Brewnalonan Cafe",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Ground Floor, Patawaran Bldg, McKinley St cor. Dewey St, Poblacion, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱120–₱450 (Chicken Biryani, Chicken Alfredo Pasta, Spanish Sardines Pasta, Brewnalonan Burger, Specialty Coffee)",
+      "description": "4.8-star local coffee shop on the ground floor of the Patawaran Building at McKinley corner Dewey Street in Poblacion, Binalonan, praised equally for its espresso drinks and fresh Chicken Biryani and Chicken Alfredo pasta.",
+      "what_to_do": [
+        "Order Chicken Biryani, Chicken Alfredo Pasta, and the Brewnalonan Burger",
+        "Work on a laptop in the heart of Poblacion, Binalonan"
+      ],
+      "rating": 4.8,
+      "total_review_count": 16,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Brewnalonan Cafe (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Brewnalonan+Cafe+Binalonan+Pangasinan&query_place_id=ChIJk-1eGoAVkTMRm82qBFYeFHU"
+        }
+      ],
+      "lat": 16.047304,
+      "lng": 120.592349
+    },
+    {
+      "id": "pangasinan-5towns-184",
+      "name": "Anea Cafe - Binalonan Airport",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "Diversion Road, Binalonan Airport, Brgy. Linmansangan, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱120–₱450 (All-day breakfast plates, specialty iced coffee, pasta & pastries)",
+      "description": "4.6-star aviation-side café located along Diversion Road at Binalonan Airport, where student pilots, cyclists, and families enjoy all-day breakfast meals and specialty coffee.",
+      "what_to_do": [
+        "Order all-day breakfast and iced coffee beside Binalonan Airport"
+      ],
+      "rating": 4.6,
+      "total_review_count": 16,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Anea Cafe - Binalonan Airport (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Anea+Cafe+-+Binalonan+Airport+Binalonan+Pangasinan&query_place_id=ChIJA9jsM7MVkTMRezm8HAkC2fg"
+        }
+      ],
+      "lat": 16.046247,
+      "lng": 120.582486
+    },
+    {
+      "id": "pangasinan-5towns-185",
+      "name": "Drop Coffee - Binalonan",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "MacArthur Hwy, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱90–₱300 (Espresso lattes, cold brew, pastries, al-fresco snacks)",
+      "description": "Spacious, accessible highway coffee shop along MacArthur Highway in Binalonan offering both air-conditioned indoor and al-fresco seating at wallet-friendly prices.",
+      "what_to_do": [
+        "Stop along MacArthur Highway for a quick espresso fix and al-fresco dining"
+      ],
+      "rating": 3.9,
+      "total_review_count": 13,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Drop Coffee - Binalonan (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Drop+Coffee+-+Binalonan+Binalonan+Pangasinan&query_place_id=ChIJf5pu4i4VkTMREWZVX8Cu1ro"
+        }
+      ],
+      "lat": 16.045859,
+      "lng": 120.594639
+    },
+    {
+      "id": "pangasinan-5towns-186",
+      "name": "1822 Cafe Binalonan",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "MacArthur Hwy, Brgy. Sumabnit, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱70–₱350 (Milk tea, iced coffee, rice meals & snacks)",
+      "description": "Casual roadside branch of 1822 Cafe along MacArthur Highway in Brgy. Sumabnit, Binalonan serving affordable coffee, milk tea, and student meals.",
+      "what_to_do": [
+        "Order budget-friendly coffee, milk tea, and snacks in Brgy. Sumabnit"
+      ],
+      "rating": 3.5,
+      "total_review_count": 24,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – 1822 Cafe Binalonan (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=1822+Cafe+Binalonan+Binalonan+Pangasinan"
+        },
+        {
+          "title": "1822 Cafe Official Facebook",
+          "url": "https://www.facebook.com/profile.php?id=100075940702770"
+        }
+      ],
+      "lat": 16.035978,
+      "lng": 120.587207
+    },
+    {
+      "id": "pangasinan-5towns-187",
+      "name": "Allos Book and Coffee Bar",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "2HWV+Q22, Poblacion, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱90–₱250 (Specialty coffee, teas, light pastries)",
+      "description": "Book-themed coffee bar in Poblacion, Binalonan designed for quiet reading, studying, and relaxed coffee sessions near the town plaza and university belt.",
+      "what_to_do": [
+        "Read a book and sip iced coffee in a quiet Poblacion study nook"
+      ],
+      "rating": 3.1,
+      "total_review_count": 22,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Allos Book and Coffee Bar (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Allos+Book+and+Coffee+Bar+Binalonan+Pangasinan"
+        }
+      ],
+      "lat": 16.046937,
+      "lng": 120.592562
+    },
+    {
+      "id": "pangasinan-5towns-188",
+      "name": "Booba Coolers Binalonan",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "55 McKinley St, Poblacion, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱60–₱200 (Lemon Tea, Cream Tea, Pearl Milk Tea, Budget Snacks)",
+      "description": "Popular town-center bubble tea and snack shop at 55 McKinley Street in Poblacion, Binalonan serving Lemon Tea, Cream Tea, boba coolers, and affordable student snacks.",
+      "what_to_do": [
+        "Order Lemon Tea, Cream Tea, and budget snacks on McKinley Street"
+      ],
+      "rating": 4,
+      "total_review_count": 21,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Booba Coolers Binalonan (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Booba+Coolers+Binalonan+Binalonan+Pangasinan"
+        }
+      ],
+      "lat": 16.045344,
+      "lng": 120.594453
+    },
+    {
+      "id": "pangasinan-5towns-189",
+      "name": "Juzz Coffee",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "3rd Floor, CNA Commercial Square, Antonio Luna St, Poblacion, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱90–₱250 (Rooftop iced coffee, espresso, and snacks)",
+      "description": "5.0-star third-floor rooftop coffee shop at CNA Commercial Square on Antonio Luna Street in Poblacion, Binalonan.",
+      "what_to_do": [
+        "Enjoy third-floor rooftop coffee views at CNA Commercial Square"
+      ],
+      "rating": 5,
+      "total_review_count": 2,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Juzz Coffee (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Juzz+Coffee+Binalonan+Pangasinan"
+        }
+      ],
+      "lat": 16.047546,
+      "lng": 120.591842
+    },
+    {
+      "id": "pangasinan-5towns-190",
+      "name": "Dunkin' Binalonan (24/7 Drive-Thru)",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Specialty Cafés, Bakeries & Milk Tea",
+      "location": "2HWP+RJ9, MacArthur Hwy, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱45–₱350 (Iced Macchiato 12oz, K-Bun Bunwich, Bavarian & Choco Butternut Doughnuts)",
+      "description": "24-hour Dunkin' café with drive-thru along MacArthur Highway in Binalonan, serving K-Bun bunwiches, Iced Macchiatos, and fresh doughnuts around the clock.",
+      "what_to_do": [
+        "Stop 24/7 via drive-thru or dine-in for K-Bun bunwiches and Iced Macchiato"
+      ],
+      "rating": 3.3,
+      "total_review_count": 15,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Dunkin' Binalonan (24/7 Drive-Thru) (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Dunkin%27+Binalonan+%2824%2F7+Drive-Thru%29+Binalonan+Pangasinan&query_place_id=ChIJ2ZOYRAAVkTMR2N10cdIKyLc"
+        }
+      ],
+      "lat": 16.047062,
+      "lng": 120.586562
+    },
+    {
+      "id": "pangasinan-5towns-191",
+      "name": "D'Brinks Resto Cafe",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Italian, Pizza, Pasta & Western",
+      "location": "2HXP+HM6, Dewey St, Poblacion, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱125–₱800 (Double Pattie Burger Steak ₱125, Hungarian Sausage Pasta ₱135, Pinoy Spaghetti ₱135, Fish & Chips ₱185, 5-pc Buffalo Wings ₱255, Medium Bilao ₱800)",
+      "description": "4.3-star resto-café on Dewey Street in Poblacion, Binalonan offering budget-friendly student meals and group bundles, including Buffalo Wings (₱255), Fish & Chips (₱185), Hungarian Sausage Pasta (₱135), and Pinoy Spaghetti bilaos.",
+      "what_to_do": [
+        "Order Buffalo Wings (₱255), Fish & Chips (₱185), or Double Pattie Burger Steak (₱125)"
+      ],
+      "rating": 4.3,
+      "total_review_count": 12,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – D'Brinks Resto Cafe (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=D%27Brinks+Resto+Cafe+Binalonan+Pangasinan&query_place_id=ChIJe8dJT7YVkTMRfylQWZwrwQ0"
+        }
+      ],
+      "lat": 16.048937,
+      "lng": 120.586687
+    },
+    {
+      "id": "pangasinan-5towns-192",
+      "name": "Shakey's Binalonan",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Italian, Pizza, Pasta & Western",
+      "location": "3H28+P3V, MacArthur Hwy, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱400–₱1,200 (Thin Crust Pizza, Chicken 'n' Mojos, Buffalo Wings ₱400+)",
+      "description": "Stand-alone Shakey's Pizza Parlor along MacArthur Highway in Binalonan with ample parking, outdoor and indoor seating, and family pizza-and-chicken bundles.",
+      "what_to_do": [
+        "Order Thin Crust Pizza and Chicken 'n' Mojos along MacArthur Highway"
+      ],
+      "rating": 3.6,
+      "total_review_count": 97,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Shakey's Binalonan (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Shakey%27s+Binalonan+Binalonan+Pangasinan&query_place_id=ChIJAT3G6tcVkTMRhWr1lpuadmw"
+        },
+        {
+          "title": "Shakey's Official Website",
+          "url": "http://www.shakeys.com/"
+        }
+      ],
+      "lat": 16.051813,
+      "lng": 120.565187
+    },
+    {
+      "id": "pangasinan-5towns-193",
+      "name": "Dominic Pizza Binalonan",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Italian, Pizza, Pasta & Western",
+      "location": "24 Mendoza St, Poblacion, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱120–₱350 (Freshly baked local party pizzas)",
+      "description": "5.0-star homegrown pizza maker and parlor at 24 Mendoza Street in Poblacion, Binalonan, loved by locals for its generous toppings and budget-friendly party pizzas.",
+      "what_to_do": [
+        "Order freshly baked local pizzas for family parties on Mendoza Street"
+      ],
+      "rating": 5,
+      "total_review_count": 11,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Dominic Pizza Binalonan (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Dominic+Pizza+Binalonan+Binalonan+Pangasinan&query_place_id=ChIJE3M-QccVkTMRX1jaRNq4C1Y"
+        },
+        {
+          "title": "Dominic Pizza Link",
+          "url": "http://bit.ly/dominicpizza"
+        }
+      ],
+      "lat": 16.04603,
+      "lng": 120.592153
+    },
+    {
+      "id": "pangasinan-5towns-195",
+      "name": "Pepay's Kambingan",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Filipino & Seafood Family Dining",
+      "location": "Near Binalonan TPLEX Exit, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱100–₱400 (Kalderetang Kambing, Pinapaitan, Kilawin, Turo-Turo Breakfast & Lunch)",
+      "description": "4.7-star goat-specialty eatery (kambingan) located near the Binalonan TPLEX Exit, opening at 4:00 AM daily to serve hot Pinapaitan and Kalderetang Kambing to early motorists and locals.",
+      "what_to_do": [
+        "Order hot Pinapaitan and Kalderetang Kambing starting at 4:00 AM near TPLEX Exit"
+      ],
+      "rating": 4.7,
+      "total_review_count": 10,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Pepay's Kambingan (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Pepay%27s+Kambingan+Binalonan+Pangasinan&query_place_id=ChIJb1sv5AYVkTMRFi-3FXU2Xkg"
+        },
+        {
+          "title": "Pepay's Kambingan Official Website",
+          "url": "https://pepayskambingan.wixsite.com/website"
+        }
+      ],
+      "lat": 16.047591,
+      "lng": 120.580086
+    },
+    {
+      "id": "pangasinan-5towns-196",
+      "name": "Tavera's Grill",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Restobars, Grills & Late-Night Dining",
+      "location": "75 Pardo De Tavera St, Brgy. Santo Niño, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱50–₱350 (Pork BBQ Skewers, Chicken Inihaw, Grilled Neck/Head, Rice Meals)",
+      "description": "5.0-star neighborhood charcoal grill ('Inihaw Para Sa Lahat') at 75 Pardo De Tavera Street in Brgy. Santo Niño, Binalonan, praised for its flavorful Pork BBQ skewers and comfortable dining.",
+      "what_to_do": [
+        "Order charcoal-grilled Pork BBQ sticks and Chicken Inihaw on Pardo De Tavera St"
+      ],
+      "rating": 5,
+      "total_review_count": 4,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Tavera's Grill (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Tavera%27s+Grill+Binalonan+Pangasinan&query_place_id=ChIJL-ymJh0TkTMRDoNah91cbLI"
+        }
+      ],
+      "lat": 16.047189,
+      "lng": 120.591862
+    },
+    {
+      "id": "pangasinan-5towns-197",
+      "name": "DAROCK'S Resto & Pares Hub",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Restobars, Grills & Late-Night Dining",
+      "location": "MacArthur Hwy, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱80–₱350 (Beef Pares w/ Rice, Pares Mami Overlord w/ Drinks, Boneless Bangus Tomato Salad ₱199)",
+      "description": "5.0-star 24-hour highway eatery and live-music restobar along MacArthur Highway in Binalonan (open 24 hours Monday–Saturday), serving Beef Pares, Pares Mami Overlord bowls, and Boneless Bangus Tomato Salad (₱199).",
+      "what_to_do": [
+        "Order Pares Mami Overlord and Boneless Bangus Tomato Salad (₱199) 24/6"
+      ],
+      "rating": 5,
+      "total_review_count": 2,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – DAROCK'S Resto & Pares Hub (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=DAROCK%27S+Resto+%26+Pares+Hub+Binalonan+Pangasinan&query_place_id=ChIJq9UpqwwVkTMR8O-WZaphqq0"
+        },
+        {
+          "title": "DAROCK'S Official Facebook",
+          "url": "https://www.facebook.com/share/cuENUS2F9prHV6XV/?mibextid=qi2Omg"
+        }
+      ],
+      "lat": 16.047678,
+      "lng": 120.593102
+    },
+    {
+      "id": "pangasinan-5towns-198",
+      "name": "Jollibee Binalonan Highway (24/7 Drive-Thru)",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "National Road cor. Laoac Rd, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱60–₱500 (1-Pc Chickenjoy w/ Double Rice & Iced Tea ₱198, 1-Pc Chickenjoy + Jolly Spaghetti w/ Drink ₱222)",
+      "description": "Major 24-hour Jollibee drive-thru and dine-in hub at the junction of National Road and Laoac Road in Binalonan with 826+ verified reviews and spacious parking for northern Luzon travelers.",
+      "what_to_do": [
+        "Stop 24/7 for Chickenjoy with Double Rice (₱198) or Jolly Spaghetti (₱222)"
+      ],
+      "rating": 3.9,
+      "total_review_count": 826,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Jollibee Binalonan Highway (24/7 Drive-Thru) (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Jollibee+Binalonan+Highway+%2824%2F7+Drive-Thru%29+Binalonan+Pangasinan"
+        },
+        {
+          "title": "Jollibee Official Store Link",
+          "url": "https://jollibee.onelink.me/U65H/googlebusinessprofile"
+        }
+      ],
+      "lat": 16.045558,
+      "lng": 120.592678
+    },
+    {
+      "id": "pangasinan-5towns-199",
+      "name": "McDonald's Binalonan (24/7 Drive-Thru)",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "MacArthur Hwy, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱80–₱500 (Big Mac, Chicken McDo, Fries, Self-Ordering Kiosks)",
+      "description": "24-hour McDonald's branch along MacArthur Highway in Binalonan equipped with self-ordering kiosks, a fast drive-thru lane, ample parking, and 395+ verified reviews.",
+      "what_to_do": [
+        "Order via self-service kiosks or the 24-hour drive-thru on MacArthur Highway"
+      ],
+      "rating": 3.9,
+      "total_review_count": 395,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – McDonald's Binalonan (24/7 Drive-Thru) (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=McDonald%27s+Binalonan+%2824%2F7+Drive-Thru%29+Binalonan+Pangasinan&query_place_id=ChIJTf0s-MsVkTMRrAAAx7EfGR0"
+        },
+        {
+          "title": "McDonald's Store Locator #771 – Binalonan",
+          "url": "https://www.mcdonalds.com.ph/store-locator?utm_source=google&utm_medium=organic&utm_campaign=GMB&utm_content=mcdph_771"
+        }
+      ],
+      "lat": 16.045172,
+      "lng": 120.594138
+    },
+    {
+      "id": "pangasinan-5towns-200",
+      "name": "Chowking Binalonan",
+      "municipality_or_city": "Binalonan",
+      "region": "Eastern Pangasinan",
+      "category": "Fast Food & Highway Transit Stops",
+      "location": "Binalonan - Dagupan Hwy, Brgy. Linmansangan, Binalonan, 2436 Pangasinan",
+      "has_fee": true,
+      "fee_in_venue": "Menu Price Range: ₱123–₱500 (Spicy Chao Fan w/ Drink ₱123, Wonton Mami w/ Drink ₱146, Pancit Canton w/ 3-pc Lumpiang Shanghai ₱146, Bestipid Combo ₱174)",
+      "description": "Spacious stand-alone Chowking restaurant with drive-thru and wide parking along the Binalonan-Dagupan Highway in Brgy. Linmansangan, Binalonan, open daily from 6:00 AM to 11:00 PM.",
+      "what_to_do": [
+        "Order Spicy Chao Fan w/ Drink (₱123) or Pancit Canton w/ Shanghai (₱146)",
+        "Stop by the drive-thru along Binalonan-Dagupan Highway"
+      ],
+      "rating": 3.7,
+      "total_review_count": 206,
+      "verified_sources": [
+        {
+          "title": "Google Maps Verified Listing – Chowking Binalonan (Binalonan)",
+          "url": "https://www.google.com/maps/search/?api=1&query=Chowking+Binalonan+Binalonan+Pangasinan&query_place_id=ChIJAaMl7B4VkTMRdIwdHZQHevc"
+        },
+        {
+          "title": "Chowking Delivery Official Portal",
+          "url": "http://www.chowkingdelivery.com/"
+        }
+      ],
+      "lat": 16.044626,
+      "lng": 120.582115
+    }
+  ]
+}
