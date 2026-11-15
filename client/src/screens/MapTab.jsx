@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Search, Umbrella, UtensilsCrossed, Landmark, MapPin, LocateFixed, Camera } from 'lucide-react';
+import { Search, Umbrella, UtensilsCrossed, Landmark, MapPin, LocateFixed, Camera, MapPinPlus } from 'lucide-react';
 import { recommend } from '../api.js';
 import { readLocalPrefs } from '../prefs.js';
 import { sessionGet, sessionSet } from '../sessionCache.js';
@@ -11,6 +11,7 @@ import { Map, MapMarker, MarkerContent } from '@/components/ui/map';
 import { pinPhoto } from '../pinPhoto.js';
 import { Chip } from '../ui.jsx';
 import SpotPopup from './SpotPopup.jsx';
+import AddPlace from './AddPlace.jsx';
 
 const RADII = [[1,'1 km'],[5,'Within 5 km'],[10,'10 km']];
 const RADIUS_ZOOM = { 1: 13, 5: 11.5, 10: 10.5 };
@@ -138,6 +139,7 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
   const [places, setPlaces] = useState(() => sessionGet(keyFor(radius, coords)) || []);
   const [spots, setSpots] = useState([]);
   const [selectedSpot, setSelectedSpot] = useState(null);
+  const [addOpen, setAddOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   // A real GPS fix has arrived — until then coords are the Pangasinan fallback,
   // which must not be shown as "You are here" or used to filter pins.
@@ -373,7 +375,14 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
       </div>
 
       {busy && <div style={{ position:'absolute', top:110, left:12, zIndex:5 }}><span className="shimmer chip" style={{ background:'#fff' }}>Loading nearby…</span></div>}
-      {!busy && !filtered.length && !filteredSpots.length && !filteredDiscover.length && <div style={{ position:'absolute', top:110, left:12, right:12, zIndex:5 }}><span className="chip" style={{ background:'#fff' }}>No stops here yet — widen the radius.</span></div>}
+      {!busy && !filtered.length && !filteredSpots.length && !filteredDiscover.length && (
+        <div style={{ position:'absolute', top:110, left:12, right:12, zIndex:5, display:'grid', gap:6, justifyItems:'start' }}>
+          <span className="chip" style={{ background:'#fff' }}>No stops here yet — widen the radius.</span>
+          <button type="button" data-testid="add-place-link" onClick={() => setAddOpen(true)} style={{ background:'none', border:'none', padding:'2px 4px', fontSize:12.5, fontWeight:600, color:'var(--primary)' }}>
+            Can't find it? Add a missing place
+          </button>
+        </div>
+      )}
       {!busy && !filtered.length && !filteredDiscover.length && filteredSpots.length > 0 && <div style={{ position:'absolute', top:110, left:12, zIndex:5 }}><span className="chip" style={{ background:'#fff' }}>{filteredSpots.length} curated{filter === 'All' ? '' : ' ' + filter.toLowerCase()} spots</span></div>}
 
       <button
@@ -387,7 +396,19 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
         <LocateFixed size={20}/>
       </button>
 
+      <button
+        type="button"
+        data-testid="add-place-fab"
+        aria-label="Add a missing place"
+        title="Add a missing place"
+        onClick={() => { setSelectedSpot(null); setAddOpen(true); }}
+        style={{ position:'absolute', right:12, bottom:'calc(134px + var(--safe-bottom))', zIndex:6, width:48, height:48, borderRadius:'50%', border:'1px solid #EDF1F7', background:'#fff', color:'var(--primary)', display:'grid', placeItems:'center', boxShadow:'0 10px 24px -12px rgba(10,37,64,.28)', padding:0 }}
+      >
+        <MapPinPlus size={22}/>
+      </button>
+
       {selectedSpot && <SpotPopup spot={selectedSpot} coords={coords} pop={() => setSelectedSpot(null)} push={push} setTab={setTab} showToast={showToast} user={user} openDirections={openDirections} />}
+      {addOpen && <AddPlace coords={coords} hasFix={hasFix} pop={() => setAddOpen(false)} showToast={showToast} user={user} />}
     </div>
   );
 }

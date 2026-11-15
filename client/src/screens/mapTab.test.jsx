@@ -229,3 +229,37 @@ describe('MapTab discovered pins', () => {
     await h.unmount();
   });
 });
+
+describe('MapTab add-a-place entry', () => {
+  const click = async (h, el) => {
+    await React.act(async () => { el.dispatchEvent(new window.MouseEvent('click', { bubbles: true })); });
+  };
+
+  it('offers a labelled button to add a place that is missing', async () => {
+    const h = await mount();
+    const fab = h.container.querySelector('[data-testid="add-place-fab"]');
+    expect(fab).not.toBeNull();
+    expect(fab.getAttribute('aria-label')).toBe('Add a missing place');
+    await h.unmount();
+  });
+
+  it('opens the sheet over the map, and closing it puts the traveller back on the map', async () => {
+    const h = await mount();
+    await click(h, h.container.querySelector('[data-testid="add-place-fab"]'));
+    expect(h.container.querySelector('[data-testid="add-place"]')).not.toBeNull();
+    await click(h, h.container.querySelector('[data-testid="add-place-close"]'));
+    expect(h.container.querySelector('[data-testid="add-place"]')).toBeNull();
+    await h.unmount();
+  });
+
+  it('offers the same entry point from the empty-map state', async () => {
+    sess.map = {};
+    recommend.mockResolvedValueOnce({ places: [] });
+    const h = await mount();
+    const link = h.container.querySelector('[data-testid="add-place-link"]');
+    expect(link).not.toBeNull();
+    await click(h, link);
+    expect(h.container.querySelector('[data-testid="add-place"]')).not.toBeNull();
+    await h.unmount();
+  });
+});

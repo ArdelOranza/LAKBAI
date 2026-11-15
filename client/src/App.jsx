@@ -23,6 +23,7 @@ import PlaceDetail from './screens/PlaceDetail.jsx';
 import Emergency from './screens/Emergency.jsx';
 import Itineraries from './screens/Itineraries.jsx';
 import MyReviews from './screens/MyReviews.jsx';
+import MySubmissions from './screens/MySubmissions.jsx';
 import ItineraryView from './screens/ItineraryView.jsx';
 import RouteSheet from './screens/RouteSheet.jsx';
 
@@ -204,6 +205,7 @@ function Shell(){
   else if (top?.name === 'profileEdit') body = <ProfileEdit {...screenProps}/>;
   else if (top?.name === 'itineraries') body = <Itineraries {...screenProps}/>;
   else if (top?.name === 'myReviews') body = <MyReviews {...screenProps}/>;
+  else if (top?.name === 'mySubmissions') body = <MySubmissions {...screenProps}/>;
   else if (top?.name === 'itinerary') body = <ItineraryView plan={top.plan} {...screenProps}/>;
   else if (tab === 'home') body = <HomeTab {...screenProps}/>;
   else if (tab === 'map') body = <MapTab {...screenProps}/>;

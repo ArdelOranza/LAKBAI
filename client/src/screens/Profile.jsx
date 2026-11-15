@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../AuthContext.jsx';
 import { listPlans, listMyReviews } from '../store.js';
 import { loadPrefs } from '../prefs.js';
-import { Route, MessageSquare, Bookmark, SlidersHorizontal, ChevronRight, LogOut, Download } from 'lucide-react';
+import { Route, MessageSquare, Bookmark, SlidersHorizontal, ChevronRight, LogOut, Download, MapPinPlus } from 'lucide-react';
 
 // The APK row is pointless inside the Android shell itself.
 const inNativeApp = () => typeof window !== 'undefined' && !!window.Capacitor?.isNativePlatform?.();
@@ -73,6 +73,11 @@ export default function Profile({ push, setTab, user, signOut }){
           <button className="menu-row" data-testid="menu-reviews" onClick={() => push({ name:'myReviews' })}>
             <span className="mi"><MessageSquare size={18}/></span>
             My Reviews
+            <span className="chev"><ChevronRight size={18}/></span>
+          </button>
+          <button className="menu-row" data-testid="menu-submissions" onClick={() => push({ name:'mySubmissions' })}>
+            <span className="mi"><MapPinPlus size={18}/></span>
+            My submissions
             <span className="chev"><ChevronRight size={18}/></span>
           </button>
           {!inNativeApp() && (

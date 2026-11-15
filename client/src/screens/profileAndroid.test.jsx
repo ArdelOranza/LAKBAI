@@ -51,3 +51,11 @@ describe('Profile → Android app download', () => {
     expect(html).toContain(`v${version}`);
   });
 });
+
+describe('Profile → My submissions', () => {
+  it('gives the traveller a way to follow what they sent for review', () => {
+    const html = renderToString(<Profile {...props} />);
+    expect(html).toContain('data-testid="menu-submissions"');
+    expect(html).toContain('My submissions');
+  });
+});

@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient.js';
 import { peekOutbox, removeFirst, queueReview, queueFavDelete, stripForInsert } from './outbox.js';
+import { submissionRow } from './placeSubmission.js';
 export async function saveFavorite(user, place){
   if (!supabase || !user) return { error: 'login required' };
   return supabase.from('favorites').upsert({ user_id: user.id, place_id: place.id, name: place.name, lng: place.lng, lat: place.lat, photo: place.photo || null, categories: Array.isArray(place.categories) ? place.categories : [] }, { onConflict: 'user_id,place_id' });
@@ -140,4 +141,50 @@ export async function saveProfile(user, { display_name, phone }){
   if (!supabase || !user) return { error: 'login required' };
   const { error } = await supabase.from('profiles').upsert({ id: user.id, display_name, phone });
   return error ? { error: error.message } : {};
+}
+
+/**
+ * A place the traveller says is missing. The row lands `pending` (the column
+ * default) and stays invisible until an editor approves it, so this only ever
+ * writes the traveller's own submission.
+ */
+export async function submitPlace(user, draft){
+  if (!supabase || !user) return { error: 'login required' };
+  const { data, error } = await supabase.from('place_submissions')
+    .insert(submissionRow(user.id, draft)).select().single();
+  if (error){
+    // The unique index is per user + name + town: this exact submission exists.
+    if (error.code === '23505') return { duplicate: true, error: 'You already submitted this place.' };
+    return { error: error.message };
+  }
+  return { data };
+}
+
+export async function listMySubmissions(user){
+  if (!supabase || !user) return [];
+  const { data } = await supabase.from('place_submissions')
+    .select('id,name,town,barangay,categories,status,note,review_note,created_at')
+    .eq('user_id', user.id).order('created_at', { ascending: false });
+  return data || [];
+}
+
+/** Update-and-delete on a reviewed row would let a traveller rewrite history. */
+export async function withdrawSubmission(user, id){
+  if (!supabase || !user) return { error: 'login required' };
+  const { error } = await supabase.from('place_submissions').delete()
+    .eq('id', id).eq('user_id', user.id).eq('status', 'pending');
+  return error ? { error: error.message } : {};
+}
+
+/**
+ * The photo lives in the private bucket until an admin approves the row, so a
+ * pending submission's picture is never publicly readable. `key` is generated
+ * by the client (the row does not exist yet), so the object can be uploaded
+ * before the row is inserted; it is namespaced to the traveller either way.
+ */
+export async function uploadSubmissionPhoto(user, key, file){
+  if (!supabase || !user) return { error: 'login required' };
+  const path = `${user.id}/${String(key).replace(/[^a-zA-Z0-9._-]/g, '')}.jpg`;
+  const { error } = await supabase.storage.from('place-submissions').upload(path, file, { upsert: true, contentType: file?.type || 'image/jpeg' });
+  return error ? { error: error.message } : { path };
 }
