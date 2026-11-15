@@ -163,6 +163,8 @@ const { searchPlaces } = require('./places.js');
 const { SPOTS } = require('./spots.js');
 const adminStore = require('./adminSpots.js');
 const adminPhotos = require('./adminPhotos.js');
+const spotList = require('./spotList.js');
+const community = require('./communityPlaces.js');
 const { findPhoto } = require('./photos.js');
 
 // --- real-photo hierarchy: 1 JSON → 2 Wikimedia → 3 Mapbox (client fallback)
@@ -202,8 +204,9 @@ async function enrichPlaces(places){
 }
 app.get('/api/spots', async (req, res) => {
   try {
-    // Cheap: listSpots() re-reads the file each time so admin edits show up immediately.
-    res.json({ spots: adminStore.listSpots() });
+    // Curated spots plus every community place an admin approved. A broken
+    // submissions backend degrades to the curated list, it never empties the map.
+    res.json({ spots: await spotList.listSpots() });
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 app.get('/api/places', async (req, res) => {
@@ -263,6 +266,29 @@ app.post('/api/admin/photos/find', adminStore.requireAdmin, async (req, res) => 
     if (!found) return res.status(404).json({ error: 'No real photo found for this place yet — add a photo URL manually.' });
     res.json({ photo: found });
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
+// --- community place submissions: a traveller pins a missing place, an admin
+// reviews it here, and only an approval makes it a pin on the map. All four are
+// token-guarded; a Supabase that is not configured answers 503 with a short
+// message rather than a stack (communityPlaces.requireConfig).
+app.get('/api/admin/submissions', adminStore.requireAdmin, async (req, res) => {
+  try {
+    const status = ['pending', 'approved', 'rejected'].includes(req.query.status) ? req.query.status : 'pending';
+    res.json({ submissions: await community.listQueue(status) });
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+app.post('/api/admin/submissions/:id/approve', adminStore.requireAdmin, async (req, res) => {
+  try { res.json({ submission: await community.approve(String(req.params.id)) }); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+app.post('/api/admin/submissions/:id/reject', adminStore.requireAdmin, async (req, res) => {
+  try { res.json({ submission: await community.reject(String(req.params.id), (req.body || {}).note) }); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+app.get('/api/admin/submissions/:id/photo', adminStore.requireAdmin, async (req, res) => {
+  try { res.json({ url: await community.photoUrl(String(req.params.id)) }); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 const { getWeather } = require('./weather.js');
 app.get('/api/weather', async (req, res) => {
