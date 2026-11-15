@@ -43,7 +43,7 @@ export function threadTitle(messages = []){
 /** Keep only what a restored card can render; never the whole spot record. */
 function slimCard(card = {}){
   const out = {};
-  for (const key of ['id', 'name', 'hint', 'description', 'rating', 'reviews', 'fees', 'festival', 'tags', 'lng', 'lat', 'photo']){
+  for (const key of ['id', 'name', 'hint', 'description', 'rating', 'reviews', 'fees', 'festival', 'tags', 'lng', 'lat', 'photo', 'visitorReviews']){
     if (card[key] !== undefined) out[key] = card[key];
   }
   if (Array.isArray(card.photos)) out.photos = card.photos.slice(0, 3);

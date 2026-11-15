@@ -107,7 +107,7 @@ function recordLine(entry, i){
   let line = `${i + 1}. ${bits.join(' | ')}`;
   if (entry.description) line += `\n   about: ${clip(entry.description, 700)}`;
   if (entry.activities.length) line += `\n   do: ${clip(entry.activities.join('; '), 400)}`;
-  if (entry.quotes[0]) line += `\n   review: "${entry.quotes[0]}"`;
+  if (entry.quotes.length) line += entry.quotes.slice(0, 2).map(q => `\n   review: "${q}"`).join('');
   if (entry.sourceUrls.length) line += `\n   source: ${entry.sourceUrls[0]}`;
   return line;
 }
@@ -343,6 +343,7 @@ async function groundedChat(message, proximity, deps = {}){
       rating: entry.rating,
       reviews: entry.reviews,
       peopleSay: peopleSay || entry.quotes[0] || '',
+      visitorReviews: entry.visitorReviews || [],
       description: entry.description,
       festival: entry.festival,
       fees: entry.price,
@@ -387,6 +388,7 @@ async function groundedRecommend(message, proximity, prefs = [], deps = {}){
       rating: e.rating,
       reviews: e.reviews,
       peopleSay: pick.peopleSay || e.quotes[0] || '',
+      visitorReviews: e.visitorReviews || [],
       description: e.description,
       festival: e.festival,
       fees: e.price,

@@ -10,8 +10,10 @@
  *   1. `images` holds gallery junk, not this place's photo. One file had 16
  *      distinct URLs across 200 entries (a Kuya J photo on 103 of them). Those
  *      URLs would outrank the real photo hierarchy, so they are dropped.
- *   2. `reviews` holds scraped third-party quotes ("Google Maps Verified
- *      Reviewer #1") — not our reviews, so only the rating and count survive.
+ *   2. `reviews` are real scraped visitor reviews (Google Maps / Trip.com /
+ *      Wanderlog), so they are kept — but normalized to { reviewer_or_source,
+ *      comment, date? }, and only the fields the app renders. dataset.js then
+ *      labels each one by its source; they are never presented as our reviews.
  *   3. The Google Maps place id lives inside the address text and used to render
  *      under the place name, so it is stripped here as well as in normalize().
  *
@@ -57,6 +59,25 @@ function haversineKm(a, b, c, d){
 
 const normalizeName = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
+/** Reviews the app shows: the words, who said them, and when. */
+function reviewsOf(entry){
+  if (!Array.isArray(entry.reviews)) return undefined;
+  const out = [];
+  for (const r of entry.reviews){
+    if (typeof r === 'string'){ const comment = clean(r); if (comment) out.push({ comment }); continue; }
+    if (!r || typeof r !== 'object') continue;
+    const comment = clean(r.text || r.quote || r.comment || r.review);
+    if (!comment) continue;
+    const source = clean(r.reviewer_or_source || r.author || r.source);
+    // Generated notes about fees/hours/location ride in the source's `reviews`
+    // array, but they are not reviews. dataset.js filters them again at read time.
+    if (/\b(summary|verification|note|highlight|index)\b/i.test(source)) continue;
+    const date = clean(r.date);
+    out.push({ ...(source ? { reviewer_or_source: source } : {}), comment, ...(date ? { date } : {}) });
+  }
+  return out.length ? out : undefined;
+}
+
 /** Keep only the fields the app reads, with this place's own numbers. */
 function convert(entry){
   const name = clean(entry.name || entry.title || entry.place_name || '');
@@ -78,6 +99,7 @@ function convert(entry){
     what_to_do: Array.isArray(entry.what_to_do) ? entry.what_to_do.map(clean).filter(Boolean) : [],
     rating: Number.isFinite(Number(entry.rating)) ? Number(entry.rating) : undefined,
     total_review_count: Number.isFinite(reviews) && reviews > 0 ? reviews : undefined,
+    reviews: reviewsOf(entry),
     verified_sources: Array.isArray(entry.verified_sources) ? entry.verified_sources : undefined,
     lat,
     lng,
@@ -88,11 +110,14 @@ function main(){
   const args = process.argv.slice(2);
   const input = args.find(a => !a.startsWith('--') && args[args.indexOf(a) - 1] !== '--out-dir' && args[args.indexOf(a) - 1] !== '--label');
   const dry = args.includes('--dry');
+  // Re-importing a label replaces that label's own files; without this every row
+  // would look like a duplicate of the file it is being written over.
+  const replace = args.includes('--replace');
   const outIdx = args.indexOf('--out-dir');
   const outDir = outIdx > -1 ? args[outIdx + 1] : path.join(__dirname, '..', 'data');
   const labelIdx = args.indexOf('--label');
   if (!input){
-    console.error('usage: node scripts/import-dataset.js <input.json> [--label NAME] [--out-dir DIR] [--dry]');
+    console.error('usage: node scripts/import-dataset.js <input.json> [--label NAME] [--replace] [--out-dir DIR] [--dry]');
     process.exit(2);
   }
 
@@ -116,7 +141,8 @@ function main(){
   // with a new id — and any photo an admin attached to the old id would be lost.
   // The incumbent therefore wins: exact duplicates are dropped here, and merely
   // nearby places are reported for a human to eyeball.
-  const existing = require('../dataset.js').allEntries();
+  const existing = require('../dataset.js').allEntries()
+    .filter(e => !(replace && String(e.source || '').startsWith(label)));
   const byName = new Map();
   for (const e of existing) {
     const key = normalizeName(e.name);
@@ -155,7 +181,7 @@ function main(){
     province: raw.province || 'Pangasinan',
     region_admin: raw.region_admin || '',
     last_verified: raw.last_verified || new Date().toISOString().slice(0, 10),
-    source_note: 'Imported by scripts/import-dataset.js from ' + label + '. Gallery images and third-party review quotes were removed on import.',
+    source_note: 'Imported by scripts/import-dataset.js from ' + label + '. Gallery images were dropped; visitor reviews are kept with their source.',
     total_entries: rows.length,
     ai_category_taxonomy: Array.isArray(raw.ai_category_taxonomy) ? raw.ai_category_taxonomy : undefined,
     [key]: rows,

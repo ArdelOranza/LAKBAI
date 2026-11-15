@@ -69,6 +69,8 @@ export function cardFor(candidate = {}, spots = []){
     rating: toNumber(candidate.rating),
     // Review counts come from the dataset row, never estimated.
     reviews: String(candidate.reviews ?? '').trim(),
+    // Scraped visitor reviews, straight from the dataset row — never reworded.
+    visitorReviews: Array.isArray(candidate.visitorReviews) ? candidate.visitorReviews : (spot?.visitorReviews || []),
     // Only what the model actually returned: no invented opening hours or prices.
     fees: String(candidate.fees || '').trim(),
     festival: String(candidate.festival || '').trim(),

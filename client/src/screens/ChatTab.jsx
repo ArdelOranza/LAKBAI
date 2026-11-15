@@ -57,9 +57,9 @@ function distanceLine(km){
 function ChatHero({ card, coords, hasFix = true, user, showToast, push, saved, onSaved, openDirections }){
   const km = hasFix ? haversineKm(coords.lng, coords.lat, card.lng, card.lat) : null;
   const img = placeImage(card, MAP_TOKEN);
-  const place = card.spot || {
-    id: card.id, name: card.name, lng: card.lng, lat: card.lat,
-    blurb: card.description, categories: card.tags, town: card.hint,
+  const place = {
+    ...(card.spot || { id: card.id, name: card.name, lng: card.lng, lat: card.lat, blurb: card.description, categories: card.tags, town: card.hint }),
+    visitorReviews: card.visitorReviews || [],
   };
 
   async function add(e){
@@ -134,9 +134,9 @@ function ChatHero({ card, coords, hasFix = true, user, showToast, push, saved, o
 function ChatRow({ card, coords, hasFix = true, user, push, showToast, saved, onSaved }){
   const km = hasFix ? haversineKm(coords.lng, coords.lat, card.lng, card.lat) : null;
   const img = placeImage(card, MAP_TOKEN);
-  const place = card.spot || {
-    id: card.id, name: card.name, lng: card.lng, lat: card.lat,
-    blurb: card.description, categories: card.tags, town: card.hint,
+  const place = {
+    ...(card.spot || { id: card.id, name: card.name, lng: card.lng, lat: card.lat, blurb: card.description, categories: card.tags, town: card.hint }),
+    visitorReviews: card.visitorReviews || [],
   };
   const meta = [
     card.hint,

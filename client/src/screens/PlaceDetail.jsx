@@ -23,6 +23,12 @@ const CAT_ICON = [
 const iconFor = text => (CAT_ICON.find(([re]) => re.test(text)) || [null, MapPin])[1];
 const isFree = fees => fees === 0 || /free|none|no fee|₱?0\b/i.test(String(fees ?? ''));
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const MAX_VISITOR_REVIEWS = 6;
+/** "2024-07-22" as a readable date; an unparseable value is shown as written. */
+function reviewDate(value){
+  const d = new Date(String(value) + 'T00:00:00');
+  return Number.isNaN(d.getTime()) ? String(value) : d.toLocaleDateString([], { month:'short', day:'numeric', year:'numeric' });
+}
 function editionText(a, b){
   const left = MONTHS[a.getMonth()] + ' ' + a.getDate();
   if (!b || b.getTime() === a.getTime()) return left;
@@ -35,8 +41,12 @@ export default function PlaceDetail({ place, coords, hasFix = true, user, pop, s
   const p = place || {};
   const [saved, setSaved] = useState(false);
   const [reviews, setReviews] = useState([]);
+  const [showAllVisitorReviews, setShowAllVisitorReviews] = useState(false);
   const km = hasFix ? haversineKm(coords.lng, coords.lat, p.lng, p.lat) : null;
   const photos = (p.photos && p.photos.length) ? p.photos : (p.photo ? [p.photo] : null);
+  // Scraped visitor reviews travel with a place from the dataset. They are not
+  // ours and not the traveller's, so they render in their own labelled section.
+  const visitorReviews = Array.isArray(p.visitorReviews) ? p.visitorReviews : [];
   // U14-A: a place that only has a location still gets a real image — its static map.
   const heroPhoto = placeImage(p, mapboxToken(), { width: 600, height: 340 });
   // Wikimedia images are free-licensed but need attribution: link to the file page.
@@ -220,6 +230,45 @@ export default function PlaceDetail({ place, coords, hasFix = true, user, pop, s
                 );
               })}
             </div>
+          </section>
+        )}
+
+        {visitorReviews.length > 0 && (
+          <section style={{ marginTop:16 }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
+              <b style={{ fontSize:14.5 }}>What visitors say</b>
+              <span style={{ fontSize:10.5, color:'var(--muted-ink)' }}>{visitorReviews.length} {visitorReviews.length === 1 ? 'review' : 'reviews'}</span>
+            </div>
+            <p style={{ margin:'3px 0 0', fontSize:11, color:'var(--muted-ink)' }}>Collected from Google Maps, Trip.com and other review sites — not written by LakbAI travellers.</p>
+            <div style={{ display:'grid', gap:10, marginTop:10 }}>
+              {(showAllVisitorReviews ? visitorReviews : visitorReviews.slice(0, MAX_VISITOR_REVIEWS)).map((r, i) => (
+                <article key={i} data-testid="visitor-review" style={{ border:'1px solid #EDF1F7', borderRadius:14, padding:12 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:9 }}>
+                    <span style={{ width:32, height:32, minWidth:32, borderRadius:'50%', background:'#EFF6FF', color:'var(--primary)', display:'grid', placeItems:'center' }}><User size={15}/></span>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <b style={{ fontSize:12.5, display:'block' }}>{r.source || 'Visitor'}</b>
+                      {r.date && <span style={{ fontSize:10.5, color:'var(--muted-ink)' }}>{reviewDate(r.date)}</span>}
+                    </div>
+                    {r.rating ? (
+                      <span style={{ display:'inline-flex', gap:1.5, color:'var(--accent)' }}>
+                        {[1,2,3,4,5].map(n => <Star key={n} size={11} fill={n <= r.rating ? 'currentColor' : 'none'} strokeWidth={1.8}/>)}
+                      </span>
+                    ) : null}
+                  </div>
+                  <p style={{ margin:'8px 0 0', fontSize:12.5, lineHeight:1.55, color:'#475569' }}>{r.text}</p>
+                </article>
+              ))}
+            </div>
+            {visitorReviews.length > MAX_VISITOR_REVIEWS && !showAllVisitorReviews && (
+              <button
+                type="button"
+                data-testid="visitor-reviews-more"
+                onClick={() => setShowAllVisitorReviews(true)}
+                style={{ marginTop:10, background:'none', border:'none', color:'var(--primary)', fontSize:12.5, fontWeight:600, padding:'6px 0', cursor:'pointer' }}
+              >
+                Show all {visitorReviews.length} reviews
+              </button>
+            )}
           </section>
         )}
 

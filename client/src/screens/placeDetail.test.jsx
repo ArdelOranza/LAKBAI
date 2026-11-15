@@ -53,6 +53,29 @@ describe('PlaceDetail source links', () => {
   });
 });
 
+describe('PlaceDetail visitor reviews', () => {
+  it('shows scraped reviews labelled by source, apart from traveller reviews', () => {
+    const html = render({
+      ...PLACE,
+      visitorReviews: [
+        { text: 'Bangus sisig is a must try.', source: 'Google Maps', date: '2024-07-22' },
+        { text: 'Fresh seafood and fast service.', source: 'Artur P, Google Review via Wanderlog', date: '' },
+      ],
+    });
+    expect(html).toContain('What visitors say');
+    expect(html).toContain('Bangus sisig is a must try.');
+    expect(html).toContain('Google Maps');
+    expect(html).toContain('Artur P, Google Review via Wanderlog');
+    expect(html).toContain('Jul 22, 2024');
+    expect(html).toContain('Collected from');
+    expect(html).toContain('data-testid="visitor-review"');
+  });
+
+  it('omits the section entirely when a place has no visitor reviews', () => {
+    expect(render(PLACE)).not.toContain('What visitors say');
+  });
+});
+
 describe('PlaceDetail directions', () => {
   it('asks the app for an in-app Mapbox route instead of opening Google Maps', async () => {
     const openDirections = vi.fn();

@@ -216,6 +216,60 @@ function parseRating(raw, countRaw){
   return { rating, reviews };
 }
 
+// Every review list the provided files use, in order of preference: the 150-spot
+// file calls them `real_reviews`, the 5-town files call them `reviews`. A bare
+// numeric `reviews` is a review COUNT, not a list, and is skipped here.
+function reviewListOf(raw, rr){
+  const candidates = [raw.real_reviews, raw.reviews_list, raw.top_reviews, raw.reviews, rr && rr.verified_reviews];
+  return candidates.find(Array.isArray) || [];
+}
+
+const REVIEW_DATE_RE = /\((\d{4}-\d{2}-\d{2})\)\s*$/;
+const VISITOR_REVIEWS_MAX = 10;
+// The 5-town file piles generated metadata notes into the same `reviews` array
+// ("Price & Fee Verification", "Hours & Operations Note", "Rating & Volume
+// Summary"). Those are facts about the place, not something a visitor said, and
+// they must never render under a reviewer's name.
+const META_REVIEW_RE = /\b(summary|verification|note|highlight|index)\b/i;
+
+/** A trailing "(2026-01-03)" is the review's date, not part of the sentence. */
+function reviewDateOf(value){
+  const m = str(value).match(REVIEW_DATE_RE);
+  return m ? m[1] : '';
+}
+
+/** "Google Maps Verified Reviewer #3" names the platform, not a person. */
+function reviewSourceName(value){
+  const s = str(value).replace(REVIEW_DATE_RE, '').replace(/\s*#\d+\s*$/, '').trim();
+  return /^google maps (verified )?reviewer$/i.test(s) ? 'Google Maps' : s;
+}
+
+/**
+ * The scraped visitor reviews as the app shows them: the words, who they came
+ * from and when. Kept apart from a traveller's own review — these are not ours,
+ * and the app labels each by its source. Capped so a busy place cannot bloat
+ * every chat and recommendation payload.
+ */
+function visitorReviews(list){
+  if (!Array.isArray(list)) return [];
+  const out = [];
+  for (const r of list){
+    const isText = typeof r === 'string';
+    let text = str(isText ? r : (r && (r.text || r.quote || r.comment || r.review)));
+    if (!text) continue;
+    const source = isText ? '' : str(r.reviewer_or_source || r.author || r.source);
+    if (META_REVIEW_RE.test(source)) continue;
+    const date = (isText ? '' : str(r.date)) || reviewDateOf(source) || reviewDateOf(text);
+    if (reviewDateOf(text)) text = text.replace(REVIEW_DATE_RE, '').trim();
+    const review = { text, source: reviewSourceName(source), date };
+    const score = isText ? null : num(r.rating);
+    if (score != null && score >= 1 && score <= 5) review.rating = score;
+    out.push(review);
+    if (out.length >= VISITOR_REVIEWS_MAX) break;
+  }
+  return out;
+}
+
 function reviewQuotes(raw){
   if (!Array.isArray(raw)) return [];
   return raw
@@ -365,7 +419,10 @@ function normalize(raw, index, kind = '', fileTag = ''){
     price: fees.short,
     feesDetail: fees.detail,
     festival: str(raw.festival) || festivalFromText(name, address),
-    quotes: reviewQuotes(raw.real_reviews || raw.reviews_list || raw.top_reviews || raw.reviews || rr.verified_reviews),
+    quotes: reviewQuotes(reviewListOf(raw, rr)),
+    // The full scraped review list, with source and date — what the app shows in
+    // a place's "what visitors say" section.
+    visitorReviews: visitorReviews(reviewListOf(raw, rr)),
   };
   entry.intents = intentsFor(entry);
   // The tourist-spot file has no category column; the derived kinds are good
@@ -707,6 +764,7 @@ async function localChat(message, proximity){
       rating: e.rating,
       reviews: e.reviews,
       peopleSay: e.quotes[0] || '',
+      visitorReviews: e.visitorReviews || [],
       description: e.description,
       festival: e.festival,
       fees: e.price,
@@ -749,6 +807,7 @@ async function localRecommend(message, proximity, prefs = []){
     rating: e.rating,
     reviews: e.reviews,
     peopleSay: e.quotes[0] || '',
+    visitorReviews: e.visitorReviews || [],
     description: e.description,
     festival: e.festival,
     fees: e.price,

@@ -3,7 +3,7 @@
   "province": "Pangasinan",
   "region_admin": "Ilocos Region (Region I), Philippines",
   "last_verified": "2026-11-15",
-  "source_note": "Imported by scripts/import-dataset.js from pangasinan-5towns. Gallery images and third-party review quotes were removed on import.",
+  "source_note": "Imported by scripts/import-dataset.js from pangasinan-5towns. Gallery images were dropped; visitor reviews are kept with their source.",
   "total_entries": 150,
   "ai_category_taxonomy": [
     {
@@ -110,6 +110,12 @@
       ],
       "rating": 4.4,
       "total_review_count": 185,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Kuya J branch at SM City Urdaneta Central along MacArthur Highway serving signature Crispy Pata and Halo-Halo Espesyal."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Kuya J Restaurant - SM City Urdaneta Central (Urdaneta City)",
@@ -120,8 +126,8 @@
           "url": "https://kuyaj.ph/branches/sm-urdaneta/"
         }
       ],
-      "lat": 15.971373,
-      "lng": 120.572626
+      "lat": 15.9711989,
+      "lng": 120.572764
     },
     {
       "id": "pangasinan-5towns-004",
@@ -139,6 +145,24 @@
       ],
       "rating": 4.2,
       "total_review_count": 171,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Great food affordable price They serve til 10pm. (2023-02-16)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Affordable and delicious food for all group sizes :) They also have clean restrooms, indoor & outdoor dining. (2025-08-25)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Sulit yung Halo-halo and Lomi nila try niyo Good food. (2026-05-03)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Serving size is just right and taste is more of lutong bahay. (2025-07-07)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – BIGGANG : Ihaw-Ihaw & Fastfood (Urdaneta City)",
@@ -163,6 +187,12 @@
       ],
       "rating": 4.1,
       "total_review_count": 52,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Google Maps listing at Urdaneta Bypass Road."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Kainan sa Kamalig - Bypass Road (Urdaneta City)",
@@ -187,6 +217,12 @@
       ],
       "rating": 4.2,
       "total_review_count": 95,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Max's Restaurant branch at SM City Urdaneta Central."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Max's Restaurant - SM City Urdaneta Central (Urdaneta City)",
@@ -197,8 +233,8 @@
           "url": "https://delivery.maxschicken.com/"
         }
       ],
-      "lat": 15.971593,
-      "lng": 120.570826
+      "lat": 15.9711989,
+      "lng": 120.572764
     },
     {
       "id": "pangasinan-5towns-007",
@@ -215,6 +251,16 @@
       ],
       "rating": 4.2,
       "total_review_count": 15,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The food is sooo good — legit lutong bahay vibes! (2026-02-15)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Very similar to Matutina's in terms of food choices and ambiance (2025-07-29)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Lanmar's Seafood Restaurant (Urdaneta City)",
@@ -239,6 +285,24 @@
       ],
       "rating": 4.2,
       "total_review_count": 133,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The food is good, authentic and affordable. (2024-02-10)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "The meat is fresh, well-seasoned, and full of flavour, just like the local favourite dish in Pangasinan. (2026-01-28)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Food was great and budget friendly too. (2026-07-09)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "The tenderness and exquisite taste of the meat are reminiscent of bestik, yet the texture is noticeably softer. (2023-08-17)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Uson Pigar Pigar Urdaneta City (Urdaneta City)",
@@ -267,6 +331,16 @@
       ],
       "rating": 3.7,
       "total_review_count": 133,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The city de luxe chain of restaurants across select towns and cities of Pangasinan offers an array of Filipino dishes at very affordable prices. (2023-07-04)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Their Korean Beef is good but a little salty. (2024-04-30)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – City Deluxe Restaurant Urdaneta (Urdaneta City)",
@@ -292,6 +366,20 @@
       ],
       "rating": 3.8,
       "total_review_count": 475,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "You can choose from eat all you can buffet and short orders through their menu...seafood, meat and vegetable are available. (2024-03-29)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "A Great Place To Eat With Your Family, Friends And Special Someone, The Food Was Good, The Staff Was Approchable, And They Have Some Parking Space For Their Costumers. (2023-09-11)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Have a lot of food options for pork, beef, seafoods and chicken menu. (2024-12-31)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Dampa Sa Pangasinan - Seafood's Restaurant and Catering Services (Urdaneta City)",
@@ -316,14 +404,20 @@
       ],
       "rating": 3.5,
       "total_review_count": 87,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Cabalen Eat-All-You-Can Buffet at SM City Urdaneta Central with 87 Google Maps reviews."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Cabalen - SM City Urdaneta Central (Urdaneta City)",
           "url": "https://www.google.com/maps/search/?api=1&query=Cabalen+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
         }
       ],
-      "lat": 15.970937,
-      "lng": 120.571812
+      "lat": 15.9709375,
+      "lng": 120.5718125
     },
     {
       "id": "pangasinan-5towns-012",
@@ -341,6 +435,12 @@
       ],
       "rating": 4.1,
       "total_review_count": 45,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Urdaneta City resort & buffet offering ₱299–₱349 eat-all-you-can dining."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Balay Senyang Resort & Hotel Buffet (Urdaneta City)",
@@ -369,6 +469,12 @@
       ],
       "rating": 3.8,
       "total_review_count": 6,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Mahal ang cost ng food na ginamit, pero at lower price na eat all you can, sulit na :) may lechon pa., tapos may sea foods., may pinakbet at upo pa. (2025-01-09)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Mangan Ta - Urdaneta City (Urdaneta City)",
@@ -393,6 +499,12 @@
       ],
       "rating": 4.3,
       "total_review_count": 38,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Google Maps listing in Urdaneta City offering ₱499 Asian buffet."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Wani Asian Cuisine (Urdaneta City)",
@@ -418,6 +530,24 @@
       ],
       "rating": 4.6,
       "total_review_count": 111,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Affordable and worthy samgyupsal restaurant that hits the ideal balance of high-grade cuts, fast service, and authentic flavor, this place delivers on all fronts. (2026-08-26)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Janchi Korean Restaurant is truly a wonderful place to dine! 🇰🇷❤️ The food was absolutely delicious, flavorful, and beautifully prepared. (2026-08-25)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Janchi is exactly the kind of Korean samgy I’ve been looking for, with lots of authentic and delicious side dishes. (2026-08-25)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Wonderful lunch at JANCHI in Urdaneta…this place is now my wife’s favorite Korean restaurant! (2026-08-12)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Janchi Korean Restaurant Urdaneta (Urdaneta City)",
@@ -446,6 +576,24 @@
       ],
       "rating": 4.6,
       "total_review_count": 204,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The Tender Pork Tonkatsu with rice, Special Salad with egg & bacon, miso soup & kimchi sides were all well prepared and satisfyingly tasty with good serving sizes (2024-08-07)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "I highly recommend Boteyju Urdaneta to anyone looking for great food and excellent service. (2026-06-14)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "I recommend the beef sukiyaki omelette curry rice. (2026-05-20)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Good Japanese-style food, service excellent. (2024-06-05)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Botejyu - SM City Urdaneta Central (Urdaneta City)",
@@ -456,8 +604,8 @@
           "url": "https://botejyu.com.ph/"
         }
       ],
-      "lat": 15.971062,
-      "lng": 120.573437
+      "lat": 15.9710533,
+      "lng": 120.5734375
     },
     {
       "id": "pangasinan-5towns-017",
@@ -474,6 +622,12 @@
       ],
       "rating": 4.5,
       "total_review_count": 88,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Google Maps Japanese restaurant in Urdaneta City."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Hagemu Sushi and Ramen Bar (Urdaneta City)",
@@ -498,6 +652,12 @@
       ],
       "rating": 4.4,
       "total_review_count": 64,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Google Maps restaurant in Urdaneta City."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Fusion Sushi Steak Bar (Urdaneta City)",
@@ -522,6 +682,12 @@
       ],
       "rating": 4.3,
       "total_review_count": 42,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Ling Nam Urdaneta branch."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Ling Nam Urdaneta (Urdaneta City)",
@@ -546,6 +712,20 @@
       ],
       "rating": 3.3,
       "total_review_count": 19,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "As mentioned earlier, the fried chicken at Dookki Unlimited Topokki Buffet stole the show for me. (2023-07-04)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "I loved the mixes sauces we put on our hotpot! (2025-09-17)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Yunmy foods, hospitable staff, and many more. (2024-11-06)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Dookki - SM City Urdaneta Central (Urdaneta City)",
@@ -556,8 +736,8 @@
           "url": "https://global.dookki.co.kr/"
         }
       ],
-      "lat": 15.970638,
-      "lng": 120.570204
+      "lat": 15.9711989,
+      "lng": 120.572764
     },
     {
       "id": "pangasinan-5towns-022",
@@ -574,14 +754,20 @@
       ],
       "rating": 4.2,
       "total_review_count": 55,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Kyukyu Ramen 99 at SM City Urdaneta Central."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Kyukyu Ramen 99 - SM City Urdaneta Central (Urdaneta City)",
           "url": "https://www.google.com/maps/search/?api=1&query=Kyukyu+Ramen+99+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
         }
       ],
-      "lat": 15.970039,
-      "lng": 120.572919
+      "lat": 15.9711989,
+      "lng": 120.572764
     },
     {
       "id": "pangasinan-5towns-023",
@@ -598,14 +784,20 @@
       ],
       "rating": 4.1,
       "total_review_count": 48,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Samgyeop Masarap branch at SM City Urdaneta Central."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Samgyeop Masarap - SM City Urdaneta Central (Urdaneta City)",
           "url": "https://www.google.com/maps/search/?api=1&query=Samgyeop+Masarap+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
         }
       ],
-      "lat": 15.97187,
-      "lng": 120.569574
+      "lat": 15.9711989,
+      "lng": 120.572764
     },
     {
       "id": "pangasinan-5towns-024",
@@ -622,6 +814,16 @@
       ],
       "rating": 2.4,
       "total_review_count": 60,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The food and services are so Good and I want to try it again. (2023-03-08)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Less smoke from the neighboring table, more expansive walk space going to the counter and buffet table (2023-02-22)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Yakiniku199 Korean Buffet Samgyupsal (Urdaneta City)",
@@ -646,14 +848,24 @@
       ],
       "rating": 2.8,
       "total_review_count": 16,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "I’ve been eating at Classic Savory for a long time in different SM around Pangasinan and they never disappoint me. (2026-10-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "We enjoyed our meal at Classic Savory SM Urdaneta. (2026-01-28)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Classic Savory - SM City Urdaneta Central (Urdaneta City)",
           "url": "https://www.google.com/maps/search/?api=1&query=Classic+Savory+-+SM+City+Urdaneta+Central+Urdaneta+City+Pangasinan"
         }
       ],
-      "lat": 15.970812,
-      "lng": 120.571937
+      "lat": 15.9708125,
+      "lng": 120.5719375
     },
     {
       "id": "pangasinan-5towns-026",
@@ -670,6 +882,12 @@
       ],
       "rating": 4.5,
       "total_review_count": 74,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Italian café and restaurant in Urdaneta City."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Bella Isabella Authentic Italian Cafe & Restaurant (Urdaneta City)",
@@ -698,6 +916,12 @@
       ],
       "rating": 4.4,
       "total_review_count": 62,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Google Maps pizzeria in Urdaneta City."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Fratelli Pizza & Pasta (Urdaneta City)",
@@ -722,6 +946,12 @@
       ],
       "rating": 4.5,
       "total_review_count": 58,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified bistro & café bakeshop in Urdaneta City."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Primo's Bistro & Café (Urdaneta City)",
@@ -750,6 +980,12 @@
       ],
       "rating": 4.1,
       "total_review_count": 112,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Shakey's Pizza Parlor branch in Urdaneta City."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Shakey's Pizza Parlor Urdaneta (Urdaneta City)",
@@ -778,6 +1014,12 @@
       ],
       "rating": 4.4,
       "total_review_count": 89,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Angel's Pizza branch at CB Mall Urdaneta."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Angel's Pizza Urdaneta (CB Mall) (Urdaneta City)",
@@ -806,6 +1048,12 @@
       ],
       "rating": 4.6,
       "total_review_count": 34,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Google Maps pizzeria in Urdaneta City."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Beyond The Crust (Urdaneta City)",
@@ -831,6 +1079,24 @@
       ],
       "rating": 4.7,
       "total_review_count": 131,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The coffee and pastries were delicious, and the prices were very affordable. (2026-08-04)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Must try their BETTER NUT BE LATTE and Iced Latte. (2023-08-19)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "The coffee and pastries they served were good. (2024-07-23)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "The ambiance is very cool, with relaxing musics and good products (2024-08-23)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Elcazo Bistro and Cafe (Urdaneta City)",
@@ -860,6 +1126,24 @@
       ],
       "rating": 4.2,
       "total_review_count": 289,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The place is clean, spacious, and has that simple, cozy, and welcoming Bo’s Coffee vibe. (2026-01-24)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Good Customer Service,Maganda ang Ambiance and the Coffee ☕ napakaworth it and very reasonable for its price.Highly Recommended 🤍. (2023-05-07)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "The staff are friendly and the service is quick, making it a good place to relax or work with a cup of coffee. (2026-01-31)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Spacious parking and a charming coffee shop - the perfect combination for a delightful coffee break. (2024-03-10)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Bo's Coffee Urdaneta (Urdaneta City)",
@@ -889,6 +1173,24 @@
       ],
       "rating": 4.6,
       "total_review_count": 80,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Their coffee is so delicious, fit to its price and worth it! (2026-07-18)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Their pastries were delicious and the coffee was also great. (2025-04-22)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Their coffee is strong with the right balance of sweetness and creaminess. (2025-12-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Their coffee is delicious! (2026-10-08)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Cup of Arc (Urdaneta City)",
@@ -918,6 +1220,24 @@
       ],
       "rating": 4.6,
       "total_review_count": 47,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Overall, the service, ambiance, and exceptional coffee make Blyss Cafe a standout spot. (2025-01-18)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "They do have 2 coffee bean roast that you can choose from (medium and dark roast) The coffee and the hojicha are great. (2026-10-26)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "I tried their sea salt latte, and it's one of the best kind of coffee I have ever had. (2025-01-03)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "But the ambiance and food was great plus free WiFi whenever you order (2025-02-05)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Blyss Cafe (Urdaneta City)",
@@ -946,6 +1266,20 @@
       ],
       "rating": 4.5,
       "total_review_count": 40,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Love the coffee and their brownies 🤤 (2024-08-04)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Very nice ambiance and great taste of cookies. (2023-01-04)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "THE BEST CAFE IN URDANETA 10000000000/10 ⭐️⭐️⭐️⭐️⭐️ (2026-01-18)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Unwnd Cafe - Urdaneta (Urdaneta City)",
@@ -974,6 +1308,12 @@
       ],
       "rating": 4.6,
       "total_review_count": 32,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Google Maps café in Urdaneta City."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Arapaap Café (Urdaneta City)",
@@ -998,6 +1338,20 @@
       ],
       "rating": 4.1,
       "total_review_count": 123,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Coffee was great, same with the ambiance. (2025-03-19)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "The red velvet is also nice especially the cream on top. (2024-03-15)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Great coffee and food, like cheese pizza, pasta aligue, and tuna pasta."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Silver Spoon Café (Urdaneta City)",
@@ -1026,6 +1380,12 @@
       ],
       "rating": 4.5,
       "total_review_count": 28,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Google Maps dessert café in Urdaneta City."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Snow Cream Cafe Urdaneta City (Urdaneta City)",
@@ -1050,6 +1410,12 @@
       ],
       "rating": 4.6,
       "total_review_count": 25,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Google Maps café & events venue in Urdaneta City."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – OH TASTE Events Place Cafe and Restaurant (Urdaneta City)",
@@ -1074,6 +1440,24 @@
       ],
       "rating": 4.8,
       "total_review_count": 17,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Mountain Blend has a beautiful interior and courteous staff. (2023-01-03)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Ordered coffee latte and bibingka for dinner. (2023-12-25)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "I liked their toasted marshmallow frappe. (2023-11-14)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Cool cozy place (2026-07-14)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Mountain Blend - SM City Urdaneta Central (Urdaneta City)",
@@ -1084,8 +1468,8 @@
           "url": "https://www.facebook.com/profile.php?id=100086331518451&mibextid=ZbWKwL"
         }
       ],
-      "lat": 15.971187,
-      "lng": 120.572437
+      "lat": 15.9711875,
+      "lng": 120.5724375
     },
     {
       "id": "pangasinan-5towns-043",
@@ -1102,6 +1486,12 @@
       ],
       "rating": 4.7,
       "total_review_count": 29,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Urdaneta City café on Foodpanda and Google Maps."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Cafe Amadito (Urdaneta City)",
@@ -1130,6 +1520,12 @@
       ],
       "rating": 4.3,
       "total_review_count": 46,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Google Maps restobar in Urdaneta City."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Antonino's Restobar (Urdaneta City)",
@@ -1154,6 +1550,12 @@
       ],
       "rating": 4.2,
       "total_review_count": 39,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Urdaneta City nightlife restobar on Facebook and Google Maps."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Amnesia Resto Bar (Urdaneta City)",
@@ -1182,6 +1584,12 @@
       ],
       "rating": 4.4,
       "total_review_count": 31,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Google Maps restobar & café in Urdaneta City."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Arrubayan Restobar & Cafe (Urdaneta City)",
@@ -1206,6 +1614,12 @@
       ],
       "rating": 4.2,
       "total_review_count": 44,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Google Maps restaurant & bar in Urdaneta City."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Gazebo Restaurant and Bar (Urdaneta City)",
@@ -1230,6 +1644,12 @@
       ],
       "rating": 4.3,
       "total_review_count": 37,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Family KTV & Restobar in Urdaneta City on Wanderlog and Google Maps."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Sound and Groove Family KTV & Restobar (Urdaneta City)",
@@ -1258,6 +1678,12 @@
       ],
       "rating": 4.3,
       "total_review_count": 142,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Burger King branch at SM City Urdaneta Central."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Burger King - SM City Urdaneta Central (Urdaneta City)",
@@ -1268,8 +1694,8 @@
           "url": "https://wanderlog.com/place/details/3207232/burger-king-sm-city-urdaneta"
         }
       ],
-      "lat": 15.972107,
-      "lng": 120.570116
+      "lat": 15.9711989,
+      "lng": 120.572764
     },
     {
       "id": "pangasinan-5towns-050",
@@ -1286,6 +1712,20 @@
       ],
       "rating": 3.9,
       "total_review_count": 455,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "I had a great experience at Jollibee Urdaneta during my visit on the midnight of June 1. Despite the late hour, the staff and managers were still very accommodating, polite, and approachable. (2026-06-01)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "is a great spot for tasty fast food with a friendly, relaxed atmosphere. (2026-01-29)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "So good because is 24 hours open (2023-03-27)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Jollibee Urdaneta Nancayasan (24/7 Drive-Thru) (Urdaneta City)",
@@ -1315,6 +1755,24 @@
       ],
       "rating": 4.4,
       "total_review_count": 531,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "⭐️⭐️⭐️⭐️⭐️ (5/5) “Love this branch! The staff are friendly and the drinks are always made perfectly. The place is cozy and relaxing — perfect spot to chill or work while enjoying my favorite caramel macchiato.” (2025-11-02)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Drinks are consistently good, and it’s a nice spot to sit down, relax, or catch up before heading around the mall. (2024-08-07)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "I like the Starbucks here very clean and good people (2023-08-08)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Tables can be cleared off faster, but generally, an excellent Starbucks. (2024-08-12)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Starbucks Coffee - SM City Urdaneta Central (Urdaneta City)",
@@ -1325,8 +1783,8 @@
           "url": "http://starbucks.ph/"
         }
       ],
-      "lat": 15.971187,
-      "lng": 120.571812
+      "lat": 15.9711875,
+      "lng": 120.5718125
     },
     {
       "id": "pangasinan-5towns-064",
@@ -1344,6 +1802,28 @@
       ],
       "rating": 4.6,
       "total_review_count": 53,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "“Pick Up Coffee Urdaneta is now one of my go-to spots! The drinks are consistently good, especially their signature blends. The staff are friendly, and the place feels clean and cozy even if you’re just waiting for your order. Definitely worth every visit!” (2025-12-03)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "“Pick Up Coffee surprise! Bold flavor, creamy texture, and budget-friendly. If you need a quick caffeine fix without breaking the bank—this is it!” (2025-12-04)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Their drinks are consistently delicious, affordable, and served with excellent quality. (2025-12-03)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "The staff is very friendly and the drinks is satisfying (2026-11-03)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #5",
+          "comment": "The coffee I ordered was smooth and flavorful! (2026-07-07)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – PICKUP COFFEE - Magic Mall Urdaneta (Urdaneta City)",
@@ -1373,6 +1853,24 @@
       ],
       "rating": 4.6,
       "total_review_count": 49,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The bunwiches are tasty, though the coffee quality could still be improved. (2026-07-13)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "I'm glad this Dunkin' has a drive-thru, which makes it very convenient. (2026-08-04)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Nice place to relax and have coffee and donuts ☺️ (2024-06-28)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "A good spot for a quick coffee run with tasty bunwiches, though the coffee could be better. (2024-08-01)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Dunkin' - Urdaneta Drive-Thru (Urdaneta City)",
@@ -1398,6 +1896,16 @@
       ],
       "rating": 4.3,
       "total_review_count": 24,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified menu highlight: Ube Mamon Singles (Ube-flavored soft chiffon pastry, ₱46)."
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Chain of Filipino bakeries selling cakes, sweets & pastries, some with savory fillings in Poblacion, Urdaneta City."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Red Ribbon - Magic Mall Urdaneta (Urdaneta City)",
@@ -1423,6 +1931,16 @@
       ],
       "rating": 3.8,
       "total_review_count": 10,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "menuItem: Okinawa; menuCategory: Traditional Milktea; price: 70 PHP."
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "The coffee and food were disappointing in quality. (2026-06-03)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – 1822 Cafe Urdaneta (Urdaneta City)",
@@ -1452,6 +1970,12 @@
       ],
       "rating": 4.8,
       "total_review_count": 5,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified 4.8/5 rating on Google Maps for Caffè Mocha and milk tea selections."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – FourteaSix Milktea Shop Urdaneta Branch 1 (Urdaneta City)",
@@ -1477,6 +2001,12 @@
       ],
       "rating": 4.7,
       "total_review_count": 9,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified 4.7/5 rating across 9 Google Maps reviews in Urdaneta City."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Hubby’s Tea House 茶馆 - Urdaneta City (Urdaneta City)",
@@ -1502,6 +2032,24 @@
       ],
       "rating": 4.4,
       "total_review_count": 65,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "It may not be the cheapest option, but the quality and convenience make it worth trying, especially for pizza lovers. (2026-08-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "They had price off even on weekdays, 2 classic regular sized pizzas for 319, t'was nice. (2025-08-17)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Been to this place several times but I just can'y do dine in because the place is small. (2024-08-18)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "The dining and parking area is limited. (2026-09-29)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Domino's Pizza - Urdaneta (Urdaneta City)",
@@ -1527,6 +2075,20 @@
       ],
       "rating": 4,
       "total_review_count": 14,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "All foods are served hot and delicious. (2026-10-17)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Dine-in at Pizzut Urdaneta was worth it! (2026-10-30)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Been through tons of pizza, this is the worst branch. (2026-10-03)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Pizza Hut Urdaneta (Urdaneta City)",
@@ -1556,6 +2118,12 @@
       ],
       "rating": 3.9,
       "total_review_count": 61,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Roasted chicken and corn muffins are popular here, and the staff is very accommodating. (2025-07-18)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Kenny Rogers Roasters - CB Mall Urdaneta (Urdaneta City)",
@@ -1585,6 +2153,24 @@
       ],
       "rating": 4,
       "total_review_count": 16,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "I love their pizza and pasta! (2026-03-24)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "The pizza was cheesy and freshly served, while the lasagna was creamy and flavorful. (2026-08-16)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "I ordered pizza meal, it consist of pizza, chicken, rice and a drink. (2026-09-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "good thing they have their branch here on Alexander St. I missed their food (2023-08-20)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Greenwich - Magic Mall Urdaneta (Urdaneta City)",
@@ -1614,6 +2200,24 @@
       ],
       "rating": 3.5,
       "total_review_count": 270,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Fast servings of food (2026-05-28)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "The service is very fast, And all staff are friendly. (2026-04-28)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Good food choices, fast service and a clean restroom in a fast food restaurant. (2025-07-30)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "I never had an issue with parking with this branch, in fact, a lot of motorists park on their motorcycle parking even if they're not gonna eat at Chowking. (2026-02-01)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Chowking Urdaneta (MacArthur Highway 24/7) (Urdaneta City)",
@@ -1643,6 +2247,16 @@
       ],
       "rating": 4.3,
       "total_review_count": 66,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The new chowking inside Magic Mall! (2025-06-11)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Verified menu highlights: Pancit Canton (₱99) and Siomai Spicy Chao Fan With Drink (₱181)."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Chowking - Magic Mall Urdaneta (Urdaneta City)",
@@ -1672,6 +2286,20 @@
       ],
       "rating": 4.3,
       "total_review_count": 62,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "thank you kfc sm urdaneta for the best experience.we will visit you again and will recommend this to our friends (2025-10-27)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Therefore, KFC SM Urdaneta deserves a 5 star rating. (2026-07-30)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Thank you KFC. (2026-01-25)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – KFC - SM City Urdaneta Central (Urdaneta City)",
@@ -1682,8 +2310,8 @@
           "url": "https://www.kfc.com.ph/en/store-locator/kfc_sm_urdaneta"
         }
       ],
-      "lat": 15.971141,
-      "lng": 120.570442
+      "lat": 15.9711989,
+      "lng": 120.572764
     },
     {
       "id": "pangasinan-5towns-077",
@@ -1701,6 +2329,16 @@
       ],
       "rating": 4,
       "total_review_count": 96,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Mang inasal SM Urdaneta has been a comfort fast food chain for us, wether with friends or with family, or even alone, with their good staff and excellent service, we’ve always enjoyed coming back here. (2026-09-25)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Come here early as they are fully packed during lunch rush, amazing chicken oil and sauce mix. (2026-02-08)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Mang Inasal - SM City Urdaneta Central (Urdaneta City)",
@@ -1711,8 +2349,8 @@
           "url": "http://manginasaldelivery.com.ph/"
         }
       ],
-      "lat": 15.969539,
-      "lng": 120.570207
+      "lat": 15.9711989,
+      "lng": 120.572764
     },
     {
       "id": "pangasinan-5towns-083",
@@ -1730,14 +2368,36 @@
       ],
       "rating": 4.8,
       "total_review_count": 1815,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "I was impressed with their 30-minute serving time guarantee if the food is not served within 30 minutes, it’s free, which shows how committed they are to customer satisfaction. (2026-06-20)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Excellent food with free after 3500 pesos.service crew excellent.Special mention to Mr. Miguel.Thanks for chopping the crispy Patta and serving us. (2026-08-20)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "From the food, staff, and the atmosphere, Getry's Grill Rosales is superb! (2025-09-06)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Food was good, service was good..beef kare 2x is good also pampano grilled was great (2024-05-13)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #5",
+          "comment": "Favorite ng mga anak ang kangkong chips.. Mabilis na seserved ang mga food.. (2026-08-16)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Gerry's SM City Rosales (Gerry's Grill) (Rosales)",
           "url": "https://www.google.com/maps/search/?api=1&query=Gerry%27s+SM+City+Rosales+%28Gerry%27s+Grill%29+Rosales+Pangasinan&query_place_id=ChIJTaOqOnQ5kTMR6JUPUR85oEA"
         }
       ],
-      "lat": 15.881429,
-      "lng": 120.600921
+      "lat": 15.8781997,
+      "lng": 120.6025975
     },
     {
       "id": "pangasinan-5towns-084",
@@ -1755,6 +2415,28 @@
       ],
       "rating": 4.5,
       "total_review_count": 477,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "This is the place to get your affordable yet impeccably cooked, deliciously simple Filipino food. (2024-12-06)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "We had lunch at Kuya J Rosales and everything was excellent from the food to the overall experience!! (2026-01-27)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Kare kare is very Recommendable Fried chicken is perfect Bangus Sinigang is recommendale also (2026-03-04)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Very good service and the food is great, fast and smooth ang dining experience👌👌 (2024-09-20)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #5",
+          "comment": "Kuya J, SM Rosales, delivered top-notch service and mouthwatering dishes. (2024-12-20)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Kuya J Restaurant - SM City Rosales (Rosales)",
@@ -1769,8 +2451,8 @@
           "url": "https://restaurantguru.com/Rosales"
         }
       ],
-      "lat": 15.882038,
-      "lng": 120.602339
+      "lat": 15.8781997,
+      "lng": 120.6025975
     },
     {
       "id": "pangasinan-5towns-086",
@@ -1788,6 +2470,28 @@
       ],
       "rating": 4.7,
       "total_review_count": 43,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "the staff are accommodating, and the food brings comfort to you after a long tiring travel. (2026-01-07)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Their Pigar-pigar tastes really good, I would say better than some of the eateries/restaurants in Dagupan. (2023-12-14)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "We realy enjoyed the food here, masarap at very affordable. (2024-01-29)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "if you travel to north or simple cravings for pigar pigar a must try it's along the road of rosales pangasinan. (2024-12-31)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #5",
+          "comment": "The area can be a bit hot, but the food is just that good. (2023-08-11)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Uson Pigar-Pigar Carmen-Rosales Branch (Rosales)",
@@ -1813,14 +2517,36 @@
       ],
       "rating": 4.9,
       "total_review_count": 100,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Located in the Foodcourt of SM City Rosales, Takoyadon serves delicious Japanese food at an affordable price. (2024-04-05)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "The gyudon is delicious and looks beautiful and the staff is also friendly, don't hesitate to eat here at Takoyadon Japaes food, they are friendly and the service is also fast (2025-07-17)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "The broth was rich and tasty, and the staff were friendly and accommodating. (2026-02-25)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "The Crew in this branch are so accommodating, The foods is good specially the Tsukimi Udon (2024-04-18)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #5",
+          "comment": "Price is good and food is well prepared and staff was accompdating (2025-07-04)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Takoyadon - SM City Rosales (Rosales)",
           "url": "https://www.google.com/maps/search/?api=1&query=Takoyadon+-+SM+City+Rosales+Rosales+Pangasinan&query_place_id=ChIJP26UkzY5kTMRGWg3bSBXi6U"
         }
       ],
-      "lat": 15.881513,
-      "lng": 120.599847
+      "lat": 15.8781997,
+      "lng": 120.6025975
     },
     {
       "id": "pangasinan-5towns-089",
@@ -1838,6 +2564,24 @@
       ],
       "rating": 4.4,
       "total_review_count": 93,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Good price and faster service than McDonald’s in the same mall. (2025-08-31)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "the environment was good and also every food that they serve is delicious and very meaningful to my mouth and stomach 😛 (2026-05-26)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "First, just want to thank the server who served our food earlier, second try their karaage I love the karaage, third their service and food is def must try will recommend this to my colleagues. (2024-09-04)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Good service, nice staffs friendly and sweet food are yummy (2025-07-10)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Botejyu - SM City Rosales (Rosales)",
@@ -1848,8 +2592,8 @@
           "url": "https://www.botejyu.com.ph/"
         }
       ],
-      "lat": 15.879188,
-      "lng": 120.601562
+      "lat": 15.8781997,
+      "lng": 120.6025975
     },
     {
       "id": "pangasinan-5towns-091",
@@ -1867,6 +2611,16 @@
       ],
       "rating": 3.9,
       "total_review_count": 69,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "A good place to stop by to rest and eat hot noodles after a long bus ride. (2024-08-29)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "You can buy tons of pasalubong bagoong,daing and tons of sweets! (2025-05-07)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Farmland Kambingan at Pasalubong (Rosales)",
@@ -1892,6 +2646,20 @@
       ],
       "rating": 4.9,
       "total_review_count": 8,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Best place to go to for comfort food! (2025-12-11)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Best comfort food for the rainy days. (2023-07-29)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Ordered delivery: Laing, embotido, other dishes. (2025-11-12)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Urban Cusina Rosales (Rosales)",
@@ -1921,6 +2689,16 @@
       ],
       "rating": 4.4,
       "total_review_count": 11,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Food is delish! (2023-10-07)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "It is situated along a major thoroughfare in Rosales. (2025-12-02)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Mama Car's Resto & Bakeshop Cafe (Rosales)",
@@ -1946,6 +2724,20 @@
       ],
       "rating": 4.5,
       "total_review_count": 191,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The combination of a tranquil atmosphere, quality coffee, and satisfying snacks makes Bo's Coffee Rosales a favorite stop for those seeking a refreshing break on the road. (2023-10-30)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Bo’s Coffee in Rosales, Pangasinan is a great place to relax and enjoy quality coffee. (2026-01-20)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "All staff Bo’s Rosales are friendly good clean store.Coffees are all good taste it’s like Starbucks coffee (2025-10-20)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Bo's Coffee Rosales (Rosales)",
@@ -1971,6 +2763,28 @@
       ],
       "rating": 5,
       "total_review_count": 63,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The food is absolutely divine - I had the signature coffee and it was rich, smooth, and perfectly crafted. (2025-10-06)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "They offer good coffee and homebaked products, staff are nice and accommodating. (2025-10-09)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "The food and drinks ON POINT!✨ i love the coffee and the pastry (highly recommended) a must try and visit! (2026-07-31)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Great food & drinks especially the muffins! (2025-10-10)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #5",
+          "comment": "Choco berries na cake the best!! (2025-11-19)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Precious Treats (Rosales)",
@@ -2000,6 +2814,16 @@
       ],
       "rating": 4.8,
       "total_review_count": 42,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "One of the bests- food, ambiance and service! (2026-02-25)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "We’re from Manila and loved the food here! (2024-11-10)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Cafe Victoria Kindred (Rosales)",
@@ -2029,6 +2853,16 @@
       ],
       "rating": 4.8,
       "total_review_count": 33,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "So yummy and affordable coffee here❤️❤️❤️ great accommodation ❤️ (2025-08-25)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Quality drinks and pastries with calm environment (2025-08-08)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Brewlliant Cafe (Rosales)",
@@ -2058,14 +2892,24 @@
       ],
       "rating": 4.4,
       "total_review_count": 16,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Great ambiance and delicious coffee & pastries. (2026-02-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Visited the Coffee Lounge at SM Rosales, Pangasinan for coffee after lunch. (2023-02-24)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – The Coffee Lounge - SM City Rosales (Rosales)",
           "url": "https://www.google.com/maps/search/?api=1&query=The+Coffee+Lounge+-+SM+City+Rosales+Rosales+Pangasinan&query_place_id=ChIJ8bECIvA5kTMRrpj8Z1vdhao"
         }
       ],
-      "lat": 15.880071,
-      "lng": 120.602584
+      "lat": 15.8781997,
+      "lng": 120.6025975
     },
     {
       "id": "pangasinan-5towns-100",
@@ -2082,6 +2926,12 @@
       ],
       "rating": 4.8,
       "total_review_count": 5,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified 4.8/5 Google Maps rating in Carmay East, Rosales."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – 0864 Brewing Café (Rosales)",
@@ -2110,6 +2960,12 @@
       ],
       "rating": 5,
       "total_review_count": 2,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified 5.0/5 Google Maps rating at 31 San Antonio St, Rosales."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – LA BREW CAFE (Rosales)",
@@ -2134,6 +2990,16 @@
       ],
       "rating": 3.5,
       "total_review_count": 4,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Place to chill at late night here in Rosales Pangasinan. (2026-10-24)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "The place and ambiance is cozy and neat, big factor is it being a high ceiling (2026-10-03)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – 1822 Cafe - Rosales (Rosales)",
@@ -2159,6 +3025,24 @@
       ],
       "rating": 4.3,
       "total_review_count": 178,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Great food, fast service, friendly staff, and a clean restaurant. (2026-06-27)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Relatively nice place to dine at SM Rosales - plenty of seating, fast and reliable service, food is as expected. (2023-07-05)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Went with family for a light snack, 2 medium thin crust pizza for less than php500 is super..🤩 (2026-07-27)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Good food especially the pasta and pizza (2023-05-23)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Greenwich - SM City Rosales (Rosales)",
@@ -2169,8 +3053,8 @@
           "url": "https://order.greenwich.com.ph/"
         }
       ],
-      "lat": 15.882507,
-      "lng": 120.600232
+      "lat": 15.8781997,
+      "lng": 120.6025975
     },
     {
       "id": "pangasinan-5towns-104",
@@ -2187,6 +3071,12 @@
       ],
       "rating": 2.3,
       "total_review_count": 44,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "First time experiencing this at Shakey’s usually, even when they’re full, they’ll talk to customers and ask if we can wait. (2026-10-18)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Shakey's Pizza Parlor - SM City Rosales (Rosales)",
@@ -2197,8 +3087,8 @@
           "url": "http://www.shakeyspizza.ph/"
         }
       ],
-      "lat": 15.879812,
-      "lng": 120.602062
+      "lat": 15.8781997,
+      "lng": 120.6025975
     },
     {
       "id": "pangasinan-5towns-105",
@@ -2216,6 +3106,24 @@
       ],
       "rating": 4.1,
       "total_review_count": 677,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Clean, fast & food was pretty good (2025-05-19)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "I recently ordered a large quantity (70 Pieces) of Jollibee meals from your establishment, and I wanted to commend the exceptional service provided by your employee, Gie. (2025-01-20)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "We only stayed for less than 15 minutes until our food was already served! (2023-05-02)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "We recently celebrated a special occasion with a Jollibee party, and it turned out to be such a wonderful experience for everyone involved. (2026-07-16)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Jollibee - SM City Rosales (24/7) (Rosales)",
@@ -2226,8 +3134,8 @@
           "url": "https://jollibee.onelink.me/U65H/googlebusinessprofile"
         }
       ],
-      "lat": 15.882312,
-      "lng": 120.597562
+      "lat": 15.8781997,
+      "lng": 120.6025975
     },
     {
       "id": "pangasinan-5towns-106",
@@ -2245,6 +3153,24 @@
       ],
       "rating": 4.1,
       "total_review_count": 777,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Nice McDo near the bridge junction with parking on both sides of the street. Clean, good protocol, and not noisy. Yummy chicken. (2025-07-26)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "I had a quick breakfast here and off i go to market in rosales...Wide space just right for having a quick and peaceful meal and the aircondition is just right for you after a sunny weather outside... (2023-04-15)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Its our go to place for dinner when its late at night Open 24/7 in mc donalds Carmen Rosales pangasinan (2023-04-16)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Lot of space for parking, fast preparation and serving time. (2024-01-14)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – McDonald's Carmen Rosales (24/7 Drive-Thru) (Rosales)",
@@ -2274,6 +3200,24 @@
       ],
       "rating": 3.9,
       "total_review_count": 107,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Accurate orders were served, fresh and good food. (2026-01-27)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Products were freshly cooked because it is very tender and juicy. (2026-01-06)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Clean dining, fast service (2025-12-06)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Fast service.pagtapos mo mag order tapos card bayad mo hihintayin mo nlng yun food mo.nice kfc sm rosales (2025-10-04)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – KFC - SM City Rosales (Rosales)",
@@ -2284,8 +3228,8 @@
           "url": "https://www.kfc.com.ph/en/store-locator/kfc_sm_city_rosales"
         }
       ],
-      "lat": 15.880162,
-      "lng": 120.602721
+      "lat": 15.8781997,
+      "lng": 120.6025975
     },
     {
       "id": "pangasinan-5towns-108",
@@ -2303,6 +3247,16 @@
       ],
       "rating": 3.4,
       "total_review_count": 88,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Excellent service and good quality of food.I will surely return to this branch. (2025-05-01)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Best Mang Inasal we've gone so far. (2023-02-15)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Mang Inasal - SM City Rosales (Rosales)",
@@ -2313,8 +3267,8 @@
           "url": "http://manginasaldelivery.com.ph/"
         }
       ],
-      "lat": 15.883109,
-      "lng": 120.602609
+      "lat": 15.8781997,
+      "lng": 120.6025975
     },
     {
       "id": "pangasinan-5towns-109",
@@ -2331,14 +3285,24 @@
       ],
       "rating": 2.1,
       "total_review_count": 24,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Thank you classic savory Sm Rosales for good dine in experience..We celebrate 5th anniversary and we enjoy your food❤️❤️❤️Mabilis Ang Ang service,very magalang Ang mga staffs,Wala pang 20mins served na Ang foods namin... (2026-01-17)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Savory Fried Rice / Lumpiang Shanghai / Black Pot Beef Stew / Incredi-bowls / Combo Meals (2024-06-15)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Classic Savory - SM City Rosales (Rosales)",
           "url": "https://www.google.com/maps/search/?api=1&query=Classic+Savory+-+SM+City+Rosales+Rosales+Pangasinan&query_place_id=ChIJZ1KeM3Q5kTMRupqpKgUKhcI"
         }
       ],
-      "lat": 15.879945,
-      "lng": 120.602609
+      "lat": 15.8781997,
+      "lng": 120.6025975
     },
     {
       "id": "pangasinan-5towns-110",
@@ -2355,6 +3319,16 @@
       ],
       "rating": 2,
       "total_review_count": 12,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The pigar pigar was good, but the lechon kawali was full of bones. (2025-07-31)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "menuItem: Kare-Kareng Gulay; menuCategory: P139 Promo Meals."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Point and Grill - Rosales (Rosales)",
@@ -2379,6 +3353,12 @@
       ],
       "rating": 3.5,
       "total_review_count": 34,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified McDonald's mall branch (Store #388) at Carmen-Poblacion Rosales National Rd."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – McDonald's - SM City Rosales (Rosales)",
@@ -2389,8 +3369,8 @@
           "url": "https://www.mcdonalds.com.ph/store-locator?utm_source=google&utm_medium=organic&utm_campaign=GMB&utm_content=mcdph_388"
         }
       ],
-      "lat": 15.883004,
-      "lng": 120.60047
+      "lat": 15.8781997,
+      "lng": 120.6025975
     },
     {
       "id": "pangasinan-5towns-112",
@@ -2407,6 +3387,12 @@
       ],
       "rating": 5,
       "total_review_count": 1,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified town-center Jollibee listing at VJWH+5FV, Coloma St, Rosales, Pangasinan."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Jollibee - Coloma St. Poblacion Rosales (Rosales)",
@@ -2432,6 +3418,28 @@
       ],
       "rating": 4.3,
       "total_review_count": 250,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Attentive staff, a very helpful security guard, good food, nice and clean comfort rooms, and the perfect upstairs dining area facing the sea - thank you for giving us a lovely lunch experience! (2025-02-20)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "This place was amazing its in-front of the Lingayen Baywalk Beach (2023-10-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Cozy beachside café with great vibes, good coffee, and a view that’s pure relaxation. (2024-11-23)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "We dined here twice during our stay in Pangasinan, and we had a great experience both times! (2026-10-17)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #5",
+          "comment": "we had spanish latte and beach latte, milo freeze and jasmine tea was good too (2025-10-30)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Naro Cafe • Coffee + Kitchen & Bar (Lingayen)",
@@ -2457,6 +3465,20 @@
       ],
       "rating": 3.9,
       "total_review_count": 68,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "I had a wonderful experience at G &G samgyupsal grill and restobar!the food was delicious the service was excellent and the place was clean and comfortable. (2026-11-04)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "The meat was delicious, the staff were friendly and accommodating, and the place was clean and cozy. (2026-11-04)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "All goods lalo sinarapan ang sidedish at ung chicken sana pwede pa bilisan ng kunti at ok na lahat (2024-04-12)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – G&G Samgyupsal Grill and Restobar (Lingayen)",
@@ -2486,6 +3508,24 @@
       ],
       "rating": 3.7,
       "total_review_count": 43,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The seafood and grilled dishes were flavorful and satisfying, making the meal really enjoyable. (2026-10-04)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "pancit and sisig are to die for, tasted fresh especially the pork. (2025-10-30)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Food was great...seafood is superb with beer (2025-02-05)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Food is good and affordable. (2026-07-22)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Chatanoga Grill Seafoods & Restaurant (Lingayen)",
@@ -2510,6 +3550,20 @@
       ],
       "rating": 4.6,
       "total_review_count": 20,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The best bbq in this area. (2023-04-20)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "The ambiance was nice, a typical nipa hut style resto by the beach. (2023-06-30)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Service time is slow but food is cheap. (2023-06-30)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Nanay Remy's Foodhouse (Lingayen)",
@@ -2535,6 +3589,16 @@
       ],
       "rating": 4.9,
       "total_review_count": 61,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "absolutely amazing coffee, you can taste the freshly brewed coffee beans in it - delicious! (2024-06-07)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Their Vietnamese coffee hits the spot, I highly recommend if you need that extra kick. (2026-10-17)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Blvnk Coffee - Roastery and Slow Bar (Lingayen)",
@@ -2564,6 +3628,16 @@
       ],
       "rating": 4.6,
       "total_review_count": 125,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Bo's Coffee Lingayen is an oasis in the heart of municipality, near the Pangasinan State University. (2025-09-11)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Great ambience Food was great... Coffee was strong and yummy (2025-11-04)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Bo's Coffee Lingayen (Lingayen)",
@@ -2589,6 +3663,20 @@
       ],
       "rating": 4,
       "total_review_count": 54,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Mankape Coffee Shop is a great spot that combines quality drinks, good vibes, and excellent service. (2025-12-29)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "A wonderful experience with delicious food, a cozy ambiance, and friendly, welcoming staff! (2026-10-17)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Highly recommended this shop.👌The foods is good and the drinks are great, specially the matcha oat latte🤤. (2025-11-14)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Mankape Lingayen (Lingayen)",
@@ -2614,6 +3702,16 @@
       ],
       "rating": 4.6,
       "total_review_count": 39,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Great coffee, tasty comfort food, and a lovely place to sit back and relax. (2026-10-16)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Good coffee with a beautiful view—truly a chef’s kiss. (2026-04-04)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Anea Cafe - Lingayen Capitol Beachside Park (Lingayen)",
@@ -2638,6 +3736,16 @@
       ],
       "rating": 4.9,
       "total_review_count": 22,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Favorite go-to coffee in Lingayen with affordable choices. (2026-06-24)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Walking distance from the cafe is Lingayen Beach/baywalk area. (2026-09-08)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – G, coffee. (Lingayen)",
@@ -2662,6 +3770,16 @@
       ],
       "rating": 4.9,
       "total_review_count": 16,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "probs the most underrated coffee shop here in lingayen !! (2026-04-20)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "This place is much better than Bo's Cafe in Lingayen. (2025-01-04)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Instant Venue Café (Lingayen)",
@@ -2686,6 +3804,16 @@
       ],
       "rating": 5,
       "total_review_count": 12,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Found a new CAFE gem in Lingayen Their drinks are top-tier. (2025-01-11)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "I ordered Spanish latte and Tsokolatera, both were great drinks! (2025-01-09)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – The Bean Co - Lingayen (Lingayen)",
@@ -2714,6 +3842,16 @@
       ],
       "rating": 4.8,
       "total_review_count": 9,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "I've tried a variety of their drinks, from lattes to cappuccinos, and each one is expertly crafted with love and care. (2025-02-14)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Best coffee in lingayen👍 (2025-01-17)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – YALLA Cafe (Lingayen)",
@@ -2738,6 +3876,16 @@
       ],
       "rating": 4.8,
       "total_review_count": 4,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Owner was really nice and the coffee was Great ! (2026-04-04)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Pretty affordable in comparison to other more popular cafes (Naro and Bo’s). (2025-08-26)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – CH² Coffee (Lingayen)",
@@ -2763,6 +3911,12 @@
       ],
       "rating": 4.6,
       "total_review_count": 17,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Mango Avenue Lingayen A small cafe in Lingayen that serves the best selling Mango Graham-a drink that all ages would love."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Mango Avenue Lingayen (Lingayen)",
@@ -2787,6 +3941,12 @@
       ],
       "rating": 4.1,
       "total_review_count": 8,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Clickeat cafe offers variety of food drinks. Food specialties: Pancit & noodles (pancit Malabon, palabok, bihok and batangas lomi), pasta, seafood paella, all-day breakfast meals."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Clickeat Cafe Baay-Lingayen (Lingayen)",
@@ -2811,6 +3971,12 @@
       ],
       "rating": 4,
       "total_review_count": 4,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "JRJ' Honeycup Cafe is a family-friendly café with a variety of delightful food selections and a wide range of beverages, including milk tea, coffee, and refreshers, all at affordable prices."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – JRJ’s Honey Cup Cafe (Lingayen)",
@@ -2839,6 +4005,12 @@
       ],
       "rating": 5,
       "total_review_count": 2,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Visit and Refresh yourself in ilovemilktea Lingayen with our new CHOCO MOUSSE in milktea and rock salt cheese variance!"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – I LOVE MILKTEA Lingayen (Lingayen)",
@@ -2863,6 +4035,12 @@
       ],
       "rating": 2.3,
       "total_review_count": 3,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "menuItem: Green Apple Lemon Brusko; menuCategory: Okinawa Big In."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – BigBrew - PSU Lingayen (Lingayen)",
@@ -2887,6 +4065,12 @@
       ],
       "rating": 5,
       "total_review_count": 3,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified 5.0/5 Google Maps rating in Brgy. Maniboc, Lingayen."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Bayside Bistro Lingayen (Lingayen)",
@@ -2912,6 +4096,12 @@
       ],
       "rating": 3,
       "total_review_count": 2,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Essen ist echt gut auch die portionen sind angemessem.. Man kann auch Billard spielen und Abends gibts live Musik (2024-12-10)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Aj's Baywalk Bar & Grill (Lingayen)",
@@ -2936,6 +4126,12 @@
       ],
       "rating": 3.7,
       "total_review_count": 3,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified food park at 26CH+7R4, Poblacion, Lingayen serving wonton noodles and char kway teow."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Villa Plaza Foodpark Lingayen (Lingayen)",
@@ -2960,6 +4156,24 @@
       ],
       "rating": 4.4,
       "total_review_count": 725,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "the food here is great and the wait is worth it because the chicken here is so juicy and the Halo Halo here is my favorite (2026-08-09)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Delicious and affordable meal (2023-06-03)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "The food tastes good especially the chicken and halo-halo. (2026-05-26)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "This is the place where you can enjoy your dining. (2026-08-26)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Mang Inasal - Lingayen Public Market (Lingayen)",
@@ -2985,6 +4199,16 @@
       ],
       "rating": 4,
       "total_review_count": 516,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Drive-thru or dine in. Clean restrooms too. (2025-12-17)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "All time favorite for a person like me who' s always hungry... 😅 good service (2023-09-08)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – McDonald's Lingayen (24/7 Drive-Thru) (Lingayen)",
@@ -3014,6 +4238,16 @@
       ],
       "rating": 3.8,
       "total_review_count": 392,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Jollibee is a good place to eat good food and drinks very fast to get your food to very nice people that work there (2024-02-16)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Chickenjoy is the soul of this fast food restaurant in Lingayen, and has been there longer than other fast food chains. (2025-07-18)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Jollibee Lingayen (Lingayen)",
@@ -3042,6 +4276,16 @@
       ],
       "rating": 5,
       "total_review_count": 2,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Good burgers 👌🏼 (2025-04-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "menuItem: Minute Burger Black Pepper Burger, Buy 1 take 1; menuCategory: Bigtime Sandwiches."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Minute Burger Lingayen (24/7) (Lingayen)",
@@ -3067,6 +4311,28 @@
       ],
       "rating": 4.8,
       "total_review_count": 26,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "chill vibes, nice aesthetics on top of the delicious coffee, you can choose the beans you likeas well. (2026-06-06)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "A charming café worth discovering in Villasis, Pangasinan! (2026-07-31)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "the egg tart and waffles were really good i ordered two of each! (2026-06-06)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "BC.G Specialty Coffee has good food, coffee, and snacks the overall experience is better. (2026-09-29)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #5",
+          "comment": "Also, their prices are cheap for the quality you're getting. (2026-03-08)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – BC.G Cafe (BC.G Specialty Coffee) (Villasis)",
@@ -3092,6 +4358,20 @@
       ],
       "rating": 5,
       "total_review_count": 9,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Great local place for coffee, fruit shakes, milk tea and food. (2024-11-29)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "The atmosphere of the cafe is another standout for me as it’s beautifully designed, cozy, and aesthetically pleasing (2024-12-30)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Caramel macchiato 🥰 Relaxing vibes 💕 Friendly environment 🌳 Toys🎲 Parking🚗🚗🚗🚗 Air bnb🤩✈️ (2024-12-26)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Island Joe's Coffee Lounge (Villasis)",
@@ -3120,6 +4400,12 @@
       ],
       "rating": 5,
       "total_review_count": 10,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified 5.0/5 rating across 10 Google Maps reviews on Santo Domingo St, Villasis."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Hidden Gem Cafe Villasis (Villasis)",
@@ -3148,6 +4434,12 @@
       ],
       "rating": 5,
       "total_review_count": 5,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Overall, I would recommend this cafe and would definitely try some of their drinks next time. (2025-01-20)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Thursday Cafe (Villasis)",
@@ -3173,6 +4465,16 @@
       ],
       "rating": 4.3,
       "total_review_count": 29,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The best espresso around! (2023-01-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "It's a nice place to unwind, catch up with friends, or spend quality time with loved ones (2026-10-14)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Café Eduardo (Villasis)",
@@ -3197,6 +4499,12 @@
       ],
       "rating": 4.3,
       "total_review_count": 7,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified 4.3/5 Google Maps rating in Zone 3, Brgy. Amamperez, Villasis."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Villa Faustrella Cafe (Villasis)",
@@ -3222,6 +4530,12 @@
       ],
       "rating": 5,
       "total_review_count": 4,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "cozy place..affordable prices and delicious products.. 😋 must try different flavors.. 😊 (2024-11-03)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Tea Talker - Unzad Villasis (Villasis)",
@@ -3250,6 +4564,16 @@
       ],
       "rating": 4.6,
       "total_review_count": 14,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Very accommodating crew, Nice Place nature's vibe and food is quite good too Some of my cousins and friends really enjoyed it (2022-12-28)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "The cafe's food menu is extensive and includes empanadas, milk tea, and street food. (2025-07-18)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – The Boulevard Cafe Villasis (Villasis)",
@@ -3274,6 +4598,12 @@
       ],
       "rating": 5,
       "total_review_count": 1,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified 5.0/5 rating in Sterling Village, Poblacion, Villasis."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Rhoan's Bake Spot (Villasis)",
@@ -3303,6 +4633,12 @@
       ],
       "rating": 4.8,
       "total_review_count": 5,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Plenty of foods, snacks and beverages to choose from. We also have spacious playground for your kids. Enjoy the view and relax here @Tal-talon FoodPark along Villasis-Malasiqui Highway"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Tal-Talon Food Park (Villasis)",
@@ -3327,6 +4663,12 @@
       ],
       "rating": 4.5,
       "total_review_count": 5,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Family Friendly Food and Beverages Park at 2009 Villasis - Asingan Road Barangay Piaz (Plaza) Villasis, Pangasinan."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Piaz Food Park (Villasis)",
@@ -3355,6 +4697,12 @@
       ],
       "rating": 4,
       "total_review_count": 1,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified 4.0/5 rating at Petron Villasis, MacArthur Highway, Villasis."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Euroamasian Bar and Grill (Villasis)",
@@ -3379,6 +4727,12 @@
       ],
       "rating": 3.5,
       "total_review_count": 4,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "menuItem: Chili Cheese; menuCategory: Unlimited Wings."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Homies Kusina - Villasis (Villasis)",
@@ -3403,6 +4757,12 @@
       ],
       "rating": 5,
       "total_review_count": 2,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Kubo Villasis Founded in 2021, Kubo Villasis is a fast-food restaurant offering affordable Filipino delicacies."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Kubo Villasis (Villasis)",
@@ -3427,6 +4787,12 @@
       ],
       "rating": 4,
       "total_review_count": 24,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "I've tried Dinakdakan and has the right smokey pork flavor. (2025-02-03)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Maria Amor Eatery (Villasis)",
@@ -3451,6 +4817,24 @@
       ],
       "rating": 4.4,
       "total_review_count": 285,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The food was delicious, the chicken was served hot, and the prices were budget-friendly. (2026-06-16)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "The service was quick, and the food arrived hot and fresh. (2026-06-01)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Mababait ang mga empleyado tas mabilis pa ang food namin lumabas compare sa iba Mas mabilis sa villasis (2026-09-24)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "This place has become one of my go-to fast-food restaurants. (2026-06-17)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Mang Inasal - Villasis (Villasis)",
@@ -3480,6 +4864,20 @@
       ],
       "rating": 3.8,
       "total_review_count": 82,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The service is very fast, you don't have to wait an hour before your order is ready and all their staff are very easy to approach (2025-11-04)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "I was biking and I'm glad McDonald's have this affordable combo meal under Php100. (2025-11-01)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Mcdonald’s app not working on New Year but they compensated great service. (2026-01-01)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – McDonald's Villasis (24/7 Drive-Thru) (Villasis)",
@@ -3508,6 +4906,16 @@
       ],
       "rating": 4.2,
       "total_review_count": 41,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Love their kimchi, cucumber amd radish salad side dishes. (2022-11-28)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "menuItem: Side Dishes; menuCategory: Unli @ 279."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Mashiso 2.0 Korean Resto (Binalonan)",
@@ -3532,6 +4940,16 @@
       ],
       "rating": 4.6,
       "total_review_count": 85,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Hebrews Cafe has such a cozy ambience that it's nice to hang out here to just relax and unwind and enjoy some peace while they serve you good coffee and good food. (2023-06-22)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "This independent coffee shop is pretty unique since it's in a gas station. (2025-01-08)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – TDZ HeBrews Cafe (Binalonan)",
@@ -3556,6 +4974,16 @@
       ],
       "rating": 5,
       "total_review_count": 42,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "a must-visit place in Binalonan! (2024-05-03)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "solid dito mga bossing, masarap mga foods nila at mababait na pogi ang mga staff (2026-05-22)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – BIKER BREWINGS (Binalonan)",
@@ -3581,6 +5009,16 @@
       ],
       "rating": 4.5,
       "total_review_count": 25,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Super cozy ang place and the coffee is so sarap, spanish latte the best!!! (2025-02-05)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Good food, service, and atmosphere 👌👌👌 (2025-02-10)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Artisan Cafè Binalonan (Binalonan)",
@@ -3606,6 +5044,16 @@
       ],
       "rating": 4.8,
       "total_review_count": 16,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Food was great, drinks were great, overall atmosphere was great... highly recommend!!! (2024-11-15)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "I wasn't expecting much about their food because I know Brewnalonan as a coffee shop first and foremost, but both their chicken biryani and pasta chicken alfredo really tasted good and fresh. (2025-02-08)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Brewnalonan Cafe (Binalonan)",
@@ -3630,6 +5078,16 @@
       ],
       "rating": 4.6,
       "total_review_count": 16,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Get a wonderful cup of your favorite drink while waiting for your flight or just drip by while relaxing and enjoying your meal with a cold drink only here at ANEA CAFE at Binalonan Airport, Pangasinan. (2025-11-27)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "All day breakfast is good (2026-10-07)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Anea Cafe - Binalonan Airport (Binalonan)",
@@ -3654,6 +5112,16 @@
       ],
       "rating": 3.9,
       "total_review_count": 13,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Very accessible, along the highway, for quick dose of caffeine.. more affordable and same quality than the over rated starbucks (2026-07-15)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "So cozy and spacious and they also offer al fresco dining. (2026-02-24)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Drop Coffee - Binalonan (Binalonan)",
@@ -3678,6 +5146,12 @@
       ],
       "rating": 3.5,
       "total_review_count": 24,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Okay naman overall, food and coffee and price. (2026-06-05)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – 1822 Cafe Binalonan (Binalonan)",
@@ -3706,6 +5180,12 @@
       ],
       "rating": 3.1,
       "total_review_count": 22,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Medyo bitin lang sa food kasi walang meals, pero highly recommended pa rin for the coffee and chill experience! (2026-06-26)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Allos Book and Coffee Bar (Binalonan)",
@@ -3730,6 +5210,16 @@
       ],
       "rating": 4,
       "total_review_count": 21,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Good place to eat, cheap but delicious foods. (2023-07-10)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "But Binalonan, during its peak of sudden progression, is happy to have a chic and 'cool' establishment like this, so it was still popular to locals. (2025-03-20)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Booba Coolers Binalonan (Binalonan)",
@@ -3754,6 +5244,12 @@
       ],
       "rating": 5,
       "total_review_count": 2,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "This is a rooftop coffee shop on the third floor. (2024-03-17)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Juzz Coffee (Binalonan)",
@@ -3778,6 +5274,16 @@
       ],
       "rating": 3.3,
       "total_review_count": 15,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Cozy dining, 24 hours open & with drive thru! (2025-01-18)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Service is also helpful and accomodating. (2025-09-24)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Dunkin' Binalonan (24/7 Drive-Thru) (Binalonan)",
@@ -3802,6 +5308,20 @@
       ],
       "rating": 4.3,
       "total_review_count": 12,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The food is delicious and good (2026-05-04)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Foods are okay, small servings yung pang solo but yung pang group ok naman. (2026-03-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "This is one of a kind place yo eat (2026-01-21)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – D'Brinks Resto Cafe (Binalonan)",
@@ -3826,6 +5346,12 @@
       ],
       "rating": 3.6,
       "total_review_count": 97,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Shakey's branch at 3H28+P3V, Binalonan with 97 Google Maps reviews."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Shakey's Binalonan (Binalonan)",
@@ -3854,6 +5380,12 @@
       ],
       "rating": 5,
       "total_review_count": 11,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Abot kayang pizza sa murang halaga🍕 sulit Ang bayad mo sa pizza at uulit ulitin mo itong bibilin kada may handaan🍕🍕 Wag kalimutan DOMINIC PIZZA IS THE BEST CHOICE IN TOWN🍕🍕 (2026-03-12)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Dominic Pizza Binalonan (Binalonan)",
@@ -3882,6 +5414,20 @@
       ],
       "rating": 4.7,
       "total_review_count": 10,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Their pinapaitan is good… (2025-02-25)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "In my opinion, their Kalderetang Kambing is great. (2024-02-13)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "One of the discent turo-turo restaurants in the area is located near Manaoag TPLEX entrace/exit. (2024-02-13)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Pepay's Kambingan (Binalonan)",
@@ -3910,6 +5456,16 @@
       ],
       "rating": 5,
       "total_review_count": 4,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Good food good service and the atmosphere feels so comftrable (2023-12-29)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "yummy food the barbecue is so good (2026-03-11)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Tavera's Grill (Binalonan)",
@@ -3934,6 +5490,12 @@
       ],
       "rating": 5,
       "total_review_count": 2,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified 5.0/5 rating on Google Maps along MacArthur Hwy, Binalonan serving Beef Pares and Boneless Bangus Tomato Salad (₱199)."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – DAROCK'S Resto & Pares Hub (Binalonan)",
@@ -3962,6 +5524,16 @@
       ],
       "rating": 3.9,
       "total_review_count": 826,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "We celebrated my niece birthday in 2019 and the product and services are good. (2023-04-01)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Courteous, friendly, and accommodating staff serve good chicken joy and great food in a clean environment."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Jollibee Binalonan Highway (24/7 Drive-Thru) (Binalonan)",
@@ -3990,6 +5562,16 @@
       ],
       "rating": 3.9,
       "total_review_count": 395,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "It's a good place where I can get my food at 2:00 am in the morning after work. (2023-04-14)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Drive-thru service is excellent and fast, and there’s ample parking."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – McDonald's Binalonan (24/7 Drive-Thru) (Binalonan)",
@@ -4019,6 +5601,20 @@
       ],
       "rating": 3.7,
       "total_review_count": 206,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Chowking Binalonan offers a convenient location with ample parking, a spacious interior, and respectful, service-oriented staff. (2026-06-25)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "The food was tasty and well-prepared, no burnt taste on the chow fan or chicken, unlike in some other Chowking branches. (2025-10-19)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Good Food, Good service (2024-05-22)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Chowking Binalonan (Binalonan)",

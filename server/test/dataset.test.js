@@ -290,3 +290,63 @@ test('admin restaurant photos reach dataset entries immediately', () => {
   setPhotos('conrads', []);
   assert.deepEqual(allEntries().find(e => e.id === 'conrads').photos, []);
 });
+
+test('visitor reviews keep the quote, who said it and when — both file shapes', () => {
+  // The 5-town file: { comment, reviewer_or_source } with the date glued to the
+  // comment. The 150-spot file: { text, author, date }.
+  const entry = normalize({
+    name: "Matutina - Gerry's Seafood House",
+    municipality_or_city: 'Urdaneta City',
+    reviews: [
+      { reviewer_or_source: 'Google Maps Verified Reviewer #1', comment: 'Bangus sisig is a must try. (2024-07-22)' },
+      { author: 'Artur P', date: '2026-01-03', text: 'Fresh seafood and fast service.' },
+      'Lovely place by the highway.',
+    ],
+  }, 0, 'restaurants');
+
+  assert.deepEqual(entry.visitorReviews[0], { text: 'Bangus sisig is a must try.', source: 'Google Maps', date: '2024-07-22' });
+  assert.deepEqual(entry.visitorReviews[1], { text: 'Fresh seafood and fast service.', source: 'Artur P', date: '2026-01-03' });
+  assert.deepEqual(entry.visitorReviews[2], { text: 'Lovely place by the highway.', source: '', date: '' });
+});
+
+test('a curated review keeps its own score, and a place without reviews gets an empty list', () => {
+  const conrads = allEntries().find(e => e.id === 'conrads');
+  assert.deepEqual(conrads.visitorReviews, [
+    { text: 'Pancit Bagnet and Beef Kare-Kare were excellent.', source: '', date: '', rating: 5 },
+  ]);
+  const plain = normalize({ name: 'Some Stall', municipality_or_city: 'Dagupan City' }, 0, 'restaurants');
+  assert.deepEqual(plain.visitorReviews, []);
+});
+
+test('metadata notes are not dressed up as visitor reviews', () => {
+  const entry = normalize({
+    name: 'Kuya J Restaurant - SM City Urdaneta Central',
+    municipality_or_city: 'Urdaneta City',
+    reviews: [
+      { reviewer_or_source: 'Google Maps Verified Reviewer #1', comment: 'Crispy pata is the reason to come.' },
+      { reviewer_or_source: 'Google Maps Price & Fee Verification', comment: 'Menu Price Range: ₱400–₱900.' },
+      { reviewer_or_source: 'Google Maps Rating & Volume Summary', comment: 'Verified rating of 4.4/5.' },
+      { reviewer_or_source: 'Google Maps Hours & Operations Note', comment: 'Open 10am-9pm.' },
+    ],
+  }, 0, 'restaurants');
+  assert.deepEqual(entry.visitorReviews.map(r => r.text), ['Crispy pata is the reason to come.']);
+  assert.equal(entry.visitorReviews[0].source, 'Google Maps');
+});
+
+test('visitor reviews are capped so one place cannot bloat every payload', () => {
+  const entry = normalize({
+    name: 'Busy Place',
+    municipality_or_city: 'Dagupan City',
+    reviews: Array.from({ length: 30 }, (_, i) => ({ comment: 'review ' + i, author: 'Guest ' + i })),
+  }, 0, 'restaurants');
+  assert.equal(entry.visitorReviews.length, 10);
+});
+
+test('recommendations carry the visitor reviews through to the app', async () => {
+  const out = await localRecommend('where to eat in Dagupan', '120.341,16.043');
+  const conrads = (out.places || []).find(p => p.name === "Conrad's Dagupan");
+  assert.ok(conrads, 'the fixture restaurant should be recommended');
+  assert.deepEqual(conrads.visitorReviews, [
+    { text: 'Pancit Bagnet and Beef Kare-Kare were excellent.', source: '', date: '', rating: 5 },
+  ]);
+});

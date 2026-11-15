@@ -3,7 +3,7 @@
   "province": "Pangasinan",
   "region_admin": "Ilocos Region (Region I), Philippines",
   "last_verified": "2026-11-15",
-  "source_note": "Imported by scripts/import-dataset.js from pangasinan-5towns. Gallery images and third-party review quotes were removed on import.",
+  "source_note": "Imported by scripts/import-dataset.js from pangasinan-5towns. Gallery images were dropped; visitor reviews are kept with their source.",
   "total_entries": 28,
   "ai_category_taxonomy": [
     {
@@ -111,6 +111,24 @@
       ],
       "rating": 4.4,
       "total_review_count": 293,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "It’s a new hotel, amenities offered like 5 star, nice location, restaurant offers delicious food, staff is accommodating. (2024-02-02)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "The cleanest and nicest hotel I have ever stayed in. (2025-02-11)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Overall, the excellent service, cleanliness, beautiful rice field views, delicious breakfast, and convenient location made this hotel a wonderful place to stay. (2026-07-26)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Scored 8.7/10 Excellent on Booking.com based on 131 verified guest reviews."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Levo Hotel (Urdaneta City)",
@@ -145,6 +163,28 @@
       ],
       "rating": 4.3,
       "total_review_count": 71,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "There is a beautiful veranda offering a beautiful view of the farm, a peaceful experience, comfortable bed with clean bathroom, delicious breakfast food and helpful staff 💯 (2025-09-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Clean, well-maintained facilities, friendly and accommodating staff, affordable rates, delicious food, nice view.. Very good for it’s price (2025-10-03)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "free breakfast, free parking, free drinking water with swimming pool, with sunrise/sunset view NO DEPOSIT MONEY REQUIRED UPON CHECK-IN (2026-11-02)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Room was comfortable, spacious and aircon provided fresh cool temperature perfect for rest and sleep.😊 There's ample and safe parking for cars. (2023-11-15)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #5",
+          "comment": "Really enjoyed the scenery, clean rooms and amazing staff. (2023-09-30)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Saroju's Farmview Hotel (Urdaneta City)",
@@ -175,6 +215,20 @@
       ],
       "rating": 3.6,
       "total_review_count": 116,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Im alwaysbbeen here.almost every other day.this a nice place to stay all night. (2024-01-13)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Rooms and facilities need improvement and upgrades for more guests to stay. (2024-04-13)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Given that the resort is quite old, they shouldve atleast have a clean rooms. (2025-04-17)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Goldland Spring Resort and Hotel (Urdaneta City)",
@@ -205,6 +259,16 @@
       ],
       "rating": 4.6,
       "total_review_count": 42,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Place is very clean, safe, guarded at night, safe location, good value for the money, receptionist is very nice, friendly and helpful, close to the local eateries. (2026-03-30)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "The best Apartelle in Urdaneta City, Pangasinan. (2023-02-27)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Good Shepherd Apartelle (Urdaneta City)",
@@ -230,6 +294,20 @@
       ],
       "rating": 4.1,
       "total_review_count": 41,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "their rooms is very spacious and clean, very relaxing din. (2026-01-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Staff were friendly and helpful, room was clean and spacious with a comfy bed. (2026-01-13)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "The hotel is clean and comfortable, with friendly and helpful staff who provide good service. (2026-01-13)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Premiére Hotel Urdaneta (Urdaneta City)",
@@ -255,6 +333,16 @@
       ],
       "rating": 4.4,
       "total_review_count": 14,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Had a pleasant stay here at this transient with my parents. (2026-06-17)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "we had a wonderful stay at Amor Hotel in Urdaneta. (2026-06-26)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Amor Building - Urdaneta City (Amor Hotel) (Urdaneta City)",
@@ -284,6 +372,16 @@
       ],
       "rating": 3.6,
       "total_review_count": 5,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "My coworkers and I were looking for a cheap place to stay and this place provided it. (2026-10-25)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "The place offers a practical option for travelers looking for a budget-friendly stay. (2026-06-05)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – D' Little Egg Hostel (RedDoorz @ D'Little Egg Hostel) (Urdaneta City)",
@@ -310,6 +408,28 @@
       ],
       "rating": 5,
       "total_review_count": 5,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Friendly service, spotless rooms, and a gorgeous resort setting made our stay so memorable. (2026-07-19)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Karaoke is fun while the kids loved the swimming pool. (2026-06-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "The ambiance of the room is nice and comfy giving American Modern style. (2026-07-19)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "They offer bar on the rooftop with a great City farm view. (2026-07-19)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #5",
+          "comment": "Whether you need a quiet retreat to study, a place to unwind, or a welcoming setting for a family vacation, Aetrium Resort Hotel delivers on all fronts. (2026-08-29)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – The Aetrium Resort Hotel (Urdaneta City)",
@@ -336,6 +456,24 @@
       ],
       "rating": 4,
       "total_review_count": 110,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Its a HOTEL used by artist guest from Urdaneta fiesta, Meron din siyang bar where sometimes there is acoustic band (2023-02-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "They are serving breakfast. (2023-08-29)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Good Accommodation. (2023-11-03)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "Only disappointment: no internet service in the room (2024-07-27)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Mark's Hotel (Urdaneta City)",
@@ -361,6 +499,16 @@
       ],
       "rating": 4.2,
       "total_review_count": 43,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "We stayed here for 3 nights and we really enjoyed because of their accomodating staffs and owner. (2026-04-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "My stay with this resort has been a pleasant experience, the staff, food and the accommodation was amazing. (2020-08-09)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Springland Hotel & Resort (Urdaneta City)",
@@ -386,6 +534,20 @@
       ],
       "rating": 3.7,
       "total_review_count": 18,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "First I'd like highlight some positive aspects of our stay: the proximity to SM, the apparent newness of the facilities, the strong air-conditioning, and the satisfactory Wi-Fi connection. (2023-12-28)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Dampa seafood restaurant was only a few minutes walk which was convenient, sari sari store nearby, quiet area and good location. (2025-02-18)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "I stayed there all by myself for a night feels safe and quite. (2023-07-26)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Dampa Poolside Events & Accommodation (Urdaneta City)",
@@ -415,6 +577,20 @@
       ],
       "rating": 3.1,
       "total_review_count": 48,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Very nice golden sunrise hotel,Rosales (2024-01-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Even the toiletries were sub par, just toothpaste, toothbrush, 3in1 body wash and slippers. (2023-03-19)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Rooms does not match the description and photos advertised. (2026-07-23)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Golden Sunrise Hotel I by RedDoorz (Rosales)",
@@ -444,6 +620,12 @@
       ],
       "rating": 4.9,
       "total_review_count": 14,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Popular hotel located 540 m from SM City Rosales in Carmen, Rosales, Pangasinan with a 4.9/5 Google rating across 14 reviews."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – RedDoorz @ JJ & Kaye Apartment Pangasinan (Rosales)",
@@ -458,8 +640,8 @@
           "url": "https://www.traveloka.com/en-ph/hotel/philippines/landmark/sm-city-rosales-91510314592094"
         }
       ],
-      "lat": 15.880662,
-      "lng": 120.602388
+      "lat": 15.8781997,
+      "lng": 120.6025975
     },
     {
       "id": "pangasinan-5towns-081",
@@ -477,6 +659,12 @@
       ],
       "rating": 3.5,
       "total_review_count": 31,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Traveloka & Google Maps hotel listing at VJJ2+84R, MacArthur Highway, Rosales, Pangasinan with 3.5/5 rating based on 31 reviews."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Cockers Inn Rosales (Rosales)",
@@ -506,6 +694,12 @@
       ],
       "rating": 4.2,
       "total_review_count": 10,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified Google Maps hotel & event venue at West Diversion Road, Rosales, 2441 Pangasinan."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Casa Rosal Resort and Events Center (Rosales)",
@@ -531,6 +725,16 @@
       ],
       "rating": 4.3,
       "total_review_count": 190,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "clean rooms, courteous staff, good location within Lingayen, good food, good service. (2023-01-02)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "I stayed in a Family Executive Room along with others and it was spacious, comfortable, well-built, and well-equipped with a swift wifi and a smart tv. (2023-08-03)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Bergamo Hotel Lingayen (Lingayen)",
@@ -560,6 +764,12 @@
       ],
       "rating": 4.6,
       "total_review_count": 47,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "The hallways are always clean and the room's spacious, good enough for those looking for comfortable place to stay at next to the Lingayen-Binmaley Beach. (2023-05-10)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – YRS Resort (Lingayen)",
@@ -589,6 +799,12 @@
       ],
       "rating": 4.5,
       "total_review_count": 19,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Overall experience is good, staff is accommodating and friendly (2025-12-11)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Baywalk Paradise Inn (Lingayen)",
@@ -618,6 +834,16 @@
       ],
       "rating": 3.8,
       "total_review_count": 333,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "180 pesos per person on a weekday, 200 on weekends. (2025-09-29)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Star Monica looks like a nice place for a family meal and a relaxing day out. (2026-10-14)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Star Monica Hotel, Resorts and Restaurant (Lingayen)",
@@ -643,6 +869,16 @@
       ],
       "rating": 4.1,
       "total_review_count": 82,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "It is a nice and reasonable place to stay when you are in Lingayen. (2025-04-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "One of the two best hotels to stay in Lingayen if you are on a business trip. Near to the market, fast food restos, jeep and bus terminals malls, and government agencies. Clean and big room (I stayed in a Deluxe Room )."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – MC Hotel Lingayen (Lingayen)",
@@ -672,6 +908,16 @@
       ],
       "rating": 3.7,
       "total_review_count": 218,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "I recently had the chance to stay at The President Hotel in Lingayen, Pangasinan, and it turned out to be a surprisingly memorable experience. (2025-08-10)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Perfect for unwinding! (2026-10-17)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – The President Hotel Lingayen (Lingayen)",
@@ -696,6 +942,12 @@
       ],
       "rating": 3.6,
       "total_review_count": 5,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Located in one of the most popular areas in Baywalk Pangasinan, only few minutes away from the town of Lingayen, VillaMar Resort is along the beachside. (2022-12-10)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – VillaMar Ramos Resort (Lingayen)",
@@ -720,6 +972,12 @@
       ],
       "rating": 5,
       "total_review_count": 8,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Verified 5.0/5 rating based on 8 reviews at Don Pastor Moran Street, Capandanan, Lingayen, Pangasinan."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Capandanan Cottages (Lingayen)",
@@ -749,6 +1007,16 @@
       ],
       "rating": 3.7,
       "total_review_count": 3,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Nice place and relaxing (2026-09-09)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "nice hotel ✅💞 (2026-07-03)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Ranch-O-Tel Guesthouse (Villasis)",
@@ -773,6 +1041,12 @@
       ],
       "rating": 4.6,
       "total_review_count": 15,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Casa Mia Apartments in Villasis scored 9.2 out of 10 on Booking.com guest reviews."
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Casa Mia Apartments Villasis (Villasis)",
@@ -803,6 +1077,24 @@
       ],
       "rating": 4.1,
       "total_review_count": 250,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Their food is awesome and the stay in the resort is affordable. (2026-04-04)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "We had fun together with my friends..The food was great specially the Pancit and Pork skewers..it was a quiet place to chill and relax..The staff are acommodating too.. (2026-01-13)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Affordable accommodation and parking are their strengths. (2023-08-31)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "A great place to stay in if you want to escape the busy city life. (2022-12-27)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Ruperto's Inland Resort and Restaurant (Binalonan)",
@@ -836,6 +1128,24 @@
       ],
       "rating": 4.1,
       "total_review_count": 35,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "With its small kitchen, wifi and airconditioned room, its a thumbs up for my family. (2024-05-17)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Hot and cold showers, ac,flatscreen tv. (2023-06-12)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #3",
+          "comment": "Linens are clean, towels are provided including toothbrush & toothpaste. (2023-03-14)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #4",
+          "comment": "The place is clean and comfortable to stay with. (2023-03-14)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – Binalonan Transient / Guest House (Pension Glaydie) (Binalonan)",
@@ -864,6 +1174,16 @@
       ],
       "rating": 4.5,
       "total_review_count": 20,
+      "reviews": [
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #1",
+          "comment": "Veru cozy place to stay in. (2025-08-27)"
+        },
+        {
+          "reviewer_or_source": "Google Maps Verified Reviewer #2",
+          "comment": "Overall, a good and comfortable stay. (2025-02-20)"
+        }
+      ],
       "verified_sources": [
         {
           "title": "Google Maps Verified Listing – The Bamboo Orange Staycation (Binalonan)",

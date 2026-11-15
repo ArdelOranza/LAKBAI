@@ -18,8 +18,12 @@ test('the context hands the AI the verified rows, not a web search', () => {
   assert.match(text, /Traveler is in/);
 });
 
-test('the traveler profile rides along as a fact, clearly labeled', () => {
-  const { text } = buildContext('where can I eat', '120.341,16.043', {
+test('scraped visitor reviews ride in the AI context, so answers can cite them', () => {
+  const { text } = buildContext('where can I eat in Dagupan', '120.341,16.043');
+  assert.match(text, /review: "Pancit Bagnet and Beef Kare-Kare were excellent\."/);
+});
+
+test('the traveler profile rides along as a fact, clearly labeled', () => {  const { text } = buildContext('where can I eat', '120.341,16.043', {
     profile: 'Ana. Interests: Beaches, Food & Dining. Local time: Thu 14:05 (Asia/Manila).',
   });
   assert.match(text, /Traveler profile: Ana\. Interests: Beaches, Food & Dining\./);
