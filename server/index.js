@@ -44,6 +44,7 @@ const { recommend } = require('./verify.js');
 const { cached } = require('./aiCache.js');
 const { datasetInfo, localChat, localRecommend, allEntries } = require('./dataset.js');
 const { groundedChat, groundedRecommend } = require('./grounded.js');
+const { existingPhoto } = require('./photoHierarchy.js');
 const AI_TTL_MS = Number(process.env.AI_TTL_MS) || 15 * 60000;
 // LAKBAI_AI=off → answer straight from the dataset with no model call at all.
 const USE_AI = String(process.env.LAKBAI_AI || '').toLowerCase() !== 'off';
@@ -64,7 +65,7 @@ app.post('/api/recommend', async (req, res) => {
     const info = datasetInfo();
     // The key carries the dataset signature so editing a data file (or switching
     // dataset<->AI modes) can't serve a stale answer from the previous world.
-    const sig = info.ready ? `${info.file}|${info.count}` : 'nodataset';
+    const sig = info.ready ? info.sig : 'nodataset';
     const key = `r:${sig}:${message}|${proxKey}|${prefs.slice().sort().join(',')}`;
     const tripBreaker = () => { aiDownUntil = Date.now() + AI_COOLDOWN_MS; };
     // Installed dataset wins: the AI may only reference those verified rows. If
@@ -97,7 +98,7 @@ app.post('/api/chat', async (req, res) => {
     const p = proximity.split(',').map(Number);
     const proxKey = p.length === 2 && p.every(Number.isFinite) ? p[0].toFixed(2) + ',' + p[1].toFixed(2) : '';
     const info = datasetInfo();
-    const sig = info.ready ? `${info.file}|${info.count}` : 'nodataset';
+    const sig = info.ready ? info.sig : 'nodataset';
     // The LTFRB file's version rides in the key: a fare update can never be
     // shadowed by an answer cached against yesterday's matrix. The terminal
     // directory version does the same for terminal answers. The profile
@@ -147,7 +148,7 @@ app.post('/api/plan', async (req, res) => {
     const proxKey = p.length === 2 && p.every(Number.isFinite) ? p[0].toFixed(2) + ',' + p[1].toFixed(2) : '';
     const h = Number(hours) || 4, s = Number(startHour) || 9;
     const info = datasetInfo();
-    const sig = info.ready ? `${info.file}|${info.count}` : 'nodataset';
+    const sig = info.ready ? info.sig : 'nodataset';
     // The radius depends on the fix, so two travelers must never share a
     // cached plan even when they ask the same question.
     const key = `p:${sig}:${message}|${h}|${s}|${proxKey}`;
@@ -173,14 +174,11 @@ function hintFromAddress(address){
   const parts = String(address || '').split(',').map(s => s.trim()).filter(Boolean);
   return parts.length > 2 ? parts[parts.length - 2] : (parts[0] || '');
 }
-function isJsonPhoto(url){ return url && !/wikimedia\.org|upload\.wikimedia/i.test(String(url)); }
 async function enrichWithPhoto(place){
-  // Hierarchy 1: JSON wins — never overwrite a curated/admin photo with Wikimedia.
-  const existingPhotos = Array.isArray(place.photos) ? place.photos.filter(Boolean) : [];
-  const existingBare = place.photo || (existingPhotos[0] || null);
-  if (existingBare && isJsonPhoto(existingBare)){
-    return { ...place, photo: existingBare, photos: existingPhotos.length ? existingPhotos : [existingBare], photoSource: 'json' };
-  }
+  // Hierarchy 1: any photo the place already carries wins — curated, admin or
+  // the committed Wikimedia map — and every photo in the list is preserved.
+  const existing = existingPhoto(place);
+  if (existing) return { ...place, ...existing };
   // Hierarchy 2: Wikimedia real photo
   const key = String(place.name || '').toLowerCase() + '|' + hintFromAddress(place.address);
   const hit = photoCache.get(key);

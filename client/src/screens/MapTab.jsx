@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Search, Umbrella, UtensilsCrossed, Landmark, MapPin, LocateFixed } from 'lucide-react';
+import { Search, Umbrella, UtensilsCrossed, Landmark, MapPin, LocateFixed, Camera } from 'lucide-react';
 import { recommend } from '../api.js';
 import { readLocalPrefs } from '../prefs.js';
 import { sessionGet, sessionSet } from '../sessionCache.js';
@@ -8,6 +8,7 @@ import { fetchSpots } from '../spots.js';
 import { haversineKm, proximityOf } from '../geo.js';
 import { FALLBACK_CENTER } from '../App.jsx';
 import { Map, MapMarker, MarkerContent } from '@/components/ui/map';
+import { pinPhoto } from '../pinPhoto.js';
 import { Chip } from '../ui.jsx';
 import SpotPopup from './SpotPopup.jsx';
 
@@ -30,14 +31,39 @@ function shortName(name){
   return n.length > 22 ? n.slice(0, 21).trimEnd() + '…' : n;
 }
 
-/** Google-Maps-style teardrop marker (white rim + centre dot). */
-function PinDrop(){
+/** Category glyph for the pin head when there is no photo (or it breaks). */
+function glyphFor(place){
+  const hay = [place && place.name, place && place.categories].flat().filter(Boolean).join(' ').toLowerCase();
+  if (/beach|coast|island|shore|sea|spring|falls/.test(hay)) return Umbrella;
+  if (/food|restaurant|cafe|eat|dining|grill|market|dish/.test(hay)) return UtensilsCrossed;
+  if (/event|festival|fiesta|histor|cultur|heritage|church|museum|landmark/.test(hay)) return Landmark;
+  return Camera;
+}
+
+/**
+ * Google-Maps-style teardrop marker. The white head carries either the
+ * place's real photo (close view only) or its category glyph. The glyph sits
+ * behind the image, so a broken photo reveals it instead of drawing a blank.
+ */
+function PinDrop({ photo, Glyph }){
   return (
-    <span className="pin-drop" aria-hidden="true">
+    <span className={'pin-drop' + (photo ? ' has-photo' : '')} aria-hidden="true">
       <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false">
         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z"/>
-        <circle cx="12" cy="9" r="2.5"/>
       </svg>
+      <span className="pin-head">
+        {Glyph && <Glyph className="pin-glyph" size={12} strokeWidth={2.5}/>}
+        {photo && (
+          <img
+            className="pin-photo"
+            src={photo}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            onError={e => { e.currentTarget.style.display = 'none'; }}
+          />
+        )}
+      </span>
     </span>
   );
 }
@@ -103,6 +129,9 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
   // detail threshold touches the DOM, so 80 markers are never re-rendered on
   // an animation frame (that is what made zooming feel heavy).
   const detailedRef = useRef(false);
+  // The close-view flag also decides whether pins may carry a photo, so it is
+  // real state (one render per threshold crossing), not only a CSS class.
+  const [detailed, setDetailed] = useState(false);
   const viewRef = useRef(viewport);
   const mapRef = useRef(null);
   const shellRef = useRef(null);
@@ -111,6 +140,7 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
   function markDetail(on){
     if (detailedRef.current === on) return;
     detailedRef.current = on;
+    setDetailed(on);
     shellRef.current?.classList.toggle('pins-far', !on);
   }
 
@@ -142,6 +172,16 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
     const zoom = RADIUS_ZOOM[km];
     markDetail(zoom >= PIN_DETAIL_ZOOM);
     moveTo(viewRef.current.center, zoom);
+  }
+
+  // Google-Maps behaviour: tapping a pin eases the map so the pin sits above
+  // the bottom sheet instead of behind it. No zoom jump — only the padding.
+  function selectSpot(spot){
+    setSelectedSpot(spot);
+    const map = mapRef.current;
+    if (!map || typeof map.easeTo !== 'function') return;
+    const bottom = Math.min(Math.round((window.innerHeight || 700) * 0.34), 280);
+    map.easeTo({ center: [spot.lng, spot.lat], padding: { top: 0, bottom, left: 0, right: 0 }, duration: 520, easing: easeOut });
   }
 
   // First real GPS fix re-centres. Later fixes only move the view when the
@@ -256,39 +296,46 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
             </MarkerContent>
           </MapMarker>
         )}
-        {filtered.map(p => (
-          <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} onClick={() => push({ name:'detail', place:p })}>
-            <MarkerContent>
-              <button type="button" className="spot-pin" data-pin="rec" title={p.name} aria-label={p.name}>
-                <PinDrop/>
-                <span className="pin-name">{shortName(p.name)}</span>
-              </button>
-            </MarkerContent>
-          </MapMarker>
-        ))}
-        {filteredSpots.map(s => {
-          const active = selectedSpot && selectedSpot.id === s.id;
+        {filtered.map(p => {
+          const Glyph = glyphFor(p);
           return (
-            <MapMarker key={'spot-' + s.id} longitude={s.lng} latitude={s.lat} onClick={() => setSelectedSpot(s)}>
+            <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} anchor="bottom" onClick={() => push({ name:'detail', place:p })}>
               <MarkerContent>
-                <button className={'spot-pin' + (active ? ' active' : '')} data-pin="spot" title={s.name} aria-label={s.name}>
-                  <PinDrop/>
-                  <span className="pin-name">{shortName(s.name)}</span>
+                <button type="button" className="spot-pin" data-pin="rec" title={p.name} aria-label={p.name}>
+                  <PinDrop photo={pinPhoto(p, detailed)} Glyph={Glyph}/>
+                  <span className="pin-name">{shortName(p.name)}</span>
                 </button>
               </MarkerContent>
             </MapMarker>
           );
         })}
-        {filteredDiscover.map(p => (
-          <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} onClick={() => push({ name:'detail', place:p })}>
-            <MarkerContent>
-              <button type="button" className="spot-pin discover" data-pin="discover" title={p.name + ' — discovered via Mapbox'} aria-label={p.name}>
-                <PinDrop/>
-                <span className="pin-name">{shortName(p.name)}</span>
-              </button>
-            </MarkerContent>
-          </MapMarker>
-        ))}
+        {filteredSpots.map(s => {
+          const active = selectedSpot && selectedSpot.id === s.id;
+          const Glyph = glyphFor(s);
+          return (
+            <MapMarker key={'spot-' + s.id} longitude={s.lng} latitude={s.lat} anchor="bottom" onClick={() => selectSpot(s)}>
+              <MarkerContent>
+                <button className={'spot-pin' + (active ? ' active' : '')} data-pin="spot" title={s.name} aria-label={s.name}>
+                  <PinDrop photo={pinPhoto(s, detailed)} Glyph={Glyph}/>
+                  <span className="pin-name">{active ? s.name : shortName(s.name)}</span>
+                </button>
+              </MarkerContent>
+            </MapMarker>
+          );
+        })}
+        {filteredDiscover.map(p => {
+          const Glyph = glyphFor(p);
+          return (
+            <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} anchor="bottom" onClick={() => push({ name:'detail', place:p })}>
+              <MarkerContent>
+                <button type="button" className="spot-pin discover" data-pin="discover" title={p.name + ' — discovered via Mapbox'} aria-label={p.name}>
+                  <PinDrop photo={pinPhoto(p, detailed)} Glyph={Glyph}/>
+                  <span className="pin-name">{shortName(p.name)}</span>
+                </button>
+              </MarkerContent>
+            </MapMarker>
+          );
+        })}
       </Map>
 
       <div style={{ position:'absolute', top:12, left:12, right:12, zIndex:5, background:'rgba(255,255,255,.97)', borderRadius:999, padding:'11px 16px', boxShadow:'0 10px 24px -14px rgba(15,23,42,.3)', display:'flex', alignItems:'center', gap:8, cursor:'pointer' }} onClick={() => push({ name:'search', query:'' })} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'search', query:'' }); } }}>

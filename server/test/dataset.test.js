@@ -16,6 +16,23 @@ test('the installed dataset is detected and normalised', () => {
   const info = datasetInfo();
   assert.equal(info.ready, true);
   assert.equal(info.count, 5);
+  assert.ok(info.sig.includes('dataset.json'), 'signature names the file');
+});
+
+test('editing a row in place changes the dataset signature', () => {
+  const file = process.env.LAKBAI_DATA;
+  const before = datasetInfo().sig;
+  const st = fs.statSync(file);
+  try {
+    fs.utimesSync(file, st.atime, new Date(st.mtimeMs - 5000));
+    const after = datasetInfo().sig;
+    // Same file, same row count — only the mtime moved. AI cache keys ride on
+    // this signature, so an in-place edit must not serve yesterday's answer.
+    assert.notEqual(after, before);
+  } finally {
+    fs.utimesSync(file, st.atime, st.mtime);
+  }
+  assert.equal(datasetInfo().sig, before);
 });
 
 test('a Google-style rating string becomes a rating and a review count', () => {

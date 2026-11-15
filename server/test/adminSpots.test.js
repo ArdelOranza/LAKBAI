@@ -48,6 +48,20 @@ test('createSpot adds a new site and invalid coords are rejected', () => {
   assert.throws(() => updateSpot(created.id, { photos: ['javascript:alert(1)'] }), /http/i);
 });
 
+test('createSpot rejects an unusable or duplicate id instead of writing a ghost spot', () => {
+  resetFile({ patches: {}, added: [], deleted: [] });
+  // An explicit id that slugs to nothing used to be written as id "" and then
+  // dropped by listSpots(), so the caller saw 201 for a spot that never showed.
+  assert.throws(() => createSpot({ name: 'Probe Spot', town: 'Dagupan', id: '!!!' }), /id/i);
+  // A base id must not be duplicated: two entries with one id mean one pin.
+  assert.throws(() => createSpot({ name: 'Patar Copy', town: 'Bolinao', id: 'patar-beach-bolinao' }), /already|exists|taken/i);
+  // A sane explicit id still works and is visible.
+  const ok = createSpot({ name: 'Probe Spot', town: 'Dagupan', id: 'probe-spot' });
+  assert.equal(ok.id, 'probe-spot');
+  assert.ok(listSpots().some(s => s.id === 'probe-spot'));
+  assert.equal(listSpots().filter(s => s.id === 'patar-beach-bolinao').length, 1);
+});
+
 test('deleteSpot hides a base spot and validateSpot rejects empty names', () => {
   resetFile({ patches: {}, added: [], deleted: [] });
   const base = listSpots()[0];

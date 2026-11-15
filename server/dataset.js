@@ -355,12 +355,17 @@ function normalize(raw, index, kind = '', fileTag = ''){
   return entry;
 }
 
+/** Files + mtimes: an in-place edit (same row count) still changes it. */
+function fileSignature(files){
+  return files.map(f => {
+    try { return f + ':' + fs.statSync(f).mtimeMs; } catch { return f + ':0'; }
+  }).join('|');
+}
+
 function readEntries(){
   const files = dataFiles();
   if (!files.length) return [];
-  const sig = files.map(f => {
-    try { return f + ':' + fs.statSync(f).mtimeMs; } catch { return f + ':0'; }
-  }).join('|');
+  const sig = fileSignature(files);
   if (cache.sig !== sig){
     const entries = [];
     for (const file of files){
@@ -387,7 +392,8 @@ function readEntries(){
 
 function datasetInfo(){
   const entries = readEntries();
-  return { ready: entries.length > 0, file: dataFiles().join(', '), count: entries.length };
+  const files = dataFiles();
+  return { ready: entries.length > 0, file: files.join(', '), count: entries.length, sig: fileSignature(files) };
 }
 
 // The AI reference is exactly the files in server/data — nothing else.

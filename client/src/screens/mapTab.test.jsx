@@ -7,7 +7,14 @@ import { createRoot } from 'react-dom/client';
 
 const markers = vi.hoisted(() => []);
 const sess = vi.hoisted(() => ({ map: {} }));
-const recommend = vi.hoisted(() => vi.fn(async () => ({ places: [{ id: 'ds1', name: 'Dataset Beach', lng: 119.86, lat: 16.3, photo: null, categories: ['Beach'] }] })));
+const recommend = vi.hoisted(() => vi.fn(async () => ({ places: [
+  { id: 'ds1', name: 'Dataset Beach', lng: 119.86, lat: 16.3, photo: null, categories: ['Beach'] },
+  // A real photo: only close view may draw it inside the pin head.
+  { id: 'ds2', name: 'Sunset Grill', lng: 119.868, lat: 16.302, photos: ['https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Food.jpg/960px-Food.jpg'], categories: ['Food'] },
+  // A Mapbox static image is a fallback for cards, never a face for a pin.
+  { id: 'ds3', name: 'Static Map Cafe', lng: 119.867, lat: 16.301, photo: 'https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-s+0066FF(119.8,16.3)/119.8,16.3,14.5,0/600x340@2x?access_token=pk.test', categories: ['Food'] },
+] })));
+const fetchSpots = vi.hoisted(() => vi.fn(async () => []));
 
 vi.mock('../api.js', () => ({ recommend, chat: vi.fn(), itineraryFromSaved: vi.fn() }));
 vi.mock('../AuthContext.jsx', () => ({ useAuth: () => ({ user: { id: 'u1' } }) }));
@@ -16,17 +23,17 @@ vi.mock('../sessionCache.js', () => ({
   sessionGet: k => sess.map[k] ?? null,
   sessionSet: (k, v) => { sess.map[k] = v; },
 }));
-vi.mock('../spots.js', () => ({ fetchSpots: vi.fn(async () => []) }));
+vi.mock('../spots.js', () => ({ fetchSpots }));
 
 // Lightweight stand-ins for the mapcn components: collect marker props.
 vi.mock('@/components/ui/map', () => {
   let uid = 0;
   return {
     Map: ({ children }) => <div data-testid="mock-map">{children}</div>,
-    MapMarker: ({ longitude, latitude, onClick, children }) => {
-      markers.push({ id: 'mk' + (++uid), key: children?.props?.['data-mk'] || null, longitude, latitude });
+    MapMarker: ({ longitude, latitude, onClick, anchor, children }) => {
+      markers.push({ id: 'mk' + (++uid), key: children?.props?.['data-mk'] || null, longitude, latitude, anchor });
       return (
-        <div data-marker data-longitude={longitude} data-latitude={latitude} onClick={onClick}>
+        <div data-marker data-anchor={anchor} data-longitude={longitude} data-latitude={latitude} onClick={onClick}>
           {children}
         </div>
       );
@@ -112,13 +119,74 @@ describe('MapTab discovered pins', () => {
     await h.unmount();
   });
 
-  it('pins never draw a photo or static-map thumbnail (a map inside the map)', async () => {
+  it('drives the pin tip onto the coordinate, not the pin centre', async () => {
     const h = await mount();
-    // Even pins with a real photo and discovered pins with a Mapbox fallback
-    // stay icon-only: the thumbnail made a second pin appear above the first.
+    const pins = h.container.querySelectorAll('button.spot-pin').length;
+    // MapLibre defaults to anchor="center"; a teardrop drawn that way points
+    // ~15 px below the real place at city zoom.
+    expect(pins).toBeGreaterThan(0);
+    const anchored = new Set(markers.filter(m => m.anchor === 'bottom').map(m => `${m.longitude},${m.latitude}`));
+    expect(anchored.size).toBe(pins);
+    expect(markers.filter(m => m.anchor && m.anchor !== 'bottom').length).toBe(0);
+    await h.unmount();
+  });
+
+  it('far zoom never draws a photo inside a pin', async () => {
+    const h = await mount(); // default radius 5 km → zoom 11.5
     expect(h.container.querySelectorAll('button.spot-pin img').length).toBe(0);
     expect(h.container.querySelectorAll('.pin-photo').length).toBe(0);
     await h.unmount();
+  });
+
+  it('at 1 km the pin head shows a real, pin-sized photo instead of the glyph', async () => {
+    const h = await mount();
+    const chip = Array.from(h.container.querySelectorAll('.map-chips button, .map-chips .chip'))
+      .find(b => b.textContent.trim() === '1 km');
+    await React.act(async () => {
+      chip.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+    });
+    const pin = h.container.querySelector('button.spot-pin[aria-label="Sunset Grill"]');
+    const img = pin.querySelector('img.pin-photo');
+    expect(img).not.toBeNull();
+    expect(img.getAttribute('src')).toContain('upload.wikimedia.org');
+    // A 960 px thumbnail per pin would be megabytes for one neighbourhood.
+    expect(img.getAttribute('src')).toContain('/128px-');
+    // A place without a photo keeps its category glyph, not an empty head.
+    const beach = h.container.querySelector('button.spot-pin[aria-label="Dataset Beach"]');
+    expect(beach.querySelector('img')).toBeNull();
+    expect(beach.querySelector('.pin-glyph')).not.toBeNull();
+    await h.unmount();
+  });
+
+  it('never puts a Mapbox static map inside a pin, even in close view', async () => {
+    const h = await mount();
+    const chip = Array.from(h.container.querySelectorAll('.map-chips button, .map-chips .chip'))
+      .find(b => b.textContent.trim() === '1 km');
+    await React.act(async () => {
+      chip.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+    });
+    const pin = h.container.querySelector('button.spot-pin[aria-label="Static Map Cafe"]');
+    expect(pin.querySelector('img')).toBeNull();
+    expect(pin.querySelector('.pin-glyph')).not.toBeNull();
+    expect(h.container.innerHTML).not.toContain('/static/pin-s');
+    await h.unmount();
+  });
+
+  it('selecting a pin shows its full name and raises it above the rest', async () => {
+    fetchSpots.mockResolvedValue([{ id: 'long', name: 'Cape Bolinao Lighthouse And Coastal Viewpoint', lng: 119.869, lat: 16.302, categories: ['Landmark'] }]);
+    const h = await mount();
+    const pin = h.container.querySelector('button.spot-pin[data-pin="spot"]');
+    expect(pin.querySelector('.pin-name').textContent).not.toBe('Cape Bolinao Lighthouse And Coastal Viewpoint');
+    await React.act(async () => {
+      pin.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+    });
+    const active = h.container.querySelector('button.spot-pin.active');
+    expect(active).not.toBeNull();
+    expect(active.getAttribute('aria-label')).toBe('Cape Bolinao Lighthouse And Coastal Viewpoint');
+    expect(active.querySelector('.pin-name').textContent).toBe('Cape Bolinao Lighthouse And Coastal Viewpoint');
+    expect(active.querySelector('.pin-glyph')).not.toBeNull();
+    await h.unmount();
+    fetchSpots.mockResolvedValue([]);
   });
 
   it('no session discoveries means no discover pins and no crash', async () => {
@@ -153,7 +221,6 @@ describe('MapTab discovered pins', () => {
     expect(h.container.firstElementChild.className).not.toContain('pins-far');
     const pin = h.container.querySelector('button.spot-pin[aria-label="Dataset Beach"]');
     expect(pin.querySelector('.pin-name').textContent).toBe('Dataset Beach');
-    expect(h.container.querySelectorAll('.pin-photo').length).toBe(0);
     expect(h.container.textContent).toContain('Balingasay Headland');
     await h.unmount();
   });

@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  Waves, UtensilsCrossed, Mountain, Landmark, Car, Camera, Maximize2,
+  Waves, UtensilsCrossed, Mountain, Landmark, Camera, Maximize2,
   Star, MapPin, Navigation, CirclePlus, CircleCheck,
 } from 'lucide-react';
 import { useAuth } from '../AuthContext.jsx';
 import { saveFavorite, listFavorites } from '../store.js';
-import { haversineKm, formatDistance, driveMinutes } from '../geo.js';
+import { haversineKm, formatDistance } from '../geo.js';
 import { dragOffset, shouldDismiss } from '../sheetDrag.js';
 import { FALLBACK_CENTER } from '../App.jsx';
 import { PrimaryBtn, PhotoPlaceholder } from '../ui.jsx';
@@ -46,7 +46,6 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
   // centre fabricates drive times when location permission is off.
   const hasFix = coords && !(coords.lng === FALLBACK_CENTER.lng && coords.lat === FALLBACK_CENTER.lat);
   const km = hasFix ? haversineKm(coords.lng, coords.lat, spot.lng, spot.lat) : null;
-  const minutes = driveMinutes(km);
   const vibe = vibeFor(spot);
 
   useEffect(() => {
@@ -122,7 +121,7 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
           </span>
           {km != null && (
             <span style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:12, color:'var(--ink)', fontWeight:600 }}>
-              <Car size={14} color="var(--muted-ink)"/> {formatDistance(km)} · {minutes} min
+              <Navigation size={14} color="var(--muted-ink)"/> {formatDistance(km)} straight-line
             </span>
           )}
         </div>

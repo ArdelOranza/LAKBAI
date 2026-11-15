@@ -72,6 +72,26 @@ button:focus-visible,a:focus-visible,select:focus-visible,[role="button"]:focus-
 /* Text fields focus by darkening their own border — no coloured glow. */
 input:focus,input:focus-visible,textarea:focus,textarea:focus-visible,select:focus,select:focus-visible{outline:none;border-color:#94A3B8}
 button:disabled{opacity:.55;cursor:not-allowed}
+/* ── boot loading screen ─────────────────────────────────────────────────
+   The session check can take up to 8 s on a hung network. This frame paints
+   from a gradient immediately, fades the intro photo over it, and shows the
+   same mark/wordmark as the splash so the hand-off has no layout jump. */
+.boot-loading{position:relative;flex:1;min-height:100dvh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;background:linear-gradient(165deg,#0B3E8F 0%,#1E63C7 38%,#DCEBFF 72%,#FFFFFF 100%)}
+.boot-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;animation:boot-photo-in .5s ease-out .04s forwards}
+.boot-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,62,143,.25) 0%,rgba(255,255,255,0) 34%,rgba(255,255,255,.82) 68%,#FFFFFF 90%)}
+.boot-content{position:relative;z-index:1;padding:0 24px 40px;display:flex;flex-direction:column;align-items:center}
+.boot-brand{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:26px}
+.boot-wordmark{display:block;height:38px;width:auto}
+.boot-tagline{font-size:11px;color:var(--muted-ink);margin-top:3px}
+.boot-progress{position:relative;width:132px;height:4px;border-radius:999px;background:rgba(0,102,255,.14);overflow:hidden}
+.boot-progress span{position:absolute;inset:0 auto 0 0;width:44%;border-radius:999px;background:var(--primary);animation:boot-bar 1.15s ease-in-out infinite}
+.boot-text{margin:12px 0 0;font-size:12.5px;color:var(--muted-ink)}
+@keyframes boot-photo-in{from{opacity:0}to{opacity:1}}
+@keyframes boot-bar{0%{transform:translateX(-110%)}55%{transform:translateX(95%)}100%{transform:translateX(250%)}}
+@media (prefers-reduced-motion: reduce){
+  .boot-photo{animation:none;opacity:1}
+  .boot-progress span{animation:none;width:100%;opacity:.55}
+}
 input,select,textarea{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;width:100%}
 input::placeholder,textarea::placeholder{color:var(--muted-ink)}
 a{color:var(--primary);text-decoration:none}
@@ -158,24 +178,41 @@ li{margin:6px 0}
 .spot-pin:active{transform:scale(.96)}
 /* Colliding pins yield instead of stacking into an unreadable pile. */
 .spot-pin.is-hidden{opacity:0;pointer-events:none;transform:scale(.78)}
-.pin-drop{display:block;width:26px;height:30px;filter:drop-shadow(0 3px 5px rgba(15,23,42,.30));transform-origin:50% 100%;transition:transform .2s ease}
+.pin-drop{position:relative;display:block;width:32px;height:38px;filter:drop-shadow(0 3px 5px rgba(15,23,42,.30));transform-origin:50% 100%;transition:transform .2s ease,filter .2s ease;animation:pin-drop-in .34s cubic-bezier(.2,.7,.3,1) backwards}
 .pin-drop svg{display:block;width:100%;height:100%}
 .pin-drop path{fill:var(--primary);stroke:#fff;stroke-width:1.4;paint-order:stroke fill}
-.pin-drop circle{fill:#fff}
+/* The head is the white disc; the glyph sits under the photo so a broken
+   image reveals the category instead of leaving an empty pin. */
+.pin-head{position:absolute;left:50%;top:14%;transform:translateX(-50%);width:56%;aspect-ratio:1/1;display:grid;place-items:center;overflow:hidden;border-radius:50%;background:#fff;color:var(--primary)}
+.pin-glyph{display:block;width:72%;height:72%}
+.pin-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.pin-drop.has-photo .pin-head{border:2px solid #fff;box-shadow:0 1px 3px rgba(15,23,42,.35);background:#E7EDF5}
 .spot-pin:hover .pin-drop{transform:translateY(-1px) scale(1.05)}
+.spot-pin.active .pin-drop{transform:translateY(-1px) scale(1.12);filter:drop-shadow(0 5px 9px rgba(10,37,64,.42))}
 .spot-pin.active .pin-drop path{fill:#0A2540}
+.spot-pin.active .pin-head{color:#0A2540}
+.spot-pin.active .pin-drop.has-photo .pin-head{border-color:#0A2540;box-shadow:0 0 0 3px rgba(10,37,64,.18)}
 .spot-pin.discover .pin-drop path{fill:#fff;stroke:#64748B}
-.spot-pin.discover .pin-drop circle{fill:#64748B}
+.spot-pin.discover .pin-glyph{color:#64748B}
+/* A selected pin owns the map: its full name rises above neighbouring pins. */
+.maplibregl-marker:has(.spot-pin.active){z-index:6}
+/* Far zoom keeps the pins but not the photo faces: 80 photos at city zoom are
+   noise and bandwidth. The 1 km view lets the head carry a real picture. */
+.pins-far .pin-drop{width:26px;height:30px}
 /* The name hangs under the pin like a map label — no white billboard, no
    photo thumbnail (a tiny map inside the map reads as a second pin). */
 .pin-name{position:absolute;top:calc(100% + 2px);left:50%;transform:translateX(-50%);max-width:132px;background:none;border:none;border-radius:0;padding:0 2px;box-shadow:none;overflow:hidden;text-overflow:ellipsis;font-size:10.5px;font-weight:650;color:#1F2937;letter-spacing:-.01em;text-shadow:0 0 2px #fff,0 0 3px #fff,0 1px 2px rgba(255,255,255,.95),0 -1px 2px rgba(255,255,255,.95);opacity:1;pointer-events:none;transition:opacity .18s ease,transform .18s ease}
-.spot-pin.active .pin-name{color:#0A2540;font-weight:700}
+.spot-pin.active .pin-name{color:#0A2540;font-weight:700;max-width:190px;white-space:normal;font-size:11.5px;line-height:1.15}
 .spot-pin.discover .pin-name{color:#475569}
 /* Far zoom: the pin stays, its name waits until the map is close enough to
    read it. Both states are the same DOM node, so the label fades instead of
    popping. */
 .pins-far .pin-name,.spot-pin.label-hidden .pin-name{opacity:0;transform:translate(-50%,-3px)}
-.pins-far .spot-pin:hover .pin-name{opacity:1;transform:translate(-50%,0)}
+.pins-far .spot-pin:hover .pin-name,.pins-far .spot-pin.active .pin-name{opacity:1;transform:translate(-50%,0)}
+@keyframes pin-drop-in{0%{opacity:0;transform:translateY(-14px) scale(.82)}70%{opacity:1;transform:translateY(2px) scale(1.04)}100%{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){
+  .pin-drop{animation:none}
+}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
 .spot-sheet{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(430px,100vw);background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -12px 40px rgba(10,37,64,.22);z-index:30;max-height:86vh;display:flex;flex-direction:column;padding-bottom:calc(78px + var(--safe-bottom));overflow:hidden}
 .spot-vibe{display:inline-flex;align-items:center;gap:5px;background:var(--primary);color:#fff;border-radius:999px;padding:5px 11px;font-size:9.5px;font-weight:650;letter-spacing:.1em;text-transform:uppercase}

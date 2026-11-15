@@ -135,10 +135,21 @@ function Shell(){
   const guard = children => <ScreenErrorBoundary onReset={reset}>{children}</ScreenErrorBoundary>;
 
   if (loading) return guard(
-    <main style={{ flex:1, display:'grid', placeItems:'center', minHeight:'100dvh' }} aria-busy="true">
-      <div style={{ textAlign:'center', color:'var(--muted-ink)' }}>
-        <Logo size={56}/>
-        <p style={{ fontSize:14, marginTop:12 }}>Loading Lakbai…</p>
+    <main className="boot-loading" data-testid="boot-loading" aria-busy="true">
+      {/* The gradient base paints instantly; the photo fades over it so a slow
+          decode never shows a blank white page. */}
+      <img className="boot-photo" src="/intro-hundred-islands.jpg" alt="" aria-hidden="true" fetchPriority="high" decoding="async"/>
+      <div className="boot-veil" aria-hidden="true"/>
+      <div className="boot-content">
+        <div className="boot-brand">
+          <Logo size={64}/>
+          <div>
+            <img className="boot-wordmark" src="/lakbai-wordmark.png" alt="LakbAI"/>
+            <div className="boot-tagline">Lakbai, smarter, not harder.</div>
+          </div>
+        </div>
+        <div className="boot-progress" data-testid="boot-progress" role="progressbar" aria-label="Loading LakbAI" aria-valuetext="Loading"><span/></div>
+        <p className="boot-text">Loading Lakbai…</p>
       </div>
     </main>
   );

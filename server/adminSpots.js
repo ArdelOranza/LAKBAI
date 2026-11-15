@@ -151,7 +151,26 @@ function nextCustomId(name, town){
 
 function createSpot(data){
   const clean = validateSpot({ ...(data || {}) });
-  const id = clean.id ? slug(clean.id) : nextCustomId(clean.name, clean.town);
+  // An explicit id is honoured only when it survives slugging and is unused:
+  // otherwise the spot is written with an empty/duplicate id, which means it
+  // either never shows up in listSpots() or collides with a curated pin.
+  let id;
+  if (clean.id !== undefined && clean.id !== null && String(clean.id).trim() !== ''){
+    id = slug(clean.id);
+    if (!id) {
+      const e = new Error('id must contain letters or numbers');
+      e.status = 400;
+      throw e;
+    }
+    const taken = new Set([...SPOTS.map(s => s.id), ...readDoc().added.map(s => s.id)]);
+    if (taken.has(id)) {
+      const e = new Error('id already exists: ' + id);
+      e.status = 409;
+      throw e;
+    }
+  } else {
+    id = nextCustomId(clean.name, clean.town);
+  }
   const spot = {
     id,
     name: clean.name,
