@@ -50,6 +50,32 @@ const DISTINCT_KM = 0.4;
 const CLOSE_KM = 0.06;
 const MAX_EXTRA = 2;
 
+// What kind of place a name says it is. This matters for one-word names:
+// "Urdaneta City Plaza" reduces to "Urdaneta", which is the town, not a name —
+// so it may only meet another record that is also some kind of plaza. A church
+// named after its town may still meet the basilica it is.
+const TYPES = [
+  ['worship', /church|parish|basilica|cathedral|chapel|shrine/],
+  ['beach', /beach|shore|coast/],
+  ['falls', /falls?|waterfall/],
+  ['cave', /cave/],
+  ['island', /island/],
+  ['park', /park|plaza|square|garden|grounds/],
+  ['museum', /museum/],
+  ['food', /restaurant|restobar|cafe|coffee|grill|eatery|diner|kitchen|kainan|carinderia/],
+  ['stay', /resort|hotel|inn|lodge|homestay/],
+];
+function typesOf(name){
+  const text = String(name || '').toLowerCase();
+  return TYPES.filter(([, re]) => re.test(text)).map(([kind]) => kind);
+}
+/** True when two names claim the same kind of place, or neither claims one. */
+function sameKind(a, b){
+  const ta = typesOf(a), tb = typesOf(b);
+  if (!ta.length && !tb.length) return true;
+  return ta.some(kind => tb.includes(kind));
+}
+
 function isSubset(small, big){
   if (!small.length) return false;
   const have = new Set(big);
@@ -80,6 +106,10 @@ export function samePlace(a, b){
   const pb = [...new Set(primaryTokens(b.name))];
   if (pa.length && pb.length && compact(pa) === compact(pb)) return true;
   const [small, big] = ta.length <= tb.length ? [ta, tb] : [tb, ta];
+  // One identifying word is weak evidence: it may just be the town. Demand a
+  // matching kind of place as well ("Manaoag Church" -> the Manaoag basilica),
+  // so a plaza cannot erase every restaurant around it.
+  if (small.length === 1 && !sameKind(a.name, b.name)) return false;
   if (isSubset(small, big) && big.length - small.length <= MAX_EXTRA) return true;
   const [one, many] = pa.length <= pb.length ? [pa, pb] : [pb, pa];
   if (one.length === 1 && many.length > 1 && many.includes(one[0]) && km <= CLOSE_KM) return true;

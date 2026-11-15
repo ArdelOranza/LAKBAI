@@ -84,6 +84,17 @@ describe('samePlace', () => {
   it('never merges a place with no usable coordinate', () => {
     expect(samePlace({ name: 'Patar Beach', lng: null, lat: null }, { name: 'Patar Beach', lng: 119.79, lat: 16.32 })).toBe(false);
   });
+
+  it('never lets a town plaza swallow the restaurants around it', () => {
+    // Live defect in the first cut: "Urdaneta City Plaza" reduces to the word
+    // "Urdaneta", so it matched every restaurant in Urdaneta City and deleted
+    // their pins. A single identifying word needs a matching kind of place.
+    const plaza = { name: 'Urdaneta City Plaza', town: 'Urdaneta City', lng: 120.571, lat: 15.976 };
+    const grill = { name: 'Uson Pigar Pigar Urdaneta City', town: 'Urdaneta City', lng: 120.5711, lat: 15.9761 };
+    const cafe = { name: 'Unwnd Cafe - Urdaneta', town: 'Urdaneta City', lng: 120.5705, lat: 15.9755 };
+    expect(samePlace(plaza, grill)).toBe(false);
+    expect(samePlace(plaza, cafe)).toBe(false);
+  });
 });
 
 describe('mergePins', () => {
