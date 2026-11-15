@@ -16,6 +16,7 @@ const { isAttraction } = require('./attractions.js');
 const { SPOTS } = require('./spots.js');
 const adminPhotos = require('./adminPhotos.js');
 const { decodePlusCode } = require('./pluscode.js');
+const { isWikimedia } = require('./photoHierarchy.js');
 
 const DATA_DIR = path.join(__dirname, 'data');
 
@@ -396,6 +397,11 @@ function normalize(raw, index, kind = '', fileTag = ''){
     const found = coordsFromText(address, town);
     if (found){ lat = found.lat; lng = found.lng; }
   }
+  // A province-locked app must not hold a coordinate it cannot vouch for. The
+  // 150-spot scrape carries a handful of rows geocoded far outside Pangasinan
+  // (an Urdaneta park at lat 15.00, Hundred Islands at lng 119.04), and each one
+  // drew a pin in the middle of nowhere. Null is honest; a wrong pin is not.
+  if (!(lat !== null && lng !== null && inBox(lng, lat))){ lat = null; lng = null; }
   const entry = {
     id: str(raw.id || raw.place_id || raw.placeId) || `${fileTag ? fileTag + '-' : ''}${name}-${town}-${index}`.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
     name,
@@ -441,6 +447,73 @@ function fileSignature(files){
   }).join('|');
 }
 
+/**
+ * Could two names be two spellings of one place, for photo-sharing purposes?
+ *
+ * Stricter than samePlaceName: "Bolinao Falls 1" and "Bolinao Falls 2" share a
+ * first word but are two different falls, and "San Fabian Beach" is not the
+ * parish church. A shared photo is only allowed when the names agree on their
+ * numbers and every identifying word of the shorter name appears in the longer
+ * one ("Patar Beach" / "Patar White Sand Beach").
+ */
+const PHOTO_TYPE_WORDS = new Set([
+  'the', 'and', 'of', 'in', 'at', 'de', 'la', 'el', 'a', 'an',
+  'beach', 'beaches', 'falls', 'fall', 'island', 'islands', 'cave', 'caves', 'river',
+  'park', 'plaza', 'square', 'garden', 'gardens', 'grounds', 'ground', 'view',
+  'church', 'parish', 'shrine', 'basilica', 'cathedral', 'chapel', 'museum',
+  'restaurant', 'cafe', 'coffee', 'grill', 'resort', 'hotel', 'inn', 'lodge', 'bar',
+  'city', 'town', 'municipality', 'barangay', 'national', 'public', 'proper', 'sm', 'mall',
+]);
+function photoWords(name){
+  return new Set(String(name || '')
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, ' ')
+    .split(/[^a-z0-9]+/)
+    .filter(w => w && !PHOTO_TYPE_WORDS.has(w)));
+}
+function photoNumbers(name){
+  return [...new Set(String(name || '').match(/\d+/g) || [])].sort().join(',');
+}
+function photoSamePlace(a, b){
+  if (photoNumbers(a) !== photoNumbers(b)) return false;
+  const ta = photoWords(a), tb = photoWords(b);
+  if (!ta.size || !tb.size) return false;
+  const [small, big] = ta.size <= tb.size ? [ta, tb] : [tb, ta];
+  return [...small].every(w => big.has(w));
+}
+
+/**
+ * Strip photos that caption more than one place.
+ *
+ * The dataset was scraped page by page, and a page-hero image ended up on every
+ * place that page mentioned: Bolinao Falls 1, 2 and 3 all showed the same
+ * waterfall, the three SM malls shared one facade, four Dagupan landmarks
+ * shared one hotel photo. A URL used by two differently-named places cannot be
+ * the photo of either, so it is dropped and the card falls through to its real
+ * Wikimedia photo or the static map. The same place listed twice under two
+ * spellings is not a conflict — it keeps its photo.
+ */
+function dropSharedPhotos(entries){
+  const users = new Map();
+  for (const entry of entries){
+    for (const url of new Set(entry.photos || [])){
+      if (!users.has(url)) users.set(url, []);
+      users.get(url).push(entry);
+    }
+  }
+  const shared = new Set();
+  for (const [url, list] of users){
+    if (list.length < 2) continue;
+    const differentPlaces = list.some((a, i) => list.some((b, j) => j > i && !photoSamePlace(a.name, b.name)));
+    if (differentPlaces) shared.add(url);
+  }
+  if (!shared.size) return entries;
+  return entries.map(e => {
+    if (!(e.photos || []).some(url => shared.has(url))) return e;
+    return { ...e, photos: e.photos.filter(url => !shared.has(url)) };
+  });
+}
+
 function readEntries(){
   const files = dataFiles();
   if (!files.length) return [];
@@ -460,7 +533,7 @@ function readEntries(){
         if (entry) entries.push(entry);
       });
     }
-    cache = { sig, entries };
+    cache = { sig, entries: dropSharedPhotos(entries) };
   }
   // Admin photo edits are applied on every read, so they show up immediately
   // without restarting or touching the committed dataset.
@@ -691,7 +764,10 @@ async function withCoords(entries, proximity){
       if (hit){ entry.lng = hit.lng; entry.lat = hit.lat; return; }
       try {
         const hits = await searchPlaces(`${entry.name} ${entry.town} Pangasinan`, proximity);
-        const found = hits.find(h => inBox(h.lng, h.lat));
+        // The hit must *be* the place, not just be nearby: a name search returns
+        // the street's houses too, and accepting the first in-box result is how
+        // a beach with no coordinate got pinned to somebody's house.
+        const found = hits.find(h => inBox(h.lng, h.lat) && samePlaceName(entry.name, h.name));
         if (found){
           entry.lng = found.lng;
           entry.lat = found.lat;
@@ -718,6 +794,21 @@ const firstSentence = text => {
   const cut = s.match(/^.{40,160}?[.!?](\s|$)/);
   return (cut ? cut[0] : s.slice(0, 150)).trim();
 };
+
+/**
+ * Photo fields every payload carries, labelled with where the photo came from:
+ * a Wikimedia file is `wikimedia`, a curated/admin/dataset URL is `json`, and
+ * no photo at all means the client draws its Mapbox static-map fallback.
+ */
+function photoFields(photos){
+  const list = (Array.isArray(photos) ? photos : []).filter(p => typeof p === 'string' && p.trim());
+  const photo = list[0] || null;
+  return {
+    photos: list,
+    photo,
+    photoSource: photo ? (isWikimedia(photo) ? 'wikimedia' : 'json') : 'mapbox',
+  };
+}
 
 function answerFor(intent, entries){
   const lead = intent === 'food' ? 'Where to eat'
@@ -771,9 +862,7 @@ async function localChat(message, proximity){
       lng: e.lng,
       lat: e.lat,
       categories: e.categories,
-      photos: e.photos || [],
-      photo: (e.photos && e.photos[0]) || null,
-      photoSource: (e.photos && e.photos[0]) ? 'json' : 'mapbox',
+      ...photoFields(e.photos),
     })),
     spotlight: spotlightFor(entries),
     sources: entries.map(e => e.mapsUrl).filter(Boolean),
@@ -811,9 +900,7 @@ async function localRecommend(message, proximity, prefs = []){
     description: e.description,
     festival: e.festival,
     fees: e.price,
-    photos: e.photos || [],
-    photo: (e.photos && e.photos[0]) || null,
-    photoSource: (e.photos && e.photos[0]) ? 'json' : 'mapbox',
+    ...photoFields(e.photos),
     sources: e.mapsUrl ? [e.mapsUrl] : [],
     sourceKind: 'dataset',
   }));

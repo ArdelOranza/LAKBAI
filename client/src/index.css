@@ -173,26 +173,32 @@ li{margin:6px 0}
 .shimmer{color:var(--muted-ink);font-weight:500}
 /* map pins (rendered through mapcn MarkerContent) — small name pills instead of icons */
 .userdot{width:18px;height:18px;border-radius:50%;background:var(--primary);border:3px solid #fff;box-shadow:0 0 0 6px rgba(0,102,255,.22);animation:pulse 2s ease-in-out infinite}
-/* map pins — two Google-style states on one coordinate: a compact POI dot when
+/* map pins — two Google-style states on one coordinate: a teardrop pin when
    the map is zoomed out, a round photo bubble once the street is readable. */
 .spot-pin{position:relative;display:flex;flex-direction:column;align-items:center;background:none;border:none;padding:0;box-shadow:none;color:var(--ink);font-size:12px;font-weight:500;letter-spacing:0;line-height:1.22;white-space:nowrap;text-align:center;transition:opacity .18s ease,transform .18s ease}
 .spot-pin:active{transform:scale(.96)}
 /* Colliding pins yield instead of stacking into an unreadable pile. */
 .spot-pin.is-hidden{opacity:0;pointer-events:none;transform:scale(.78)}
-/* Google's dots are small but never hard to tap: a 40 px hit area around a
-   24 px disc. */
-.spot-pin:not(.bubble)::before{content:'';position:absolute;left:50%;top:50%;width:40px;height:40px;transform:translate(-50%,-50%);border-radius:50%}
-.pin-dot{position:relative;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--primary);border:2.5px solid #fff;color:#fff;box-shadow:0 1px 4px rgba(15,23,42,.35);overflow:hidden;transition:transform .2s ease,box-shadow .2s ease;animation:pin-drop-in .3s cubic-bezier(.2,.7,.3,1) backwards}
+/* Google's pins are small but never hard to tap: a 40 px hit area over the
+   pin head. */
+.spot-pin:not(.bubble)::before{content:'';position:absolute;left:50%;top:12px;width:40px;height:40px;transform:translate(-50%,-50%);border-radius:50%}
+/* Far view: a teardrop whose tip marks the coordinate. The marker box stays
+   centred on the spot (anchor="center"), so MapTab lifts it by half its height;
+   the tail then lands exactly on the place. */
+.pin-dot{position:relative;display:block;width:24px;height:32px;background:none;border:0;color:#fff;transform-origin:50% 100%;filter:drop-shadow(0 1px 3px rgba(15,23,42,.35));transition:transform .2s ease,filter .2s ease;animation:pin-drop-in .3s cubic-bezier(.2,.7,.3,1) backwards}
+.pin-shape{position:absolute;inset:0;width:100%;height:100%;fill:var(--primary);stroke:#fff;stroke-width:2.5;paint-order:stroke fill}
+.pin-face{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;overflow:hidden;display:grid;place-items:center}
 .pin-glyph{display:block;width:62%;height:62%}
 .pin-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 /* Close view: Google's round photo bubble, centred on the spot, no tail. */
 .pin-bubble{position:relative;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:#fff;border:3px solid #fff;overflow:hidden;color:var(--primary);box-shadow:0 2px 7px rgba(15,23,42,.42);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;animation:pin-drop-in .3s cubic-bezier(.2,.7,.3,1) backwards}
 .pin-bubble.has-photo{background:#E7EDF5}
 .spot-pin:hover .pin-dot{transform:scale(1.08)}
-.spot-pin.active .pin-dot{transform:scale(1.12);box-shadow:0 0 0 4px rgba(10,37,64,.18),0 3px 8px rgba(10,37,64,.35)}
+.spot-pin.active .pin-dot{transform:scale(1.12);filter:drop-shadow(0 0 3px rgba(10,37,64,.4)) drop-shadow(0 2px 5px rgba(10,37,64,.4))}
 .spot-pin:hover .pin-bubble{transform:translateY(-1px) scale(1.04)}
 .spot-pin.active .pin-bubble{transform:scale(1.08);border-color:#0A2540;box-shadow:0 0 0 3px rgba(10,37,64,.18),0 5px 12px rgba(10,37,64,.4)}
-.spot-pin.discover .pin-dot{background:#fff;border-color:#94A3B8;color:#64748B}
+.spot-pin.discover .pin-dot{color:#64748B}
+.spot-pin.discover .pin-shape{fill:#fff;stroke:#94A3B8}
 .spot-pin.bubble.discover .pin-bubble{color:#64748B}
 /* A selected pin owns the map: its full name rises above neighbouring pins. */
 .maplibregl-marker:has(.spot-pin.active){z-index:6}

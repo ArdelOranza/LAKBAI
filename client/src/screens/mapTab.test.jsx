@@ -30,10 +30,10 @@ vi.mock('@/components/ui/map', () => {
   let uid = 0;
   return {
     Map: ({ children }) => <div data-testid="mock-map">{children}</div>,
-    MapMarker: ({ longitude, latitude, onClick, anchor, children }) => {
-      markers.push({ id: 'mk' + (++uid), key: children?.props?.['data-mk'] || null, longitude, latitude, anchor });
+    MapMarker: ({ longitude, latitude, onClick, anchor, offset, children }) => {
+      markers.push({ id: 'mk' + (++uid), key: children?.props?.['data-mk'] || null, longitude, latitude, anchor, offset });
       return (
-        <div data-marker data-anchor={anchor} data-longitude={longitude} data-latitude={latitude} onClick={onClick}>
+        <div data-marker data-anchor={anchor} data-longitude={longitude} data-latitude={latitude} data-offset={Array.isArray(offset) ? offset.join(',') : ''} onClick={onClick}>
           {children}
         </div>
       );
@@ -127,6 +127,20 @@ describe('MapTab discovered pins', () => {
     // "bottom" floats the tip above the place and reads as a swarm of balloons
     // at city zoom.
     expect(markers.filter(m => m.anchor).every(m => m.anchor === 'center')).toBe(true);
+    await h.unmount();
+  });
+
+  it('far zoom draws a real pin whose tip sits on the coordinate', async () => {
+    const h = await mount(); // default 5 km view → far pins
+    const pin = h.container.querySelector('button.spot-pin[aria-label="Dataset Beach"]');
+    // A teardrop, not a generic disc: the head carries the glyph and the tip
+    // marks the place.
+    expect(pin.querySelector('.pin-dot .pin-shape')).not.toBeNull();
+    const marker = pin.closest('[data-marker]');
+    expect(marker.getAttribute('data-anchor')).toBe('center');
+    // The marker box is centred on the coordinate, so the whole pin is lifted by
+    // half its height — otherwise the tail hangs below the place.
+    expect(marker.getAttribute('data-offset')).toBe('0,-16');
     await h.unmount();
   });
 
@@ -226,6 +240,43 @@ describe('MapTab discovered pins', () => {
     const pin = h.container.querySelector('button.spot-pin[aria-label="Dataset Beach"]');
     expect(pin.querySelector('.pin-name').textContent).toBe('Dataset Beach');
     expect(h.container.textContent).toContain('Balingasay Headland');
+    await h.unmount();
+  });
+
+  // The live catalogue holds the same building twice: the curated spot and the
+  // imported dataset row. Two pins 50 m apart read as two different places.
+  it('draws one pin when a curated spot and the dataset row are the same building', async () => {
+    recommend.mockResolvedValueOnce({ places: [
+      { id: 'pangasinan-053', name: 'Cathedral of Our Lady of the Immaculate Conception (Urdaneta Cathedral)', lng: 120.5673, lat: 15.9736, categories: ['Church'] },
+    ] });
+    fetchSpots.mockResolvedValue([{ id: 'cathedral-urdaneta', name: 'Cathedral of Our Lady of the Immaculate Conception', lng: 120.567, lat: 15.974, categories: ['Church'] }]);
+    const h = await mount({ lng: 120.5711, lat: 15.9761 });
+    const pinKinds = Array.from(h.container.querySelectorAll('button.spot-pin')).map(b => b.dataset.pin);
+    expect(pinKinds).toEqual(['spot']);
+    expect(h.container.querySelector('button.spot-pin[aria-label="Cathedral of Our Lady of the Immaculate Conception (Urdaneta Cathedral)"]')).toBeNull();
+    await h.unmount();
+    fetchSpots.mockResolvedValue([]);
+  });
+
+  it('never merges two mall tenants that share one coordinate', async () => {
+    recommend.mockResolvedValueOnce({ places: [
+      { id: 'kfc', name: 'KFC - SM City Rosales', lng: 120.6026, lat: 15.8782, categories: ['Food'] },
+      { id: 'kuya', name: 'Kuya J Restaurant - SM City Rosales', lng: 120.6026, lat: 15.8782, categories: ['Food'] },
+    ] });
+    const h = await mount({ lng: 120.6026, lat: 15.8782 });
+    const labels = Array.from(h.container.querySelectorAll('button.spot-pin[data-pin="rec"]'))
+      .map(b => b.getAttribute('aria-label')).sort();
+    expect(labels).toEqual(['KFC - SM City Rosales', 'Kuya J Restaurant - SM City Rosales']);
+    await h.unmount();
+  });
+
+  it('drops a Mapbox discovery the dataset already pins', async () => {
+    sess.map = { 'lakbai.discovered': [
+      { id: 'box:dup', name: 'Dataset Beach', lng: 119.8602, lat: 16.3002, categories: [], photo: null, source: 'mapbox' },
+    ] };
+    const h = await mount();
+    expect(h.container.querySelectorAll('button.spot-pin.discover').length).toBe(0);
+    expect(h.container.querySelectorAll('button.spot-pin[data-pin="rec"]').length).toBeGreaterThan(0);
     await h.unmount();
   });
 });

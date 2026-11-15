@@ -8,6 +8,7 @@
 // agent.js is untouched — this reuses its exported callGeminiForPlan(sys, msg),
 // which talks to Gemini without the google_search tool, then DeepSeek.
 const { callGeminiForPlan, extractJson } = require('./agent.js');
+const { isWikimedia } = require('./photoHierarchy.js');
 const { callGroq } = require('./groq.js');
 const {
   datasetInfo, allEntries, search, withCoords, reasonFor, intentOf, answerFor, NO_MATCH,
@@ -352,7 +353,7 @@ async function groundedChat(message, proximity, deps = {}){
       categories: entry.categories,
       photos: entry.photos || [],
       photo: (entry.photos && entry.photos[0]) || null,
-      photoSource: (entry.photos && entry.photos[0]) ? 'json' : 'mapbox',
+      photoSource: (entry.photos && entry.photos[0]) ? (isWikimedia(entry.photos[0]) ? 'wikimedia' : 'json') : 'mapbox',
     })),
     spotlight: parsed.spotlight ? { name: spot.entry.name, reason: spot.reason } : null,
     sources: picked.map(p => p.entry.mapsUrl).filter(Boolean),
@@ -394,7 +395,7 @@ async function groundedRecommend(message, proximity, prefs = [], deps = {}){
       fees: e.price,
       photos: e.photos || [],
       photo: (e.photos && e.photos[0]) || null,
-      photoSource: (e.photos && e.photos[0]) ? 'json' : 'mapbox',
+      photoSource: (e.photos && e.photos[0]) ? (isWikimedia(e.photos[0]) ? 'wikimedia' : 'json') : 'mapbox',
       sources: e.mapsUrl ? [e.mapsUrl] : [],
       sourceKind: 'dataset',
     };

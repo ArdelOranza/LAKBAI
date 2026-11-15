@@ -9,7 +9,7 @@ const overlayFile = path.join(os.tmpdir(), 'lakbai-dataset-photos-' + process.pi
 process.env.LAKBAI_ADMIN_PHOTOS_FILE = overlayFile;
 try { fs.unlinkSync(overlayFile); } catch { /* fresh */ }
 
-const { datasetInfo, allEntries, localChat, localRecommend, search, parseRating, normalize, pickList, NO_MATCH } = require('../dataset.js');
+const { datasetInfo, allEntries, localChat, localRecommend, search, parseRating, normalize, pickList, withCoords, NO_MATCH } = require('../dataset.js');
 const { setPhotos } = require('../adminPhotos.js');
 
 /** Run a read against a throwaway dataset file, then put the fixture back. */
@@ -349,4 +349,106 @@ test('recommendations carry the visitor reviews through to the app', async () =>
   assert.deepEqual(conrads.visitorReviews, [
     { text: 'Pancit Bagnet and Beef Kare-Kare were excellent.', source: '', date: '', rating: 5 },
   ]);
+});
+
+/** Async twin of withDataset: keep the temp file alive until the read settles. */
+async function withDatasetAsync(rows, fn){
+  const file = path.join(os.tmpdir(), 'lakbai-dataset-' + process.pid + '-' + Math.random().toString(36).slice(2) + '.json');
+  fs.writeFileSync(file, JSON.stringify({ places: rows }), 'utf8');
+  const before = process.env.LAKBAI_DATA;
+  process.env.LAKBAI_DATA = file;
+  try { return await fn(); }
+  finally {
+    process.env.LAKBAI_DATA = before;
+    try { fs.unlinkSync(file); } catch { /* already gone */ }
+  }
+}
+
+test('a coordinate outside Pangasinan is dropped, never used as a pin', () => {
+  // pangasinan-150.json really carries this row: an Urdaneta park at 15.00 —
+  // 108 km south, which showed up as a pin in the middle of nowhere.
+  const bad = normalize({
+    name: 'Urdaneta Park Landmark Monument',
+    municipality_or_city: 'Urdaneta City',
+    lat: 15.003965624999998, lng: 120.5761875,
+  }, 0, 'tourist_spots');
+  assert.equal(bad.lat, null);
+  assert.equal(bad.lng, null, 'a province-locked app must not hold a coordinate it cannot vouch for');
+
+  const good = normalize({ name: 'Patar Beach', municipality_or_city: 'Bolinao', lat: 16.32, lng: 119.79 }, 1);
+  assert.equal(good.lat, 16.32);
+});
+
+test('a missing coordinate is only filled from a Mapbox hit that names the place', async () => {
+  const realFetch = globalThis.fetch;
+  const beforeToken = process.env.VITE_MAPBOX_TOKEN;
+  process.env.VITE_MAPBOX_TOKEN = 'pk.test';
+  const hits = [];
+  globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => ({ features: hits }) });
+  // A house address that matched the search text must not become a pin.
+  hits.push({ geometry: { coordinates: [120.5, 15.9] }, properties: { mapbox_id: 'm1', name: 'Some Random House' } });
+  try {
+    const [no] = await withCoords([normalize({ id: 'geocode-house-1', name: 'Camp Puor', municipality: 'Aguilar' }, 0)]);
+    assert.equal(no.lat, null);
+    assert.equal(no.lng, null);
+
+    hits.length = 0;
+    hits.push({ geometry: { coordinates: [120.5, 15.9] }, properties: { mapbox_id: 'm2', name: 'Camp Puor' } });
+    const [yes] = await withCoords([normalize({ id: 'geocode-match-1', name: 'Camp Puor', municipality: 'Aguilar' }, 0)]);
+    assert.equal(yes.lat, 15.9, 'a POI that carries the name is a real fix');
+    assert.equal(yes.lng, 120.5);
+  } finally {
+    globalThis.fetch = realFetch;
+    if (beforeToken === undefined) delete process.env.VITE_MAPBOX_TOKEN;
+    else process.env.VITE_MAPBOX_TOKEN = beforeToken;
+  }
+});
+
+test('a photo reused by a differently-named place is not that place’s photo', () => {
+  // The scrape attached one page-hero image to every place on that page, so
+  // Bolinao Falls 1, 2 and 3 all showed the same waterfall. One photo cannot
+  // caption two different places.
+  const shared = 'https://seepangasinan.com/wp-content/uploads/2021/03/Clave.jpg';
+  const out = withDataset([
+    { name: "Governor's Island", municipality_or_city: 'Alaminos City', lat: 16.21, lng: 120.04, photos: [shared] },
+    { name: 'Quezon Island', municipality_or_city: 'Alaminos City', lat: 16.211, lng: 120.041, photos: [shared] },
+    { name: 'Patar Beach', municipality_or_city: 'Bolinao', lat: 16.32, lng: 119.79, photos: ['https://example.com/patar.jpg'] },
+  ], () => allEntries());
+  const byName = Object.fromEntries(out.map(e => [e.name, e]));
+  assert.deepEqual(byName["Governor's Island"].photos, []);
+  assert.deepEqual(byName['Quezon Island'].photos, []);
+  assert.deepEqual(byName['Patar Beach'].photos, ['https://example.com/patar.jpg'], 'a unique photo stays');
+});
+
+test('two numbered falls are two places, so they cannot share one photo', () => {
+  // Live defect: Bolinao Falls 1, 2 and 3 all rendered the same scraped
+  // waterfall because their names share the word "Bolinao".
+  const url = 'https://ilovepangasinan.com/wp-content/uploads/2022/03/1-768x432.jpg';
+  const out = withDataset([
+    { name: 'Bolinao Falls 1 (Cachoeira de Bolinao)', municipality_or_city: 'Bolinao', lat: 16.30, lng: 119.90, photos: [url] },
+    { name: 'Bolinao Falls 2', municipality_or_city: 'Bolinao', lat: 16.31, lng: 119.91, photos: [url] },
+    { name: 'Bolinao Falls 3 (Bolinao Falls 3A)', municipality_or_city: 'Bolinao', lat: 16.32, lng: 119.92, photos: [url] },
+  ], () => allEntries());
+  assert.equal(out.length, 3);
+  assert.deepEqual(out.map(e => e.photos), [[], [], []]);
+});
+
+test('the same place listed twice keeps its photo', () => {
+  const url = 'https://example.com/patar.jpg';
+  const out = withDataset([
+    { name: 'Patar Beach', municipality_or_city: 'Bolinao', lat: 16.32000, lng: 119.79000, photos: [url] },
+    { name: 'Patar White Sand Beach', municipality_or_city: 'Bolinao', lat: 16.32010, lng: 119.79010, photos: [url] },
+  ], () => allEntries());
+  assert.equal(out.length, 1);
+  assert.deepEqual(out[0].photos, [url]);
+});
+
+test('recommend labels a Wikimedia photo as wikimedia, not json', async () => {
+  const WIKI = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Beach.jpg/960px-Beach.jpg';
+  const out = await withDatasetAsync([
+    { name: 'Patar Beach', municipality_or_city: 'Bolinao', categories: ['beach'], lat: 16.32, lng: 119.79, photos: [WIKI] },
+  ], () => localRecommend('Patar Beach', '119.79,16.32'));
+  const place = (out.places || [])[0];
+  assert.ok(place, 'Patar Beach should be recommended');
+  assert.equal(place.photoSource, 'wikimedia');
 });

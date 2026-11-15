@@ -73,13 +73,13 @@ app.post('/api/recommend', async (req, res) => {
     // that fallback, so a transient model hiccup is not served for 15 minutes.
     if (info.ready) {
       if (aiUsable()) {
-        try { return res.json(await cached(key, AI_TTL_MS, () => groundedRecommend(message, proximity, prefs), { onStale: tripBreaker })); }
+        try { return res.json(await enrichRecommend(await cached(key, AI_TTL_MS, () => groundedRecommend(message, proximity, prefs), { onStale: tripBreaker }))); }
         catch (e) { tripBreaker(); console.warn('grounded recommend failed:', e.message); }
       }
-      return res.json(await localRecommend(message, proximity, prefs));
+      return res.json(await enrichRecommend(await localRecommend(message, proximity, prefs)));
     }
     if (!aiUsable()) return res.status(503).json({ error: 'AI unavailable' });
-    res.json(await cached(key, AI_TTL_MS, () => recommend(message, proximity, prefs), { onStale: tripBreaker }));
+    res.json(await enrichRecommend(await cached(key, AI_TTL_MS, () => recommend(message, proximity, prefs), { onStale: tripBreaker })));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 const { chatRecommend } = require('./agent.js');
@@ -181,8 +181,10 @@ async function enrichWithPhoto(place){
   // the committed Wikimedia map — and every photo in the list is preserved.
   const existing = existingPhoto(place);
   if (existing) return { ...place, ...existing };
-  // Hierarchy 2: Wikimedia real photo
-  const key = String(place.name || '').toLowerCase() + '|' + hintFromAddress(place.address);
+  // Hierarchy 2: Wikimedia real photo. A dataset row usually has no address, so
+  // the town it already carries is the search hint.
+  const hint = hintFromAddress(place.address) || String(place.hint || place.town || '').trim();
+  const key = String(place.name || '').toLowerCase() + '|' + hint;
   const hit = photoCache.get(key);
   if (hit && Date.now() - hit.at < PHOTO_TTL){
     return hit.value
@@ -190,7 +192,7 @@ async function enrichWithPhoto(place){
       : { ...place, photo: null, photos: [], photoSource: 'mapbox' };
   }
   try {
-    const found = await findPhoto(place.name || '', hintFromAddress(place.address), place.lng, place.lat);
+    const found = await findPhoto(place.name || '', hint, place.lng, place.lat);
     photoCache.set(key, { value: found, at: Date.now() });
     return found
       ? { ...place, photo: found.src, photos: [found.src], photoSource: 'wikimedia' }
@@ -201,6 +203,15 @@ async function enrichPlaces(places){
   if (!places || !places.length) return places;
   // cap concurrency: all at once is 8, which is fine for this endpoint
   return Promise.all(places.map(enrichWithPhoto));
+}
+/**
+ * Recommendation payloads get the same photo hierarchy as /api/places: a place
+ * that carries a real photo keeps it, and one that carries none is looked up on
+ * Wikimedia Commons before the app falls back to a static map.
+ */
+async function enrichRecommend(payload){
+  if (!payload || !Array.isArray(payload.places) || !payload.places.length) return payload;
+  return { ...payload, places: await enrichPlaces(payload.places) };
 }
 app.get('/api/spots', async (req, res) => {
   try {

@@ -9,6 +9,7 @@ import { haversineKm, proximityOf } from '../geo.js';
 import { FALLBACK_CENTER } from '../App.jsx';
 import { Map, MapMarker, MarkerContent } from '@/components/ui/map';
 import { pinPhoto } from '../pinPhoto.js';
+import { mergePins } from '../pinDedupe.js';
 import { Chip } from '../ui.jsx';
 import SpotPopup from './SpotPopup.jsx';
 import AddPlace from './AddPlace.jsx';
@@ -18,6 +19,9 @@ const RADIUS_ZOOM = { 1: 13, 5: 11.5, 10: 10.5 };
 // Below this zoom the map is a city/region view: 80 name labels turn into a
 // wall. Pins stay, names wait until the traveler is close enough to read them.
 const PIN_DETAIL_ZOOM = 12.5;
+// The far pin is 32 px tall and the marker box is centred on the coordinate, so
+// the whole pin is lifted by half its height for the tip to touch the place.
+const FAR_PIN_OFFSET = [0, -16];
 const easeOut = t => 1 - Math.pow(1 - t, 3);
 const FILTERS = [
   ['All', MapPin],
@@ -43,10 +47,12 @@ function glyphFor(place){
 
 /**
  * Google-Maps-style marker, two states on the same map coordinate:
- *  - far zoom: a compact round POI dot, so 80 of them stay readable;
+ *  - far zoom: a compact teardrop pin whose tip marks the spot, so 80 of them
+ *    stay readable;
  *  - close view: a round photo bubble with the name to the right.
- * Both are centred on the spot (anchor="center"), and the glyph sits behind
- * the image so a broken photo reveals the category instead of a blank disc.
+ * Both keep anchor="center" on the marker; the far pin is lifted by half its
+ * height instead, so its tip (not its box) lands on the coordinate. The glyph
+ * sits behind the image so a broken photo reveals the category.
  */
 function PinMark({ photo, Glyph, bubble }){
   if (bubble){
@@ -69,18 +75,23 @@ function PinMark({ photo, Glyph, bubble }){
   }
   return (
     <span className={'pin-dot' + (photo ? ' has-photo' : '')} aria-hidden="true">
-      {Glyph && <Glyph className="pin-glyph" size={13} strokeWidth={2.6}/>}
-      {photo && (
-        <img
-          className="pin-photo"
-          src={photo}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          referrerPolicy="no-referrer"
-          onError={e => { e.currentTarget.style.display = 'none'; }}
-        />
-      )}
+      <svg className="pin-shape" viewBox="0 0 24 32" focusable="false">
+        <path d="M12 0C5.373 0 0 5.373 0 12c0 8 12 20 12 20s12-12 12-20C24 5.373 18.627 0 12 0Z"/>
+      </svg>
+      <span className="pin-face">
+        {Glyph && <Glyph className="pin-glyph" size={13} strokeWidth={2.6}/>}
+        {photo && (
+          <img
+            className="pin-photo"
+            src={photo}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            referrerPolicy="no-referrer"
+            onError={e => { e.currentTarget.style.display = 'none'; }}
+          />
+        )}
+      </span>
     </span>
   );
 }
@@ -283,6 +294,16 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
     discovered.filter(p => Number.isFinite(p.lng) && Number.isFinite(p.lat) && matches(p, filter) && withinRadius(p)),
   [discovered, filter, radius, hasFix, coords.lng, coords.lat]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // One pin per place. The three layers overlap (the curated catalogue and the
+  // imported dataset share plenty of buildings, and a Mapbox discovery can be a
+  // place the dataset already has), so a curated spot claims its pin first, then
+  // the dataset row, then the discovery. Mall tenants never merge: proximity
+  // alone cannot tell one business from the next.
+  const shown = useMemo(
+    () => mergePins({ spots: filteredSpots, rec: filtered, discover: filteredDiscover }),
+    [filteredSpots, filtered, filteredDiscover],
+  );
+
   return (
     <div ref={shellRef} className="pins-far" style={{ position:'relative', flex:1, minHeight:0, display:'flex', flexDirection:'column' }}>
       <Map
@@ -318,10 +339,10 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
             </MarkerContent>
           </MapMarker>
         )}
-        {filtered.map(p => {
+        {shown.rec.map(p => {
           const Glyph = glyphFor(p);
           return (
-            <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} anchor="center" onClick={() => push({ name:'detail', place:p })}>
+            <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} anchor="center" offset={detailed ? undefined : FAR_PIN_OFFSET} onClick={() => push({ name:'detail', place:p })}>
               <MarkerContent>
                 <button type="button" className={'spot-pin' + (detailed ? ' bubble' : '')} data-pin="rec" title={p.name} aria-label={p.name}>
                   <PinMark photo={pinPhoto(p, detailed)} Glyph={Glyph} bubble={detailed}/>
@@ -331,11 +352,11 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
             </MapMarker>
           );
         })}
-        {filteredSpots.map(s => {
+        {shown.spots.map(s => {
           const active = selectedSpot && selectedSpot.id === s.id;
           const Glyph = glyphFor(s);
           return (
-            <MapMarker key={'spot-' + s.id} longitude={s.lng} latitude={s.lat} anchor="center" onClick={() => selectSpot(s)}>
+            <MapMarker key={'spot-' + s.id} longitude={s.lng} latitude={s.lat} anchor="center" offset={detailed ? undefined : FAR_PIN_OFFSET} onClick={() => selectSpot(s)}>
               <MarkerContent>
                 <button className={'spot-pin' + (detailed ? ' bubble' : '') + (active ? ' active' : '')} data-pin="spot" title={s.name} aria-label={s.name}>
                   <PinMark photo={pinPhoto(s, detailed)} Glyph={Glyph} bubble={detailed}/>
@@ -345,10 +366,10 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
             </MapMarker>
           );
         })}
-        {filteredDiscover.map(p => {
+        {shown.discover.map(p => {
           const Glyph = glyphFor(p);
           return (
-            <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} anchor="center" onClick={() => push({ name:'detail', place:p })}>
+            <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} anchor="center" offset={detailed ? undefined : FAR_PIN_OFFSET} onClick={() => push({ name:'detail', place:p })}>
               <MarkerContent>
                 <button type="button" className={'spot-pin discover' + (detailed ? ' bubble' : '')} data-pin="discover" title={p.name + ' — discovered via Mapbox'} aria-label={p.name}>
                   <PinMark photo={pinPhoto(p, detailed)} Glyph={Glyph} bubble={detailed}/>
@@ -375,7 +396,7 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
       </div>
 
       {busy && <div style={{ position:'absolute', top:110, left:12, zIndex:5 }}><span className="shimmer chip" style={{ background:'#fff' }}>Loading nearby…</span></div>}
-      {!busy && !filtered.length && !filteredSpots.length && !filteredDiscover.length && (
+      {!busy && !shown.rec.length && !shown.spots.length && !shown.discover.length && (
         <div style={{ position:'absolute', top:110, left:12, right:12, zIndex:5, display:'grid', gap:6, justifyItems:'start' }}>
           <span className="chip" style={{ background:'#fff' }}>No stops here yet — widen the radius.</span>
           <button type="button" data-testid="add-place-link" onClick={() => setAddOpen(true)} style={{ background:'none', border:'none', padding:'2px 4px', fontSize:12.5, fontWeight:600, color:'var(--primary)' }}>
@@ -383,7 +404,7 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
           </button>
         </div>
       )}
-      {!busy && !filtered.length && !filteredDiscover.length && filteredSpots.length > 0 && <div style={{ position:'absolute', top:110, left:12, zIndex:5 }}><span className="chip" style={{ background:'#fff' }}>{filteredSpots.length} curated{filter === 'All' ? '' : ' ' + filter.toLowerCase()} spots</span></div>}
+      {!busy && !shown.rec.length && !shown.discover.length && shown.spots.length > 0 && <div style={{ position:'absolute', top:110, left:12, zIndex:5 }}><span className="chip" style={{ background:'#fff' }}>{shown.spots.length} curated{filter === 'All' ? '' : ' ' + filter.toLowerCase()} spots</span></div>}
 
       <button
         type="button"
