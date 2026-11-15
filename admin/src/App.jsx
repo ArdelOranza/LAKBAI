@@ -19,6 +19,65 @@ function toForm(spot) {
 
 const isHttp = v => /^https?:\/\/\S+$/i.test(String(v || '').trim());
 
+// --- reviewing a community submission -------------------------------------
+const NOTE_MIN = 5;
+const NOTE_MAX = 200;
+const SAME_PIN_M = 50;
+const CHECK_M = 120;
+const AREA_M = 400;
+const STATUS_LABEL = { pending: 'Pending', approved: 'Approved', rejected: 'Rejected' };
+
+/** Straight-line metres between two pins (haversine; the admin has no geo module). */
+function metresBetween(aLng, aLat, bLng, bLat){
+  const R = 6371000, rad = Math.PI / 180;
+  const dLat = (bLat - aLat) * rad, dLng = (bLng - aLng) * rad;
+  const s = Math.sin(dLat / 2) ** 2 + Math.cos(aLat * rad) * Math.cos(bLat * rad) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+
+const nameWords = name => String(name || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
+/** Could these names be the same place? One contains the other, or they lead with the same word. */
+function namesAlike(a, b){
+  const na = nameWords(a), nb = nameWords(b);
+  if (!na || !nb) return false;
+  if (na.includes(nb) || nb.includes(na)) return true;
+  return na.split(' ')[0] === nb.split(' ')[0];
+}
+
+/**
+ * Would approving this submission put a second pin on a place that is already
+ * there?
+ *
+ * - on the same spot (50 m) with an alike name: a duplicate, approval blocked;
+ * - within 120 m: ask the admin to look;
+ * - within 400 m: only a note about what else is nearby.
+ * The catalogue has mall tenants on one coordinate, so distance alone never
+ * decides — a name signal is required before calling two pins the same place.
+ */
+function duplicateGuard(submission, spots){
+  if (!submission) return null;
+  const lng = Number(submission.lng), lat = Number(submission.lat);
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null;
+  let best = null;
+  for (const spot of spots || []){
+    const sLng = Number(spot.lng), sLat = Number(spot.lat);
+    if (!Number.isFinite(sLng) || !Number.isFinite(sLat)) continue;
+    const metres = metresBetween(lng, lat, sLng, sLat);
+    if (!best || metres < best.metres) best = { spot, metres, alike: namesAlike(submission.name, spot.name) };
+  }
+  if (!best || best.metres > AREA_M) return null;
+  if (best.metres <= SAME_PIN_M && best.alike) return { ...best, level: 'duplicate' };
+  if (best.metres <= CHECK_M) return { ...best, level: 'check' };
+  return { ...best, level: 'near' };
+}
+
+const fmtMetres = m => (m < 1000 ? Math.round(m) + ' m' : (m / 1000).toFixed(1) + ' km');
+const fmtDate = stamp => {
+  const d = new Date(stamp);
+  return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+};
+
 /** Repeatable photo rows: one URL input per photo, live preview, remove/add.
  *  Replaces the old "one URL per line" textarea so multiple photos are edited
  *  as separate fields. */
@@ -87,10 +146,23 @@ export default function App() {
   const [placesLoaded, setPlacesLoaded] = useState(false);
   const [placeId, setPlaceId] = useState(null);
   const [placePhotos, setPlacePhotos] = useState([]);
+  // Community submissions queue.
+  const [subs, setSubs] = useState([]);
+  const [subsLoaded, setSubsLoaded] = useState(false);
+  const [subStatus, setSubStatus] = useState('pending');
+  const [subId, setSubId] = useState(null);
+  const [subNote, setSubNote] = useState('');
+  const [subPhoto, setSubPhoto] = useState(null);
+  const [subBusy, setSubBusy] = useState(false);
+  const [noteError, setNoteError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [pendingCount, setPendingCount] = useState(0);
 
   const selected = spots.find(s => s.id === selectedId) || null;
   const selectedPlace = places.find(p => p.id === placeId) || null;
-  const rows = mode === 'spots' ? spots : places;
+  const selectedSub = subs.find(s => s.id === subId) || null;
+  const dup = useMemo(() => duplicateGuard(selectedSub, spots), [selectedSub, spots]);
+  const rows = mode === 'spots' ? spots : mode === 'restos' ? places : subs;
 
   const stats = useMemo(() => ({
     total: rows.length,
@@ -113,10 +185,19 @@ export default function App() {
       const { spots: list } = await api.list();
       setSpots(list);
       setAuthed(true);
+      await loadPendingCount();
     } catch (e) {
       setAuthed(false);
       setErr(e.message || 'Could not load spots');
     }
+  }
+
+  /** The badge on the Submissions tab; a queue that is not configured stays 0. */
+  async function loadPendingCount(){
+    try {
+      const { submissions } = await api.listSubmissions('pending');
+      setPendingCount((submissions || []).length);
+    } catch { /* the tab itself explains an unavailable queue */ }
   }
 
   useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -142,6 +223,82 @@ export default function App() {
   function showRestos() {
     setMode('restos');
     if (!placesLoaded) loadPlaces();
+  }
+
+  function showSubs(){
+    setMode('subs');
+    setSubId(null);
+    setSubPhoto(null);
+    setSubNote('');
+    setNoteError('');
+    setNotice('');
+    loadSubs(subStatus);
+  }
+
+  async function loadSubs(status = subStatus){
+    setErr('');
+    setSubBusy(true);
+    try {
+      const { submissions } = await api.listSubmissions(status);
+      setSubs(submissions || []);
+      setSubsLoaded(true);
+      if (status === 'pending') setPendingCount((submissions || []).length);
+    } catch (e) { setErr(e.message || 'Could not load submissions'); }
+    finally { setSubBusy(false); }
+  }
+
+  function selectSub(sub){
+    setSubId(sub.id);
+    setSubNote('');
+    setNoteError('');
+    setNotice('');
+    setSubPhoto(null);
+    if (sub.photo_path){
+      api.submissionPhoto(sub.id)
+        .then(r => setSubPhoto(r.url || null))
+        .catch(() => setSubPhoto(null));
+    }
+  }
+
+  async function approveSub(){
+    const sub = selectedSub;
+    if (!sub || dup?.level === 'duplicate') return;
+    setErr('');
+    setNotice('');
+    setSubBusy(true);
+    try {
+      await api.approveSubmission(sub.id);
+      setNotice(`Approved “${sub.name}” — it is a pin on the map now.`);
+      setSubId(null);
+      setSubPhoto(null);
+      setSubNote('');
+      setNoteError('');
+      await loadSubs(subStatus);
+    } catch (e) { setErr(e.message); }
+    finally { setSubBusy(false); }
+  }
+
+  async function rejectSub(){
+    const sub = selectedSub;
+    if (!sub) return;
+    const note = subNote.trim();
+    if (note.length < NOTE_MIN || note.length > NOTE_MAX){
+      setNoteError(`Write ${NOTE_MIN}-${NOTE_MAX} characters so the traveller knows why.`);
+      return;
+    }
+    setNoteError('');
+    setErr('');
+    setNotice('');
+    setSubBusy(true);
+    try {
+      await api.rejectSubmission(sub.id, note);
+      setNotice(`Rejected “${sub.name}”. The traveller will see your reason.`);
+      setSubId(null);
+      setSubPhoto(null);
+      setSubNote('');
+      await loadSubs(subStatus);
+    } catch (e) { setErr(e.message); }
+    finally { setSubBusy(false); }
   }
 
   function edit(spot) {
@@ -242,9 +399,18 @@ export default function App() {
         <div className="admin-title">Lakbai Admin</div>
         <div className="admin-sub">Spots, restaurants and real photos. Separate site — the traveller app never links here.</div>
         <div className="stats">
-          <span className="stat">{mode === 'spots' ? 'Spots' : 'Restaurants'} <b>{stats.total}</b></span>
-          <span className="stat">With photos <b>{stats.withPhotos}</b></span>
-          <span className="stat">Missing photos <b>{stats.missing}</b></span>
+          {mode === 'subs' ? (
+            <>
+              <span className="stat">Pending <b>{pendingCount}</b></span>
+              <span className="stat">{STATUS_LABEL[subStatus]} listed <b>{subs.length}</b></span>
+            </>
+          ) : (
+            <>
+              <span className="stat">{mode === 'spots' ? 'Spots' : 'Restaurants'} <b>{stats.total}</b></span>
+              <span className="stat">With photos <b>{stats.withPhotos}</b></span>
+              <span className="stat">Missing photos <b>{stats.missing}</b></span>
+            </>
+          )}
           <span className={`status ${authed ? 'ok' : 'bad'}`}>{authed ? 'Connected' : 'Not connected'}</span>
         </div>
       </div>
@@ -259,24 +425,147 @@ export default function App() {
       </div>
 
       {err && <p role="alert" data-testid="error" className="error">{err}</p>}
+      {notice && <p className="hint" data-testid="notice" role="status">{notice}</p>}
 
       <div className="admin-bar">
         <div className="seg" role="tablist" aria-label="Catalogue">
           <button className={mode === 'spots' ? 'on' : ''} onClick={showSpots} data-testid="tab-spots">Tourist spots</button>
           <button className={mode === 'restos' ? 'on' : ''} onClick={showRestos} data-testid="tab-restos">Restaurants</button>
+          <button className={mode === 'subs' ? 'on' : ''} onClick={showSubs} data-testid="tab-subs">Submissions{pendingCount ? ` (${pendingCount})` : ''}</button>
         </div>
-        <div className="field">
-          <input placeholder={mode === 'spots' ? 'Search spots' : 'Search restaurants'} value={q} onChange={e => setQ(e.target.value)} aria-label="Search" data-testid="search" />
-        </div>
-        <div className="seg" role="tablist" aria-label="Photo filter">
-          <button className={!onlyMissing ? 'on' : ''} onClick={() => setOnlyMissing(false)}>All</button>
-          <button className={onlyMissing ? 'on' : ''} onClick={() => setOnlyMissing(true)} data-testid="missing-filter">Missing photos</button>
-        </div>
+        {mode !== 'subs' && (
+          <div className="field">
+            <input placeholder={mode === 'spots' ? 'Search spots' : 'Search restaurants'} value={q} onChange={e => setQ(e.target.value)} aria-label="Search" data-testid="search" />
+          </div>
+        )}
+        {mode === 'subs' ? (
+          <div className="seg" role="tablist" aria-label="Submission status">
+            {['pending', 'approved', 'rejected'].map(st => (
+              <button
+                key={st}
+                className={subStatus === st ? 'on' : ''}
+                data-testid={'sub-status-' + st}
+                onClick={() => { setSubStatus(st); setSubId(null); setSubPhoto(null); setNotice(''); loadSubs(st); }}
+              >
+                {STATUS_LABEL[st]}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="seg" role="tablist" aria-label="Photo filter">
+            <button className={!onlyMissing ? 'on' : ''} onClick={() => setOnlyMissing(false)}>All</button>
+            <button className={onlyMissing ? 'on' : ''} onClick={() => setOnlyMissing(true)} data-testid="missing-filter">Missing photos</button>
+          </div>
+        )}
         {mode === 'spots' && <button className="btn" onClick={createNew} data-testid="create">New site</button>}
-        <button className="btn secondary" onClick={mode === 'spots' ? load : loadPlaces} data-testid="refresh">Refresh</button>
+        <button className="btn secondary" onClick={mode === 'spots' ? load : mode === 'restos' ? loadPlaces : () => loadSubs()} data-testid="refresh">Refresh</button>
       </div>
 
-      <div className="workspace">
+      {mode === 'subs' && (
+        <div className="workspace">
+          <div data-testid="sub-list" className="list">
+            {subs.map(s => (
+              <button
+                key={s.id}
+                data-testid="sub-row"
+                onClick={() => selectSub(s)}
+                className={`row ${subId === s.id ? 'on' : ''}`}
+                style={{ textAlign: 'left', cursor: 'pointer' }}
+              >
+                <span className="row-title">{s.name}</span>
+                <span className="row-meta">
+                  {[s.town, s.barangay, s.email].filter(Boolean).join(' · ')}
+                </span>
+                <span className={`row-badge ${s.status === 'pending' ? 'miss' : 'ok'}`}>
+                  {STATUS_LABEL[s.status] || s.status}{s.created_at ? ' · ' + fmtDate(s.created_at) : ''}
+                </span>
+              </button>
+            ))}
+            {!subs.length && (
+              <div className="empty">
+                {subBusy ? 'Loading submissions...'
+                  : subStatus === 'pending' ? 'Nothing waiting for review.'
+                  : subStatus === 'approved' ? 'No approved submissions yet.'
+                  : 'No rejected submissions yet.'}
+              </div>
+            )}
+          </div>
+
+          <div data-testid="sub-editor" className="editor">
+            {!selectedSub ? (
+              <div className="empty">
+                {subsLoaded ? 'Select a submission on the left to review it.' : 'Open the queue to start reviewing.'}
+              </div>
+            ) : (
+              <>
+                <h2>{selectedSub.name}</h2>
+                <div className="hint">
+                  {[selectedSub.town, selectedSub.barangay, selectedSub.email ? 'submitted by ' + selectedSub.email : '', selectedSub.created_at ? fmtDate(selectedSub.created_at) : ''].filter(Boolean).join(' · ')}
+                </div>
+
+                {subPhoto && (
+                  <img className="photo-thumb" data-testid="sub-photo" src={subPhoto} alt={`Photo of ${selectedSub.name}`} style={{ width: '100%', height: 180, marginTop: 12 }} />
+                )}
+                {selectedSub.photo_path && !subPhoto && <div className="hint">The photo is private until approval; its signed link did not load.</div>}
+
+                <div className="hint" style={{ marginTop: 12 }}>
+                  {[
+                    (selectedSub.categories || []).join(', '),
+                    selectedSub.hours ? 'Hours: ' + selectedSub.hours : '',
+                    selectedSub.price ? 'Price: ' + selectedSub.price : '',
+                    selectedSub.note ? 'Note: ' + selectedSub.note : '',
+                  ].filter(Boolean).join(' · ')}
+                </div>
+                <div className="hint">Pin: {Number(selectedSub.lng).toFixed(5)}, {Number(selectedSub.lat).toFixed(5)}</div>
+
+                {dup && (
+                  <p
+                    className={dup.level === 'duplicate' ? 'error' : 'hint'}
+                    role={dup.level === 'duplicate' ? 'alert' : undefined}
+                    data-testid={dup.level === 'duplicate' ? 'sub-duplicate' : 'sub-nearby'}
+                    style={{ marginTop: 12 }}
+                  >
+                    {dup.level === 'duplicate'
+                      ? `Same place as “${dup.spot.name}” (${fmtMetres(dup.metres)} away). Reject this submission instead of approving a second pin.`
+                      : dup.level === 'check'
+                        ? `“${dup.spot.name}” is ${fmtMetres(dup.metres)} away — check this is not the same place.`
+                        : `Also near “${dup.spot.name}” (${fmtMetres(dup.metres)}).`}
+                  </p>
+                )}
+
+                {selectedSub.status === 'pending' ? (
+                  <>
+                    <label className="input-label" htmlFor="sub-note">Reason (only needed to reject)</label>
+                    <textarea id="sub-note" className="input" rows={3} data-testid="sub-note" value={subNote} onChange={e => setSubNote(e.target.value)} placeholder="What should the traveller know?" />
+                    <div className="hint">{subNote.trim().length}/{NOTE_MAX} characters — a rejection needs {NOTE_MIN}-{NOTE_MAX}.</div>
+                    {noteError && <p className="error" role="alert" data-testid="sub-note-error">{noteError}</p>}
+
+                    <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
+                      <button
+                        className="btn"
+                        data-testid="sub-approve"
+                        onClick={approveSub}
+                        disabled={subBusy || dup?.level === 'duplicate'}
+                      >
+                        {subBusy ? 'Working' : 'Approve and pin'}
+                      </button>
+                      <button className="btn secondary" data-testid="sub-reject" onClick={rejectSub} disabled={subBusy}>Reject</button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="hint" style={{ marginTop: 14 }}>
+                    {STATUS_LABEL[selectedSub.status] || selectedSub.status}
+                    {selectedSub.reviewed_at ? ' on ' + fmtDate(selectedSub.reviewed_at) : ''}
+                    {selectedSub.review_note ? ': ' + selectedSub.review_note : ''}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {mode !== 'subs' && (<div className="workspace">
         <div data-testid="list" className="list">
           {filtered.map(s => (
             <button
@@ -362,7 +651,7 @@ export default function App() {
             </>
           ))}
         </div>
-      </div>
+      </div>)}
     </div>
   );
 }

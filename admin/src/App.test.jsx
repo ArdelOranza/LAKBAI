@@ -9,6 +9,25 @@ const mocks = vi.hoisted(() => ({
   update: vi.fn(async (id, data) => ({ spot: { ...data, id } })),
   places: vi.fn(async () => ({ places: [{ id: 'ChIJtest1', name: 'Test Resto', town: 'Dagupan City', address: 'Dagupan', categories: ['restaurant'], rating: '4.5', reviews: '10', photos: [] }] })),
   setPhotos: vi.fn(async (id, photos) => ({ place: { id, photos } })),
+  listSubmissions: vi.fn(async () => ({ submissions: [{
+    id: 'sub-1',
+    status: 'pending',
+    name: 'Tondol Sunset Grill',
+    town: 'Anda',
+    barangay: 'Tondol',
+    categories: ['Food'],
+    note: 'Beside the beach, open at sunset.',
+    hours: '4pm - 10pm',
+    price: '150-400',
+    lng: 119.9502,
+    lat: 16.2903,
+    email: 'ana@example.com',
+    photo_path: 'user-1/sub-1.jpg',
+    created_at: '2026-11-14T10:00:00.000Z',
+  }] })),
+  approveSubmission: vi.fn(async () => ({ submission: { id: 'sub-1', status: 'approved' } })),
+  rejectSubmission: vi.fn(async (id, note) => ({ submission: { id, status: 'rejected', review_note: note } })),
+  submissionPhoto: vi.fn(async () => ({ url: 'https://example.com/signed/tondol.jpg' })),
 }));
 vi.mock('./api.js', () => ({
   getToken: () => 't',
@@ -16,6 +35,10 @@ vi.mock('./api.js', () => ({
   api: {
     list: mocks.list, update: mocks.update, create: vi.fn(), remove: vi.fn(), findPhoto: vi.fn(),
     places: mocks.places, setPhotos: mocks.setPhotos,
+    listSubmissions: mocks.listSubmissions,
+    approveSubmission: mocks.approveSubmission,
+    rejectSubmission: mocks.rejectSubmission,
+    submissionPhoto: mocks.submissionPhoto,
   },
 }));
 
@@ -95,6 +118,69 @@ describe('admin app', () => {
     await React.act(async () => { h.container.querySelector('[data-testid="save-photos"]').dispatchEvent(new window.MouseEvent('click', { bubbles: true })); });
 
     expect(mocks.setPhotos).toHaveBeenCalledWith('ChIJtest1', ['https://example.com/resto.jpg']);
+    await h.unmount();
+  });
+
+  // --- submissions queue -------------------------------------------------
+  const click = async el => { await React.act(async () => { el.dispatchEvent(new window.MouseEvent('click', { bubbles: true })); }); };
+
+  async function openSubmissions(){
+    const h = await mount();
+    await click(h.container.querySelector('[data-testid="tab-subs"]'));
+    await React.act(async () => {});
+    return h;
+  }
+
+  it('shows the pending queue with a count, and opens a submission for review', async () => {
+    const h = await openSubmissions();
+    const tab = h.container.querySelector('[data-testid="tab-subs"]');
+    expect(tab.textContent).toContain('1');
+    expect(mocks.listSubmissions).toHaveBeenCalledWith('pending');
+
+    await click(h.container.querySelector('[data-testid="sub-row"]'));
+    expect(h.container.querySelector('[data-testid="sub-editor"]').textContent).toContain('Tondol Sunset Grill');
+    expect(h.container.querySelector('[data-testid="sub-editor"]').textContent).toContain('ana@example.com');
+    // The photo is private until approval: it comes from a short-lived URL.
+    expect(mocks.submissionPhoto).toHaveBeenCalledWith('sub-1');
+    expect(h.container.querySelector('[data-testid="sub-photo"]')).not.toBeNull();
+    await h.unmount();
+  });
+
+  it('approves a submission through the token-guarded endpoint', async () => {
+    const h = await openSubmissions();
+    await click(h.container.querySelector('[data-testid="sub-row"]'));
+    await click(h.container.querySelector('[data-testid="sub-approve"]'));
+    expect(mocks.approveSubmission).toHaveBeenCalledWith('sub-1');
+    expect(h.container.textContent).toContain('Approved');
+    await h.unmount();
+  });
+
+  it('will not reject without a reason of 5-200 characters', async () => {
+    const h = await openSubmissions();
+    await click(h.container.querySelector('[data-testid="sub-row"]'));
+    const note = h.container.querySelector('[data-testid="sub-note"]');
+    await React.act(async () => { type(note, 'no'); });
+    await click(h.container.querySelector('[data-testid="sub-reject"]'));
+    expect(mocks.rejectSubmission).not.toHaveBeenCalled();
+    expect(h.container.querySelector('[data-testid="sub-note-error"]')).not.toBeNull();
+
+    await React.act(async () => { type(note, 'Already on the map as Tondol Beach Grill.'); });
+    await click(h.container.querySelector('[data-testid="sub-reject"]'));
+    expect(mocks.rejectSubmission).toHaveBeenCalledWith('sub-1', 'Already on the map as Tondol Beach Grill.');
+    await h.unmount();
+  });
+
+  it('blocks approval when the pin lands on an existing place with the same name', async () => {
+    mocks.list.mockResolvedValueOnce({ spots: [
+      { id: 'tondol-grill', name: 'Tondol Sunset Grill', town: 'Anda', district: '1', categories: ['Food'], blurb: '', lng: 119.95025, lat: 16.29031, photos: [] },
+    ] });
+    const h = await openSubmissions();
+    await click(h.container.querySelector('[data-testid="sub-row"]'));
+    const approve = h.container.querySelector('[data-testid="sub-approve"]');
+    expect(approve.disabled).toBe(true);
+    const guard = h.container.querySelector('[data-testid="sub-duplicate"]');
+    expect(guard.textContent).toContain('Tondol Sunset Grill');
+    expect(guard.textContent).toContain('Reject');
     await h.unmount();
   });
 });

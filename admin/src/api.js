@@ -40,4 +40,10 @@ export const api = {
   findPhoto: (payload) => req('/api/admin/photos/find', { method: 'POST', body: JSON.stringify(payload) }),
   places: () => req('/api/admin/places'),
   setPhotos: (id, photos) => req(`/api/admin/places/${encodeURIComponent(id)}/photos`, { method: 'PUT', body: JSON.stringify({ photos }) }),
+  // Community submissions: a traveller's pending place, reviewed here. Approve
+  // makes it a pin; reject needs a short reason the traveller will read.
+  listSubmissions: (status = 'pending') => req('/api/admin/submissions?status=' + encodeURIComponent(status)),
+  approveSubmission: (id) => req(`/api/admin/submissions/${encodeURIComponent(id)}/approve`, { method: 'POST' }),
+  rejectSubmission: (id, note) => req(`/api/admin/submissions/${encodeURIComponent(id)}/reject`, { method: 'POST', body: JSON.stringify({ note }) }),
+  submissionPhoto: (id) => req(`/api/admin/submissions/${encodeURIComponent(id)}/photo`),
 };
