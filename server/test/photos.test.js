@@ -78,12 +78,48 @@ test('findPhoto searches names only and never geosearches', async () => {
   assert.equal(out, null);
   assert.equal(calls.length, 1, calls.join(', '));
   const q = new URL(calls[0]).searchParams.get('gsrsearch');
-  // intitle: keeps barangay photo dumps out of the result set. Full-text
-  // search ranked "2657Poblacion, Lingayen..." above "Lingayen Beach.jpg".
-  assert.equal(q, 'intitle:patar intitle:beach Bolinao');
+  // intitle: keeps barangay photo dumps out of the result set; the feature word
+  // stays plain so the search is not over-specific.
+  assert.equal(q, 'intitle:patar beach Bolinao');
   assert.equal(new URL(calls[0]).searchParams.get('generator'), 'search');
   assert.ok(!calls[0].includes('geosearch'), calls[0]);
   assert.ok(!calls[0].includes('ggscoord'), calls[0]);
+});
+
+test('a filler adjective does not block the right beach photo', () => {
+  // "Abagatanen White Sand Beach" is the same beach as the Commons file
+  // "Abagatanen Beach of Pangasinan.jpg". Demanding "white"/"sand" rejected it.
+  assert.equal(strictRelevant('File:Abagatanen Beach of Pangasinan.jpg', 'Abagatanen White Sand Beach'), true);
+});
+
+test('a compound name matches a file that names any of its parts', () => {
+  assert.equal(
+    strictRelevant('File:Lingayen Beach (Lingayen, Pangasinan)(2018-02-25).jpg', 'Lingayen Beach & Lingayen Baywalk'),
+    true
+  );
+  assert.equal(
+    strictRelevant('File:Panacalan Island.jpg', 'Tondol White Sand Beach & Panacalan Island Sandbar'),
+    true
+  );
+});
+
+test('a brochure or collage is never a place photo', () => {
+  assert.equal(strictRelevant('File:Abagatanen Beach brochure.jpg', 'Abagatanen White Sand Beach'), false);
+  assert.equal(strictRelevant('File:Anea Cafe collage.jpg', 'Anea Cafe'), false);
+});
+
+test('a distinctive name still needs its feature noun', () => {
+  // Lingayen alone is not a beach photo.
+  assert.equal(strictRelevant('File:Lingayen Capitol.jpg', 'Lingayen Beach'), false);
+  assert.equal(strictRelevant('File:Lingayen Beach.jpg', 'Lingayen Beach'), true);
+});
+
+test('the query pins only the distinctive words so recall stays wide', async () => {
+  const calls = [];
+  const fake = respondWith(pages(), calls);
+  await findPhoto('Abagatanen White Sand Beach', 'Agno', undefined, undefined, { fetch: fake });
+  const q = new URL(calls[0]).searchParams.get('gsrsearch');
+  assert.equal(q, 'intitle:abagatanen beach Agno');
 });
 
 test('findCommonsPhoto rejects a different numbered feature', async () => {

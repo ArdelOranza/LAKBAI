@@ -75,4 +75,14 @@ describe('MdText', () => {
     expect((html.match(/<li>/g) || []).length).toBe(2);
     expect((html.match(/<p>/g) || []).length).toBe(2);
   });
+
+  it('renders markdown headings instead of leaking the hashes', () => {
+    // The itinerary answer uses "### Day 1: ..." — showing the raw hashes made
+    // the plan look broken.
+    const html = renderToString(<MdText text={'### **Day 1: Bolinao**\n\nGo early.'} />);
+    expect(html).not.toContain('###');
+    expect(html).toContain('Day 1: Bolinao');
+    expect(html).toContain('class="md-head"');
+    expect(html).toContain('<strong>Day 1: Bolinao</strong>');
+  });
 });

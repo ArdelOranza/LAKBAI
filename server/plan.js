@@ -9,6 +9,14 @@ const MAX_PLAN_KM = 50;
 const NO_FIX = 'Turn on location so the route can stay within 50 km of you.';
 const NOTHING_NEAR = 'No verified places within 50 km of your location.';
 
+// A prompt with every nearby row blew past Groq's size limit (413 with 261 rows
+// near Dagupan) and made the planner sloppier. The nearest rows are kept, plus
+// a couple from each kind of place: near a city the nearest rows are all
+// restaurants, and a beach day must still see a beach.
+const MAX_PLAN_ROWS = 60;
+const NEAREST_ROWS = 40;
+const PER_CATEGORY = 2;
+
 const keyOf = name => String(name || '').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
 
 // The itinerary's clock is built here, never trusted to the model: the model
@@ -114,6 +122,30 @@ function placeList(entries){
   return entries.map(e => `- ${e.name}${e.town ? ` — ${e.town}` : ''}${e.price ? ` — ${e.price}` : ''}`).join('\n');
 }
 
+/** The rows worth putting in the prompt: nearest first, capped, one or two of
+ *  every category so the model can answer any kind of day. */
+function promptRows(rows, traveler){
+  if (rows.length <= MAX_PLAN_ROWS) return rows;
+  const byKm = rows
+    .map(e => ({ e, km: haversineKm(traveler.lng, traveler.lat, Number(e.lng), Number(e.lat)) }))
+    .sort((a, b) => a.km - b.km)
+    .map(x => x.e);
+  const picked = [];
+  const seen = new Set();
+  const add = e => { if (!seen.has(e)) { seen.add(e); picked.push(e); } };
+  byKm.slice(0, NEAREST_ROWS).forEach(add);
+  const perCat = new Map();
+  for (const e of byKm.slice(NEAREST_ROWS)){
+    if (picked.length >= MAX_PLAN_ROWS) break;
+    const cat = (Array.isArray(e.categories) && e.categories[0]) || 'Other';
+    const n = perCat.get(cat) || 0;
+    if (n >= PER_CATEGORY) continue;
+    perCat.set(cat, n + 1);
+    add(e);
+  }
+  return picked;
+}
+
 function radiusLine(traveler){
   const town = nearestTown(traveler.lng, traveler.lat);
   const where = town
@@ -131,9 +163,10 @@ async function planDay(message, hours, startHour = 9, deps = {}){
   if (sourceRows.length && !rows.length) throw Object.assign(new Error(NOTHING_NEAR), { status: 422 });
 
   const where = radiusLine(traveler);
+  const prompt = promptRows(rows, traveler);
   const agentFn = deps.agentFn || (async (msg, h, s) => {
     const sys = rows.length
-      ? `You plan a Pangasinan day trip of ${h} hours starting ${s}:00. ${where} Use ONLY the places in this list and copy every name exactly as written — do not add a place that is not here:\n${placeList(rows)}\nJSON only: {"title":"...","stops":[{"name":"exact name from the list","hint":"town","arrive":"HH:MM","depart":"HH:MM","activities":["..."]}]}. All times inside the ${h}-hour window starting ${s}:00.`
+      ? `You plan a Pangasinan day trip of ${h} hours starting ${s}:00. ${where} Use ONLY the places in this list and copy every name exactly as written — do not add a place that is not here:\n${placeList(prompt)}\nJSON only: {"title":"...","stops":[{"name":"exact name from the list","hint":"town","arrive":"HH:MM","depart":"HH:MM","activities":["..."]}]}. All times inside the ${h}-hour window starting ${s}:00.`
       : `You plan a Pangasinan day trip of ${h} hours starting ${s}:00. ${where} JSON only: {"title":"...","stops":[{"name":"exact place","hint":"town","arrive":"HH:MM","depart":"HH:MM","activities":["..."]}]}. Real places within 50 km only, all times inside the ${h}-hour window starting ${s}:00.`;
     let raw;
     try {

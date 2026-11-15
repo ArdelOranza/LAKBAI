@@ -17,12 +17,46 @@ const STOP = new Set([
 ]);
 
 // Subjects that mean the file is about something else: a house, a room, a
-// wedding, a selfie. Only rejected when the place itself is not that thing.
+// wedding, a selfie, a scan of a brochure. Only rejected when the place itself
+// is not that thing.
 const JUNK = new Set([
   'house', 'home', 'residence', 'mansion', 'apartment', 'dwelling',
   'interior', 'altar', 'wedding', 'reception', 'selfie', 'portrait',
-  'screenshot', 'logo', 'seal', 'diagram', 'certificate', 'poster', 'banner'
+  'screenshot', 'logo', 'seal', 'diagram', 'certificate', 'poster', 'banner',
+  'document', 'collage', 'brochure', 'flyer', 'scan', 'map', 'room', 'lobby',
+  'menu', 'tarpaulin',
 ]);
+
+// Words that describe how a place looks, not which place it is. "Abagatanen
+// White Sand Beach" is the same beach as "Abagatanen Beach of Pangasinan", so
+// demanding "white" and "sand" in the file title rejected the right photo.
+const DESCRIPTOR = new Set([
+  'white', 'sand', 'black', 'blue', 'crystal', 'clear', 'water', 'sea', 'ocean',
+  'view', 'views', 'viewpoint', 'scenic', 'beautiful', 'sunset', 'sunrise',
+  'paradise', 'natural', 'nature', 'national', 'protected', 'landscape',
+  'tourist', 'spot', 'area', 'site',
+]);
+
+// The noun that says what kind of place this is. It must be in the file title,
+// or "Sunset at Lingayen Capitol" could stand in for "Lingayen Beach".
+const FEATURE = new Set([
+  'beach', 'coast', 'shore', 'sandbar', 'cove', 'island', 'fall', 'river',
+  'spring', 'cave', 'church', 'shrine', 'park', 'plaza', 'market', 'museum',
+  'lighthouse', 'garden', 'mountain', 'hill', 'lake', 'rock', 'resort', 'hotel',
+]);
+
+// A compound name ("Lingayen Beach & Lingayen Baywalk") is one destination, so
+// a file that names any of its parts is honest. The primary segment drives the
+// search query; every segment is allowed to satisfy the match.
+function segments(name){
+  return String(name || '')
+    .split(/\s*(?:&|,|\/|\||\(|\s-\s)\s*/)
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+function primaryName(name){
+  return segments(name)[0] || String(name || '');
+}
 
 /** Lowercase word tokens with file/place boilerplate dropped. */
 function searchWords(s){
@@ -35,49 +69,65 @@ function tokens(s){
   return searchWords(s).map(w => w.replace(/s$/, ''));
 }
 
-/** Terms for Commons search. Full-text search ranks barangay photo dumps
- *  ("2657Poblacion, Lingayen...") above the beach itself; intitle:<word>
- *  only returns files actually named after the place. */
+/** Terms for Commons search. Only the distinctive words are pinned with
+ *  intitle: — pinning every word ("intitle:white intitle:sand") matched almost
+ *  nothing. The feature noun and the town stay plain so recall stays wide. */
 function searchFor(name, hint){
-  const terms = searchWords(name).map(w => 'intitle:' + w);
+  const seg = primaryName(name);
+  const all = tokens(seg);
+  const distinctive = [...new Set(all.filter(t => !DESCRIPTOR.has(t) && !FEATURE.has(t)))];
+  const feature = all.find(t => FEATURE.has(t));
   const town = String(hint || '').trim();
-  if (!terms.length) return town;
-  return [...terms, town].filter(Boolean).join(' ');
+  const q = [...distinctive.map(w => 'intitle:' + w), feature, town].filter(Boolean).join(' ');
+  return q || town;
 }
 
-/** Conservative match: every name token must appear in the file title, a
+/** Conservative match: the distinctive words of one name segment must all
+ *  appear in the file title, at least one feature noun must appear too, a
  *  numbered feature must keep its own number, and an unrelated subject in the
  *  title rejects the file outright. */
 function strictRelevant(title, name){
-  const keys = tokens(name);
-  if (!keys.length) return false;
   const have = tokens(title);
   const haveSet = new Set(have);
-  if (!keys.every(k => haveSet.has(k))) return false;
-  if (have.some(t => JUNK.has(t) && !keys.includes(t))) return false;
   const want = new Set(String(name || '').match(/\d+/g) || []);
   // Parenthetical numbers are sequence labels ("(2).jpg"), not the feature's
   // own number, so they cannot prove "Bolinao Falls 2" is the right falls.
   const got = new Set(String(title || '').replace(/\([^)]*\)/g, ' ').match(/\d+/g) || []);
-  // A numbered feature must carry its number: an unnumbered "Bolinao Falls"
-  // file cannot prove it is Falls 1 rather than Falls 2.
   if (want.size) {
     for (const n of want) if (!got.has(n)) return false;
   }
-  return true;
+  const parts = segments(name).map(seg => {
+    const all = [...new Set(tokens(seg))];
+    return {
+      distinctive: all.filter(t => !DESCRIPTOR.has(t) && !FEATURE.has(t)),
+      features: all.filter(t => FEATURE.has(t)),
+      keys: all,
+    };
+  }).filter(p => p.distinctive.length);
+  if (!parts.length) return false;
+  return parts.some(({ distinctive, features, keys }) => {
+    if (!distinctive.every(k => haveSet.has(k))) return false;
+    // Without a feature noun any file that repeats the town would pass.
+    if (features.length && !features.some(f => haveSet.has(f))) return false;
+    if (have.some(t => JUNK.has(t) && !keys.includes(t))) return false;
+    return true;
+  });
 }
 
 function pickStrict(data, name){
   const pages = (data.query && data.query.pages) || {};
-  for (const p of Object.values(pages)){
-    if (p.thumbnail && strictRelevant(p.title, name)) {
-      return {
-        src: p.thumbnail.source,
-        page: 'https://commons.wikimedia.org/wiki/' + encodeURIComponent(p.title)
-      };
-    }
-  }
-  return null;
+  const relevant = Object.values(pages).filter(p => p.thumbnail && strictRelevant(p.title, name));
+  // Prefer the file whose title says the least beyond the place name: "Lingayen
+  // Beach.jpg" beats "Lingayen Beach, Labrador mountain view (...).jpg".
+  const known = new Set(tokens(name));
+  const extra = p => tokens(p.title).filter(t => !known.has(t)).length;
+  relevant.sort((a, b) => extra(a) - extra(b));
+  const p = relevant[0];
+  if (!p) return null;
+  return {
+    src: p.thumbnail.source,
+    page: 'https://commons.wikimedia.org/wiki/' + encodeURIComponent(p.title),
+  };
 }
 
 async function commons(fetcher, params){

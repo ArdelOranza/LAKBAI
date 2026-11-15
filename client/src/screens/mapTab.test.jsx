@@ -133,9 +133,10 @@ describe('MapTab discovered pins', () => {
   it('far zoom draws a real pin whose tip sits on the coordinate', async () => {
     const h = await mount(); // default 5 km view → far pins
     const pin = h.container.querySelector('button.spot-pin[aria-label="Dataset Beach"]');
-    // A teardrop, not a generic disc: the head carries the glyph and the tip
-    // marks the place.
+    // A clean teardrop: no category icon on the head, and the tip marks the
+    // place.
     expect(pin.querySelector('.pin-dot .pin-shape')).not.toBeNull();
+    expect(pin.querySelector('.pin-glyph')).toBeNull();
     const marker = pin.closest('[data-marker]');
     expect(marker.getAttribute('data-anchor')).toBe('center');
     // The marker box is centred on the coordinate, so the whole pin is lifted by
@@ -168,11 +169,12 @@ describe('MapTab discovered pins', () => {
     expect(img.getAttribute('src')).toContain('upload.wikimedia.org');
     // A 960 px thumbnail per pin would be megabytes for one neighbourhood.
     expect(img.getAttribute('src')).toContain('/120px-');
-    // A place without a photo keeps its category glyph, not an empty head.
+    // A place without a photo stays a clean dot — never an icon head.
     const beach = h.container.querySelector('button.spot-pin[aria-label="Dataset Beach"]');
     expect(beach.querySelector('img')).toBeNull();
     expect(beach.querySelector('.pin-bubble')).not.toBeNull();
-    expect(beach.querySelector('.pin-glyph')).not.toBeNull();
+    expect(beach.querySelector('.pin-glyph')).toBeNull();
+    expect(beach.querySelector('.pin-core')).not.toBeNull();
     await h.unmount();
   });
 
@@ -185,7 +187,7 @@ describe('MapTab discovered pins', () => {
     });
     const pin = h.container.querySelector('button.spot-pin[aria-label="Static Map Cafe"]');
     expect(pin.querySelector('img')).toBeNull();
-    expect(pin.querySelector('.pin-glyph')).not.toBeNull();
+    expect(pin.querySelector('.pin-glyph')).toBeNull();
     expect(h.container.innerHTML).not.toContain('/static/pin-s');
     await h.unmount();
   });
@@ -202,7 +204,7 @@ describe('MapTab discovered pins', () => {
     expect(active).not.toBeNull();
     expect(active.getAttribute('aria-label')).toBe('Cape Bolinao Lighthouse And Coastal Viewpoint');
     expect(active.querySelector('.pin-name').textContent).toBe('Cape Bolinao Lighthouse And Coastal Viewpoint');
-    expect(active.querySelector('.pin-glyph')).not.toBeNull();
+    expect(active.querySelector('.pin-glyph')).toBeNull();
     await h.unmount();
     fetchSpots.mockResolvedValue([]);
   });
@@ -223,7 +225,8 @@ describe('MapTab discovered pins', () => {
     const pin = h.container.querySelector('button.spot-pin');
     expect(pin.getAttribute('aria-label')).toBe('Dataset Beach');
     expect(pin.getAttribute('title')).toBe('Dataset Beach');
-    // The name stays mounted and is hidden by CSS, so it can transition.
+    // The name is mounted at every zoom: the declutter decides which labels
+    // have room, so a traveller can read the map without tapping every pin.
     expect(pin.querySelector('.pin-name').textContent).toBe('Dataset Beach');
     expect(pin.dataset.pin).not.toBeUndefined(); // declutter priority
     await h.unmount();

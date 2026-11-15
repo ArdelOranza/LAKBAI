@@ -2,7 +2,7 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import {
   ArrowUp, Mic, Plus, CircleCheck, MapPin, Star, CheckCheck,
   ChevronRight, ChevronDown, EllipsisVertical, SlidersHorizontal, MessageSquarePlus,
-  Bookmark, Navigation, Compass, ArrowLeft, History, Ticket, Square,
+  Bookmark, Navigation, ArrowLeft, History, Ticket, Square,
 } from 'lucide-react';
 import { chat } from '../api.js';
 import { fetchSpots } from '../spots.js';
@@ -11,6 +11,7 @@ import { answerLead } from '../chatAnswer.js';
 import { latestThread, listThreads, saveThread, cleanMessages, cachedThreads } from '../chatStore.js';
 import { placeImage, mapboxToken } from '../staticMap.js';
 import { MdText } from '../mdText.jsx';
+import AiAvatar from '../aiAvatar.jsx';
 import { saveFavorite, listFavorites } from '../store.js';
 import { haversineKm, formatDistance, driveMinutes, proximityOf } from '../geo.js';
 import { suggestionsFor } from '../chatSuggest.js';
@@ -419,7 +420,8 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
   const lastAi = [...msgs].reverse().find(m => m.role === 'ai' && !m.loading);
   // Which chip makes sense next: another fare question after a fare answer,
   // the place follow-ups after a place, a town bus prompt when the fix says so.
-  const CHIP_ICON = { plan: Compass, more: MapPin, beach: Compass, festival: Ticket, fare: Ticket, bus: Ticket, terminal: Navigation };
+  const LogoIcon = ({ size = 12 }) => <Logo size={size}/>;
+  const CHIP_ICON = { plan: LogoIcon, more: MapPin, beach: LogoIcon, festival: Ticket, fare: Ticket, bus: Ticket, terminal: Navigation };
   const followUp = suggestionsFor({ lastAi, coords, hasFix }).map(s => ({
     ...s,
     icon: CHIP_ICON[s.id] || MapPin,
@@ -503,14 +505,14 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
             const rows = list.slice(1);
             const shownRows = expanded ? rows : rows.slice(0, 2);
             const hidden = rows.length - shownRows.length;
-            const answer = answerLead(m.text, list.length > 0);
+            const answer = answerLead(m.text, list.length > 0, list.map(c => c.name));
             return (
               <Fragment key={m.id}>
                 {startsDay && <div className="chat-day">{dayLabel(m.at)}</div>}
                 {m.loading ? (
                   <div className="chat-ai">
                     <div className="chat-ai-head">
-                      <span className="ai-avatar"><Compass size={14} color="#fff" strokeWidth={2.2}/></span>
+                      <AiAvatar/>
                       <span className="ai-name">LakbAI</span>
                     </div>
                     <span className="shimmer" style={{ fontSize:13 }}>Searching places...</span>
@@ -546,7 +548,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
                 ) : (
                   <div className="chat-ai">
                     <div className="chat-ai-head">
-                      <span className="ai-avatar"><Compass size={14} color="#fff" strokeWidth={2.2}/></span>
+                      <AiAvatar/>
                       <span className="ai-name">LakbAI</span>
                     </div>
                     {answer.kind === 'label' && list.length > 0 ? (

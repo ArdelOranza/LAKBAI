@@ -134,10 +134,10 @@ async function runSteps(wait, steps){
 async function callGeminiForPlan(sys, msg, opts = {}){
   const wait = opts.wait || (ms => new Promise(r => setTimeout(r, ms)));
   const ms = opts.timeoutMs || MODEL_TIMEOUT_MS;
-  const attempt = async () => {
+  const attempt = model => async () => {
     const key = process.env.GEMINI_API_KEY;
     if (!key) { const e = new Error('Missing GEMINI_API_KEY'); e.status = 503; throw e; }
-    const r = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/${PRIMARY_MODEL}:generateContent?key=${key}`, {
+    const r = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ system_instruction: { parts: [{ text: sys }] }, contents: [{ parts: [{ text: `Trip request: ${msg}` }] }], generationConfig: { responseMimeType: 'application/json' } })
     }, ms);
@@ -164,7 +164,10 @@ async function callGeminiForPlan(sys, msg, opts = {}){
     const data = await r.json();
     return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
   };
-  const steps = [attempt, attempt];
+  // The primary model can be rate-limited for a whole quota window (429
+  // RESOURCE_EXHAUSTED). Retrying it burns the client's 60 s budget, so the
+  // lite model gets the next try before any other provider.
+  const steps = [attempt(PRIMARY_MODEL), attempt(FALLBACK_MODEL)];
   if (process.env.DEEPSEEK_API_KEY) steps.push(ds);
   return runSteps(wait, steps);
 }

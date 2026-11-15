@@ -26,4 +26,30 @@ describe('answerLead', () => {
     const long = 'These are the verified places closest to where you are right now, ordered by drive time from your GPS fix:';
     expect(answerLead(`${long}\n- **Patar Beach** — White sand.`, true)).toEqual({ lead: long, kind: 'prose' });
   });
+
+  it('keeps a day plan whose bullets are labelled by time of day, not by place', () => {
+    // The model answers an itinerary request with cards for the stops AND a
+    // plan whose bullets are **Morning:** / **Afternoon:**. Only the bullets
+    // that repeat a card name may be dropped — the plan itself is the answer.
+    const text = [
+      'Here is a 2-day itinerary for 2 people in Bolinao and Alaminos.',
+      '',
+      '### **Day 1: Bolinao Heritage**',
+      '',
+      '*   **Morning:** Patar Beach, then the lighthouse.',
+      '*   **Afternoon:** Bolinao Falls and the market.',
+      '',
+      '### **Day 2: Alaminos Islands**',
+      '',
+      '*   **Morning:** Hundred Islands boat tour.',
+    ].join('\n');
+    expect(answerLead(text, true, ['Patar Beach', 'Bolinao Falls']))
+      .toEqual({ lead: text, kind: 'prose' });
+  });
+
+  it('still drops bullets that only repeat the result cards', () => {
+    const text = 'Closest to you:\n- **Patar Beach** (Bolinao · 4.8★ · 351 reviews) — White sand.\n- **Bolinao Falls** (Bolinao · 4.5★) — Cold water.';
+    expect(answerLead(text, true, ['Patar Beach', 'Bolinao Falls']))
+      .toEqual({ lead: 'Closest to you:', kind: 'label' });
+  });
 });

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Search, Umbrella, UtensilsCrossed, Landmark, MapPin, LocateFixed, Camera, MapPinPlus } from 'lucide-react';
+import { Search, Umbrella, UtensilsCrossed, Landmark, MapPin, LocateFixed, BedDouble, MapPinPlus } from 'lucide-react';
 import { recommend } from '../api.js';
 import { readLocalPrefs } from '../prefs.js';
 import { sessionGet, sessionSet } from '../sessionCache.js';
@@ -26,6 +26,7 @@ const easeOut = t => 1 - Math.pow(1 - t, 3);
 const FILTERS = [
   ['All', MapPin],
   ['Beaches', Umbrella],
+  ['Hotels', BedDouble],
   ['Food', UtensilsCrossed],
   ['Events', Landmark],
 ];
@@ -36,29 +37,23 @@ function shortName(name){
   return n.length > 22 ? n.slice(0, 21).trimEnd() + '…' : n;
 }
 
-/** Category glyph for the pin head when there is no photo (or it breaks). */
-function glyphFor(place){
-  const hay = [place && place.name, place && place.categories].flat().filter(Boolean).join(' ').toLowerCase();
-  if (/beach|coast|island|shore|sea|spring|falls/.test(hay)) return Umbrella;
-  if (/food|restaurant|cafe|eat|dining|grill|market|dish/.test(hay)) return UtensilsCrossed;
-  if (/event|festival|fiesta|histor|cultur|heritage|church|museum|landmark/.test(hay)) return Landmark;
-  return Camera;
-}
-
 /**
  * Google-Maps-style marker, two states on the same map coordinate:
  *  - far zoom: a compact teardrop pin whose tip marks the spot, so 80 of them
  *    stay readable;
  *  - close view: a round photo bubble with the name to the right.
  * Both keep anchor="center" on the marker; the far pin is lifted by half its
- * height instead, so its tip (not its box) lands on the coordinate. The glyph
- * sits behind the image so a broken photo reveals the category.
+ * height instead, so its tip (not its box) lands on the coordinate.
+ *
+ * No category icon sits on the head: a little umbrella or fork made the map
+ * look like a toy and said less than the name pill beside it. A place with a
+ * real photo shows the photo; a place without one shows a clean dot.
  */
-function PinMark({ photo, Glyph, bubble }){
+function PinMark({ photo, bubble }){
   if (bubble){
     return (
       <span className={'pin-bubble' + (photo ? ' has-photo' : '')} aria-hidden="true">
-        {Glyph && <Glyph className="pin-glyph" size={18} strokeWidth={2.3}/>}
+        {!photo && <span className="pin-core"/>}
         {photo && (
           <img
             className="pin-photo"
@@ -79,7 +74,7 @@ function PinMark({ photo, Glyph, bubble }){
         <path d="M12 0C5.373 0 0 5.373 0 12c0 8 12 20 12 20s12-12 12-20C24 5.373 18.627 0 12 0Z"/>
       </svg>
       <span className="pin-face">
-        {Glyph && <Glyph className="pin-glyph" size={13} strokeWidth={2.6}/>}
+        {!photo && <span className="pin-core"/>}
         {photo && (
           <img
             className="pin-photo"
@@ -103,12 +98,13 @@ function overlaps(a, b, pad){
 
 /**
  * Google-Maps-style declutter, done in screen space after the map settles.
- * Pins that would stack on top of a higher-priority pin step aside; in close
- * view the name underneath a pin also yields when another name already owns
- * that patch of map. Nothing is removed from the data — it fades back in as
- * soon as the traveler pans or zooms to give it room.
+ * Pins that would stack on top of a higher-priority pin step aside, and a name
+ * pill yields when another label already owns that patch of map. Names are laid
+ * out at every zoom, so the map is readable without tapping each pin. Nothing
+ * is removed from the data — it fades back in as soon as the traveller pans or
+ * zooms to give it room.
  */
-function declutterPins(root, detailed){
+function declutterPins(root){
   if (!root) return;
   const pins = Array.from(root.querySelectorAll('button.spot-pin'));
   if (!pins.length) return;
@@ -125,7 +121,6 @@ function declutterPins(root, detailed){
     if (!box.width || !box.height) continue; // hidden tab / not laid out yet
     if (keptPins.some(b => overlaps(box, b, 1))){ pin.classList.add('is-hidden'); continue; }
     keptPins.push(box);
-    if (!detailed) continue;
     const name = pin.querySelector('.pin-name');
     if (!name) continue;
     // Flip a label that would run past the right edge of the map, then measure
@@ -179,7 +174,7 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
 
   function scheduleDeclutter(){
     clearTimeout(declutterTimer.current);
-    declutterTimer.current = setTimeout(() => declutterPins(shellRef.current, detailedRef.current), 90);
+    declutterTimer.current = setTimeout(() => declutterPins(shellRef.current), 90);
   }
 
   function onViewChange(v){
@@ -275,7 +270,7 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
   // Places without coordinates can't be pinned — drop them, never render an
   // invalid marker.
   const filtered = useMemo(() => places.filter(p => Number.isFinite(p.lng) && Number.isFinite(p.lat) && matches(p, filter) && withinRadius(p)), [places, filter, radius, hasFix, coords.lng, coords.lat]); // eslint-disable-line react-hooks/exhaustive-deps
-  const catFor = f => f === 'Food' ? 'Food' : f === 'Events' ? 'Events' : 'Beaches';
+  const catFor = f => f === 'Food' ? 'Food' : f === 'Events' ? 'Events' : f === 'Hotels' ? 'Hotels' : 'Beaches';
   const filteredSpots = useMemo(() => {
     const base = filter === 'All'
       ? spots.filter(s => Number.isFinite(s.lng) && Number.isFinite(s.lat))
@@ -339,46 +334,39 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
             </MarkerContent>
           </MapMarker>
         )}
-        {shown.rec.map(p => {
-          const Glyph = glyphFor(p);
-          return (
-            <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} anchor="center" offset={detailed ? undefined : FAR_PIN_OFFSET} onClick={() => push({ name:'detail', place:p })}>
-              <MarkerContent>
-                <button type="button" className={'spot-pin' + (detailed ? ' bubble' : '')} data-pin="rec" title={p.name} aria-label={p.name}>
-                  <PinMark photo={pinPhoto(p, detailed)} Glyph={Glyph} bubble={detailed}/>
-                  <span className="pin-name">{shortName(p.name)}</span>
-                </button>
-              </MarkerContent>
-            </MapMarker>
-          );
-        })}
+        {shown.rec.map(p => (
+          <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} anchor="center" offset={detailed ? undefined : FAR_PIN_OFFSET} onClick={() => push({ name:'detail', place:p })}>
+            <MarkerContent>
+              <button type="button" className={'spot-pin' + (detailed ? ' bubble' : '')} data-pin="rec" title={p.name} aria-label={p.name}>
+                <PinMark photo={pinPhoto(p, detailed)} bubble={detailed}/>
+                <span className="pin-name">{shortName(p.name)}</span>
+              </button>
+            </MarkerContent>
+          </MapMarker>
+        ))}
         {shown.spots.map(s => {
           const active = selectedSpot && selectedSpot.id === s.id;
-          const Glyph = glyphFor(s);
           return (
             <MapMarker key={'spot-' + s.id} longitude={s.lng} latitude={s.lat} anchor="center" offset={detailed ? undefined : FAR_PIN_OFFSET} onClick={() => selectSpot(s)}>
               <MarkerContent>
                 <button className={'spot-pin' + (detailed ? ' bubble' : '') + (active ? ' active' : '')} data-pin="spot" title={s.name} aria-label={s.name}>
-                  <PinMark photo={pinPhoto(s, detailed)} Glyph={Glyph} bubble={detailed}/>
+                  <PinMark photo={pinPhoto(s, detailed)} bubble={detailed}/>
                   <span className="pin-name">{active ? s.name : shortName(s.name)}</span>
                 </button>
               </MarkerContent>
             </MapMarker>
           );
         })}
-        {shown.discover.map(p => {
-          const Glyph = glyphFor(p);
-          return (
-            <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} anchor="center" offset={detailed ? undefined : FAR_PIN_OFFSET} onClick={() => push({ name:'detail', place:p })}>
-              <MarkerContent>
-                <button type="button" className={'spot-pin discover' + (detailed ? ' bubble' : '')} data-pin="discover" title={p.name + ' — discovered via Mapbox'} aria-label={p.name}>
-                  <PinMark photo={pinPhoto(p, detailed)} Glyph={Glyph} bubble={detailed}/>
-                  <span className="pin-name">{shortName(p.name)}</span>
-                </button>
-              </MarkerContent>
-            </MapMarker>
-          );
-        })}
+        {shown.discover.map(p => (
+          <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} anchor="center" offset={detailed ? undefined : FAR_PIN_OFFSET} onClick={() => push({ name:'detail', place:p })}>
+            <MarkerContent>
+              <button type="button" className={'spot-pin discover' + (detailed ? ' bubble' : '')} data-pin="discover" title={p.name + ' — discovered via Mapbox'} aria-label={p.name}>
+                <PinMark photo={pinPhoto(p, detailed)} bubble={detailed}/>
+                <span className="pin-name">{shortName(p.name)}</span>
+              </button>
+            </MarkerContent>
+          </MapMarker>
+        ))}
       </Map>
 
       <div style={{ position:'absolute', top:12, left:12, right:12, zIndex:5, background:'rgba(255,255,255,.97)', borderRadius:999, padding:'11px 16px', boxShadow:'0 10px 24px -14px rgba(15,23,42,.3)', display:'flex', alignItems:'center', gap:8, cursor:'pointer' }} onClick={() => push({ name:'search', query:'' })} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'search', query:'' }); } }}>

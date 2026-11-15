@@ -152,6 +152,33 @@ test('a hung provider is cut off instead of hanging the plan', async () => {
   }
 });
 
+test('the plan tries the lite Gemini model when the primary is exhausted', async () => {
+  // Live evidence: gemini-3.6-flash answered 429 RESOURCE_EXHAUSTED while
+  // gemini-flash-lite-latest answered 200. Retrying the exhausted model and
+  // then dropping to DeepSeek (402, no credits) took the whole plan down.
+  const { callGeminiForPlan } = require('../agent.js');
+  const realFetch = global.fetch;
+  const urls = [];
+  const planJson = '{"title":"Lite day","stops":[]}';
+  global.fetch = async url => {
+    urls.push(String(url));
+    if (String(url).includes('gemini-3.6-flash')) return { ok: false, status: 429 };
+    return { ok: true, json: async () => ({ candidates: [{ content: { parts: [{ text: planJson }] } }] }) };
+  };
+  const hadDeepSeek = process.env.DEEPSEEK_API_KEY;
+  delete process.env.DEEPSEEK_API_KEY;
+  process.env.GEMINI_API_KEY = 'test-key';
+  try {
+    const out = await callGeminiForPlan('sys', 'msg', { wait: async () => {} });
+    assert.equal(out, planJson);
+    assert.equal(urls.filter(u => u.includes('gemini-3.6-flash')).length, 1, 'the exhausted model is not retried');
+    assert.ok(urls.some(u => u.includes('gemini-flash-lite-latest')), urls.join(', '));
+  } finally {
+    global.fetch = realFetch;
+    if (hadDeepSeek === undefined) delete process.env.DEEPSEEK_API_KEY;
+  }
+});
+
 test('chatRecommend retries without tools on 429', async () => {
   const { chatRecommend } = require('../agent.js');
   const good = '{"intent":"food","answer":"a","candidates":[],"spotlight":null,"sources":[]}';

@@ -188,11 +188,14 @@ li{margin:6px 0}
 .pin-dot{position:relative;display:block;width:24px;height:32px;background:none;border:0;color:#fff;transform-origin:50% 100%;filter:drop-shadow(0 1px 3px rgba(15,23,42,.35));transition:transform .2s ease,filter .2s ease;animation:pin-drop-in .3s cubic-bezier(.2,.7,.3,1) backwards}
 .pin-shape{position:absolute;inset:0;width:100%;height:100%;fill:var(--primary);stroke:#fff;stroke-width:2.5;paint-order:stroke fill}
 .pin-face{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;overflow:hidden;display:grid;place-items:center}
-.pin-glyph{display:block;width:62%;height:62%}
+/* A place without a photo is a clean dot, not a toy category icon. */
+.pin-core{display:block;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.28)}
 .pin-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 /* Close view: Google's round photo bubble, centred on the spot, no tail. */
 .pin-bubble{position:relative;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:#fff;border:3px solid #fff;overflow:hidden;color:var(--primary);box-shadow:0 2px 7px rgba(15,23,42,.42);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;animation:pin-drop-in .3s cubic-bezier(.2,.7,.3,1) backwards}
 .pin-bubble.has-photo{background:#E7EDF5}
+.pin-bubble .pin-core{width:13px;height:13px;background:var(--primary);box-shadow:0 0 0 4px rgba(0,61,122,.10)}
+.spot-pin.discover .pin-bubble .pin-core{background:#94A3B8}
 .spot-pin:hover .pin-dot{transform:scale(1.08)}
 .spot-pin.active .pin-dot{transform:scale(1.12);filter:drop-shadow(0 0 3px rgba(10,37,64,.4)) drop-shadow(0 2px 5px rgba(10,37,64,.4))}
 .spot-pin:hover .pin-bubble{transform:translateY(-1px) scale(1.04)}
@@ -202,25 +205,23 @@ li{margin:6px 0}
 .spot-pin.bubble.discover .pin-bubble{color:#64748B}
 /* A selected pin owns the map: its full name rises above neighbouring pins. */
 .maplibregl-marker:has(.spot-pin.active){z-index:6}
-/* The name is a map label, sized like Google's POI labels (12 px, weight 500)
-   with a white halo instead of a card, so it reads on any map colour.
-   width:max-content keeps it on one line: an absolutely positioned label is
-   otherwise clamped to the 24-38 px marker box and wraps after one word. */
-.pin-name{position:absolute;top:calc(100% + 3px);left:50%;transform:translateX(-50%);width:max-content;max-width:150px;background:none;border:none;border-radius:0;padding:0 2px;box-shadow:none;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:500;color:#202124;letter-spacing:0;line-height:1.22;text-shadow:0 0 2px #fff,0 0 3px #fff,0 1px 2px rgba(255,255,255,.95),0 -1px 2px rgba(255,255,255,.95);opacity:1;pointer-events:none;transition:opacity .18s ease,transform .18s ease}
-.spot-pin.active .pin-name{color:#0A2540;font-weight:700;max-width:200px;white-space:normal;font-size:12.5px;line-height:1.18}
+/* The name is a small white pill. A text halo alone disappeared over busy
+   satellite/road colours, and the point of the label is that a traveller can
+   read it. width:max-content keeps it on one line: an absolutely positioned
+   label is otherwise clamped to the 24-38 px marker box. */
+.pin-name{position:absolute;top:calc(100% + 2px);left:50%;transform:translateX(-50%);width:max-content;max-width:132px;background:rgba(255,255,255,.95);border:1px solid rgba(15,23,42,.10);border-radius:999px;padding:1px 7px 2px;box-shadow:0 1px 3px rgba(15,23,42,.22);overflow:hidden;text-overflow:ellipsis;font-size:11px;font-weight:650;color:#1F2937;letter-spacing:0;line-height:1.45;white-space:nowrap;opacity:1;pointer-events:none;transition:opacity .18s ease,transform .18s ease}
+.spot-pin.active .pin-name{color:#0A2540;font-weight:750;max-width:200px;white-space:normal;font-size:12px;line-height:1.25}
 .spot-pin.discover .pin-name{color:#475569}
 /* Close view: the name sits to the right of the bubble, like Google's POI
    labels, instead of hanging under a dot. */
-.spot-pin.bubble .pin-name{top:50%;left:calc(100% + 8px);transform:translateY(-50%);max-width:158px;white-space:normal;text-align:left;font-size:12.5px;line-height:1.2;font-weight:500}
+.spot-pin.bubble .pin-name{top:50%;left:calc(100% + 8px);transform:translateY(-50%);max-width:158px;white-space:normal;text-align:left;font-size:12px;line-height:1.25;font-weight:550}
 /* A pin near the right edge flips its label to the left, like Google, instead
    of having the name cut off by the map edge. */
-.spot-pin.bubble.label-left .pin-name{left:auto;right:calc(100% + 8px);text-align:right}
-.spot-pin.bubble.active .pin-name{max-width:188px;font-weight:700}
-/* Far zoom: the dot stays, its name waits until the map is close enough to
-   read it. Both states are the same DOM node, so the label fades instead of
-   popping. */
-.pins-far .pin-name,.spot-pin.label-hidden .pin-name{opacity:0;transform:translate(-50%,-3px)}
-.pins-far .spot-pin:hover .pin-name,.pins-far .spot-pin.active .pin-name{opacity:1;transform:translate(-50%,0)}
+.spot-pin.bubble.label-left .pin-name{left:auto;right:calc(100% + 8px);text-align:left}
+.spot-pin.bubble.active .pin-name{max-width:188px;font-weight:750}
+/* The declutter decides which labels have room. The hidden ones stay mounted,
+   so a pan brings them back with a fade instead of a pop. */
+.spot-pin.label-hidden .pin-name{opacity:0}
 @keyframes pin-drop-in{0%{opacity:0;transform:translateY(-10px) scale(.82)}70%{opacity:1;transform:translateY(2px) scale(1.05)}100%{opacity:1;transform:none}}
 @media (prefers-reduced-motion: reduce){
   .pin-dot,.pin-bubble{animation:none}
@@ -382,7 +383,7 @@ li{margin:6px 0}
 .msg-time{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;color:#64748B;margin-top:5px;padding-right:2px}
 .chat-ai{display:flex;flex-direction:column;align-items:flex-start;align-self:stretch}
 .chat-ai-head{display:flex;align-items:center;gap:8px;margin-bottom:7px}
-.ai-avatar{width:26px;height:26px;border-radius:50%;background:var(--primary);display:grid;place-items:center}
+.ai-avatar{width:28px;height:28px;flex:0 0 28px;border-radius:50%;background:#fff;border:1px solid #E2E9F6;display:grid;place-items:center;box-shadow:0 1px 3px rgba(15,23,42,.12)}
 .ai-name{font-size:12px;font-weight:700;letter-spacing:-.1px}
 .ai-text{margin:0;font-size:14px;line-height:1.65;color:var(--ink);white-space:pre-wrap;word-break:break-word}
 

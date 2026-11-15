@@ -25,7 +25,8 @@ vi.mock('../sessionCache.js', () => ({
 vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => ({ hospitals: [], police: [] }) })));
 
 import SavedTab from './SavedTab.jsx';
-import { itineraryFromSaved } from '../api.js';
+import { itineraryFromSaved, recommend } from '../api.js';
+import { listFavorites, saveFavorite } from '../store.js';
 
 describe('SavedTab detail navigation', () => {
   it('normalizes favorite rows so PlaceDetail receives id=place_id', async () => {
@@ -51,12 +52,12 @@ describe('SavedTab detail navigation', () => {
 });
 
 describe('SavedTab itinerary location', () => {
-  async function renderSaved(coords, push, showToast){
+  async function renderSaved(coords, push, showToast, props = {}){
     const container = document.createElement('div');
     document.body.appendChild(container);
     const root = createRoot(container);
     await React.act(async () => {
-      root.render(<SavedTab coords={coords} push={push} showToast={showToast} />);
+      root.render(<SavedTab coords={coords} push={push} showToast={showToast} {...props} />);
     });
     return { container, root };
   }
@@ -81,7 +82,7 @@ describe('SavedTab itinerary location', () => {
     const push = vi.fn();
     const showToast = vi.fn();
     // FALLBACK_CENTER has no `accuracy` — it is not a real fix.
-    const { container, root } = await renderSaved({ lng: 120.23, lat: 16.03 }, push, showToast);
+    const { container, root } = await renderSaved({ lng: 120.23, lat: 16.03 }, push, showToast, { hasFix: false });
     const btn = container.querySelector('[data-testid="generate-itinerary"] button');
     await React.act(async () => {
       btn.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
@@ -90,6 +91,43 @@ describe('SavedTab itinerary location', () => {
     expect(itineraryFromSaved).not.toHaveBeenCalled();
     expect(push).not.toHaveBeenCalled();
     expect(showToast.mock.calls.some(c => /location/i.test(String(c[0])))).toBe(true);
+    await React.act(async () => root.unmount());
+    container.remove();
+  });
+
+  it('keeps Generate disabled until there is something to sequence', async () => {
+    listFavorites.mockResolvedValueOnce({ data: [] });
+    recommend.mockResolvedValueOnce({ places: [] });
+    const { container, root } = await renderSaved({ lng: 119.79, lat: 16.12, accuracy: 8 }, vi.fn(), () => {});
+    const btn = container.querySelector('[data-testid="generate-itinerary"] button');
+    expect(btn.disabled).toBe(true);
+    await React.act(async () => root.unmount());
+    container.remove();
+  });
+
+  it('Add All shows progress and cannot be double-submitted', async () => {
+    listFavorites.mockResolvedValueOnce({ data: [] });
+    recommend.mockResolvedValueOnce({ places: [
+      { id: 's1', name: 'Sug One', categories: ['beach'] },
+      { id: 's2', name: 'Sug Two', categories: ['beach'] },
+    ] });
+    let releaseFirst;
+    saveFavorite.mockClear();
+    saveFavorite.mockImplementationOnce(() => new Promise(r => { releaseFirst = r; }));
+    const { container, root } = await renderSaved({ lng: 119.79, lat: 16.12, accuracy: 8 }, vi.fn(), () => {});
+    const btn = container.querySelector('[data-testid="add-all-sugg"]');
+    await React.act(async () => {
+      btn.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+      await Promise.resolve();
+    });
+    expect(btn.disabled).toBe(true);
+    expect(btn.textContent).toContain('Adding');
+    await React.act(async () => {
+      btn.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+      await Promise.resolve();
+    });
+    expect(saveFavorite).toHaveBeenCalledTimes(1);
+    await React.act(async () => { releaseFirst({}); });
     await React.act(async () => root.unmount());
     container.remove();
   });

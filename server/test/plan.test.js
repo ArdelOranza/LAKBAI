@@ -217,6 +217,43 @@ test('plan prompt carries the time window and the 50 km radius', async () => {
   }
 });
 
+test('the plan prompt caps the place list and keeps every kind of place', async () => {
+  // Groq rejects oversized prompts (413) and Gemini gets slower and sloppier
+  // with 260 random rows. Near a city the closest rows are all restaurants, so
+  // a plain "first 60" list would make a beach day impossible.
+  const realFetch = global.fetch;
+  let body = '';
+  const planJson = '{"title":"T","stops":[]}';
+  global.fetch = async (url, opts) => {
+    body = opts.body;
+    return { ok: true, json: async () => ({ candidates: [{ content: { parts: [{ text: planJson }] } }] }) };
+  };
+  const rows = Array.from({ length: 300 }, (_, i) => ({
+    id: 'r' + i,
+    name: 'Row Place ' + i,
+    town: 'T',
+    price: '',
+    // 280 restaurants nearest, 20 beaches farthest: a beach day must still see
+    // a beach.
+    categories: [i < 280 ? 'restaurant' : 'Beach & Coastal'],
+    lng: 120.34 + i * 0.0001,
+    lat: 16.043,
+  }));
+  try {
+    process.env.GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'test-key';
+    await planDay('beach day', 6, 8, { entries: rows, proximity: '120.34,16.043' });
+    const sys = JSON.parse(body).system_instruction.parts[0].text;
+    const lines = sys.split('\n').filter(l => l.startsWith('- '));
+    assert.ok(lines.length > 0, 'the prompt must still carry places');
+    assert.ok(lines.length <= 60, `the prompt listed ${lines.length} rows`);
+    assert.ok(lines.some(l => l.includes('Row Place 0')), 'the nearest rows stay');
+    assert.ok(!sys.includes('Row Place 299'), 'the farthest rows are dropped');
+    assert.ok(lines.some(l => l.includes('Row Place 280')), 'a beach row survives next to 280 restaurants');
+  } finally {
+    global.fetch = realFetch;
+  }
+});
+
 test('parsePlan ignores trailing prose braces', () => {
   const { parsePlan } = require('../plan.js');
   const out = parsePlan('Here: {"title":"T","stops":[]} done }');

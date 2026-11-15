@@ -14,6 +14,7 @@ export default function SavedTab({ coords, hasFix = true, push, showToast }){
   const [rows, setRows] = useState([]);
   const [suggs, setSuggs] = useState(sessionGet('lakbai.rec.sugg') || []);
   const [busyGen, setBusyGen] = useState(false);
+  const [busyAll, setBusyAll] = useState(false);
   useEffect(() => {
     let alive = true;
     listFavorites(user).then(res => { if (alive) setRows(res.data || []); });
@@ -32,6 +33,19 @@ export default function SavedTab({ coords, hasFix = true, push, showToast }){
     else showToast('Removed from Saved');
   }
   function queueRestore(row){ setRows(r => [row, ...r]); }
+  // One tap saves every suggestion. The button stays disabled until the queue
+  // drains, so a double-tap cannot fire the same saves twice.
+  async function addAll(){
+    if (busyAll) return;
+    const pending = suggs.filter(x => !rows.some(r => r.place_id === x.id));
+    if (!pending.length) return;
+    setBusyAll(true);
+    try {
+      for (const s of pending) await saveToSaved(s);
+    } finally {
+      setBusyAll(false);
+    }
+  }
   function suggestionLabels(row){ // hint pill from category + sunset clock (no festival data on favorites)
     const cat = (row.categories || [])[0] || 'Place';
     // No sunset string is available here — don't render a dangling "Optimal
@@ -41,9 +55,10 @@ export default function SavedTab({ coords, hasFix = true, push, showToast }){
   }
   async function generate(){
     if (!rows.length) { showToast('Save a few places first', 'error'); return; }
-    // Only a real GPS fix has accuracy. FALLBACK_CENTER does not, and sending
-    // it would make the server plan around the wrong town.
-    if (!coords || coords.accuracy == null) {
+    // Only a real GPS fix can anchor the 50 km radius. `hasFix` is computed from
+    // the fallback centre in App, so a fix without an accuracy field still
+    // counts — the old accuracy check silently blocked real users.
+    if (!hasFix) {
       showToast('Turn on location to build a route within 50 km of you', 'error');
       return;
     }
@@ -96,12 +111,12 @@ export default function SavedTab({ coords, hasFix = true, push, showToast }){
                 <button data-testid="add-sugg" className="chip" style={{ fontSize:12, padding:'6px 12px', display:'inline-flex', alignItems:'center', gap:4 }} onClick={async () => { await saveToSaved(s); }}><Plus size={13}/> Add</button>
               </div>
             ))}
-            <button data-testid="add-all-sugg" className="chip" style={{ justifySelf:'start', fontSize:12, padding:'6px 12px', display:'inline-flex', alignItems:'center', gap:4 }} onClick={async () => { for (const s of suggs.filter(x => !rows.some(r => r.place_id === x.id))) await saveToSaved(s); }}><Plus size={13}/> Add All</button>
+            <button data-testid="add-all-sugg" className="chip" disabled={busyAll} style={{ justifySelf:'start', fontSize:12, padding:'6px 12px', display:'inline-flex', alignItems:'center', gap:4, opacity: busyAll ? .6 : 1 }} onClick={addAll}><Plus size={13}/> {busyAll ? 'Adding...' : 'Add All'}</button>
           </div>
         </div>
       )}
       <div className="pane" style={{ marginTop:18 }}>
-        <div data-testid="generate-itinerary"><PrimaryBtn disabled={busyGen} onClick={generate}><Compass size={17}/> {busyGen ? 'Sequencing stops…' : 'Generate Smart Itinerary'}</PrimaryBtn></div>
+        <div data-testid="generate-itinerary"><PrimaryBtn disabled={busyGen || !rows.length} onClick={generate}><Compass size={17}/> {busyGen ? 'Sequencing stops…' : 'Generate Smart Itinerary'}</PrimaryBtn></div>
         <p style={{ fontSize:11, color:'var(--muted-ink)', textAlign:'center', marginTop:8 }}>LakbAI will automatically sequence stops by distance and sunset timing.</p>
       </div>
     </main>

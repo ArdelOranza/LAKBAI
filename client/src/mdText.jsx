@@ -23,9 +23,11 @@ export function mdInline(text){
 }
 
 const BULLET = /^\s*(?:[-•]|\*)\s+/;
+const HEADING = /^\s{0,3}(#{1,6})\s+(.*\S)\s*$/;
 
 /** Text → blocks: paragraphs split on blank lines, consecutive bullet lines
- *  grouped into one ul. Blocks carry inline segments already parsed. */
+ *  grouped into one ul, "#" lines promoted to headings. Blocks carry inline
+ *  segments already parsed. */
 export function mdBlocks(text){
   const paras = String(text ?? '').split(/\n{2,}/);
   const blocks = [];
@@ -40,7 +42,12 @@ export function mdBlocks(text){
       }
     }
     for (const line of lines){
-      if (BULLET.test(line)){
+      const head = HEADING.exec(line);
+      if (head){
+        flushPara();
+        list = null;
+        blocks.push({ type: 'h', level: head[1].length, segs: mdInline(head[2]) });
+      } else if (BULLET.test(line)){
         flushPara();
         if (!list){ list = { type: 'ul', items: [] }; blocks.push(list); }
         list.items.push(mdInline(line.replace(BULLET, '')));
@@ -60,15 +67,20 @@ function Segs({ segs }){
   return segs.map((s, i) => s.t === 'bold' ? <strong key={i}>{s.v}</strong> : <React.Fragment key={i}>{s.v}</React.Fragment>);
 }
 
-/** Renders mdBlocks to <p>/<ul>. Non-string loading placeholders pass through. */
+/** Renders mdBlocks to <p>/<ul>/<h3|h4>. Non-string loading placeholders pass through. */
 export function MdText({ text }){
   if (typeof text !== 'string') return text;
   const blocks = mdBlocks(text);
   return (
     <>
-      {blocks.map((b, i) => b.type === 'ul'
-        ? <ul key={i}>{b.items.map((segs, j) => <li key={j}><Segs segs={segs}/></li>)}</ul>
-        : <p key={i}><Segs segs={b.segs}/></p>)}
+      {blocks.map((b, i) => {
+        if (b.type === 'ul') return <ul key={i}>{b.items.map((segs, j) => <li key={j}><Segs segs={segs}/></li>)}</ul>;
+        if (b.type === 'h'){
+          const Tag = b.level <= 2 ? 'h3' : 'h4';
+          return <Tag key={i} className="md-head"><Segs segs={b.segs}/></Tag>;
+        }
+        return <p key={i}><Segs segs={b.segs}/></p>;
+      })}
     </>
   );
 }
