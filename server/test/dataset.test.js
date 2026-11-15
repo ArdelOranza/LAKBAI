@@ -12,6 +12,19 @@ try { fs.unlinkSync(overlayFile); } catch { /* fresh */ }
 const { datasetInfo, allEntries, localChat, localRecommend, search, parseRating, normalize, pickList, NO_MATCH } = require('../dataset.js');
 const { setPhotos } = require('../adminPhotos.js');
 
+/** Run a read against a throwaway dataset file, then put the fixture back. */
+function withDataset(rows, fn){
+  const file = path.join(os.tmpdir(), 'lakbai-dataset-' + process.pid + '-' + Math.random().toString(36).slice(2) + '.json');
+  fs.writeFileSync(file, JSON.stringify({ places: rows }), 'utf8');
+  const before = process.env.LAKBAI_DATA;
+  process.env.LAKBAI_DATA = file;
+  try { return fn(); }
+  finally {
+    process.env.LAKBAI_DATA = before;
+    try { fs.unlinkSync(file); } catch { /* already gone */ }
+  }
+}
+
 test('the installed dataset is detected and normalised', () => {
   const info = datasetInfo();
   assert.equal(info.ready, true);
@@ -49,6 +62,74 @@ test('field spellings from hand-made files still normalise', () => {
   const b = normalize({ name: 'Cafe', location: 'Dagupan', coordinates: { lat: 16.04, lng: 120.33 } });
   assert.equal(b.town, 'Dagupan');
   assert.equal(b.lng, 120.33);
+});
+
+test('two different businesses sharing a mall pin are both kept', () => {
+  // A mall puts a dozen tenants within 50 m of each other. Treating proximity
+  // alone as "same place" silently deleted 40 real places from the catalogue.
+  const out = withDataset([
+    { name: 'Cabalen - SM City Urdaneta Central', municipality_or_city: 'Urdaneta City', lat: 15.97610, lng: 120.57120, total_review_count: 120 },
+    { name: "Classic Savory - SM City Urdaneta Central", municipality_or_city: 'Urdaneta City', lat: 15.97615, lng: 120.57125, total_review_count: 300 },
+    { name: 'Starbucks Coffee - SM City Urdaneta Central', municipality_or_city: 'Urdaneta City', lat: 15.97618, lng: 120.57128, total_review_count: 900 },
+  ], () => allEntries());
+  assert.equal(out.length, 3);
+});
+
+test('the same place under two spellings still collapses to one row', () => {
+  const out = withDataset([
+    { name: 'URESHII KOI', municipality_or_city: 'Urdaneta City', lat: 15.97610, lng: 120.57120, total_review_count: 41 },
+    { name: 'URESHII KOI Japanese Restaurant', municipality_or_city: 'Urdaneta City', lat: 15.97612, lng: 120.57121, total_review_count: 1900 },
+  ], () => allEntries());
+  assert.equal(out.length, 1);
+  assert.equal(out[0].name, 'URESHII KOI Japanese Restaurant', 'the row with more reviews is the surviving one');
+});
+
+test('the fatter row wins even when its count is written as "1.9k"', () => {
+  // Number("1.9k") is NaN, which used to hand the win to the thinner row.
+  const out = withDataset([
+    { name: 'Patar Beach', municipality_or_city: 'Bolinao', lat: 16.32000, lng: 119.79000, total_review_count: 41 },
+    { name: 'Patar White Sand Beach', municipality_or_city: 'Bolinao', lat: 16.32010, lng: 119.79010, total_review_count: 1900 },
+  ], () => allEntries());
+  assert.equal(out.length, 1);
+  assert.equal(out[0].reviews, '1.9k');
+});
+
+test('a Google Maps place id never reaches the address travellers see', () => {
+  // Scraped files carry the source listing's id inside the address. It is not
+  // part of the address, and it must not show under a place name.
+  const entry = normalize({
+    name: "Matutina - Gerry's Seafood House",
+    municipality_or_city: 'Urdaneta City',
+    location: "Brgy. Nancayasan, MacArthur Hwy, Urdaneta City, 2428 Pangasinan (Google Maps Place ID: ChIJJ5gzGP0-kTMRG-1ZO3hRkFg)",
+  }, 0, 'restaurants');
+  assert.equal(entry.address, 'Brgy. Nancayasan, MacArthur Hwy, Urdaneta City, 2428 Pangasinan');
+  assert.ok(!/ChIJ/.test(entry.address + entry.name));
+
+  const named = normalize({ name: 'Kainan sa Kamalig (Place ID: ChIJabc123456)', municipality: 'Urdaneta City' }, 1, 'restaurants');
+  assert.equal(named.name, 'Kainan sa Kamalig');
+});
+
+test('the older files write ids, coordinates and phones in backticks — all of it goes', () => {
+  // The shape actually present in pangasinan-150.json: plural label, two ids,
+  // and a coordinates/phone note behind it.
+  const entry = normalize({
+    name: 'St. Vincent Ferrer Parish',
+    municipality_or_city: 'Bayambang',
+    location: 'RF54+F9V, Roxas Street, Town Proper (Poblacion), Bayambang, 2423 Pangasinan (Google Maps Place ID: `ChIJ____DxlJkTMR8hfnKrKiJ10`; Phone: `+63 75 529 2024`)',
+  }, 0, 'tourist_spots');
+  assert.equal(entry.address, 'RF54+F9V, Roxas Street, Town Proper (Poblacion), Bayambang, 2423 Pangasinan');
+  assert.ok(!/ChIJ|Phone/.test(entry.address));
+
+  const two = normalize({
+    name: 'Bayambang Stop',
+    municipality_or_city: 'Bayambang',
+    location: 'Bayambang Road, Barangay Bani, Bayambang, 2423 Pangasinan (Google Maps Place IDs: `ChIJhRf7wT5JkTMRwcDsipUyS0o` / `ChIJg1QXwiJJkTMRsD4M75HaAu0`; Coordinates: `15°49′11′′N 120°26′39′′E`)',
+  }, 0, 'tourist_spots');
+  assert.equal(two.address, 'Bayambang Road, Barangay Bani, Bayambang, 2423 Pangasinan');
+
+  // A parenthetical that is part of the name stays put.
+  const kept = normalize({ name: 'Archdiocesan Shrine and Parish of St. Vincent Ferrer (Bayambang Church)', municipality_or_city: 'Bayambang' }, 0, 'tourist_spots');
+  assert.equal(kept.name, 'Archdiocesan Shrine and Parish of St. Vincent Ferrer (Bayambang Church)');
 });
 
 test('an array file is accepted as-is', () => {

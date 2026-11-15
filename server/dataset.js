@@ -293,14 +293,36 @@ function intentsFor(entry){
   return Object.entries(CATEGORY_HINTS).filter(([, re]) => re.test(text)).map(([k]) => k);
 }
 
+// Scraped source files carry the listing id inside the address, e.g.
+// "... 2428 Pangasinan (Google Maps Place ID: ChIJ...)" or the older
+// "... (Google Maps Place IDs: `ChIJ...` / `ChIJ...`; Coordinates: `15°49′N`)"
+// shape. That is provenance, not an address, and it must never render under a
+// place name. A parenthetical that is part of the name ("(Bayambang Church)")
+// is left alone.
+const META_PAREN_RE = /\(([^()]*)\)/g;
+const META_LABEL_RE = /^\s*(?:google\s+maps\s+)?(?:place\s*ids?|coordinates?|plus\s*code|phone|contact|telephone)\s*[:#]/i;
+const PLACE_ID_RE = /[(,[]?\s*(?:google\s+maps\s+)?place\s*ids?\s*[:#-]?\s*[`'"\s]*[A-Za-z0-9_/`'"\s-]{8,}/gi;
+const BARE_PLACE_ID_RE = /\bChI[A-Za-z0-9_-]{8,}\b/g;
+
+function stripPlaceIds(value){
+  let s = String(value == null ? '' : value);
+  s = s.replace(META_PAREN_RE, (whole, inner) => (META_LABEL_RE.test(inner) ? ' ' : whole));
+  s = s.replace(PLACE_ID_RE, ' ').replace(BARE_PLACE_ID_RE, ' ');
+  return s
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\s+([,.])/g, '$1')
+    .replace(/[,\s]+$/, '')
+    .trim();
+}
+
 function normalize(raw, index, kind = '', fileTag = ''){
   if (!raw || typeof raw !== 'object') return null;
-  const name = str(raw.name || raw.title || raw.official_name || raw.place_name || raw.placeName);
+  const name = stripPlaceIds(str(raw.name || raw.title || raw.official_name || raw.place_name || raw.placeName));
   if (!name) return null;
-  const town = str(raw.municipality || raw.town || raw.city || raw.locality || raw.municipality_or_city || (typeof raw.location === 'string' ? raw.location : '')).replace(/\s*\(.*$/, '').trim();
+  const town = stripPlaceIds(str(raw.municipality || raw.town || raw.city || raw.locality || raw.municipality_or_city || (typeof raw.location === 'string' ? raw.location : '')).replace(/\s*\(.*$/, ''));
   // The 150-spot file calls this `location`; it carries the address (often with
   // the plus code) even when there is no separate address field.
-  const address = str(raw.address || raw.full_address || raw.formatted_address || raw.vicinity || raw.exact_location_address || (typeof raw.location === 'string' ? raw.location : ''));
+  const address = stripPlaceIds(str(raw.address || raw.full_address || raw.formatted_address || raw.vicinity || raw.exact_location_address || (typeof raw.location === 'string' ? raw.location : '')));
   const rr = raw.ratings_and_reviews && typeof raw.ratings_and_reviews === 'object' ? raw.ratings_and_reviews : {};
   // Numeric review counts win over a `reviews` array (the 150-spot file carries
   // both `total_review_count` and a `reviews` array of quote objects).
@@ -400,6 +422,40 @@ function datasetInfo(){
 // server/spots.js still drives the map and the curated browsing screens, but it
 // is deliberately NOT mixed in here: if a place is not in the provided files,
 // the assistant says so instead of quietly answering from another list.
+function normalizedName(name){
+  return String(name || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+/** The first word that actually names the place ("patar" in "Patar Beach"). */
+function firstSignificantWord(normalized){
+  return normalized.split(' ').find(w => w.length > 2 && !STOP.has(w)) || '';
+}
+
+/**
+ * Could these two names be the same place spelled differently?
+ * Proximity alone cannot answer that: a mall puts a dozen different businesses
+ * on one coordinate. So either one name contains the other ("URESHII KOI" vs
+ * "URESHII KOI Japanese Restaurant"), or they lead with the same place word
+ * ("Patar Beach" vs "Patar White Sand Beach"). "Cabalen - SM City ..." and
+ * "Classic Savory - SM City ..." share only the mall, and stay separate.
+ */
+function samePlaceName(a, b){
+  const na = normalizedName(a), nb = normalizedName(b);
+  if (!na || !nb) return false;
+  if (na.includes(nb) || nb.includes(na)) return true;
+  const fa = firstSignificantWord(na);
+  return Boolean(fa) && fa === firstSignificantWord(nb);
+}
+
+/** Review counts arrive as "1.2k", "41" or 1200 — compare them as numbers. */
+function reviewCount(entry){
+  const m = String(entry && entry.reviews == null ? '' : entry.reviews).trim().match(/(\d+(?:\.\d+)?)\s*([kK])?/);
+  if (!m) return 0;
+  const n = Number(m[1]);
+  if (!Number.isFinite(n)) return 0;
+  return m[2] ? n * 1000 : n;
+}
+
 function allEntries(){
   const seen = new Set();
   const out = [];
@@ -410,9 +466,10 @@ function allEntries(){
     out.push(entry);
   }
   // Same place listed twice under slightly different names (pangasinan-150
-  // vs spots.json): the same pin (within 50m) + same town ⇒ one row. Keep the
-  // one with the higher review count. (A wider radius would wrongly merge
-  // genuinely distinct nearby places, e.g. neighbouring eateries.)
+  // vs spots.json): the same pin (within 50m) + same town + the same NAME ⇒ one
+  // row. Proximity alone is not enough: every tenant of a mall carries the
+  // mall's single coordinate, so "near each other" deleted Cabalen, Classic
+  // Savory and Starbucks as if they were one restaurant. Keep the fatter row.
   const byTown = new Map();
   for (const e of out){
     const k = String(e.town || '').toLowerCase();
@@ -427,9 +484,8 @@ function allEntries(){
       for (let j = i + 1; j < group.length; j++){
         const b = group[j];
         if (!(Number.isFinite(b.lat) && Number.isFinite(b.lng))) continue;
-        if (haversineKm(a.lng, a.lat, b.lng, b.lat) < 0.05){
-          // Same pin, same town, different name spelling — drop the thinner row.
-          const keepA = Number(a.reviews || 0) >= Number(b.reviews || 0);
+        if (haversineKm(a.lng, a.lat, b.lng, b.lat) < 0.05 && samePlaceName(a.name, b.name)){
+          const keepA = reviewCount(a) >= reviewCount(b);
           dup.add(keepA ? b.id : a.id);
         }
       }
