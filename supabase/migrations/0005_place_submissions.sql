@@ -6,7 +6,10 @@
 -- has no persistent disk: an approved place written to a file would disappear
 -- on the next deploy.
 --
--- Run by hand, then: notify pgrst, 'reload schema';
+-- Run by hand in the Supabase SQL editor. The whole job is this one file: it
+-- creates the table and its policies, creates the two photo buckets, and ends
+-- with the PostgREST reload. Without that reload the API keeps answering
+-- "table not found" until the next deploy, because PostgREST caches the schema.
 
 create table if not exists public.place_submissions (
   id            uuid primary key default gen_random_uuid(),
@@ -32,9 +35,14 @@ create table if not exists public.place_submissions (
   updated_at    timestamptz not null default now()
 );
 
--- One traveller cannot submit the same place twice while it is pending.
-create unique index if not exists place_submissions_once_per_user
-  on public.place_submissions (user_id, lower(btrim(name)), lower(btrim(town)));
+-- One traveller cannot submit the same place twice *while it is pending*. The
+-- status is in the predicate on purpose: a rejected place must be correctable
+-- and resubmitted, and an approved one is already a pin. Without it the client
+-- answers a corrected resubmission with "You already submitted this place."
+drop index if exists public.place_submissions_once_per_user;
+create unique index place_submissions_once_per_user
+  on public.place_submissions (user_id, lower(btrim(name)), lower(btrim(town)))
+  where status = 'pending';
 
 create index if not exists place_submissions_queue
   on public.place_submissions (status, created_at);
@@ -87,3 +95,7 @@ create policy "place-photos public read" on storage.objects
   for select using (bucket_id = 'place-photos');
 
 -- Service-role writes (approve copies the object) bypass RLS by design.
+
+-- PostgREST caches the schema. Without this the API answers 404 "Could not find
+-- the table 'public.place_submissions'" until the project restarts.
+notify pgrst, 'reload schema';
