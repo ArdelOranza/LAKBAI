@@ -641,7 +641,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
           <div className="quick-row">
             {followUp.map(({ icon:Icon, label, send:text }) => (
               <button key={label} type="button" className="quick-action" onClick={() => send(text)}>
-                <Icon size={13}/> {label}
+                <Icon size={12}/> {label}
               </button>
             ))}
           </div>

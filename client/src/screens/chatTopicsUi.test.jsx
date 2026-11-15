@@ -59,6 +59,10 @@ describe('chat topics after a fare answer', () => {
 
     const chips = [...container.querySelectorAll('.quick-action')].map(b => b.textContent);
     expect(chips.join(' | ')).toContain('Fare to another town');
+    // One pill is a suggestion; a wall of pills is clutter.
+    expect(chips.length).toBe(1);
+    expect([...container.querySelectorAll('.topic-tab')].map(b => b.textContent))
+      .toEqual(['Places', 'Food', 'Commute']);
 
     await React.act(async () => root.unmount());
     container.remove();

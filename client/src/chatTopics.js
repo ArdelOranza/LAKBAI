@@ -1,14 +1,14 @@
-// The five topics a traveler actually asks about, and the question each one
-// sends. The question follows the conversation: the place from the last answer,
+// The three questions a traveler actually asks, and the question each one
+// sends. Events and day plans are still answered from chat text; they do not
+// need a pill of their own above the composer.
+// The question follows the conversation: the place from the last answer,
 // else the town the GPS says you are in, else Pangasinan as a whole.
 import { haversineKm } from './geo.js';
 
 export const TOPICS = [
   { id: 'places', label: 'Places', icon: 'pin' },
   { id: 'food', label: 'Food', icon: 'food' },
-  { id: 'events', label: 'Events', icon: 'event' },
   { id: 'commute', label: 'Commute', icon: 'bus' },
-  { id: 'plan', label: 'Plan', icon: 'plan' },
 ];
 
 // Same town anchors the chips use — only to name the town, never to rank places.
@@ -28,9 +28,7 @@ const ACTIVE = {
   discover: 'places',
   nearby: 'places',
   food: 'food',
-  event: 'events',
   commute: 'commute',
-  plan: 'plan',
 };
 
 function nearestTown(coords){
@@ -45,24 +43,20 @@ function nearestTown(coords){
 
 function questionFor(id, place, town){
   if (place){
-    if (id === 'places') return `Show me places like ${place}`;
     if (id === 'food') return `Where should I eat near ${place}?`;
-    if (id === 'events') return `What festivals happen near ${place}?`;
     if (id === 'commute') return `How much is the bus fare to ${place}?`;
-    return `Plan a day trip to ${place}`;
+    return `Show me places like ${place}`;
   }
   const where = town || 'Pangasinan';
-  if (id === 'places') return `Tourist spots in ${where}`;
   if (id === 'food') return `Where should I eat in ${where}?`;
-  if (id === 'events') return `Which festivals and events are on in ${where}?`;
   // Without a named town the honest default is the provincial capital's route:
   // Cubao is the terminal most travelers actually leave from.
   if (id === 'commute') return town ? `How much is the bus fare from Cubao to ${town}?` : 'How much is the bus fare to Dagupan?';
-  return `Plan a day trip in ${where}`;
+  return `Tourist spots in ${where}`;
 }
 
 /**
- * Five tabs, each with the question it would send right now.
+ * Three tabs, each with the question it would send right now.
  * @param {{ lastAi?: { intent?: string, cards?: Array<{name: string}> }, coords?: {lng:number, lat:number}, hasFix?: boolean }} state
  */
 export function topicTabs({ lastAi, coords, hasFix = true } = {}){

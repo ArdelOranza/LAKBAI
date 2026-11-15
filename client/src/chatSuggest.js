@@ -16,7 +16,9 @@ const TOWNS = [
   { name: 'Mangaldan', lng: 120.4030, lat: 16.0700 },
 ];
 
-const MAX = 4;
+// One chip, not a row of them: the composer already carries the topic pills,
+// so the second row is a single contextual next question.
+const MAX = 1;
 
 function nearestTown(coords){
   if (!coords || !Number.isFinite(Number(coords.lng)) || !Number.isFinite(Number(coords.lat))) return null;
@@ -28,13 +30,10 @@ function nearestTown(coords){
   return best ? best.town : null;
 }
 
-const DEFAULT = [
-  { id: 'beach', label: 'Beaches near me', send: 'Best beaches near me' },
-  { id: 'festival', label: 'Festivals this month', send: 'Which festivals are on this month?' },
-];
+const DEFAULT = { id: 'beach', label: 'Beaches near me', send: 'Best beaches near me' };
 
 /**
- * Up to four chips for the current state.
+ * The single best chip for the current state.
  * @param {{ lastAi?: { intent?: string, cards?: Array<{name: string}> }, coords?: {lng:number, lat:number}, hasFix?: boolean }} state
  */
 export function suggestionsFor({ lastAi, coords, hasFix = true } = {}){
@@ -50,10 +49,8 @@ export function suggestionsFor({ lastAi, coords, hasFix = true } = {}){
 
   if (intent === 'commute'){
     add({ id: 'fare', label: 'Fare to another town', send: 'How much is the bus fare to Lingayen?' });
-    add({ id: 'terminal', label: 'Closest terminal', send: 'Which bus terminal near me goes to Manila?' });
   } else if (card && card.name){
     add({ id: 'plan', label: 'Plan a day here', send: 'Plan a day trip to ' + card.name });
-    add({ id: 'more', label: 'More like this', send: 'Show me more places like ' + card.name });
   }
 
   // Without a fix `coords` is the province fallback centre, not the traveler's
@@ -67,6 +64,6 @@ export function suggestionsFor({ lastAi, coords, hasFix = true } = {}){
     });
   }
 
-  if (!out.length) DEFAULT.forEach(add);
+  add(DEFAULT);
   return out;
 }

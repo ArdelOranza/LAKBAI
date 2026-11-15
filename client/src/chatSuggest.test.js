@@ -11,30 +11,27 @@ const FAR_AWAY = { lng: 121.0, lat: 14.6 };
 const labels = list => list.map(s => s.label);
 
 describe('suggestionsFor', () => {
-  it('offers more fare questions right after a fare answer', () => {
+  it('offers the single best next question after a fare answer', () => {
     const list = suggestionsFor({ lastAi: { intent: 'commute', text: 'Ordinary is ₱467.50.' } });
-    expect(labels(list)).toContain('Fare to another town');
-    expect(labels(list)).toContain('Closest terminal');
+    expect(labels(list)).toEqual(['Fare to another town']);
     expect(labels(list)).not.toContain('Plan a day here');
   });
 
-  it('keeps the place follow-ups after a place answer', () => {
+  it('keeps the place follow-up after a place answer', () => {
     const list = suggestionsFor({ lastAi: { cards: [{ name: 'Patar White Sand Beach' }] } });
-    expect(labels(list)).toContain('Plan a day here');
-    expect(labels(list)).toContain('More like this');
-    expect(list.find(s => s.label === 'Plan a day here').send).toContain('Patar White Sand Beach');
+    expect(labels(list)).toEqual(['Plan a day here']);
+    expect(list[0].send).toContain('Patar White Sand Beach');
   });
 
   it('knows which town the traveler is standing in', () => {
     const list = suggestionsFor({ coords: DAGUPAN });
-    expect(labels(list)).toContain('Bus from Cubao to Dagupan');
+    expect(labels(list)).toEqual(['Bus from Cubao to Dagupan']);
     expect(labels(list)).not.toContain('Beaches near me');
   });
 
-  it('falls back to general prompts when the fix is outside Pangasinan', () => {
+  it('falls back to the one general prompt when the fix is outside Pangasinan', () => {
     const list = suggestionsFor({ coords: FAR_AWAY });
-    expect(labels(list)).toContain('Beaches near me');
-    expect(labels(list)).toContain('Festivals this month');
+    expect(labels(list)).toEqual(['Beaches near me']);
   });
 
   it('does not name the fallback town when there is no GPS fix', () => {
@@ -43,15 +40,15 @@ describe('suggestionsFor', () => {
     const FALLBACK = { lng: 120.23, lat: 16.03 };
     const list = suggestionsFor({ coords: FALLBACK, hasFix: false });
     expect(labels(list)).not.toContain('Bus from Cubao to Lingayen');
-    expect(labels(list)).toContain('Beaches near me');
+    expect(labels(list)).toEqual(['Beaches near me']);
   });
 
-  it('never repeats a chip and never returns more than four', () => {
+  it('never repeats a chip and never returns more than one', () => {
     const list = suggestionsFor({
       lastAi: { intent: 'commute', cards: [{ name: 'Patar White Sand Beach' }] },
       coords: DAGUPAN,
     });
-    expect(list.length).toBeLessThanOrEqual(4);
+    expect(list.length).toBe(1);
     expect(new Set(labels(list)).size).toBe(list.length);
   });
 
