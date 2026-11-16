@@ -45,6 +45,43 @@ const FEATURE = new Set([
   'lighthouse', 'garden', 'mountain', 'hill', 'lake', 'rock', 'resort', 'hotel',
 ]);
 
+// A Commons file that is not a photograph cannot caption a place. Ruby's
+// (Labrador) showed page one of an FBI report: its PDF title carried "2402"
+// and "Jack Ruby", so it passed a title match it should never have reached.
+const NOT_PHOTO = /\.(pdf|djvu|svg|gif|ogv|webm|ogg|mp3|wav|flac|xcf|stl|zip)\s*$/i;
+
+// Address parts that name a region, not the town. Useless as a search hint,
+// and "Pangasinan" would pull province-wide photo dumps back in.
+const REGION = new Set([
+  'philippines', 'philippine', 'pangasinan', 'luzon', 'region i',
+  'ilocos region', 'central luzon'
+]);
+
+/** The town to pair with a place name in a Commons search query.
+ *  "Lingayen, 2401, Philippines" used to yield "2401" — the postcode — and
+ *  "intitle:lingayen beach 2401" matches nothing. Plus codes are worse: the
+ *  curated Lingayen Beach address ends "(Plus Codes: 26PM+RQ9, 26PJ+WG4, ...)",
+ *  so splitting on commas handed Commons "26PJ+JCH)". Drop the noise and take
+ *  the last real locality, so a street or barangay in front of it cannot win. */
+function hintFromAddress(address){
+  const clean = String(address || '').replace(/\([^)]*\)/g, ' ');
+  const parts = clean.split(',').map(s => s.trim()).filter(Boolean);
+  const places = parts.filter(p =>
+    !/^\d[\d\s-]*$/.test(p) &&                 // bare postcode
+    !/^\d{4}\s/.test(p) &&                     // "2401 Pangasinan"
+    !/\b[0-9A-Z]{4}\+[0-9A-Z]{2,}/i.test(p) && // plus code
+    !REGION.has(p.toLowerCase())
+  );
+  return places.length ? places[places.length - 1] : '';
+}
+
+/** The town hint for a place row. An explicit hint (curated dataset or admin
+ *  row) is deliberate, so it wins; only a row without one parses its address. */
+function photoHint(place){
+  const explicit = String((place && (place.hint || place.town)) || '').trim();
+  return explicit || hintFromAddress(place && place.address);
+}
+
 // A compound name ("Lingayen Beach & Lingayen Baywalk") is one destination, so
 // a file that names any of its parts is honest. The primary segment drives the
 // search query; every segment is allowed to satisfy the match.
@@ -56,6 +93,19 @@ function segments(name){
 }
 function primaryName(name){
   return segments(name)[0] || String(name || '');
+}
+
+/** True when a place has no name of its own — Mapbox labels some shops just
+ *  "Lingayen", the town they sit in. Every town file would then "match", which
+ *  is how a church captioned an ice-cream shop. Without a feature noun to pin
+ *  (a real "Lingayen Beach" still searches), a town-only name gets no lookup. */
+function namesOnlyTown(name, hint){
+  const own = tokens(primaryName(name));
+  if (own.some(t => FEATURE.has(t))) return false;
+  const distinctive = own.filter(t => !DESCRIPTOR.has(t) && !FEATURE.has(t));
+  if (!distinctive.length) return true;
+  const town = new Set(tokens(hint));
+  return distinctive.every(t => town.has(t));
 }
 
 /** Lowercase word tokens with file/place boilerplate dropped. */
@@ -85,8 +135,11 @@ function searchFor(name, hint){
 /** Conservative match: the distinctive words of one name segment must all
  *  appear in the file title, at least one feature noun must appear too, a
  *  numbered feature must keep its own number, and an unrelated subject in the
- *  title rejects the file outright. */
-function strictRelevant(title, name){
+ *  title rejects the file outright. A name with no feature noun of its own
+ *  (a barangay, a beach with a bare name) also needs the file to say what kind
+ *  of place it is, name the town, or name the province — see the note below. */
+function strictRelevant(title, name, hint){
+  if (NOT_PHOTO.test(String(title || ''))) return false;
   const have = tokens(title);
   const haveSet = new Set(have);
   const want = new Set(String(name || '').match(/\d+/g) || []);
@@ -109,14 +162,26 @@ function strictRelevant(title, name){
     if (!distinctive.every(k => haveSet.has(k))) return false;
     // Without a feature noun any file that repeats the town would pass.
     if (features.length && !features.some(f => haveSet.has(f))) return false;
+    // "Patar" is also an Indian poet, "Labrador" a dog breed and "Agno" a map
+    // of a Swiss village. With no feature noun of its own the name alone proves
+    // nothing, so the file must say what kind of place it is ("Tondol Beach"),
+    // name its town, or carry the province ("Sual pangasinan").
+    if (!features.length) {
+      const namesFeature = have.some(t => FEATURE.has(t));
+      const town = tokens(hint);
+      const namesTown = town.length > 0 && town.every(t => haveSet.has(t));
+      // Province names are STOP words for matching, so read them raw.
+      const namesRegion = /\b(?:pangasinan|philippines)\b/i.test(String(title || ''));
+      if (!namesFeature && !namesTown && !namesRegion) return false;
+    }
     if (have.some(t => JUNK.has(t) && !keys.includes(t))) return false;
     return true;
   });
 }
 
-function pickStrict(data, name){
+function pickStrict(data, name, hint){
   const pages = (data.query && data.query.pages) || {};
-  const relevant = Object.values(pages).filter(p => p.thumbnail && strictRelevant(p.title, name));
+  const relevant = Object.values(pages).filter(p => p.thumbnail && strictRelevant(p.title, name, hint));
   // Prefer the file whose title says the least beyond the place name: "Lingayen
   // Beach.jpg" beats "Lingayen Beach, Labrador mountain view (...).jpg".
   const known = new Set(tokens(name));
@@ -144,11 +209,12 @@ async function commons(fetcher, params){
 /** Commons file search by place name + town. The query is the only place
  *  signal: coordinates are accepted for callers' convenience and ignored. */
 async function findBySearch(fetcher, name, hint){
+  if (namesOnlyTown(name, hint)) return null;
   const byName = await commons(fetcher, {
     generator: 'search', gsrsearch: searchFor(name, hint),
     gsrnamespace: '6', gsrlimit: '10'
   });
-  return byName ? pickStrict(byName, name) : null;
+  return byName ? pickStrict(byName, name, hint) : null;
 }
 
 /** Commons-only lookup with strict title matching (used to build the
@@ -174,4 +240,4 @@ async function findPhoto(name, hint, lng, lat, deps = {}){
   }
 }
 
-module.exports = { findPhoto, findCommonsPhoto, strictRelevant, pickStrict };
+module.exports = { findPhoto, findCommonsPhoto, strictRelevant, pickStrict, hintFromAddress, photoHint };

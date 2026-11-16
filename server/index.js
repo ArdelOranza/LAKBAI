@@ -165,25 +165,21 @@ const adminStore = require('./adminSpots.js');
 const adminPhotos = require('./adminPhotos.js');
 const spotList = require('./spotList.js');
 const community = require('./communityPlaces.js');
-const { findPhoto } = require('./photos.js');
+const { findPhoto, photoHint } = require('./photos.js');
 
 // --- real-photo hierarchy: 1 JSON → 2 Wikimedia → 3 Mapbox (client fallback)
 // JSON = curated dataset / admin-verified URL (wins). Wikimedia = real photo
 // found via commons search (secondary). Mapbox = static map (client-only last resort).
 const photoCache = new Map(); // key -> { value, at }
 const PHOTO_TTL = 60 * 60 * 1000;
-function hintFromAddress(address){
-  const parts = String(address || '').split(',').map(s => s.trim()).filter(Boolean);
-  return parts.length > 2 ? parts[parts.length - 2] : (parts[0] || '');
-}
 async function enrichWithPhoto(place){
   // Hierarchy 1: any photo the place already carries wins — curated, admin or
   // the committed Wikimedia map — and every photo in the list is preserved.
   const existing = existingPhoto(place);
   if (existing) return { ...place, ...existing };
-  // Hierarchy 2: Wikimedia real photo. A dataset row usually has no address, so
-  // the town it already carries is the search hint.
-  const hint = hintFromAddress(place.address) || String(place.hint || place.town || '').trim();
+  // Hierarchy 2: Wikimedia real photo. A curated row knows its hint; a dataset
+  // row without one has the town parsed out of its address.
+  const hint = photoHint(place);
   const key = String(place.name || '').toLowerCase() + '|' + hint;
   const hit = photoCache.get(key);
   if (hit && Date.now() - hit.at < PHOTO_TTL){
