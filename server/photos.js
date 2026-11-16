@@ -24,7 +24,7 @@ const JUNK = new Set([
   'interior', 'altar', 'wedding', 'reception', 'selfie', 'portrait',
   'screenshot', 'logo', 'seal', 'diagram', 'certificate', 'poster', 'banner',
   'document', 'collage', 'brochure', 'flyer', 'scan', 'map', 'room', 'lobby',
-  'menu', 'tarpaulin',
+  'menu', 'tarpaulin', 'flag', 'flags',
 ]);
 
 // Words that describe how a place looks, not which place it is. "Abagatanen
@@ -49,6 +49,28 @@ const FEATURE = new Set([
 // (Labrador) showed page one of an FBI report: its PDF title carried "2402"
 // and "Jack Ruby", so it passed a title match it should never have reached.
 const NOT_PHOTO = /\.(pdf|djvu|svg|gif|ogv|webm|ogg|mp3|wav|flac|xcf|stl|zip)\s*$/i;
+
+// A seal, an icon or a locator map is small. A photograph of a place is not:
+// "Calasiao Pangasinan.png" was the municipal seal at 150x165.
+const MIN_PHOTO_PX = 400;
+
+// How far a file may be geotagged from the place it claims to show. A town and
+// its barangays fit well inside this; another province or country does not.
+const MAX_KM = 40;
+
+// Pangasinan's municipalities and cities. A file whose category names a
+// different one of them is a photo of that other place: "Burgos" was captioned
+// with the San Carlos City Hall because its category said San Carlos.
+const PANGASINAN_TOWNS = [
+  'agno', 'aguilar', 'alaminos', 'alcala', 'anda', 'asingan', 'balungao',
+  'bani', 'basista', 'bautista', 'bayambang', 'binalonan', 'binmaley',
+  'bolinao', 'bugallon', 'burgos', 'calasiao', 'dagupan', 'dasol', 'infanta',
+  'labrador', 'laoac', 'lingayen', 'mabini', 'malasiqui', 'manaoag',
+  'mangaldan', 'mangatarem', 'mapandan', 'natividad', 'pozorrubio', 'rosales',
+  'san carlos', 'san fabian', 'san jacinto', 'san manuel', 'san nicolas',
+  'san quintin', 'santa barbara', 'santa maria', 'santo tomas', 'sison',
+  'sual', 'tayug', 'umingan', 'urbiztondo', 'urdaneta', 'villasis'
+];
 
 // Address parts that name a region, not the town. Useless as a search hint,
 // and "Pangasinan" would pull province-wide photo dumps back in.
@@ -80,6 +102,20 @@ function hintFromAddress(address){
 function photoHint(place){
   const explicit = String((place && (place.hint || place.town)) || '').trim();
   return explicit || hintFromAddress(place && place.address);
+}
+
+/** Cache key for a Commons lookup. Same-name places at different coordinates
+ *  are different places: "Santo Tomas" near Manaoag is not the municipality
+ *  50 km away, and must not reuse its market photo. Three decimals is about
+ *  100 m, so repeat requests for one place still hit. */
+function photoCacheKey(place){
+  const name = String((place && place.name) || '').toLowerCase();
+  const lat = Number(place && place.lat);
+  const lng = Number(place && place.lng);
+  const at = Number.isFinite(lat) && Number.isFinite(lng)
+    ? lat.toFixed(3) + ',' + lng.toFixed(3)
+    : '';
+  return name + '|' + photoHint(place).toLowerCase() + '|' + at;
 }
 
 // A compound name ("Lingayen Beach & Lingayen Baywalk") is one destination, so
@@ -132,13 +168,32 @@ function searchFor(name, hint){
   return q || town;
 }
 
+/** Great-circle distance in km between two {lat,lng} points. */
+function kmBetween(a, b){
+  const R = 6371, rad = d => d * Math.PI / 180;
+  const dLat = rad(b.lat - a.lat), dLon = rad(b.lng - a.lng);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+/** True when text names a Pangasinan town that is not this place. */
+function otherTown(text, name, hint){
+  const lower = String(text || '').toLowerCase();
+  if (!lower) return false;
+  const own = new Set([...tokens(name), ...tokens(hint)]);
+  return PANGASINAN_TOWNS.some(town =>
+    new RegExp('\\b' + town + '\\b').test(lower) &&
+    !town.split(' ').every(w => own.has(w))
+  );
+}
+
 /** Conservative match: the distinctive words of one name segment must all
  *  appear in the file title, at least one feature noun must appear too, a
  *  numbered feature must keep its own number, and an unrelated subject in the
  *  title rejects the file outright. A name with no feature noun of its own
- *  (a barangay, a beach with a bare name) also needs the file to say what kind
- *  of place it is, name the town, or name the province — see the note below. */
-function strictRelevant(title, name, hint){
+ *  (a barangay, a beach with a bare name) also needs location proof — the
+ *  province in the title, or `located` from Commons metadata — see below. */
+function strictRelevant(title, name, hint, located){
   if (NOT_PHOTO.test(String(title || ''))) return false;
   const have = tokens(title);
   const haveSet = new Set(have);
@@ -162,26 +217,61 @@ function strictRelevant(title, name, hint){
     if (!distinctive.every(k => haveSet.has(k))) return false;
     // Without a feature noun any file that repeats the town would pass.
     if (features.length && !features.some(f => haveSet.has(f))) return false;
-    // "Patar" is also an Indian poet, "Labrador" a dog breed and "Agno" a map
-    // of a Swiss village. With no feature noun of its own the name alone proves
-    // nothing, so the file must say what kind of place it is ("Tondol Beach"),
-    // name its town, or carry the province ("Sual pangasinan").
+    // "Patar" is also an Indian poet, "Labrador" a dog breed, "Agno" a map of
+    // a Swiss village and "Bautista" a river in Venezuela. With no feature noun
+    // of its own the name alone proves nothing, and a feature word in the file
+    // ("River") does not prove location. The file must carry the province in
+    // its title or prove its location through Commons metadata.
     if (!features.length) {
-      const namesFeature = have.some(t => FEATURE.has(t));
-      const town = tokens(hint);
-      const namesTown = town.length > 0 && town.every(t => haveSet.has(t));
       // Province names are STOP words for matching, so read them raw.
       const namesRegion = /\b(?:pangasinan|philippines)\b/i.test(String(title || ''));
-      if (!namesFeature && !namesTown && !namesRegion) return false;
+      if (!namesRegion && !located) return false;
     }
     if (have.some(t => JUNK.has(t) && !keys.includes(t))) return false;
     return true;
   });
 }
 
-function pickStrict(data, name, hint){
+function pickStrict(data, name, hint, place){
   const pages = (data.query && data.query.pages) || {};
-  const relevant = Object.values(pages).filter(p => p.thumbnail && strictRelevant(p.title, name, hint));
+  const here = place && Number.isFinite(place.lat) && Number.isFinite(place.lng) ? place : null;
+  const cats = p => (p.categories || []).map(c => String(c.title || '').replace(/^category:\s*/i, ''));
+  // Distance from the place, or null when either side has no coordinates.
+  const km = p => {
+    const c = p.coordinates && p.coordinates[0];
+    if (!here || !c || !Number.isFinite(c.lat) || !Number.isFinite(c.lon)) return null;
+    return kmBetween(here, { lat: c.lat, lng: c.lon });
+  };
+  const near = p => {
+    const d = km(p);
+    return d !== null && d <= MAX_KM;
+  };
+  // Location proof for a bare name: the file is geotagged here, its categories
+  // name the province/country, or a category is the town itself. A category
+  // that names a different Pangasinan town disproves it instead.
+  const located = p => {
+    if (near(p)) return true;
+    const list = cats(p);
+    if (list.some(c => otherTown(c, name, hint))) return false;
+    const own = new Set([...tokens(name), ...tokens(hint)]);
+    return list.some(c => {
+      if (/\b(?:pangasinan|philippines)\b/i.test(c)) return true;
+      const words = tokens(c);
+      return words.length > 0 && words.every(w => own.has(w));
+    });
+  };
+  const relevant = Object.values(pages).filter(p => {
+    if (!p.thumbnail) return false;
+    // A seal or an icon cannot stand in for a photograph of the place.
+    const info = p.imageinfo && p.imageinfo[0];
+    if (info && Math.max(info.width || 0, info.height || 0) < MIN_PHOTO_PX) return false;
+    if (!strictRelevant(p.title, name, hint, located(p))) return false;
+    // Reject a file that says it was taken somewhere else. Only checked when
+    // both the file and the place carry coordinates; a miss is not a lie.
+    const d = km(p);
+    if (d !== null && d > MAX_KM) return false;
+    return true;
+  });
   // Prefer the file whose title says the least beyond the place name: "Lingayen
   // Beach.jpg" beats "Lingayen Beach, Labrador mountain view (...).jpg".
   const known = new Set(tokens(name));
@@ -206,15 +296,18 @@ async function commons(fetcher, params){
   return r.json();
 }
 
-/** Commons file search by place name + town. The query is the only place
- *  signal: coordinates are accepted for callers' convenience and ignored. */
-async function findBySearch(fetcher, name, hint){
+/** Commons file search by place name + town. The query is a name search; the
+ *  coordinates and categories only validate a hit that Commons places
+ *  somewhere else. */
+async function findBySearch(fetcher, name, hint, lat, lng){
   if (namesOnlyTown(name, hint)) return null;
   const byName = await commons(fetcher, {
     generator: 'search', gsrsearch: searchFor(name, hint),
-    gsrnamespace: '6', gsrlimit: '10'
+    gsrnamespace: '6', gsrlimit: '10',
+    prop: 'pageimages|imageinfo|coordinates|categories',
+    iiprop: 'size', clshow: '!hidden', cllimit: '20'
   });
-  return byName ? pickStrict(byName, name, hint) : null;
+  return byName ? pickStrict(byName, name, hint, { lat, lng }) : null;
 }
 
 /** Commons-only lookup with strict title matching (used to build the
@@ -222,7 +315,7 @@ async function findBySearch(fetcher, name, hint){
 async function findCommonsPhoto(name, hint, lng, lat, deps = {}){
   const fetcher = deps.fetch || fetch;
   try {
-    return await findBySearch(fetcher, name, hint);
+    return await findBySearch(fetcher, name, hint, lat, lng);
   } catch (e) {
     if (e && e.status === 429) throw e;
     return null;
@@ -234,10 +327,10 @@ async function findCommonsPhoto(name, hint, lng, lat, deps = {}){
 async function findPhoto(name, hint, lng, lat, deps = {}){
   const fetcher = deps.fetch || fetch;
   try {
-    return await findBySearch(fetcher, name, hint);
+    return await findBySearch(fetcher, name, hint, lat, lng);
   } catch {
     return null;
   }
 }
 
-module.exports = { findPhoto, findCommonsPhoto, strictRelevant, pickStrict, hintFromAddress, photoHint };
+module.exports = { findPhoto, findCommonsPhoto, strictRelevant, pickStrict, hintFromAddress, photoHint, photoCacheKey };

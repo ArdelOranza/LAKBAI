@@ -1,9 +1,18 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { strictRelevant, findPhoto, findCommonsPhoto, hintFromAddress, photoHint } = require('../photos.js');
+const { strictRelevant, findPhoto, findCommonsPhoto, hintFromAddress, photoHint, pickStrict, photoCacheKey } = require('../photos.js');
 
 const pages = (...titles) => ({ query: { pages: Object.fromEntries(
   titles.map((t, i) => [i + 1, { title: t, thumbnail: { source: 'http://x/' + i + '.jpg' } }])
+) } });
+
+/** One page with extra Commons metadata (size, coordinates). */
+const pageList = (...specs) => ({ query: { pages: Object.fromEntries(
+  specs.map((s, i) => [i + 1, {
+    title: s.title,
+    thumbnail: { source: 'http://x/' + i + '.jpg' },
+    ...(s.extra || {})
+  }])
 ) } });
 
 function respondWith(data, calls = []){
@@ -82,6 +91,7 @@ test('findPhoto searches names only and never geosearches', async () => {
   // stays plain so the search is not over-specific.
   assert.equal(q, 'intitle:patar beach Bolinao');
   assert.equal(new URL(calls[0]).searchParams.get('generator'), 'search');
+  assert.ok(calls[0].includes('categories'), 'location metadata arrives in the same call');
   assert.ok(!calls[0].includes('geosearch'), calls[0]);
   assert.ok(!calls[0].includes('ggscoord'), calls[0]);
 });
@@ -198,20 +208,51 @@ test('a place named only after its town gets no borrowed photo', async () => {
   assert.equal(calls.length, 0, 'no lookup at all for a town-only name');
 });
 
-test('a name with no feature noun needs the file to say what kind of place it is', () => {
+test('a bare name needs location proof, not just a feature word', () => {
   // These places carry no address, so there is no town to lean on. "Patar" is
   // also an Indian poet, "Labrador" a dog breed, "Agno" a Swiss village whose
-  // map scan reads "Agno - Swisstopo". Only a file that names a feature (or the
-  // town/province) is about the Philippine place.
+  // map scan reads "Agno - Swisstopo", and "Bautista" a river in Venezuela.
   assert.equal(strictRelevant('File:Surjit Patar.jpg', 'Patar'), false);
   assert.equal(strictRelevant('File:400-mork-labrador.png', 'Labrador'), false);
   assert.equal(strictRelevant('File:Agno - Swisstopo technical image 000-408-205.tif.jpg', 'Agno'), false);
   assert.equal(strictRelevant('File:5877San Agustin, Alaminos, Laguna 54.jpg', 'Alaminos'), false);
   assert.equal(strictRelevant('File:Ruby In Pool After Fetch.jpg', "Ruby's", 'Labrador'), false);
-  // A real place photo still passes: it says "beach" or names the province.
-  assert.equal(strictRelevant('File:Tondol Beach Sunset by Gerald Mondala.jpg', 'Tondol'), true);
-  assert.equal(strictRelevant('File:Bolinao beach low tide.jpg', 'Bolinao'), true);
+  // "Tondol Beach Sunset" names a feature, but so does "Bautista River". A
+  // feature word is not location proof, so Commons metadata has to place the
+  // file in Pangasinan (or at the place).
+  const tondol = pageList({
+    title: 'File:Tondol Beach Sunset by Gerald Mondala.jpg',
+    extra: { categories: [{ title: 'Category:Sunsets of the Philippines' }] }
+  });
+  assert.ok(pickStrict(tondol, 'Tondol', 'Tondol', { lat: 16.3, lng: 119.9 }));
+  const patar = pageList({
+    title: 'File:Patar Beach.jpg',
+    extra: { categories: [{ title: 'Category:Pangasinan' }] }
+  });
+  assert.ok(pickStrict(patar, 'Patar', 'Bolinao', { lat: 16.12, lng: 119.79 }));
+  const bolinao = pageList({
+    title: 'File:Bolinao beach low tide.jpg',
+    extra: { coordinates: [{ lat: 16.356, lon: 119.813 }] }
+  });
+  assert.ok(pickStrict(bolinao, 'Bolinao', 'Bolinao', { lat: 16.33, lng: 119.79 }));
+  // The province in the title is location proof by itself.
   assert.equal(strictRelevant('File:Sual pangasinan.jpg', 'Sual'), true);
+});
+
+test('a category naming another Pangasinan town is not location proof', () => {
+  // "Burgos" was captioned with the San Carlos City Hall photo: the category
+  // says San Carlos, and San Carlos is a different municipality.
+  const burgos = pageList({
+    title: 'File:05219jfBonifacio Burgos Soriano Palaris Halls Park San Carlos Pangasin5.JPG',
+    extra: { categories: [{ title: 'Category:San Carlos City Hall (Pangasinan)' }] }
+  });
+  assert.equal(pickStrict(burgos, 'Burgos', 'Burgos', { lat: 16.07, lng: 119.87 }), null);
+  // A category that is the town itself is fine: this is the Balungao bridge.
+  const balungao = pageList({
+    title: 'File:Balungao-bridge-Mt.jf6077 03.JPG',
+    extra: { categories: [{ title: 'Category:Balungao' }] }
+  });
+  assert.ok(pickStrict(balungao, 'Balungao', 'Balungao', { lat: 15.9, lng: 120.5 }));
 });
 
 test('plus codes and postcodes never become the town hint', () => {
@@ -240,6 +281,63 @@ test('findPhoto refuses a namesake with no address to disambiguate it', async ()
   assert.equal(await findPhoto('Patar', '', undefined, undefined, { fetch: fake }), null);
   assert.equal(await findPhoto('Labrador', '', undefined, undefined, { fetch: fake }), null);
   assert.equal(await findPhoto('Agno', '', undefined, undefined, { fetch: fake }), null);
+});
+
+test('a municipal flag is not a photo of the place', () => {
+  // Anda, Infanta, Mabini, Mangatarem and Pozorrubio all showed their town
+  // flag because the flag file names the town, not a place that looks like it.
+  assert.equal(strictRelevant('File:Flag of Anda, Pangasinan.png', 'Anda', 'Anda'), false);
+  assert.equal(strictRelevant('File:Flag of Mabini, Pangasinan.png', 'Mabini', 'Mabini'), false);
+  assert.equal(strictRelevant('File:Flag of Pozorrubio, Pangasinan.png', 'Pozorrubio', 'Pozorrubio'), false);
+});
+
+test('a seal or icon smaller than a photo is not a place photo', () => {
+  // Calasiao showed "Calasiao Pangasinan.png" — the municipal seal, 150x165.
+  const data = pageList({ title: 'File:Calasiao Pangasinan.png', extra: { imageinfo: [{ width: 150, height: 165, mime: 'image/png' }] } });
+  assert.equal(pickStrict(data, 'Calasiao', 'Calasiao', { lat: 16.0, lng: 120.35 }), null);
+});
+
+test('a same-named place in another country is not a place photo', () => {
+  // Bautista is a river in Venezuela, Santa Maria is a font in Spain, Santa
+  // Barbara is a California mission and a US town hall. The titles name the
+  // town and nothing that places them in Pangasinan.
+  assert.equal(strictRelevant('File:Boy playing in San Juan Bautista River.jpg', 'Bautista', 'Bautista'), false);
+  assert.equal(strictRelevant('File:Santa Maria Organyà Pila bautismal.jpg', 'Santa Maria De Pila', 'Santa Maria'), false);
+  assert.equal(strictRelevant('File:Santa Barbara Town Hall Monique Limon.jpg', 'Santa Barbara Town Hall', 'Santa Barbara'), false);
+  assert.equal(strictRelevant('File:Inlaid decoration of shells for tabernacle at Mission Santa Barbara, ca.1905 (CHS-4463).jpg', 'Shell | Santa Barbara', 'Santa Barbara'), false);
+});
+
+test('a file geotagged far away is rejected even when the title matches', () => {
+  // "Santo Tomas City Public Market, Batangas" is 250 km from Pangasinan;
+  // "Agoo, La Union" is 56 km. Commons knows where its files were taken.
+  const far = pageList({
+    title: 'File:Santo Tomas City Public Market, Batangas, Sep 2026.jpg',
+    extra: { coordinates: [{ lat: 14.1, lon: 121.1 }] }
+  });
+  assert.equal(pickStrict(far, 'Santo Tomas Public Market', 'Santo Tomas', { lat: 15.85, lng: 120.6 }), null);
+
+  const near = pageList({
+    title: 'File:Santo Tomas Public Market, Pangasinan.jpg',
+    extra: { coordinates: [{ lat: 15.86, lon: 120.61 }] }
+  });
+  assert.ok(pickStrict(near, 'Santo Tomas Public Market', 'Santo Tomas', { lat: 15.85, lng: 120.6 }));
+});
+
+test('the province still lets a correct town photo through', () => {
+  assert.equal(strictRelevant('File:Sual pangasinan.jpg', 'Sual', 'Sual'), true);
+  assert.equal(strictRelevant('File:9324Baay, Lingayen, Pangasinan 44.jpg', 'Lingayen', 'Lingayen'), true);
+});
+
+test('the photo cache never shares a lookup between same-named places', () => {
+  // Two Mapbox results called "Santo Tomas" 50 km apart shared one cache slot,
+  // so the one near Manaoag was served the municipality's market photo.
+  const town = photoCacheKey({ name: 'Santo Tomas', lat: 15.8671, lng: 120.5801 });
+  const elsewhere = photoCacheKey({ name: 'Santo Tomas', lat: 16.2837, lng: 120.3887 });
+  assert.notEqual(town, elsewhere);
+  // The same place asked twice still hits its own entry.
+  assert.equal(town, photoCacheKey({ name: 'santo tomas', lat: 15.867, lng: 120.58 }));
+  // A row without coordinates keeps the old name|hint key.
+  assert.equal(photoCacheKey({ name: 'Patar', hint: 'Bolinao' }), 'patar|bolinao|');
 });
 
 test('findCommonsPhoto surfaces rate limiting so callers can back off', async () => {

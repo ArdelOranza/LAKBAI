@@ -165,7 +165,7 @@ const adminStore = require('./adminSpots.js');
 const adminPhotos = require('./adminPhotos.js');
 const spotList = require('./spotList.js');
 const community = require('./communityPlaces.js');
-const { findPhoto, photoHint } = require('./photos.js');
+const { findPhoto, photoHint, photoCacheKey } = require('./photos.js');
 
 // --- real-photo hierarchy: 1 JSON → 2 Wikimedia → 3 Mapbox (client fallback)
 // JSON = curated dataset / admin-verified URL (wins). Wikimedia = real photo
@@ -180,7 +180,7 @@ async function enrichWithPhoto(place){
   // Hierarchy 2: Wikimedia real photo. A curated row knows its hint; a dataset
   // row without one has the town parsed out of its address.
   const hint = photoHint(place);
-  const key = String(place.name || '').toLowerCase() + '|' + hint;
+  const key = photoCacheKey(place);
   const hit = photoCache.get(key);
   if (hit && Date.now() - hit.at < PHOTO_TTL){
     return hit.value
