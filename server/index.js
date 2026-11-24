@@ -45,14 +45,24 @@ const { cached } = require('./aiCache.js');
 const { datasetInfo, localChat, localRecommend, allEntries } = require('./dataset.js');
 const { groundedChat, groundedRecommend } = require('./grounded.js');
 const { existingPhoto } = require('./photoHierarchy.js');
+const { aiStatus } = require('./aiStatus.js');
+const { cooldownFor } = require('./aiBreaker.js');
 const AI_TTL_MS = Number(process.env.AI_TTL_MS) || 15 * 60000;
 // LAKBAI_AI=off → answer straight from the dataset with no model call at all.
 const USE_AI = String(process.env.LAKBAI_AI || '').toLowerCase() !== 'off';
 // When the model quota is out, stop retrying on every message: serve dataset
 // answers for a few minutes instead of paying the backoff on each request.
+// A provider that names its window (Groq: "try again in 42s") only arms the
+// breaker for that long; everything else gets the full cooldown.
 let aiDownUntil = 0;
-const AI_COOLDOWN_MS = 5 * 60000;
+const tripBreaker = (e) => { aiDownUntil = Date.now() + cooldownFor(e); };
 const aiUsable = () => USE_AI && Date.now() > aiDownUntil;
+// The app's chat dot reads this: is the model path usable right now? No model
+// call and no cache, so a cold API answers instantly and a breaker that tripped
+// after a failed message is reflected on the next check.
+app.get('/api/ai-status', (req, res) => {
+  res.json(aiStatus({ useAi: USE_AI, downUntil: aiDownUntil }));
+});
 app.post('/api/recommend', async (req, res) => {
   try {
     const message = boundedMessage(req);
@@ -67,14 +77,13 @@ app.post('/api/recommend', async (req, res) => {
     // dataset<->AI modes) can't serve a stale answer from the previous world.
     const sig = info.ready ? info.sig : 'nodataset';
     const key = `r:${sig}:${message}|${proxKey}|${prefs.slice().sort().join(',')}`;
-    const tripBreaker = () => { aiDownUntil = Date.now() + AI_COOLDOWN_MS; };
     // Installed dataset wins: the AI may only reference those verified rows. If
     // it is unavailable, answer straight from the dataset — and do not cache
     // that fallback, so a transient model hiccup is not served for 15 minutes.
     if (info.ready) {
       if (aiUsable()) {
         try { return res.json(await enrichRecommend(await cached(key, AI_TTL_MS, () => groundedRecommend(message, proximity, prefs), { onStale: tripBreaker }))); }
-        catch (e) { tripBreaker(); console.warn('grounded recommend failed:', e.message); }
+        catch (e) { tripBreaker(e); console.warn('grounded recommend failed:', e.message); }
       }
       return res.json(await enrichRecommend(await localRecommend(message, proximity, prefs)));
     }
@@ -104,11 +113,10 @@ app.post('/api/chat', async (req, res) => {
     // directory version does the same for terminal answers. The profile
     // fingerprint rides along too, so Ana's itinerary is never served to Ben.
     const key = `d:${sig}:${commuteVersion()}:${terminalsVersion()}:${message}|${proxKey}|${profileHash(context, hasFix)}`;
-    const tripBreaker = () => { aiDownUntil = Date.now() + AI_COOLDOWN_MS; };
     if (info.ready) {
       if (aiUsable()) {
         try { return res.json(await cached(key, AI_TTL_MS, () => groundedChat(message, proximity, { profile: context, hasFix }), { onStale: tripBreaker })); }
-        catch (e) { tripBreaker(); console.warn('grounded chat failed:', e.message); }
+        catch (e) { tripBreaker(e); console.warn('grounded chat failed:', e.message); }
       }
       // A fare question does not need a model: the answer is in the LTFRB file,
       // so an AI outage must not turn "how much is the bus" into "I don't know".
@@ -155,7 +163,6 @@ app.post('/api/plan', async (req, res) => {
     // The plan path has no local fallback, so the breaker/off-switch must
     // apply here too — honest 503 beats burning quota during an outage.
     if (!aiUsable()) return res.status(503).json({ error: 'AI unavailable' });
-    const tripBreaker = () => { aiDownUntil = Date.now() + AI_COOLDOWN_MS; };
     res.json(await cached(key, AI_TTL_MS, () => planDay(message, h, s, { proximity }), { onStale: tripBreaker }));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
@@ -164,32 +171,26 @@ const { SPOTS } = require('./spots.js');
 const adminStore = require('./adminSpots.js');
 const adminPhotos = require('./adminPhotos.js');
 const spotList = require('./spotList.js');
+const { fullCatalogue } = require('./catalogue.js');
 const community = require('./communityPlaces.js');
-const { findPhoto, photoHint, photoCacheKey } = require('./photos.js');
+const { findPhoto, photoHint } = require('./photos.js');
 
 // --- real-photo hierarchy: 1 JSON → 2 Wikimedia → 3 Mapbox (client fallback)
 // JSON = curated dataset / admin-verified URL (wins). Wikimedia = real photo
 // found via commons search (secondary). Mapbox = static map (client-only last resort).
-const photoCache = new Map(); // key -> { value, at }
-const PHOTO_TTL = 60 * 60 * 1000;
+const photoCache = require('./photoCache.js').createPhotoCache();
 async function enrichWithPhoto(place){
   // Hierarchy 1: any photo the place already carries wins — curated, admin or
   // the committed Wikimedia map — and every photo in the list is preserved.
   const existing = existingPhoto(place);
   if (existing) return { ...place, ...existing };
   // Hierarchy 2: Wikimedia real photo. A curated row knows its hint; a dataset
-  // row without one has the town parsed out of its address.
+  // row without one has the town parsed out of its address. Lookups go through
+  // the on-disk cache, so a restart or a second traveller never re-queries
+  // Commons for a place already answered.
   const hint = photoHint(place);
-  const key = photoCacheKey(place);
-  const hit = photoCache.get(key);
-  if (hit && Date.now() - hit.at < PHOTO_TTL){
-    return hit.value
-      ? { ...place, photo: hit.value.src, photos: [hit.value.src], photoSource: 'wikimedia' }
-      : { ...place, photo: null, photos: [], photoSource: 'mapbox' };
-  }
   try {
-    const found = await findPhoto(place.name || '', hint, place.lng, place.lat);
-    photoCache.set(key, { value: found, at: Date.now() });
+    const found = await findPhoto(place.name || '', hint, { cache: photoCache });
     return found
       ? { ...place, photo: found.src, photos: [found.src], photoSource: 'wikimedia' }
       : { ...place, photo: null, photos: [], photoSource: 'mapbox' };
@@ -215,6 +216,12 @@ app.get('/api/spots', async (req, res) => {
     // submissions backend degrades to the curated list, it never empties the map.
     res.json({ spots: await spotList.listSpots() });
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+// The one catalogue the map and the browse screens both read: curated + admin +
+// approved community spots, then every dataset row with a real coordinate.
+app.get('/api/catalogue', async (req, res) => {
+  try { res.json({ places: await fullCatalogue() }); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 app.get('/api/places', async (req, res) => {
   try {
@@ -269,7 +276,7 @@ app.post('/api/admin/photos/find', adminStore.requireAdmin, async (req, res) => 
   try {
     const { name = '', town = '', lng, lat } = req.body || {};
     if (!String(name).trim()) return res.status(400).json({ error: 'name is required' });
-    const found = await findPhoto(String(name), String(town), lng, lat);
+    const found = await findPhoto(String(name), String(town));
     if (!found) return res.status(404).json({ error: 'No real photo found for this place yet — add a photo URL manually.' });
     res.json({ photo: found });
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }

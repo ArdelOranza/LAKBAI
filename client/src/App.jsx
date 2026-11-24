@@ -1,11 +1,14 @@
-import { Component, useEffect, useState } from 'react';
+import { Component, Fragment, useEffect, useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { AuthProvider, useAuth } from './AuthContext.jsx';
 import { Toast, TabBar, PrimaryBtn, TextField, useAutoToast } from './ui.jsx';
 import Logo from './logo.jsx';
 import { readLocalPrefs, loadPrefs } from './prefs.js';
+import { clearHomeCache } from './homeCache.js';
 import { nextFix } from './geo.js';
 import { tabFromSearch } from './deepLink.js';
+import { warmUp } from './warmup.js';
+import PullToRefresh from './PullToRefresh.jsx';
 import Splash from './screens/Splash.jsx';
 import SignUp from './screens/SignUp.jsx';
 import LogIn from './screens/LogIn.jsx';
@@ -65,10 +68,15 @@ function Shell(){
   // In-app driving guidance replaces the old google.com/maps tab hand-off, so
   // one sheet lives above every screen and any of them can open it.
   const [routePlace, setRoutePlace] = useState(null);
+  // Bumped by pull-to-refresh so the current screen re-mounts and re-fetches.
+  const [refreshKey, setRefreshKey] = useState(0);
   const openDirections = place => { if (place) setRoutePlace(place); };
   const push = view => setStack(s => [...s, view]);
   const pop = () => setStack(s => s.slice(0, -1));
   const showToast = (text, kind = 'ok', detail) => setToast({ text, kind, detail });
+  // Pull-to-refresh: wake the API + pull admin photos, then re-mount the screen
+  // so it re-fetches. Never rejects (warmUp swallows its own errors).
+  const refreshApp = async () => { await warmUp().catch(() => {}); setRefreshKey(k => k + 1); };
 
   // Signing in from a deep link can fail after the traveler already left the
   // app (the Custom Tab closed on an error, or the URL is not allowlisted).
@@ -87,6 +95,11 @@ function Shell(){
     setTab(t);
     try { window.history.replaceState(null, '', window.location.pathname + window.location.hash); } catch { /* file:// etc. */ }
   }, []);
+
+  // Boot work: wake a sleeping API and pull the latest admin photos onto the
+  // device before the traveler asks for anything. Fire-and-forget — the UI is
+  // never gated on it (a cold Render instance can take ~30-60s to answer).
+  useEffect(() => { warmUp().catch(() => {}); }, []);
 
   useEffect(() => {  // LIVE touring GPS (high-accuracy, smoothed, accuracy-gated)
     // 'geolocation' in navigator can be true while geolocation itself is null
@@ -190,6 +203,8 @@ function Shell(){
   // user's detail/plan screens and stale prefs.
   const doSignOut = async () => {
     try { await signOut(); } catch { /* already signed out */ }
+    // The feed is account data: a shared device must not show it after logout.
+    clearHomeCache(user);
     setStack([]); setTab('home'); setPrefsStage(false); setAuthStage(null); setAuthNotice(null);
   };
   const top = stack[stack.length - 1];
@@ -216,7 +231,11 @@ function Shell(){
   return (
     <div data-testid="app" style={{ display:'flex', flexDirection:'column', height:'100%', overflow:'hidden' }}>
       <Toast toast={toast} onClose={() => setToast(null)} />
-      {guard(body)}
+      {guard(
+        <PullToRefresh enabled={!stack.length && tab !== 'map'} onRefresh={refreshApp}>
+          <Fragment key={refreshKey}>{body}</Fragment>
+        </PullToRefresh>
+      )}
       {!stack.length && <TabBar tab={tab} onTab={t => { setStack([]); setTab(t); }} />}
       {routePlace && (
         <RouteSheet

@@ -121,6 +121,24 @@ describe('admin app', () => {
     await h.unmount();
   });
 
+  it('opens an internet search for a spot or restaurant in a new tab', async () => {
+    const h = await mount();
+    const linkFor = name => [...h.container.querySelectorAll('[data-testid="row-search"]')]
+      .find(a => a.getAttribute('aria-label') === `Search the web for ${name}`);
+
+    const spot = linkFor('Patar Beach');
+    expect(spot).not.toBeNull();
+    expect(spot.getAttribute('target')).toBe('_blank');
+    expect(spot.getAttribute('rel')).toContain('noopener');
+    expect(decodeURIComponent(spot.getAttribute('href'))).toBe('https://www.google.com/search?q=Patar Beach Bolinao Pangasinan');
+
+    await React.act(async () => { h.container.querySelector('[data-testid="tab-restos"]').dispatchEvent(new window.MouseEvent('click', { bubbles: true })); });
+    const resto = linkFor('Test Resto');
+    expect(resto).not.toBeNull();
+    expect(decodeURIComponent(resto.getAttribute('href'))).toBe('https://www.google.com/search?q=Test Resto Dagupan City Pangasinan');
+    await h.unmount();
+  });
+
   // --- submissions queue -------------------------------------------------
   const click = async el => { await React.act(async () => { el.dispatchEvent(new window.MouseEvent('click', { bubbles: true })); }); };
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeName, matchSpot, mapThumb, cardFor, cardsFromMore } from './chatCards.js';
+import { normalizeName, matchSpot, mapThumb, cardFor, cardsFromMore, cardPlace } from './chatCards.js';
 
 const SPOTS = [
   { id: 'giant-sungayan-grill-bolinao', name: 'Giant Sungayan Grill', town: 'Bolinao', lng: 119.869, lat: 16.302, categories: ['Food', 'Dining'], photos: [] },
@@ -102,5 +102,33 @@ describe('cardFor', () => {
 
     const withFestival = cardFor({ name: 'Patar Beach', festival: 'Binongey Festival' }, SPOTS);
     expect(withFestival.festival).toBe('Binongey Festival');
+  });
+});
+
+describe('cardPlace', () => {
+  const WIKI = 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Lingayen_Beach.jpg/960px-Lingayen_Beach.jpg';
+
+  it('keeps the real photo even when the matching curated spot has none', () => {
+    const card = cardFor({ name: 'Giant Sungayan Grill', photos: [WIKI], photoSource: 'wikimedia' }, SPOTS);
+    const place = cardPlace(card);
+    expect(place.photos).toEqual([WIKI]);
+    expect(place.photo).toBe(WIKI);
+    expect(place.photoSource).toBe('wikimedia');
+    expect(place.name).toBe('Giant Sungayan Grill');
+    expect(place.lng).toBe(119.869);
+  });
+
+  it('falls back to the curated spot photo when the card has none', () => {
+    const card = cardFor({ name: 'Patar Beach' }, SPOTS);
+    delete card.photos;
+    delete card.photo;
+    const place = cardPlace(card);
+    expect(place.photo).toBe('/photos/patar.jpg');
+  });
+
+  it('carries the card facts the detail page displays', () => {
+    const card = cardFor({ name: 'Patar Beach', rating: '4.8', reviews: '351', description: 'White sand.' }, SPOTS);
+    const place = cardPlace(card);
+    expect(place).toMatchObject({ rating: 4.8, reviews: '351', blurb: 'White sand.', town: 'Bolinao' });
   });
 });

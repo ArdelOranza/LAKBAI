@@ -1,4 +1,5 @@
 import { haversineKm } from './geo.js';
+import { kindsOf } from './kinds.js';
 
 // Category browse ("Dining in Bolinao", "Beaches in Bolinao") over the curated
 // spots list. Cuisine facets are derived from the place name, the same way
@@ -10,11 +11,13 @@ const CUISINE = [
 ];
 const BEACH_RADIUS = { Near: 3, 'Within 5km': 5, 'Within 10km': 10 };
 
-const hasCat = (p, names) => (p.categories || []).some(c => names.includes(c));
-
+// The browse screens read the same chips the map does (kinds.js). A category
+// like "Beach & Coastal" or "Filipino & Seafood Family Dining" is a beach or a
+// restaurant just as much as the curated "Beach"/"Food" labels are.
 export function kindMatch(p, kind){
-  if (kind === 'beaches') return hasCat(p, ['Beach']);
-  if (kind === 'dining') return hasCat(p, ['Food', 'Dining']);
+  const kinds = kindsOf(p);
+  if (kind === 'beaches') return kinds.includes('beach');
+  if (kind === 'dining') return kinds.includes('restaurant');
   return true;
 }
 

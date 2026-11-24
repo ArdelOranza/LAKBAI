@@ -13,7 +13,9 @@ fs.mkdirSync(DIR, { recursive: true });
 const DATA = path.join(DIR, 'places.json');
 const PHOTOS = path.join(DIR, 'photos.json');
 const ADMIN = path.join(DIR, 'admin-spots.json');
+const PHOTO_CACHE = path.join(DIR, 'photo-cache.json');
 try { fs.unlinkSync(PHOTOS); } catch { /* fresh */ }
+try { fs.unlinkSync(PHOTO_CACHE); } catch { /* fresh */ }
 
 fs.writeFileSync(DATA, JSON.stringify({
   places: [
@@ -28,6 +30,7 @@ fs.writeFileSync(DATA, JSON.stringify({
 process.env.LAKBAI_DATA = DATA;
 process.env.LAKBAI_ADMIN_PHOTOS_FILE = PHOTOS;
 process.env.LAKBAI_ADMIN_FILE = ADMIN;
+process.env.LAKBAI_PHOTO_CACHE_FILE = PHOTO_CACHE;
 process.env.LAKBAI_AI = 'off';
 process.env.VITE_MAPBOX_TOKEN = 'pk.test';
 
@@ -43,13 +46,18 @@ globalThis.fetch = async (url) => {
     json: async () => ({
       query: {
         pages: {
-          1: { title: 'File:Patar white beach.jpg', thumbnail: { source: WIKI } },
+          1: {
+            title: 'File:Patar white beach.jpg',
+            thumbnail: { source: WIKI },
+            categories: [{ title: 'Category:Beaches of Bolinao, Pangasinan' }],
+          },
         },
       },
     }),
   };
 };
 
+const { setPhotos } = require('../adminPhotos.js');
 const app = require('../index.js');
 
 async function withServer(fn){
@@ -82,13 +90,21 @@ test('a place with no photo gets the Wikimedia one before it reaches the app', a
 });
 
 test('a place that already has a real photo is never re-searched', async () => {
-  await withServer(async (base) => {
-    const before = calls.filter(u => u.includes('commons.wikimedia.org')).length;
-    const out = await recommend(base, 'Bolinao Falls 2');
-    const place = (out.places || [])[0];
-    assert.ok(place);
-    assert.equal(place.photo, 'https://example.com/bolinao-falls-2.jpg');
-    assert.equal(place.photoSource, 'json', 'a unique curated photo is not relabelled');
-    assert.equal(calls.filter(u => u.includes('commons.wikimedia.org')).length, before, 'no lookup for a photographed place');
-  });
+  // A curated/admin photo is already a decision. Look it up again and the
+  // Wikimedia result could replace a hand-checked picture with a worse one.
+  const CURATED = 'https://example.com/bolinao-falls-2.jpg';
+  setPhotos('places-bolinao-falls-2-bolinao-1', [CURATED]);
+  try {
+    await withServer(async (base) => {
+      const before = calls.filter(u => u.includes('commons.wikimedia.org')).length;
+      const out = await recommend(base, 'Bolinao Falls 2');
+      const place = (out.places || [])[0];
+      assert.ok(place);
+      assert.equal(place.photo, CURATED);
+      assert.equal(place.photoSource, 'json', 'a unique curated photo is not relabelled');
+      assert.equal(calls.filter(u => u.includes('commons.wikimedia.org')).length, before, 'no lookup for a photographed place');
+    });
+  } finally {
+    setPhotos('places-bolinao-falls-2-bolinao-1', []);
+  }
 });

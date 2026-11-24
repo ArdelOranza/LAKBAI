@@ -1,0 +1,12 @@
+{
+  "source": "hand-reviewed",
+  "note": "Each entry was opened and looked at. The generator never overwrites these, and never searches their spot id again.",
+  "photos": {
+    "lingayen-baywalk-lingayen": {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/Lingayen_Capitol_Promenade.jpg/960px-Lingayen_Capitol_Promenade.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "page": "https://commons.wikimedia.org/wiki/File:Lingayen_Capitol_Promenade.jpg",
+      "title": "Lingayen Capitol Promenade.jpg",
+      "reason": "The baywalk is the Capitol promenade: reflecting pools, palms, the walk along the gulf. The automated match was a Philippine Beach Games sponsor banner on a fence."
+    }
+  }
+}

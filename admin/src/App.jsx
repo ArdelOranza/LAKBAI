@@ -78,6 +78,26 @@ const fmtDate = stamp => {
   return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString();
 };
 
+/** Public web search for one catalogue row, opened in a new browser tab. */
+function webSearchUrl(place){
+  const name = String(place?.name || '').trim();
+  const town = String(place?.town || '').trim();
+  const words = [name, town, 'Pangasinan'].filter((v, i, a) => v && a.indexOf(v) === i);
+  return 'https://www.google.com/search?q=' + encodeURIComponent(words.join(' '));
+}
+
+/** Magnifier + outward arrow: "look this place up on the internet". */
+function WebSearchIcon(){
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <circle cx="10.5" cy="10.5" r="6.5"/>
+      <path d="m15.5 15.5 5 5"/>
+      <path d="M18 9V6h-3"/>
+      <path d="M21 3l-6 6"/>
+    </svg>
+  );
+}
+
 /** Repeatable photo rows: one URL input per photo, live preview, remove/add.
  *  Replaces the old "one URL per line" textarea so multiple photos are edited
  *  as separate fields. */
@@ -568,23 +588,35 @@ export default function App() {
       {mode !== 'subs' && (<div className="workspace">
         <div data-testid="list" className="list">
           {filtered.map(s => (
-            <button
-              key={s.id}
-              data-testid="row"
-              onClick={() => (mode === 'spots' ? edit(s) : editPlace(s))}
-              className={`row ${(mode === 'spots' ? selectedId : placeId) === s.id ? 'on' : ''}`}
-              style={{ textAlign: 'left', cursor: 'pointer' }}
-            >
-              <span className="row-title">{s.name}</span>
-              <span className="row-meta">
-                {mode === 'spots'
-                  ? `${s.town} · District ${s.district} · ${(s.categories || []).join(', ')}`
-                  : `${s.town}${s.address ? ' · ' + s.address : ''}`}
-              </span>
-              <span className={`row-badge ${(s.photos || []).length ? 'ok' : 'miss'}`}>
-                {(s.photos || []).length ? `${s.photos.length} photo${s.photos.length === 1 ? '' : 's'}` : 'No photo yet'}
-              </span>
-            </button>
+            <div className="row-wrap" key={s.id}>
+              <button
+                data-testid="row"
+                onClick={() => (mode === 'spots' ? edit(s) : editPlace(s))}
+                className={`row ${(mode === 'spots' ? selectedId : placeId) === s.id ? 'on' : ''}`}
+                style={{ textAlign: 'left', cursor: 'pointer' }}
+              >
+                <span className="row-title">{s.name}</span>
+                <span className="row-meta">
+                  {mode === 'spots'
+                    ? `${s.town} · District ${s.district} · ${(s.categories || []).join(', ')}`
+                    : `${s.town}${s.address ? ' · ' + s.address : ''}`}
+                </span>
+                <span className={`row-badge ${(s.photos || []).length ? 'ok' : 'miss'}`}>
+                  {(s.photos || []).length ? `${s.photos.length} photo${s.photos.length === 1 ? '' : 's'}` : 'No photo yet'}
+                </span>
+              </button>
+              <a
+                className="row-search"
+                data-testid="row-search"
+                href={webSearchUrl(s)}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Search the web for ${s.name}`}
+                title={`Search the web for ${s.name}`}
+              >
+                <WebSearchIcon/>
+              </a>
+            </div>
           ))}
           {!filtered.length && <div className="empty">{mode === 'spots' ? 'No spots match.' : (placesLoaded ? 'No restaurants match.' : 'Loading restaurants…')}</div>}
         </div>

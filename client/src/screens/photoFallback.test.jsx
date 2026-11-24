@@ -28,6 +28,9 @@ vi.mock('../App.jsx', () => ({ FALLBACK_CENTER: { lng: 120.23, lat: 16.03 } }));
 vi.mock('../spots.js', () => ({
   fetchSpots: vi.fn(async () => ([photoless({ id: 'sp1', town: 'Alaminos', categories: ['Beach'] })])),
 }));
+vi.mock('../catalogue.js', () => ({
+  fetchCatalogue: vi.fn(async () => ([photoless({ id: 'cat1', town: 'Alaminos', categories: ['Beach'] })])),
+}));
 vi.mock('../prefs.js', () => ({ readLocalPrefs: () => [] }));
 vi.mock('../sessionCache.js', () => ({ sessionGet: () => null, sessionSet: () => {} }));
 vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => ({}), headers: { get: () => null } })));

@@ -314,7 +314,7 @@ const INTENT_WORDS = {
   event: /\b(festivals?|fiestas?|events?|celebrations?|parades?|carnivals?|fairs?)\b/i,
   nearby: /\b(near|nearby|around|close|malapit|walking distance)\b/i,
   emergency: /\b(hospital|emergency|ambulance|police|fire|accident|injured|medical|clinic)\b/i,
-  plan: /\b(plan|itinerary|day trip|schedule)\b/i,
+  plan: /\b(plans?|planning|itinerar(?:y|ies)|trips?|day ?trip|tours?|things to do|what (?:can|should) i do|schedule|explore)\b/i,
 };
 
 const CATEGORY_HINTS = {
@@ -419,7 +419,11 @@ function normalize(raw, index, kind = '', fileTag = ''){
     website: str(raw.website || raw.site),
     mapsUrl: str(raw.google_maps_url || raw.maps_url || raw.map_url),
     sourceUrls: sourceUrlsOf(raw),
-    photos: listOf(raw.verified_image_urls || raw.photos || raw.images),
+    // No scraped images. `verified_image_urls` in the source JSON are page
+    // heroes and ads, not photographs of the place — a Lingayen card showed a
+    // resort brochure, a beach showed a Scribd page of text. Photos come from
+    // the admin/hand-reviewed map and the Wikimedia name lookup instead.
+    photos: [],
     description: str(raw.description || raw.blurb || raw.about || raw.summary || raw.detailed_description),
     activities: listOf(raw.what_to_do_activities || raw.activities || raw.what_to_do),
     price: fees.short,
@@ -447,73 +451,6 @@ function fileSignature(files){
   }).join('|');
 }
 
-/**
- * Could two names be two spellings of one place, for photo-sharing purposes?
- *
- * Stricter than samePlaceName: "Bolinao Falls 1" and "Bolinao Falls 2" share a
- * first word but are two different falls, and "San Fabian Beach" is not the
- * parish church. A shared photo is only allowed when the names agree on their
- * numbers and every identifying word of the shorter name appears in the longer
- * one ("Patar Beach" / "Patar White Sand Beach").
- */
-const PHOTO_TYPE_WORDS = new Set([
-  'the', 'and', 'of', 'in', 'at', 'de', 'la', 'el', 'a', 'an',
-  'beach', 'beaches', 'falls', 'fall', 'island', 'islands', 'cave', 'caves', 'river',
-  'park', 'plaza', 'square', 'garden', 'gardens', 'grounds', 'ground', 'view',
-  'church', 'parish', 'shrine', 'basilica', 'cathedral', 'chapel', 'museum',
-  'restaurant', 'cafe', 'coffee', 'grill', 'resort', 'hotel', 'inn', 'lodge', 'bar',
-  'city', 'town', 'municipality', 'barangay', 'national', 'public', 'proper', 'sm', 'mall',
-]);
-function photoWords(name){
-  return new Set(String(name || '')
-    .toLowerCase()
-    .replace(/\([^)]*\)/g, ' ')
-    .split(/[^a-z0-9]+/)
-    .filter(w => w && !PHOTO_TYPE_WORDS.has(w)));
-}
-function photoNumbers(name){
-  return [...new Set(String(name || '').match(/\d+/g) || [])].sort().join(',');
-}
-function photoSamePlace(a, b){
-  if (photoNumbers(a) !== photoNumbers(b)) return false;
-  const ta = photoWords(a), tb = photoWords(b);
-  if (!ta.size || !tb.size) return false;
-  const [small, big] = ta.size <= tb.size ? [ta, tb] : [tb, ta];
-  return [...small].every(w => big.has(w));
-}
-
-/**
- * Strip photos that caption more than one place.
- *
- * The dataset was scraped page by page, and a page-hero image ended up on every
- * place that page mentioned: Bolinao Falls 1, 2 and 3 all showed the same
- * waterfall, the three SM malls shared one facade, four Dagupan landmarks
- * shared one hotel photo. A URL used by two differently-named places cannot be
- * the photo of either, so it is dropped and the card falls through to its real
- * Wikimedia photo or the static map. The same place listed twice under two
- * spellings is not a conflict — it keeps its photo.
- */
-function dropSharedPhotos(entries){
-  const users = new Map();
-  for (const entry of entries){
-    for (const url of new Set(entry.photos || [])){
-      if (!users.has(url)) users.set(url, []);
-      users.get(url).push(entry);
-    }
-  }
-  const shared = new Set();
-  for (const [url, list] of users){
-    if (list.length < 2) continue;
-    const differentPlaces = list.some((a, i) => list.some((b, j) => j > i && !photoSamePlace(a.name, b.name)));
-    if (differentPlaces) shared.add(url);
-  }
-  if (!shared.size) return entries;
-  return entries.map(e => {
-    if (!(e.photos || []).some(url => shared.has(url))) return e;
-    return { ...e, photos: e.photos.filter(url => !shared.has(url)) };
-  });
-}
-
 function readEntries(){
   const files = dataFiles();
   if (!files.length) return [];
@@ -533,7 +470,7 @@ function readEntries(){
         if (entry) entries.push(entry);
       });
     }
-    cache = { sig, entries: dropSharedPhotos(entries) };
+    cache = { sig, entries };
   }
   // Admin photo edits are applied on every read, so they show up immediately
   // without restarting or touching the committed dataset.
@@ -586,42 +523,87 @@ function reviewCount(entry){
   return m[2] ? n * 1000 : n;
 }
 
+const hasCoords = e => Number.isFinite(e.lat) && Number.isFinite(e.lng);
+
+/** The name with a parenthetical qualifier removed: "Foo (Dagupan)" → "Foo". */
+function baseName(name){
+  return String(name || '').toLowerCase().replace(/\([^)]*\)/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+/**
+ * How much of a real place a row carries. When two rows turn out to be the same
+ * place, the richer one survives: a coordinate first, then a phone, an address,
+ * a description, and finally the review count.
+ */
+function richness(entry){
+  return (hasCoords(entry) ? 1e6 : 0)
+    + (entry.phone ? 1e4 : 0)
+    + (entry.address ? 1e3 : 0)
+    + (entry.description ? 1e2 : 0)
+    + reviewCount(entry);
+}
+
+/** Rows grouped by town, so a merge can never cross town lines. */
+function byTown(entries){
+  const groups = new Map();
+  for (const e of entries){
+    const k = String(e.town || '').toLowerCase();
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(e);
+  }
+  return groups.values();
+}
+
 function allEntries(){
+  // 1. The same name twice is the same place, full stop.
   const seen = new Set();
-  const out = [];
+  let out = [];
   for (const entry of readEntries()){
-    const key = entry.name.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    const key = normalizedName(entry.name);
     if (seen.has(key)) continue;
     seen.add(key);
     out.push(entry);
   }
-  // Same place listed twice under slightly different names (pangasinan-150
-  // vs spots.json): the same pin (within 50m) + same town + the same NAME ⇒ one
-  // row. Proximity alone is not enough: every tenant of a mall carries the
-  // mall's single coordinate, so "near each other" deleted Cabalen, Classic
-  // Savory and Starbucks as if they were one restaurant. Keep the fatter row.
-  const byTown = new Map();
-  for (const e of out){
-    const k = String(e.town || '').toLowerCase();
-    if (!byTown.has(k)) byTown.set(k, []);
-    byTown.get(k).push(e);
-  }
-  const dup = new Set();
-  for (const group of byTown.values()){
+  // 2. Same place listed twice under slightly different names (pangasinan-150
+  // vs spots.json): the same pin (within 50 m) + same town + a shared name ⇒ one
+  // row. Proximity alone is not enough — every tenant of a mall carries the
+  // mall's single coordinate, so "near each other" once deleted Cabalen,
+  // Classic Savory and Starbucks as if they were one restaurant.
+  const nearDup = new Set();
+  for (const group of byTown(out)){
     for (let i = 0; i < group.length; i++){
       const a = group[i];
-      if (!(Number.isFinite(a.lat) && Number.isFinite(a.lng))) continue;
+      if (!hasCoords(a)) continue;
       for (let j = i + 1; j < group.length; j++){
         const b = group[j];
-        if (!(Number.isFinite(b.lat) && Number.isFinite(b.lng))) continue;
+        if (!hasCoords(b)) continue;
         if (haversineKm(a.lng, a.lat, b.lng, b.lat) < 0.05 && samePlaceName(a.name, b.name)){
-          const keepA = reviewCount(a) >= reviewCount(b);
-          dup.add(keepA ? b.id : a.id);
+          nearDup.add(richness(a) >= richness(b) ? b.id : a.id);
         }
       }
     }
   }
-  return out.filter(e => !dup.has(e.id));
+  out = out.filter(e => !nearDup.has(e.id));
+  // 3. The same place under a parenthetical town suffix, with no coordinate in
+  // either row ("MATUTINA-GERRY's Seafood House" vs "... (Dagupan)"). Proximity
+  // has nothing to measure, so an identical base name inside one town is the
+  // whole signal. Different towns (the Urdaneta branch) stay separate.
+  const nameDup = new Set();
+  for (const group of byTown(out)){
+    const byBase = new Map();
+    for (const e of group){
+      const k = baseName(e.name);
+      if (!k) continue;
+      if (!byBase.has(k)) byBase.set(k, []);
+      byBase.get(k).push(e);
+    }
+    for (const list of byBase.values()){
+      if (list.length < 2) continue;
+      const best = list.slice().sort((a, b) => richness(b) - richness(a))[0];
+      for (const e of list) if (e !== best) nameDup.add(e.id);
+    }
+  }
+  return out.filter(e => !nameDup.has(e.id));
 }
 
 const STOP = new Set(['the', 'and', 'for', 'with', 'you', 'your', 'are', 'can', 'how', 'what', 'where', 'when', 'who', 'why', 'any', 'some', 'best', 'good', 'great', 'top', 'please', 'want', 'need', 'looking', 'find', 'show', 'give', 'recommend', 'suggest', 'near', 'around', 'close', 'about', 'there', 'here', 'this', 'that', 'from', 'have', 'has', 'get', 'try', 'place', 'places', 'spot', 'spots', 'trip', 'pangasinan', 'philippines', 'me', 'my', 'i', 'a', 'an', 'in', 'at', 'to', 'of', 'is', 'it', 'on', 'or', 'do', 'go', 'be']);
@@ -648,6 +630,36 @@ function intentOf(message){
   const text = String(message || '');
   for (const key of ['emergency', 'event', 'food', 'nearby', 'plan']) if (INTENT_WORDS[key].test(text)) return key;
   return 'discover';
+}
+
+// Words that ask for a day out without naming a place: "plan a day here",
+// "what can I do", "a trip". When every token is one of these, the traveler gave
+// no town, dish or kind of place, so the best real options are fair game.
+const GENERIC_ASK = new Set([
+  'plan', 'planning', 'day', 'trip', 'itinerary', 'tour', 'thing', 'activity',
+  'explore', 'do', 'go', 'see', 'visit', 'here', 'now', 'today', 'time', 'around',
+]);
+
+/** True when a plan/nearby request names no place, town or kind of place. */
+function genericPlanAsk(message, intent){
+  if (intent !== 'plan' && intent !== 'nearby') return false;
+  return tokens(message).every(t => GENERIC_ASK.has(t));
+}
+
+// Small talk is answered directly: a greeting or a thank-you must not spend a
+// model call (or fall through to the no-match line). Requiring zero meaningful
+// tokens keeps "hi, where can I eat in Dagupan" out of this path.
+const SMALL_TALK = /^(?:hi+|hey+|hello+|yo|sup|good (?:morning|afternoon|evening)|kumusta|kamusta|musta|thanks?|thank you|ty|salamat|bye+|goodbye|see (?:you|ya)|who are you|what are you|what can you do|what do you do)[\s!.,?]*$/i;
+
+function smallTalkReply(message){
+  const text = String(message || '').trim();
+  // The pattern is anchored, so a real request that merely starts with "hi"
+  // ("hi, where can I eat in Dagupan") never matches.
+  if (!text || !SMALL_TALK.test(text)) return null;
+  if (/thank|salamat|\bty\b/i.test(text)) return "You're welcome! Ask me about a town, a dish or a place in Pangasinan anytime.";
+  if (/bye|see (?:you|ya)/i.test(text)) return "Safe travels! Come back anytime you need a place in Pangasinan.";
+  if (/who are you|what are you|what (?:can|do) you do/i.test(text)) return "I'm LakbAI, your Pangasinan travel guide. Ask me about places, food, fees, or a day trip.";
+  return 'Hi! I\'m LakbAI. Ask me about a town, a dish or a place in Pangasinan — or say "plan a day here".';
 }
 
 function scoreEntry(entry, toks, intent, here){
@@ -703,6 +715,13 @@ function search(message, proximity, limit = 6){
   const scored = entries.map(entry => ({ entry, ...scoreEntry(entry, toks, intent, here) }));
   let hits = scored.filter(s => s.matched);
   if (!hits.length && intent !== 'discover') hits = scored.filter(s => s.entry.intents.includes(intent));
+  // A request that names no place ("plan a trip", "what can I do here") has no
+  // token to match, so offer the best real places instead of a dead end. Food
+  // is kept out of a day-out unless the traveler actually asked for it.
+  if (!hits.length && genericPlanAsk(message, intent)){
+    hits = scored.filter(s => !isFoodOnly(s.entry));
+    if (!hits.length) hits = scored;
+  }
   if (!hits.length) return [];
   // A named town wins over a loose word match elsewhere.
   const town = townFilterFor(message, entries);
@@ -814,6 +833,7 @@ function answerFor(intent, entries){
   const lead = intent === 'food' ? 'Where to eat'
     : intent === 'event' ? 'Events worth catching'
     : intent === 'nearby' ? 'Closest to you'
+    : intent === 'plan' ? 'A day worth taking'
     : 'Worth a look';
   const bullets = entries.slice(0, 5).map(e => {
     const meta = [e.town, e.rating ? `${e.rating}★${e.reviews ? ` · ${e.reviews} reviews` : ''}` : '', e.price || ''].filter(Boolean).join(' · ');
@@ -833,6 +853,11 @@ function spotlightFor(entries){
 /** Chat-shaped payload: what /api/chat used to return from the agent. */
 async function localChat(message, proximity){
   const intent = intentOf(message);
+  // A greeting or a thank-you is answered here too: when the model quota is out
+  // the chat falls back to this path, and small talk must not become the
+  // no-match line just because the AI is unavailable.
+  const hello = smallTalkReply(message);
+  if (hello) return { intent: 'discover', answer: hello, candidates: [], spotlight: null, sources: [], source: 'dataset' };
   // Emergency: the dataset carries no emergency entries, so never answer from
   // thin air — guide to 911 and the nearest hospital instead of a travel dead
   // end. No hospital names or numbers are invented here; only 911 is universal.
@@ -917,9 +942,12 @@ module.exports = {
   localRecommend,
   search,
   intentOf,
+  genericPlanAsk,
+  smallTalkReply,
   tokens,
   normalize,
   pickList,
   parseRating,
+  photoFields,
   NO_MATCH,
 };

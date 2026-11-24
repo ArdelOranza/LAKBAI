@@ -101,6 +101,12 @@ li{margin:6px 0}
 .pane{padding:0 20px}
 /* tab screens scroll inside the fixed phone column; leave room for the floating nav */
 .screen{padding-bottom:104px}
+/* Home "Recommended for You": touch swipe already works; the grab cursor and
+   drag state make the desktop mouse affordance obvious. Snap is disabled while
+   dragging so the row follows the pointer instead of fighting it. */
+.rec-carousel{cursor:grab;scroll-snap-type:x proximity}
+.rec-carousel>*{scroll-snap-align:start}
+.rec-carousel.dragging{cursor:grabbing;scroll-snap-type:none;user-select:none}
 .primary-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;border-radius:999px;border:none;background:var(--primary);color:#fff;font-weight:600;font-size:16px;box-shadow:0 8px 20px -8px rgba(0,102,255,.5)}
 .primary-btn:hover{background:var(--primary-strong)}
 .chip{border-radius:999px;border:1px solid var(--border);padding:9px 15px;font-size:14px;background:#fff;color:var(--ink)}
@@ -205,20 +211,22 @@ li{margin:6px 0}
 .spot-pin.bubble.discover .pin-bubble{color:#64748B}
 /* A selected pin owns the map: its full name rises above neighbouring pins. */
 .maplibregl-marker:has(.spot-pin.active){z-index:6}
-/* The name is a small white pill. A text halo alone disappeared over busy
-   satellite/road colours, and the point of the label is that a traveller can
-   read it. width:max-content keeps it on one line: an absolutely positioned
+/* The name is a Google-Maps-style map label: text beside the pin with a white
+   halo, not a white pill under it. It sits to the left of the marker by
+   default; the declutter flips it to the right when the left edge would clip
+   it. width:max-content keeps it on one line because an absolutely positioned
    label is otherwise clamped to the 24-38 px marker box. */
-.pin-name{position:absolute;top:calc(100% + 2px);left:50%;transform:translateX(-50%);width:max-content;max-width:132px;background:rgba(255,255,255,.95);border:1px solid rgba(15,23,42,.10);border-radius:999px;padding:1px 7px 2px;box-shadow:0 1px 3px rgba(15,23,42,.22);overflow:hidden;text-overflow:ellipsis;font-size:11px;font-weight:650;color:#1F2937;letter-spacing:0;line-height:1.45;white-space:nowrap;opacity:1;pointer-events:none;transition:opacity .18s ease,transform .18s ease}
-.spot-pin.active .pin-name{color:#0A2540;font-weight:750;max-width:200px;white-space:normal;font-size:12px;line-height:1.25}
+.pin-name{position:absolute;top:6px;right:calc(100% + 5px);left:auto;transform:none;width:max-content;max-width:150px;background:none;border:0;border-radius:0;padding:0;box-shadow:none;overflow:hidden;text-overflow:ellipsis;font-size:13px;font-weight:500;color:#202124;letter-spacing:-.01em;line-height:1.2;white-space:nowrap;text-align:right;text-shadow:0 0 2px #fff,0 0 2px #fff,0 1px 2px rgba(255,255,255,.95),0 -1px 2px rgba(255,255,255,.95),1px 0 2px rgba(255,255,255,.95),-1px 0 2px rgba(255,255,255,.95);opacity:1;pointer-events:none;transition:opacity .18s ease}
+.spot-pin.active .pin-name{color:#0A2540;font-weight:700;max-width:220px;white-space:normal;font-size:13.5px;line-height:1.25}
 .spot-pin.discover .pin-name{color:#475569}
-/* Close view: the name sits to the right of the bubble, like Google's POI
-   labels, instead of hanging under a dot. */
-.spot-pin.bubble .pin-name{top:50%;left:calc(100% + 8px);transform:translateY(-50%);max-width:158px;white-space:normal;text-align:left;font-size:12px;line-height:1.25;font-weight:550}
-/* A pin near the right edge flips its label to the left, like Google, instead
-   of having the name cut off by the map edge. */
-.spot-pin.bubble.label-left .pin-name{left:auto;right:calc(100% + 8px);text-align:left}
-.spot-pin.bubble.active .pin-name{max-width:188px;font-weight:750}
+/* Close view: the name sits beside the photo bubble, Google-style, instead of
+   hanging under a dot. */
+.spot-pin.bubble .pin-name{top:50%;right:calc(100% + 8px);left:auto;transform:translateY(-50%);max-width:180px;white-space:normal;text-align:right;font-size:13px;line-height:1.25;font-weight:500}
+/* A pin close to the left edge flips its label to the right instead of letting
+   the name run off the map. */
+.spot-pin.label-right .pin-name{right:auto;left:calc(100% + 5px);text-align:left}
+.spot-pin.bubble.label-right .pin-name{left:calc(100% + 8px)}
+.spot-pin.bubble.active .pin-name{max-width:200px;font-weight:750}
 /* The declutter decides which labels have room. The hidden ones stay mounted,
    so a pan brings them back with a fade instead of a pop. */
 .spot-pin.label-hidden .pin-name{opacity:0}
@@ -341,8 +349,8 @@ li{margin:6px 0}
 .chip-flat{border-color:transparent;background:none;color:var(--ink);font-weight:600;font-size:13.5px;padding:7px 4px}
 .chip-flat:hover{background:none;color:var(--primary)}
 .chip-flat.active{background:var(--primary);border-color:var(--primary);color:#fff;padding:7px 17px}
-.result-list{display:grid;gap:12px;padding:10px 20px 28px}
-.result-card{display:flex;align-items:center;gap:13px;padding:10px;background:#fff;border:1px solid #EEF2F7;border-radius:18px;cursor:pointer;box-shadow:0 8px 20px -18px rgba(15,23,42,.55);transition:box-shadow .16s ease,transform .16s ease,border-color .16s ease}
+.result-list{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding:10px 20px 28px}
+.result-card{display:flex;align-items:center;gap:13px;padding:10px;min-width:0;background:#fff;border:1px solid #EEF2F7;border-radius:18px;cursor:pointer;box-shadow:0 8px 20px -18px rgba(15,23,42,.55);transition:box-shadow .16s ease,transform .16s ease,border-color .16s ease}
 .result-card:hover{transform:translateY(-1px);border-color:#E3EAF3;box-shadow:0 14px 28px -20px rgba(15,23,42,.7)}
 .result-thumb{position:relative;width:84px;height:84px;flex:0 0 84px;border-radius:13px;overflow:hidden;background:#EDF1F7}
 .result-thumb img{width:100%;height:100%;object-fit:cover;display:block}
@@ -375,6 +383,17 @@ li{margin:6px 0}
 .chat-sub{font-size:10.5px;color:var(--muted-ink);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .online-dot{width:7px;height:7px;border-radius:50%;background:#22C55E}
 .online-dot.off{background:#64748B}
+/* Red when the browser is online but the AI cannot answer (model down / API
+   unreachable), so a dead assistant is visible before the first message. */
+.online-dot.down{background:#EF4444;box-shadow:0 0 0 3px rgba(239,68,68,.16)}
+
+/* Pull-to-refresh: a growing bar pushes the screen down; the spinner spins
+   while the refresh runs. The Map screen opts out (see App.jsx). */
+.ptr-bar{flex:0 0 auto;height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#64748B;transition:height .18s ease}
+.ptr-bar.busy{transition:none}
+.ptr-spin{width:18px;height:18px;border-radius:50%;border:2px solid #CBD5E1;border-top-color:#2563EB}
+.ptr-bar.busy .ptr-spin{animation:ptr-spin .7s linear infinite}
+@keyframes ptr-spin{to{transform:rotate(360deg)}}
 
 .chat-log{flex:1;min-height:0;overflow-y:auto;padding:14px 16px 8px;display:flex;flex-direction:column;gap:16px}
 .chat-day{display:flex;align-items:center;justify-content:center;gap:6px;font-size:10.5px;font-weight:500;color:#64748B}
@@ -386,6 +405,16 @@ li{margin:6px 0}
 .ai-avatar{width:28px;height:28px;flex:0 0 28px;border-radius:50%;background:#fff;border:1px solid #E2E9F6;display:grid;place-items:center;box-shadow:0 1px 3px rgba(15,23,42,.12)}
 .ai-name{font-size:12px;font-weight:700;letter-spacing:-.1px}
 .ai-text{margin:0;font-size:14px;line-height:1.65;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+/* AI answers are markdown-lite. Tailwind's preflight strips list markers, so
+   fare tables and day plans read as one undifferentiated block of lines. */
+.ai-text ul{list-style:disc;margin:8px 0;padding-left:20px}
+.ai-text ol{list-style:decimal;margin:8px 0;padding-left:22px}
+.ai-text li{margin:4px 0;padding-left:2px}
+.ai-text li::marker{color:#94A3B8}
+.ai-text p{margin:8px 0}
+.ai-text p:first-child{margin-top:0}
+.ai-text p:last-child{margin-bottom:0}
+.ai-text h3,.ai-text h4{margin:14px 0 6px}
 
 /* "Saved to Trips" confirmation — pill + message + route into the Saved tab */
 .chat-saved{display:block;width:100%}

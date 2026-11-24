@@ -41,7 +41,7 @@ async function recommend(message, proximity, prefs = [], deps = {}) {
   }
   await Promise.all(places.map(async (p) => {
     try {
-      const photo = await findPhoto(p.name, p.hint, p.lng, p.lat);
+      const photo = await findPhoto(p.name, p.hint);
       if (photo) { p.photo = photo.src; p.photoPage = photo.page; }
     } catch { /* no photo beats a wrong photo */ }
   }));

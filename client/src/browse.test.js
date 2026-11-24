@@ -58,3 +58,21 @@ describe('browseRows', () => {
     expect(wide.map(r => r.id)).toEqual(['a', 'd', 'e']);
   });
 });
+
+describe('browse reads the unified catalogue vocabulary', () => {
+  // The map pins dataset rows whose categories are long descriptive strings.
+  // Browse must recognise those as dining/beach, or the two screens desync.
+  const CAT = [
+    { id: 'anon', name: 'The Anonymous Garden', town: 'Dagupan City', categories: ['restaurant'], lng: 120.34, lat: 16.04 },
+    { id: 'kuya', name: 'Kuya J', town: 'Urdaneta City', categories: ['Filipino & Seafood Family Dining'], lng: 120.57, lat: 15.97 },
+    { id: 'coast', name: 'Bolinao Coast', town: 'Bolinao', categories: ['Beach & Coastal'], lng: 119.87, lat: 16.31 },
+  ];
+
+  it('dining includes dataset restaurants, not only curated Food/Dining rows', () => {
+    expect(browseRows(CAT, { kind: 'dining' }).map(r => r.id).sort()).toEqual(['anon', 'kuya']);
+  });
+
+  it('beaches include the dataset beach categories', () => {
+    expect(browseRows(CAT, { kind: 'beaches' }).map(r => r.id)).toEqual(['coast']);
+  });
+});

@@ -33,6 +33,7 @@ vi.mock('../spots.js', () => ({ fetchSpots: vi.fn(async () => []) }));
 import ChatTab from './ChatTab.jsx';
 import { latestThread } from '../chatStore.js';
 import { chat } from '../api.js';
+import { fetchSpots } from '../spots.js';
 
 function click(el){
   el.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
@@ -129,8 +130,37 @@ describe('chat result sheet', () => {
     container.remove();
   });
 
-  it('guides from a chat card inside the app instead of opening Google Maps', async () => {
-    const openDirections = vi.fn();
+  it('keeps the real photo when a chat card opens its detail page', async () => {
+    // A chat card carries the server's Wikimedia photo in `photos`. The detail
+    // page used to be built from name/coords only, so it fell back to a Mapbox
+    // static map even though the card showed the real photo.
+    const photo = 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Lingayen_Beach.jpg/960px-Lingayen_Beach.jpg';
+    fetchSpots.mockResolvedValueOnce([
+      { id: 'lingayen-beach', name: 'Lingayen Beach & Lingayen Baywalk', town: 'Lingayen', lng: 120.23, lat: 16.03, categories: ['Beaches'], photos: [] },
+    ]);
+    chat.mockResolvedValueOnce({
+      answer: 'A beach for you:',
+      candidates: [{ name: 'Lingayen Beach & Lingayen Baywalk', hint: 'Lingayen', lng: 120.23, lat: 16.03, photos: [photo], photoSource: 'wikimedia' }],
+    });
+    const push = vi.fn();
+    const { container, root } = await mountChat({ push });
+    await ask(container);
+
+    const hero = container.querySelector('[data-testid="chat-card"]');
+    await React.act(async () => { click(hero); });
+
+    const place = push.mock.calls.at(-1)[0].place;
+    expect(place.name).toBe('Lingayen Beach & Lingayen Baywalk');
+    expect(place.photos).toEqual([photo]);
+    expect(place.photo).toBe(photo);
+    expect(place.photoSource).toBe('wikimedia');
+
+    fetchSpots.mockResolvedValue([]);
+    await React.act(async () => root.unmount());
+    container.remove();
+  });
+
+  it('guides from a chat card inside the app instead of opening Google Maps', async () => {    const openDirections = vi.fn();
     const { container, root } = await mountChat({ openDirections });
     await ask(container);
 

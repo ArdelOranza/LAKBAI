@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, Compass } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { TAGS, toggleTag, readLocalPrefs, savePrefs, loadPrefs } from '../prefs.js';
 import { useAuth } from '../AuthContext.jsx';
+import Logo from '../logo.jsx';
 
 export default function Preferences({ onContinue, onBack }){
   const { user } = useAuth();
@@ -55,9 +56,7 @@ export default function Preferences({ onContinue, onBack }){
         </div>
 
         <div className="soft-card" style={{ marginTop:28 }}>
-          <span style={{ width:36, height:36, minWidth:36, borderRadius:12, background:'#fff', color:'var(--primary)', display:'grid', placeItems:'center' }}>
-            <Compass size={17}/>
-          </span>
+          <span className="brand-tile" style={{ width:36, height:36, minWidth:36, borderRadius:12 }}><Logo size={20}/></span>
           <span>
             <b style={{ color:'var(--primary)', fontSize:13.5 }}>AI Recommendation Style</b>
             <p style={{ fontSize:12, color:'var(--muted-ink)', margin:'3px 0 0', lineHeight:1.45 }}>LakbAI curates destinations matching your selected tags with real-time transit routes</p>

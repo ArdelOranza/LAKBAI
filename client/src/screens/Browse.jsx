@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft, ChevronDown, Plus, MapPin, Star, Check } from 'lucide-react';
 import { useAuth } from '../AuthContext.jsx';
-import { fetchSpots } from '../spots.js';
+import { fetchCatalogue } from '../catalogue.js';
 import { saveFavorite } from '../store.js';
 import { browseRows, townsFor, nearestTown } from '../browse.js';
 import { formatDistance } from '../geo.js';
@@ -30,7 +30,7 @@ export default function Browse({ kind = 'beaches', coords, hasFix = true, push, 
 
   useEffect(() => {
     let alive = true;
-    fetchSpots()
+    fetchCatalogue()
       .then(list => {
         if (!alive) return;
         setSpots(list || []);

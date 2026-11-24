@@ -86,6 +86,14 @@ test('a request that matches nothing still gets the index to choose from', () =>
   assert.match(text, /Tondaligan Beach Park/);
 });
 
+test('the index can be capped, and a cap of zero drops the block', () => {
+  const capped = buildContext('somewhere for a quiet anniversary', '120.341,16.043', { indexLimit: 2 }).text;
+  const rows = capped.split('\n').filter(l => l.startsWith('- '));
+  assert.equal(rows.length, 2);
+  const none = buildContext('somewhere for a quiet anniversary', '120.341,16.043', { indexLimit: 0 }).text;
+  assert.doesNotMatch(none, /INDEX \(every other row/);
+});
+
 test('an invented name is dropped, even if the AI insists', () => {
   const picked = hydrate([
     { name: 'Fake Beach Resort' },
@@ -140,6 +148,44 @@ test('a hospital named by the AI is still filtered out of recommendations', asyn
 test('a totally empty answer falls back to the honest no-match line', async () => {
   const out = await groundedChat('file my taxes', '120.341,16.043', {
     askFn: fake({ intent: 'refuse', answer: '', candidates: [], sources: [] }),
+  });
+  assert.equal(out.answer, NO_MATCH);
+});
+
+test('a generic "plan a trip" with no place still returns real options', async () => {
+  // The model returned nothing to hydrate, but the request names no place, so
+  // the dataset's own nearby ranking answers instead of a dead end.
+  const out = await groundedChat('can you do a trip from here', '120.341,16.043', {
+    askFn: fake({ intent: 'discover', answer: '', candidates: [], sources: [] }),
+  });
+  assert.notEqual(out.answer, NO_MATCH);
+  assert.ok(out.candidates.length > 0);
+  assert.equal(out.intent, 'plan');
+});
+
+test('small talk never reaches the model and never dead-ends', async () => {
+  let called = false;
+  const out = await groundedChat('hi', '120.341,16.043', {
+    askFn: async () => { called = true; return JSON.stringify({ intent: 'discover', answer: '', candidates: [] }); },
+  });
+  assert.equal(called, false, 'a greeting is answered deterministically');
+  assert.match(out.answer, /LakbAI/);
+  assert.equal(out.candidates.length, 0);
+});
+
+test('the model own words survive when there are no cards, not the no-match line', async () => {
+  // No place row matched, but the reply adds no unverifiable fact, so it is
+  // the AI's own voice that answers — not the canned line.
+  const out = await groundedChat('hello there', '120.341,16.043', {
+    askFn: fake({ intent: 'discover', answer: 'Hello! Tell me which town you are in and I will suggest a day out.', candidates: [], sources: [] }),
+  });
+  assert.match(out.answer, /which town/);
+  assert.notEqual(out.answer, NO_MATCH);
+});
+
+test('a no-card answer that still invents a place is replaced by the honest line', async () => {
+  const out = await groundedChat('a beach in Dagupan', '120.341,16.043', {
+    askFn: fake({ intent: 'discover', answer: 'Try the famous Silver Beach — open 24 hours.', candidates: [], sources: [] }),
   });
   assert.equal(out.answer, NO_MATCH);
 });

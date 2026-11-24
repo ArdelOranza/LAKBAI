@@ -9,7 +9,7 @@ const overlayFile = path.join(os.tmpdir(), 'lakbai-dataset-photos-' + process.pi
 process.env.LAKBAI_ADMIN_PHOTOS_FILE = overlayFile;
 try { fs.unlinkSync(overlayFile); } catch { /* fresh */ }
 
-const { datasetInfo, allEntries, localChat, localRecommend, search, parseRating, normalize, pickList, withCoords, NO_MATCH } = require('../dataset.js');
+const { datasetInfo, allEntries, localChat, localRecommend, search, intentOf, genericPlanAsk, smallTalkReply, parseRating, normalize, pickList, withCoords, NO_MATCH } = require('../dataset.js');
 const { setPhotos } = require('../adminPhotos.js');
 
 /** Run a read against a throwaway dataset file, then put the fixture back. */
@@ -167,7 +167,11 @@ test('the tourist-spot file shape is understood, coordinates included', () => {
   assert.deepEqual(entry.activities, ['Attend Holy Mass', 'Perform Visita Iglesia']);
   assert.equal(entry.quotes[0], 'Beautiful old church.');
   assert.equal(entry.sourceUrls.length, 1);
-  assert.equal(entry.photos.length, 1);
+  // A URL scraped off a listing page is not a photo of the place: it is an ad,
+  // a brochure scan or a page hero shared by a dozen entries. The dataset no
+  // longer hands those to the app; photos come from the admin map and the
+  // Wikimedia name lookup.
+  assert.equal(entry.photos.length, 0);
   assert.ok(Math.abs(entry.lat - 15.8087) < 0.02, 'decoded latitude');
   assert.ok(Math.abs(entry.lng - 120.4559) < 0.02, 'decoded longitude');
 });
@@ -209,6 +213,78 @@ test('recommendations keep the fields the cards need', async () => {
   assert.ok(first.sources[0].includes('google.com/maps'));
 });
 
+test('a trip request that names no place is planned, not refused', async () => {
+  // "can you do a trip from here" has no dish, town or kind of place to match,
+  // so it used to fall through to the honest no-match line. A generic day-out
+  // request should still be answered with real, nearby places.
+  assert.equal(intentOf('can you do a trip for me here'), 'plan');
+  assert.equal(intentOf('do a trip from here'), 'plan');
+  assert.equal(intentOf('what can i do here'), 'plan');
+  const generic = search('do a trip from here', '120.341,16.043');
+  assert.ok(generic.length > 0, 'a nameless trip request still returns verified places');
+  assert.ok(generic.some(e => e.name === 'Tondaligan Beach Park'), 'attractions, not a dead end');
+  const out = await localChat('can you do a trip from here', '120.341,16.043');
+  assert.equal(out.intent, 'plan');
+  assert.ok(out.candidates.length > 0);
+  assert.notEqual(out.answer, NO_MATCH);
+});
+
+test('the generic trip fallback only fires when no place or town is named', () => {
+  // "do a trip from here" names nothing, so best-effort places are fair game.
+  assert.equal(genericPlanAsk('do a trip from here', 'plan'), true);
+  assert.equal(genericPlanAsk('what can i do here', 'plan'), true);
+  // A named, uncovered town must not be answered with Pangasinan places.
+  assert.equal(genericPlanAsk('plan a trip to Baguio', 'plan'), false);
+  assert.equal(genericPlanAsk('beaches near me', 'nearby'), false);
+});
+
+test('small talk gets a friendly line instead of the no-match line', () => {
+  assert.match(smallTalkReply('hi'), /LakbAI/);
+  assert.match(smallTalkReply('thank you!'), /welcome/i);
+  assert.equal(smallTalkReply('hi, where can I eat in Dagupan'), null, 'a real request is not small talk');
+  assert.equal(smallTalkReply('beaches'), null);
+});
+
+test('the dataset-only chat path answers small talk too (AI-quota fallback)', async () => {
+  // When the model quota is out the route serves localChat; a greeting must not
+  // become the no-match line just because the AI is unavailable.
+  const out = await localChat('hi', '120.341,16.043');
+  assert.match(out.answer, /LakbAI/);
+  assert.equal(out.candidates.length, 0);
+});
+
+test('a duplicate restaurant under a parenthetical town suffix collapses to one row', () => {
+  // pangasinan-150.json carries "MATUTINA-GERRY's Seafood House" and
+  // "MATUTINA-GERRY's Seafood House (Dagupan)" in the same town, neither with a
+  // coordinate, so the 50 m proximity merge could not see them.
+  const out = withDataset([
+    { name: "MATUTINA-GERRY's Seafood House", municipality_or_city: 'Dagupan City', total_review_count: 300 },
+    { name: "MATUTINA-GERRY's Seafood House (Dagupan)", municipality_or_city: 'Dagupan City', total_review_count: 41 },
+  ], () => allEntries());
+  assert.equal(out.length, 1);
+  assert.equal(out[0].reviews, '300', 'the fatter row survives');
+});
+
+test('the same base name in two different towns is still two rows', () => {
+  // Branches in different towns are separate places and must stay separate.
+  const out = withDataset([
+    { name: "Matutina - Gerry's Seafood House (Dagupan)", municipality_or_city: 'Dagupan City' },
+    { name: "Matutina - Gerry's Seafood House (Urdaneta)", municipality_or_city: 'Urdaneta City' },
+  ], () => allEntries());
+  assert.equal(out.length, 2);
+});
+
+test('a shared host name does not swallow the business inside it', () => {
+  // Base names are compared lowercased: a naive strip-uppercase left
+  // "SM City Rosales" (no coordinate, like the real mall row) and
+  // "KFC - SM City Rosales" identical and deleted the restaurant.
+  const out = withDataset([
+    { name: 'SM City Rosales', municipality_or_city: 'Rosales' },
+    { name: 'KFC - SM City Rosales', municipality_or_city: 'Rosales', lat: 15.8781997, lng: 120.6025975 },
+  ], () => allEntries());
+  assert.equal(out.length, 2);
+});
+
 test('an unmatched question says so instead of inventing a place', async () => {
   const out = await localChat('how do I file my taxes', '120.341,16.043');
   assert.equal(out.candidates.length, 0);
@@ -244,7 +320,7 @@ test('a bare "beaches" request returns beach entries, not restaurants', () => {
   assert.ok(out.every(e => e.intents.includes('beach')));
 });
 
-test('the 150-spot file shape is understood (location prose, fee paragraph, comment reviews, image URLs)', () => {
+test('the 150-spot file shape is understood (location prose, fee paragraph, comment reviews)', () => {
   const entry = normalize({
     id: 'pangasinan-001',
     name: 'Hundred Islands National Park (Governor\'s, Quezon, Marcos)',
@@ -268,7 +344,7 @@ test('the 150-spot file shape is understood (location prose, fee paragraph, comm
   assert.equal(entry.reviews, '515');
   assert.match(entry.price, /PHP 40\.00/);
   assert.deepEqual(entry.activities, ['Go island hopping', 'Snorkel over giant clam sanctuaries']);
-  assert.equal(entry.photos.length, 1);
+  assert.equal(entry.photos.length, 0);
   assert.equal(entry.sourceUrls.length, 1);
   assert.equal(entry.quotes[0], 'Islands are not far away from each other.');
   assert.equal(entry.phone, '+63 75 433 7532');
@@ -404,51 +480,29 @@ test('a missing coordinate is only filled from a Mapbox hit that names the place
   }
 });
 
-test('a photo reused by a differently-named place is not that place’s photo', () => {
-  // The scrape attached one page-hero image to every place on that page, so
-  // Bolinao Falls 1, 2 and 3 all showed the same waterfall. One photo cannot
-  // caption two different places.
+test('scraped image URLs are not place photos', () => {
+  // The scrape attached one page-hero image to every place on a page, and some
+  // entries carry ads or brochure scans. None of those are photos of the place,
+  // so the dataset no longer forwards them: photos come from the reviewed map,
+  // the admin app and the Wikimedia name lookup.
   const shared = 'https://seepangasinan.com/wp-content/uploads/2021/03/Clave.jpg';
   const out = withDataset([
     { name: "Governor's Island", municipality_or_city: 'Alaminos City', lat: 16.21, lng: 120.04, photos: [shared] },
-    { name: 'Quezon Island', municipality_or_city: 'Alaminos City', lat: 16.211, lng: 120.041, photos: [shared] },
-    { name: 'Patar Beach', municipality_or_city: 'Bolinao', lat: 16.32, lng: 119.79, photos: ['https://example.com/patar.jpg'] },
+    { name: 'Bolinao Falls 1 (Cachoeira de Bolinao)', municipality_or_city: 'Bolinao', lat: 16.30, lng: 119.90, images: [shared] },
+    { name: 'Patar Beach', municipality_or_city: 'Bolinao', lat: 16.32, lng: 119.79, verified_image_urls: ['https://example.com/patar.jpg'] },
   ], () => allEntries());
-  const byName = Object.fromEntries(out.map(e => [e.name, e]));
-  assert.deepEqual(byName["Governor's Island"].photos, []);
-  assert.deepEqual(byName['Quezon Island'].photos, []);
-  assert.deepEqual(byName['Patar Beach'].photos, ['https://example.com/patar.jpg'], 'a unique photo stays');
-});
-
-test('two numbered falls are two places, so they cannot share one photo', () => {
-  // Live defect: Bolinao Falls 1, 2 and 3 all rendered the same scraped
-  // waterfall because their names share the word "Bolinao".
-  const url = 'https://ilovepangasinan.com/wp-content/uploads/2022/03/1-768x432.jpg';
-  const out = withDataset([
-    { name: 'Bolinao Falls 1 (Cachoeira de Bolinao)', municipality_or_city: 'Bolinao', lat: 16.30, lng: 119.90, photos: [url] },
-    { name: 'Bolinao Falls 2', municipality_or_city: 'Bolinao', lat: 16.31, lng: 119.91, photos: [url] },
-    { name: 'Bolinao Falls 3 (Bolinao Falls 3A)', municipality_or_city: 'Bolinao', lat: 16.32, lng: 119.92, photos: [url] },
-  ], () => allEntries());
-  assert.equal(out.length, 3);
   assert.deepEqual(out.map(e => e.photos), [[], [], []]);
 });
 
-test('the same place listed twice keeps its photo', () => {
-  const url = 'https://example.com/patar.jpg';
-  const out = withDataset([
-    { name: 'Patar Beach', municipality_or_city: 'Bolinao', lat: 16.32000, lng: 119.79000, photos: [url] },
-    { name: 'Patar White Sand Beach', municipality_or_city: 'Bolinao', lat: 16.32010, lng: 119.79010, photos: [url] },
-  ], () => allEntries());
-  assert.equal(out.length, 1);
-  assert.deepEqual(out[0].photos, [url]);
-});
-
-test('recommend labels a Wikimedia photo as wikimedia, not json', async () => {
+test('the admin photo map still supplies a real photo', () => {
+  // The dataset itself carries no scraped images any more, so the admin overlay
+  // is the one hand-curated photo source that reaches a card unchanged.
   const WIKI = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Beach.jpg/960px-Beach.jpg';
-  const out = await withDatasetAsync([
-    { name: 'Patar Beach', municipality_or_city: 'Bolinao', categories: ['beach'], lat: 16.32, lng: 119.79, photos: [WIKI] },
-  ], () => localRecommend('Patar Beach', '119.79,16.32'));
-  const place = (out.places || [])[0];
-  assert.ok(place, 'Patar Beach should be recommended');
-  assert.equal(place.photoSource, 'wikimedia');
+  setPhotos('conrads', [WIKI]);
+  try {
+    const entry = allEntries().find(e => e.id === 'conrads');
+    assert.deepEqual(entry.photos, [WIKI]);
+  } finally {
+    setPhotos('conrads', []);
+  }
 });

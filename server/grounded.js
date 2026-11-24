@@ -10,8 +10,10 @@
 const { callGeminiForPlan, extractJson } = require('./agent.js');
 const { isWikimedia } = require('./photoHierarchy.js');
 const { callGroq } = require('./groq.js');
+const { callTokenHarbor } = require('./tokenHarbor.js');
 const {
   datasetInfo, allEntries, search, withCoords, reasonFor, intentOf, answerFor, NO_MATCH,
+  genericPlanAsk, smallTalkReply, localChat,
 } = require('./dataset.js');
 const { isAttraction } = require('./attractions.js');
 const { parseProximity, nearestTown, haversineKm } = require('./location.js');
@@ -23,6 +25,13 @@ const MAX_RECORDS = 8;
 // Every provided row goes to the model, so nothing in the files is invisible.
 const MAX_INDEX = 400;
 const MAX_CANDIDATES = 6;
+// The Groq free tier rejects a request over 8k tokens a minute, and the full
+// context is ~14k. The fallback therefore gets its own payload: trimmed record
+// details plus a capped index, kept under this many characters (≈4k tokens,
+// leaving room for the answer inside the provider's window).
+const GROQ_INDEX = 120;
+const GROQ_MAX_CHARS = 17000;
+const GROQ_MAX_TOKENS = 1600;
 
 // The primary model's free-tier quota can run out mid-day. agent.js is not
 // touched, so this is an extra attempt on the lite model before we fall back to
@@ -60,27 +69,40 @@ async function callLite(system, payload){
   const data = await r.json();
   return data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
 }
-async function askModel(system, payload){
-  // Gemini primary → Gemini lite → Groq. Each step is independent, so a dead
-  // quota or a 402 never stops the answer. Failures are logged (without keys)
-  // so a 429/quota failure is diagnosable; the last error is surfaced when
-  // every provider has failed, never swallowed into an empty 502.
+async function askModel(system, payload, opts = {}){
+  // Token Harbor → Gemini primary → Groq. Token Harbor comes first: its free
+  // route accepts the full context and is the reliable path while Gemini's
+  // free quota is exhausted. Each step is independent, so a dead quota or a
+  // 402 never stops the answer. Failures are logged (without keys) so a
+  // 429/quota failure is diagnosable; the last error is surfaced when every
+  // provider has failed, never swallowed into an empty 502.
   // Empty strings are failures too: a provider that returns no candidate
   // content must fall through to the next provider, not throw a bare 502.
   let lastError = null;
-  const withTimeout = (p, label) => Promise.race([
-    p,
-    new Promise((_, reject) => setTimeout(
-      () => reject(Object.assign(new Error(label + ' timed out after 30s'), { status: 504 })),
-      30000
-    )),
-  ]);
+  const withTimeout = (p, label) => {
+    let timer;
+    return Promise.race([
+      p,
+      new Promise((_, reject) => {
+        timer = setTimeout(
+          () => reject(Object.assign(new Error(label + ' timed out after 30s'), { status: 504 })),
+          30000
+        );
+      }),
+    ]).finally(() => clearTimeout(timer));
+  };
   const nonempty = (r, label) => { if (typeof r !== 'string' || !r.trim()) throw Object.assign(new Error(label + ' returned empty'), { status: 502 }); return r; };
+  // Token Harbor takes the full payload: its free model has a 1M-token window,
+  // so no compact copy is needed.
+  try { return nonempty(await withTimeout(callTokenHarbor(system, payload, { maxTokens: opts.maxTokens }), 'Token Harbor'), 'Token Harbor'); }
+  catch (e) { lastError = e; console.warn('token harbor unavailable:', e.message); }
+  // callGeminiForPlan already walks primary → lite → DeepSeek internally.
   try { return nonempty(await withTimeout(callGeminiForPlan(system, payload), 'Gemini primary'), 'Gemini primary'); }
   catch (e) { lastError = e; console.warn('gemini primary unavailable:', e.message); }
-  try { return nonempty(await callLite(system, payload), 'Gemini lite'); }
-  catch (e) { lastError = e; console.warn('gemini lite unavailable:', e.message); }
-  try { return nonempty(await callGroq(system, payload), 'Groq'); }
+  // Groq's free tier rejects the full context, so it gets the compact payload
+  // built alongside it (same rows, fewer characters). Without one, fall back to
+  // the full payload and let the provider decide.
+  try { return nonempty(await callGroq(system, opts.compact || payload, { maxTokens: opts.maxTokens || GROQ_MAX_TOKENS }), 'Groq'); }
   catch (e) { lastError = e; console.warn('groq unavailable:', e.message); }
   throw lastError || Object.assign(new Error('All model providers unavailable'), { status: 502 });
 }
@@ -96,7 +118,7 @@ const clip = (text, max) => {
   return s.length > max ? s.slice(0, max - 1).trimEnd() + '…' : s;
 };
 
-function recordLine(entry, i){
+function recordLine(entry, i, tight = false){
   const bits = [entry.name];
   if (entry.town) bits.push(entry.town);
   if (entry.categories.length) bits.push(entry.categories.join('/'));
@@ -106,10 +128,10 @@ function recordLine(entry, i){
   if (entry.phone) bits.push(`phone: ${entry.phone}`);
   if (entry.address) bits.push(`address: ${clip(entry.address, 160)}`);
   let line = `${i + 1}. ${bits.join(' | ')}`;
-  if (entry.description) line += `\n   about: ${clip(entry.description, 700)}`;
-  if (entry.activities.length) line += `\n   do: ${clip(entry.activities.join('; '), 400)}`;
-  if (entry.quotes.length) line += entry.quotes.slice(0, 2).map(q => `\n   review: "${q}"`).join('');
-  if (entry.sourceUrls.length) line += `\n   source: ${entry.sourceUrls[0]}`;
+  if (entry.description) line += `\n   about: ${clip(entry.description, tight ? 200 : 700)}`;
+  if (entry.activities.length) line += `\n   do: ${clip(entry.activities.join('; '), tight ? 120 : 400)}`;
+  if (entry.quotes.length) line += entry.quotes.slice(0, tight ? 1 : 2).map(q => `\n   review: "${q}"`).join('');
+  if (entry.sourceUrls.length && !tight) line += `\n   source: ${entry.sourceUrls[0]}`;
   return line;
 }
 
@@ -122,7 +144,7 @@ function indexLine(entry){
 }
 
 /** Compact context block: full rows for the likely matches, a name index for the rest. */
-function buildContext(message, proximity, { profile = '', hasFix = true } = {}){
+function buildContext(message, proximity, { profile = '', hasFix = true, indexLimit = MAX_INDEX, tight = false } = {}){
   const here = parseProximity(proximity);
   // With no fix the coordinates are the province fallback point, so they must
   // not bias which rows read as "nearby" — only the request and profile matter.
@@ -141,17 +163,33 @@ function buildContext(message, proximity, { profile = '', hasFix = true } = {}){
       lines.push(`Traveler is in ${town ? town + ', ' : ''}Pangasinan (${here.lat.toFixed(3)}, ${here.lng.toFixed(3)}). Prefer nearby places unless the request names somewhere else.`);
     }
   }
-  if (hits.length) lines.push('', 'RECORDS:', ...hits.map(recordLine));
+  if (hits.length) lines.push('', 'RECORDS:', ...hits.map((h, i) => recordLine(h, i, tight)));
   const hitKeys = new Set(hits.map(h => h.id));
   const rest = all.filter(e => !hitKeys.has(e.id));
-  if (rest.length){
+  if (rest.length && indexLimit > 0){
     const ordered = bias
       ? rest.slice().sort((a, b) => distance(a, bias) - distance(b, bias))
       : rest.slice().sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0));
-    lines.push('', 'INDEX (every other row in the provided files):', ...ordered.slice(0, MAX_INDEX).map(indexLine));
+    lines.push('', 'INDEX (every other row in the provided files):', ...ordered.slice(0, indexLimit).map(indexLine));
   }
   if (!hits.length) lines.push('', 'No RECORDS matched directly — pick from INDEX by meaning if anything fits, otherwise say you do not have it.');
   return { text: lines.join('\n'), hits };
+}
+
+/**
+ * The payload for a provider with a small token window (Groq's free tier).
+ * Tight records keep the index alive, and the index shrinks step by step until
+ * the whole thing fits the budget — a generic ask (no records) keeps the most
+ * rows, a keyword-heavy ask trades record detail for index coverage.
+ */
+function compactContext(message, proximity, extra = [], opts = {}){
+  const blocks = extra.filter(Boolean);
+  let out = '';
+  for (const indexLimit of [GROQ_INDEX, 60, 0]){
+    out = [buildContext(message, proximity, { ...opts, indexLimit, tight: true }).text, ...blocks].join('\n\n');
+    if (out.length <= GROQ_MAX_CHARS) break;
+  }
+  return out;
 }
 
 function distance(entry, here){
@@ -279,6 +317,18 @@ function groundAnswer(answer, intent, entries){
   return text;
 }
 
+/**
+ * The model's prose when it survives the fact check against no rows at all.
+ * With nothing to ground against, any place name, price, hour or rating the
+ * model added is rejected, so only talk that makes no verifiable claim (a
+ * greeting, an explanation, an honest "I don't cover that") comes back.
+ */
+function cleanProse(answer, intent){
+  const text = String(answer || '').trim();
+  if (!text) return '';
+  return groundAnswer(text, intent, []) === text ? text : '';
+}
+
 async function ask(message, proximity, deps = {}){
   const askFn = deps.askFn || askModel;
   const hasFix = deps.hasFix !== false;
@@ -292,8 +342,12 @@ async function ask(message, proximity, deps = {}){
   // place rules stay exactly as they were for everything else. Terminal rows
   // join when the traveler is asking about terminals, so both can be answered
   // from one grounded block.
-  const payload = [text, commute && commute.text, terminal && terminal.text].filter(Boolean).join('\n\n');
-  const raw = await askFn(SYSTEM, payload);
+  const extra = [commute && commute.text, terminal && terminal.text].filter(Boolean);
+  const payload = [text, ...extra].join('\n\n');
+  // A provider with a smaller token window (Groq free tier) gets the same
+  // question, trimmed to fit — so an exhausted Gemini quota is not a dead end.
+  const compact = compactContext(message, proximity, extra, { profile: deps.profile, hasFix });
+  const raw = await askFn(SYSTEM, payload, { compact, maxTokens: GROQ_MAX_TOKENS });
   const parsed = parseGrounded(raw);
   const entries = allEntries();
   const picked = hydrate(parsed.candidates, entries);
@@ -304,6 +358,10 @@ async function ask(message, proximity, deps = {}){
 async function groundedChat(message, proximity, deps = {}){
   const info = datasetInfo();
   if (!info.ready) throw Object.assign(new Error('No dataset installed'), { status: 503 });
+  // A greeting or a thank-you is answered here, not by the model: it must never
+  // dead-end on the no-match line, and it is not worth a model call.
+  const hello = smallTalkReply(message);
+  if (hello) return { intent: 'discover', answer: hello, candidates: [], spotlight: null, sources: [], source: 'dataset' };
   const { parsed, picked, commute, terminal } = await ask(message, proximity, deps);
   const intent = commute ? 'commute' : parsed.intent || intentOf(message);
   // Terminal questions are answered from the terminal directory: address, phone,
@@ -321,7 +379,20 @@ async function groundedChat(message, proximity, deps = {}){
     return { intent: 'commute', answer: grounded.answer, candidates: [], spotlight: null, sources: [], source: 'dataset+ai' };
   }
   if (!picked.length){
-    // No verified row backs the reply, so the model's prose is not trusted.
+    // The model matched no verified row. Its own words are still worth showing
+    // when they add no unverifiable fact — a greeting, an explanation or "here
+    // is how to plan" must not be turned into the no-match line. The fact check
+    // runs against an empty row set, so any invented place, price or hour is
+    // rejected and swapped for a real answer below.
+    const prose = cleanProse(parsed.answer, intent);
+    if (prose) return { intent, answer: prose, candidates: [], spotlight: null, sources: [], source: 'dataset+ai' };
+    // A request that names no place of its own ("plan a trip", "what can I do
+    // here") still deserves real options, so answer from the dataset's own
+    // nearby ranking instead of a dead end.
+    if (genericPlanAsk(message, intentOf(message))){
+      const alt = await localChat(message, proximity);
+      if (alt.candidates.length) return { ...alt, source: 'dataset' };
+    }
     return { intent, answer: NO_MATCH, candidates: [], spotlight: null, sources: [], source: 'dataset+ai' };
   }
   // withCoords returns clones — apply the geocoded coordinates back to the
@@ -409,4 +480,4 @@ async function groundedRecommend(message, proximity, prefs = [], deps = {}){
   };
 }
 
-module.exports = { groundedChat, groundedRecommend, buildContext, hydrate, parseGrounded, groundAnswer, SYSTEM, callLite };
+module.exports = { groundedChat, groundedRecommend, buildContext, compactContext, hydrate, parseGrounded, groundAnswer, SYSTEM, callLite };

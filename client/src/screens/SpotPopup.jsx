@@ -7,6 +7,7 @@ import { useAuth } from '../AuthContext.jsx';
 import { saveFavorite, listFavorites } from '../store.js';
 import { haversineKm, formatDistance } from '../geo.js';
 import { dragOffset, shouldDismiss } from '../sheetDrag.js';
+import { popupBlurb } from '../popupBlurb.js';
 import { FALLBACK_CENTER } from '../App.jsx';
 import { PrimaryBtn, PhotoPlaceholder } from '../ui.jsx';
 import { placeImage, mapboxToken } from '../staticMap.js';
@@ -176,7 +177,7 @@ export default function SpotPopup({ spot, coords, pop, push, showToast, user, se
         </p>
 
         <p style={{ margin:'8px 0 0', fontSize:13, lineHeight:1.55, color:'#475569' }}>
-          {spot.blurb || `A curated ${String((spot.categories && spot.categories.length) ? spot.categories[0] : 'local').toLowerCase()} stop in ${spot.town || 'Pangasinan'} — save it and let LakbAI sequence your day around it.`}
+          {popupBlurb(spot)}
         </p>
 
         <div style={{ margin:'14px 0 2px' }}>

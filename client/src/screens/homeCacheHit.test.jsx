@@ -101,26 +101,25 @@ describe('Home with a saved feed', () => {
     container.remove();
   });
 
-  it('keeps the previous picks visible while refreshing after moving to a new town', async () => {
+  it('drops the old town’s picks as soon as the traveler moves', async () => {
     let finish;
     recommend.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
     // Feed built in Bolinao; the traveler is now in Dagupan (~50 km away).
     seedCache(60 * 1000, { lng: 119.89, lat: 16.32 });
     const { container, root } = await mount(DAGUPAN);
 
-    expect(container.textContent).toContain('Patar White Sand Beach');
-    expect(container.textContent).not.toContain('Finding hidden gems for you…');
+    // The Bolinao row must not be painted under Dagupan's name.
+    expect(container.textContent).not.toContain('Patar White Sand Beach');
 
     await React.act(async () => { await Promise.resolve(); });
     expect(recommend).toHaveBeenCalledTimes(1);
-    // Local cards stay up instead of blanking to a shimmer mid-request.
-    expect(container.textContent).toContain('Patar White Sand Beach');
 
     await React.act(async () => {
       finish({ places: [{ id: 'dag1', name: 'Dagupan Bangus Market', lng: 120.34, lat: 16.04, categories: ['Food & Dining'] }] });
       await Promise.resolve();
     });
     expect(container.textContent).toContain('Dagupan Bangus Market');
+    expect(container.textContent).not.toContain('Patar White Sand Beach');
 
     await React.act(async () => root.unmount());
     container.remove();

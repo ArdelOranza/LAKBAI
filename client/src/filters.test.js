@@ -30,6 +30,24 @@ describe('matches', () => {
     expect(matches({ name:'Beach Resort', categories:['Beach'] }, 'Beaches')).toBe(true);
   });
 });
+describe('matches — the map chip vocabulary', () => {
+  const church = { id:'6', name:'Manaoag Basilica', categories:['Religious & Pilgrimage Site'] };
+  const museum = { id:'7', name:'Bolinao Museum', categories:['Historical, Museum & Cultural Heritage'] };
+
+  it('Restaurants and Churches are separate chips', () => {
+    expect(matches(B, 'Restaurants')).toBe(true);
+    expect(matches(A, 'Restaurants')).toBe(false);
+    expect(matches(church, 'Churches')).toBe(true);
+    expect(matches(church, 'Restaurants')).toBe(false);
+  });
+
+  it('Others is the honest catch-all, not a copy of All', () => {
+    expect(matches(museum, 'Others')).toBe(true);
+    expect(matches(B, 'Others')).toBe(false);
+    expect(matches(A, 'Others')).toBe(false);
+  });
+});
+
 describe('feeLabel', () => {
   it('Free when fees empty or /free/i, else the fee text', () => {
     expect(feeLabel('')).toBe('Free');

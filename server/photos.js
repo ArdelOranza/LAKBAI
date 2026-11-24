@@ -24,7 +24,7 @@ const JUNK = new Set([
   'interior', 'altar', 'wedding', 'reception', 'selfie', 'portrait',
   'screenshot', 'logo', 'seal', 'diagram', 'certificate', 'poster', 'banner',
   'document', 'collage', 'brochure', 'flyer', 'scan', 'map', 'room', 'lobby',
-  'menu', 'tarpaulin', 'flag', 'flags',
+  'menu', 'tarpaulin', 'flag', 'flags', 'marker', 'plaque', 'sign', 'signage',
 ]);
 
 // Words that describe how a place looks, not which place it is. "Abagatanen
@@ -43,6 +43,7 @@ const FEATURE = new Set([
   'beach', 'coast', 'shore', 'sandbar', 'cove', 'island', 'fall', 'river',
   'spring', 'cave', 'church', 'shrine', 'park', 'plaza', 'market', 'museum',
   'lighthouse', 'garden', 'mountain', 'hill', 'lake', 'rock', 'resort', 'hotel',
+  'festival',
 ]);
 
 // A Commons file that is not a photograph cannot caption a place. Ruby's
@@ -54,9 +55,30 @@ const NOT_PHOTO = /\.(pdf|djvu|svg|gif|ogv|webm|ogg|mp3|wav|flac|xcf|stl|zip)\s*
 // "Calasiao Pangasinan.png" was the municipal seal at 150x165.
 const MIN_PHOTO_PX = 400;
 
-// How far a file may be geotagged from the place it claims to show. A town and
-// its barangays fit well inside this; another province or country does not.
-const MAX_KM = 40;
+// Words that say the file is about an event held at the place, not the place
+// itself. "Philippine Beach Games in Baywalk of Lingayen, Pangasinan 2024 02"
+// became the Lingayen Baywalk photo: a sponsor banner on a fence. An event may
+// still be photographed for its own listing (name includes the event word).
+const EVENT = new Set([
+  'games', 'game', 'festival', 'fiesta', 'parade', 'pageant', 'race', 'races',
+  'marathon', 'triathlon', 'concert', 'contest', 'competition', 'tournament',
+  'ceremony', 'inauguration', 'rally', 'celebration', 'party', 'wedding',
+  'exhibit', 'bazaar', 'fair', 'opening', 'procession', 'coronation',
+  'sportsfest', 'gamesfest', 'showing', 'premiere', 'launch', 'turnover',
+]);
+
+// A file from another province is not this Pangasinan place, however well the
+// name matches. Photo lookup is a name search, so the province has to be read
+// from the name too: "Santo Tomas City Public Market, Batangas" is Batangas.
+const OTHER_PROVINCE = [
+  'batangas', 'la union', 'ilocos', 'zambales', 'nueva ecija', 'tarlac',
+  'pampanga', 'bataan', 'bulacan', 'cavite', 'laguna', 'rizal', 'quezon',
+  'aurora', 'nueva vizcaya', 'quirino', 'isabela', 'cagayan', 'albay',
+  'camarines', 'sorsogon', 'masbate', 'aklan', 'antique', 'capiz', 'iloilo',
+  'negros', 'bohol', 'cebu', 'leyte', 'samar', 'palawan', 'mindoro', 'romblon',
+  'marinduque', 'basilan', 'sulu', 'tawi-tawi', 'zamboanga', 'davao',
+  'cotabato', 'lanao', 'misamis', 'agusan', 'surigao', 'bukidnon',
+];
 
 // Pangasinan's municipalities and cities. A file whose category names a
 // different one of them is a photo of that other place: "Burgos" was captioned
@@ -104,18 +126,13 @@ function photoHint(place){
   return explicit || hintFromAddress(place && place.address);
 }
 
-/** Cache key for a Commons lookup. Same-name places at different coordinates
- *  are different places: "Santo Tomas" near Manaoag is not the municipality
- *  50 km away, and must not reuse its market photo. Three decimals is about
- *  100 m, so repeat requests for one place still hit. */
+/** Cache key for a Commons lookup. The lookup is a name search, so the name
+ *  and the town are the whole key: the same place asked twice hits its entry,
+ *  and a row with no coordinates is not a different lookup. */
 function photoCacheKey(place){
-  const name = String((place && place.name) || '').toLowerCase();
-  const lat = Number(place && place.lat);
-  const lng = Number(place && place.lng);
-  const at = Number.isFinite(lat) && Number.isFinite(lng)
-    ? lat.toFixed(3) + ',' + lng.toFixed(3)
-    : '';
-  return name + '|' + photoHint(place).toLowerCase() + '|' + at;
+  const name = String((place && place.name) || '').toLowerCase().trim();
+  const hint = photoHint(place).toLowerCase().trim();
+  return name + '|' + hint;
 }
 
 // A compound name ("Lingayen Beach & Lingayen Baywalk") is one destination, so
@@ -168,14 +185,6 @@ function searchFor(name, hint){
   return q || town;
 }
 
-/** Great-circle distance in km between two {lat,lng} points. */
-function kmBetween(a, b){
-  const R = 6371, rad = d => d * Math.PI / 180;
-  const dLat = rad(b.lat - a.lat), dLon = rad(b.lng - a.lng);
-  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(h));
-}
-
 /** True when text names a Pangasinan town that is not this place. */
 function otherTown(text, name, hint){
   const lower = String(text || '').toLowerCase();
@@ -183,7 +192,9 @@ function otherTown(text, name, hint){
   const own = new Set([...tokens(name), ...tokens(hint)]);
   return PANGASINAN_TOWNS.some(town =>
     new RegExp('\\b' + town + '\\b').test(lower) &&
-    !town.split(' ').every(w => own.has(w))
+    // Compare through the same tokeniser, or "Santo Tomas" never matches its
+    // own name: tokens() collapses the trailing s to "toma".
+    !tokens(town).every(w => own.has(w))
   );
 }
 
@@ -197,6 +208,15 @@ function strictRelevant(title, name, hint, located){
   if (NOT_PHOTO.test(String(title || ''))) return false;
   const have = tokens(title);
   const haveSet = new Set(have);
+  const ownKeys = new Set([...tokens(name), ...tokens(hint)]);
+  // A file about an event is not a photo of the venue. "Philippine Beach Games
+  // in Baywalk of Lingayen" was captioned as the Lingayen Baywalk: the picture
+  // was a sponsor banner on a fence.
+  if (have.some(t => EVENT.has(t) && !ownKeys.has(t))) return false;
+  // Another province in the file name means another place, however well the
+  // name matches. The lookup is a name search, so read the province off the name.
+  const text = String(title || '').toLowerCase();
+  if (!/\bpangasinan\b/.test(text) && OTHER_PROVINCE.some(p => new RegExp('\\b' + p + '\\b').test(text))) return false;
   const want = new Set(String(name || '').match(/\d+/g) || []);
   // Parenthetical numbers are sequence labels ("(2).jpg"), not the feature's
   // own number, so they cannot prove "Bolinao Falls 2" is the right falls.
@@ -232,25 +252,14 @@ function strictRelevant(title, name, hint, located){
   });
 }
 
-function pickStrict(data, name, hint, place){
+function pickStrict(data, name, hint){
   const pages = (data.query && data.query.pages) || {};
-  const here = place && Number.isFinite(place.lat) && Number.isFinite(place.lng) ? place : null;
   const cats = p => (p.categories || []).map(c => String(c.title || '').replace(/^category:\s*/i, ''));
-  // Distance from the place, or null when either side has no coordinates.
-  const km = p => {
-    const c = p.coordinates && p.coordinates[0];
-    if (!here || !c || !Number.isFinite(c.lat) || !Number.isFinite(c.lon)) return null;
-    return kmBetween(here, { lat: c.lat, lng: c.lon });
-  };
-  const near = p => {
-    const d = km(p);
-    return d !== null && d <= MAX_KM;
-  };
-  // Location proof for a bare name: the file is geotagged here, its categories
-  // name the province/country, or a category is the town itself. A category
-  // that names a different Pangasinan town disproves it instead.
+  // Location proof for a bare name comes from the file's own name or categories:
+  // the province/country, or a category that is the town itself. A category that
+  // names a different Pangasinan town disproves it instead. Coordinates are not
+  // part of the decision — this is a name search.
   const located = p => {
-    if (near(p)) return true;
     const list = cats(p);
     if (list.some(c => otherTown(c, name, hint))) return false;
     const own = new Set([...tokens(name), ...tokens(hint)]);
@@ -265,11 +274,12 @@ function pickStrict(data, name, hint, place){
     // A seal or an icon cannot stand in for a photograph of the place.
     const info = p.imageinfo && p.imageinfo[0];
     if (info && Math.max(info.width || 0, info.height || 0) < MIN_PHOTO_PX) return false;
-    if (!strictRelevant(p.title, name, hint, located(p))) return false;
-    // Reject a file that says it was taken somewhere else. Only checked when
-    // both the file and the place carry coordinates; a miss is not a lie.
-    const d = km(p);
-    if (d !== null && d > MAX_KM) return false;
+    // Every match needs name-based location proof: "Public Plaza / Santa
+    // Barbara" is a library plaza in California, and "San Nicolas Church" was a
+    // church in Bilbao. The categories have to say Pangasinan, the Philippines
+    // or this town.
+    if (!located(p)) return false;
+    if (!strictRelevant(p.title, name, hint, true)) return false;
     return true;
   });
   // Prefer the file whose title says the least beyond the place name: "Lingayen
@@ -282,6 +292,7 @@ function pickStrict(data, name, hint, place){
   return {
     src: p.thumbnail.source,
     page: 'https://commons.wikimedia.org/wiki/' + encodeURIComponent(p.title),
+    title: String(p.title || '').replace(/^File:\s*/i, ''),
   };
 }
 
@@ -296,10 +307,9 @@ async function commons(fetcher, params){
   return r.json();
 }
 
-/** Commons file search by place name + town. The query is a name search; the
- *  coordinates and categories only validate a hit that Commons places
- *  somewhere else. */
-async function findBySearch(fetcher, name, hint, lat, lng){
+/** Commons file search by place name + town. Name only: coordinates are never
+ *  sent and never decide a match. */
+async function findBySearch(fetcher, name, hint){
   if (namesOnlyTown(name, hint)) return null;
   const byName = await commons(fetcher, {
     generator: 'search', gsrsearch: searchFor(name, hint),
@@ -307,15 +317,29 @@ async function findBySearch(fetcher, name, hint, lat, lng){
     prop: 'pageimages|imageinfo|coordinates|categories',
     iiprop: 'size', clshow: '!hidden', cllimit: '20'
   });
-  return byName ? pickStrict(byName, name, hint, { lat, lng }) : null;
+  return byName ? pickStrict(byName, name, hint) : null;
+}
+
+/** Run a lookup through the caller's cache, if given. A hit and a miss are both
+ *  cached; a rate limit is not, so a 429 is retried next time instead of being
+ *  remembered as "no photo". */
+async function cachedLookup(name, hint, deps, lookup){
+  const key = photoCacheKey({ name, hint });
+  if (deps.cache){
+    const hit = deps.cache.get(key);
+    if (hit !== undefined) return hit.value;
+  }
+  const found = await lookup();
+  if (deps.cache) deps.cache.set(key, found);
+  return found;
 }
 
 /** Commons-only lookup with strict title matching (used to build the
  *  committed tourist-spot map). Never calls Google image search. */
-async function findCommonsPhoto(name, hint, lng, lat, deps = {}){
+async function findCommonsPhoto(name, hint, deps = {}){
   const fetcher = deps.fetch || fetch;
   try {
-    return await findBySearch(fetcher, name, hint, lat, lng);
+    return await cachedLookup(name, hint, deps, () => findBySearch(fetcher, name, hint));
   } catch (e) {
     if (e && e.status === 429) throw e;
     return null;
@@ -324,10 +348,10 @@ async function findCommonsPhoto(name, hint, lng, lat, deps = {}){
 
 /** Runtime lookup for unphotographed places. Strict matching, name search
  *  only; a miss returns null so the client keeps its map fallback. */
-async function findPhoto(name, hint, lng, lat, deps = {}){
+async function findPhoto(name, hint, deps = {}){
   const fetcher = deps.fetch || fetch;
   try {
-    return await findBySearch(fetcher, name, hint, lat, lng);
+    return await cachedLookup(name, hint, deps, () => findBySearch(fetcher, name, hint));
   } catch {
     return null;
   }

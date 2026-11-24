@@ -1,53 +1,31 @@
 // The chips above the composer are the fastest way into the assistant, so they
-// have to follow the conversation: a fare answer should offer another fare
-// question, not "plan a day here". Pure function, no React, so the rules stay
-// testable.
+// follow the conversation. Fares are answered when typed but never suggested:
+// the chip row must not advertise what the greeting no longer mentions.
 import { describe, it, expect } from 'vitest';
 import { suggestionsFor } from './chatSuggest.js';
-
-const DAGUPAN = { lng: 120.3431, lat: 16.0433 };
-const FAR_AWAY = { lng: 121.0, lat: 14.6 };
 
 const labels = list => list.map(s => s.label);
 
 describe('suggestionsFor', () => {
-  it('offers the single best next question after a fare answer', () => {
-    const list = suggestionsFor({ lastAi: { intent: 'commute', text: 'Ordinary is ₱467.50.' } });
-    expect(labels(list)).toEqual(['Fare to another town']);
-    expect(labels(list)).not.toContain('Plan a day here');
-  });
-
-  it('keeps the place follow-up after a place answer', () => {
+  it('offers a place follow-up only after a place answer', () => {
     const list = suggestionsFor({ lastAi: { cards: [{ name: 'Patar White Sand Beach' }] } });
     expect(labels(list)).toEqual(['Plan a day here']);
     expect(list[0].send).toContain('Patar White Sand Beach');
   });
 
-  it('knows which town the traveler is standing in', () => {
-    const list = suggestionsFor({ coords: DAGUPAN });
-    expect(labels(list)).toEqual(['Bus from Cubao to Dagupan']);
-    expect(labels(list)).not.toContain('Beaches near me');
-  });
-
-  it('falls back to the one general prompt when the fix is outside Pangasinan', () => {
-    const list = suggestionsFor({ coords: FAR_AWAY });
+  it('never suggests a fare question, even after a fare answer', () => {
+    const list = suggestionsFor({ lastAi: { intent: 'commute', text: 'Ordinary is ₱467.50.' } });
     expect(labels(list)).toEqual(['Beaches near me']);
+    expect(list.some(s => /fare|bus/i.test(s.label) || /fare|bus/i.test(s.send))).toBe(false);
   });
 
-  it('does not name the fallback town when there is no GPS fix', () => {
-    // The Lingayen-area fallback centre is not where the traveler is, so it must
-    // not become a "Bus from Cubao to Lingayen" chip.
-    const FALLBACK = { lng: 120.23, lat: 16.03 };
-    const list = suggestionsFor({ coords: FALLBACK, hasFix: false });
-    expect(labels(list)).not.toContain('Bus from Cubao to Lingayen');
-    expect(labels(list)).toEqual(['Beaches near me']);
+  it('falls back to the one general prompt', () => {
+    expect(labels(suggestionsFor())).toEqual(['Beaches near me']);
+    expect(labels(suggestionsFor({ lastAi: { cards: [] } }))).toEqual(['Beaches near me']);
   });
 
-  it('never repeats a chip and never returns more than one', () => {
-    const list = suggestionsFor({
-      lastAi: { intent: 'commute', cards: [{ name: 'Patar White Sand Beach' }] },
-      coords: DAGUPAN,
-    });
+  it('never returns more than one chip', () => {
+    const list = suggestionsFor({ lastAi: { intent: 'commute', cards: [{ name: 'Patar White Sand Beach' }] } });
     expect(list.length).toBe(1);
     expect(new Set(labels(list)).size).toBe(list.length);
   });

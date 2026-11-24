@@ -12,7 +12,7 @@ const SPOTS = [
 ];
 
 vi.mock('../AuthContext.jsx', () => ({ useAuth: () => ({ user: null }) }));
-vi.mock('../spots.js', () => ({ fetchSpots: vi.fn(async () => SPOTS) }));
+vi.mock('../catalogue.js', () => ({ fetchCatalogue: vi.fn(async () => SPOTS) }));
 vi.mock('../store.js', () => ({ saveFavorite: vi.fn(async () => ({})) }));
 vi.mock('../staticMap.js', () => ({ placeImage: () => null, mapboxToken: () => '' }));
 vi.mock('../ui.jsx', () => ({ PhotoPlaceholder: () => null }));

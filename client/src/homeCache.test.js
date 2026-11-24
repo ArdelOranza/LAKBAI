@@ -35,20 +35,25 @@ describe('home recommendation cache', () => {
     expect(readHomeCache(USER, COORDS, [...PREFS].reverse(), 1_000_000)).not.toBeNull();
   });
 
+  it('a different location is a miss, never the old town’s picks', () => {
+    // Cached in Bolinao, opened in Dagupan (~50 km). Showing Bolinao hidden
+    // gems while the new feed loads is wrong: the cache is location-scoped.
+    writeHomeCache(USER, { lng: 119.89, lat: 16.32 }, PREFS, PLACES, 1_000_000);
+    expect(readHomeCache(USER, { lng: 120.34, lat: 16.04 }, PREFS, 1_000_000)).toBeNull();
+  });
+
+  it('a GPS drift of a few hundred metres is still the same place', () => {
+    writeHomeCache(USER, COORDS, PREFS, PLACES, 1_000_000);
+    // ~0.5 km away, the usual jitter between fixes in one town.
+    expect(readHomeCache(USER, { lng: 120.235, lat: 16.034 }, PREFS, 1_000_000)).not.toBeNull();
+  });
+
   it('marks an entry stale after 30 minutes instead of hiding it', () => {
     writeHomeCache(USER, COORDS, PREFS, PLACES, 1_000_000);
     const thin = readHomeCache(USER, COORDS, PREFS, 1_000_000 + 10 * 60 * 1000);
     const old = readHomeCache(USER, COORDS, PREFS, 1_000_000 + 31 * 60 * 1000);
     expect(isStale(thin, COORDS, 1_000_000 + 10 * 60 * 1000)).toBe(false);
     expect(isStale(old, COORDS, 1_000_000 + 31 * 60 * 1000)).toBe(true);
-  });
-
-  it('marks an entry stale when the traveler moved more than 8 km', () => {
-    writeHomeCache(USER, COORDS, PREFS, PLACES, 1_000_000);
-    const near = readHomeCache(USER, { lng: 120.24, lat: 16.04 }, PREFS, 1_000_000);
-    const far = readHomeCache(USER, { lng: 119.89, lat: 16.32 }, PREFS, 1_000_000);
-    expect(isStale(near, { lng: 120.24, lat: 16.04 }, 1_000_000)).toBe(false);
-    expect(isStale(far, { lng: 119.89, lat: 16.32 }, 1_000_000)).toBe(true);
   });
 
   it('survives corrupt storage and quota errors', () => {

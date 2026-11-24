@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ChevronRight, Plus, Compass, Sun, Cloud, Info, Mountain } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Plus, Sun, Cloud, Info, Mountain } from 'lucide-react';
 import { listPlans } from '../store.js';
 import { useAuth } from '../AuthContext.jsx';
 import { planStatus, matchesFilter, STATUS_FILTERS } from '../planStatus.js';
 import { sessionGet } from '../sessionCache.js';
+import Logo from '../logo.jsx';
 
 const STATUS_STYLE = {
   Upcoming: { background:'#E7F0FE', color:'#0066FF' },
@@ -77,7 +78,7 @@ export default function Itineraries({ pop, push, setTab }){
             <Plus size={16}/>
           </span>
           <b style={{ flex:1, color:'var(--primary)', fontSize:13.5 }}>Generate New AI Itinerary</b>
-          <Compass size={17} color="var(--primary)"/>
+          <Logo size={19}/>
         </div>
 
         <div data-testid="offline-footer" style={{ marginTop:'auto', display:'flex', alignItems:'center', gap:10, background:'#F1F5F9', borderRadius:14, padding:'12px 14px', margin:'24px 0 24px' }}>

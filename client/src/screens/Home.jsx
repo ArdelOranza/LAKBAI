@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   MapPin, Search, Mic, Umbrella, UtensilsCrossed, Soup, CalendarDays,
-  Compass, ArrowRight, Plus, Star,
+  ArrowRight, Plus, Star,
 } from 'lucide-react';
 import { recommend } from '../api.js';
 import { reverseGeocode } from '../geocode.js';
 import { FALLBACK_CENTER } from '../App.jsx';
 import { readLocalPrefs } from '../prefs.js';
-import { readHomeCache, writeHomeCache, isStale } from '../homeCache.js';
+import { readHomeCache, writeHomeCache, isStale, prefsSignature } from '../homeCache.js';
 import { haversineKm, formatDistance, proximityOf } from '../geo.js';
 import { saveFavorite } from '../store.js';
 // User comes from the shell via props (App.jsx screenProps) — single source, no context shadow.
@@ -16,6 +16,8 @@ import { upcomingFestivals, FESTIVALS } from '../festivals.js';
 import { feeLabel } from '../filters.js';
 import { PhotoPlaceholder } from '../ui.jsx';
 import { placeImage, mapboxToken } from '../staticMap.js';
+import { attachCarouselDrag } from '../carousel.js';
+import Logo from '../logo.jsx';
 // import PangasinanMap from '../PangasinanMap.jsx'; // parked with the map header
 
 const QUICK = [
@@ -29,14 +31,16 @@ const QUICK = [
 // once we have a real fix — a cold launch starts at the province centre, and
 // treating that as "the traveler moved" is what made every launch show
 // "Finding hidden gems for you…" again.
-const FEED_MAX_KM = 8;
+// The home feed is an AI call. It is cached per account AND per place: the same
+// town reuses it, a new location drops it so the row can never show another
+// town's picks.
 function localFeed(user, coords, prefs){
-  const cached = readHomeCache(user, coords, prefs);
+  // Before the first GPS fix, location is unknown, so trust the account's last
+  // feed rather than compare it with the province centre.
+  const at = coords === FALLBACK_CENTER ? null : coords;
+  const cached = readHomeCache(user, at, prefs);
   if (!cached) return null;
-  if (coords === FALLBACK_CENTER) return { places: cached.places, stale: isStale(cached, coords) };
-  const km = haversineKm(cached.at.lng, cached.at.lat, coords.lng, coords.lat);
-  if (km != null && km > FEED_MAX_KM) return { places: cached.places, stale: true };
-  return { places: cached.places, stale: isStale(cached, coords) };
+  return { places: cached.places, stale: isStale(cached, at) };
 }
 
 export default function Home({ coords, hasFix = true, push, showToast, setTab, user }){
@@ -53,6 +57,11 @@ export default function Home({ coords, hasFix = true, push, showToast, setTab, u
   // what stops the location line blinking back to "Pangasinan" on every GPS tick.
   const placeRef = useRef({ key: '', label: '' });
   const recogRef = useRef(null);
+  const recsRef = useRef(null);
+  // Desktop browsers cannot drag an overflow-x row out of the box. Attaching
+  // drag + wheel scrolling makes the home carousel a real control, not a strip
+  // that only looks like one.
+  useEffect(() => attachCarouselDrag(recsRef.current), []);
 
   useEffect(() => { // reverse geocode; never blank the label mid-lookup
     // No real fix yet: show the province, never a fabricated town (a fallback
@@ -70,6 +79,8 @@ export default function Home({ coords, hasFix = true, push, showToast, setTab, u
 
   // ~1 km bucket: a jittering GPS fix does not refetch, a real move does.
   const locKey = coords === FALLBACK_CENTER ? 'fallback' : coords.lng.toFixed(2) + ',' + coords.lat.toFixed(2);
+  // A new account or new interests is a new feed too, not just a new place.
+  const prefKey = prefsSignature(readLocalPrefs(user));
 
   useEffect(() => {
     const prefs = readLocalPrefs(user);
@@ -84,8 +95,9 @@ export default function Home({ coords, hasFix = true, push, showToast, setTab, u
     // Give the first real GPS fix a moment, so the plan is built for where the
     // user actually is instead of the province fallback centre.
     const wait = coords === FALLBACK_CENTER ? 2500 : 0;
-    // Whatever is on screen stays on screen: a refresh must never blink the
-    // feed back to an empty shimmer, in any town.
+    // Same-place refresh keeps the cards up. A new place clears them: showing
+    // the previous town's picks under the new town's name is a lie.
+    if (!cached) setRecs([]);
     setBusy(!cached);
     const timer = setTimeout(() => {
       setBusy(true);
@@ -101,7 +113,7 @@ export default function Home({ coords, hasFix = true, push, showToast, setTab, u
         .finally(() => { if (alive) setBusy(false); });
     }, wait);
     return () => { alive = false; clearTimeout(timer); };
-  }, [locKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [locKey, user?.id, prefKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function search(text){
     const q = String(text || '').trim();
@@ -201,7 +213,7 @@ export default function Home({ coords, hasFix = true, push, showToast, setTab, u
         )}
 
         <div data-testid="plan-cta" onClick={() => setTab('chat')} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTab('chat'); } }} role="button" tabIndex={0} className="soft-card" style={{ margin:'16px 0', cursor:'pointer', borderRadius:18, padding:14 }}>
-          <span style={{ width:40, height:40, minWidth:40, borderRadius:'50%', background:'var(--primary)', color:'#fff', display:'grid', placeItems:'center' }}><Compass size={19}/></span>
+          <span className="brand-tile" style={{ width:40, height:40, minWidth:40, borderRadius:12 }}><Logo size={22}/></span>
           <span style={{ flex:1 }}>
             <b style={{ fontSize:14 }}>Need a personalized plan?</b>
             <p style={{ margin:0, fontSize:12.5, color:'var(--muted-ink)' }}>Let LakbAI orchestrate your day in {place.split(',')[0]}</p>
@@ -214,7 +226,7 @@ export default function Home({ coords, hasFix = true, push, showToast, setTab, u
           <button onClick={() => search('best places to visit')} style={{ background:'none', border:'none', padding:0, fontSize:12.5, color:'var(--primary)', fontWeight:600, display:'inline-flex', alignItems:'center', gap:3 }}>See All <ArrowRight size={13}/></button>
         </div>
 
-        <div data-testid="recs" style={{ display:'flex', gap:12, overflowX:'auto', paddingBottom:8, scrollbarWidth:'none' }}>
+        <div data-testid="recs" ref={recsRef} className="rec-carousel" style={{ display:'flex', gap:12, overflowX:'auto', paddingBottom:8, scrollbarWidth:'none' }}>
           {recs.map(p => { const cardImg = placeImage(p, mapboxToken()); return (
             <article key={p.id} style={{ flex:'0 0 220px', borderRadius:18, background:'#fff', border:'1px solid #EDF1F7', overflow:'hidden', cursor:'pointer', boxShadow:'0 10px 24px -20px rgba(15,23,42,.55)' }} onClick={() => push({ name:'detail', place:p })} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); push({ name:'detail', place:p }); } }}>
               <div style={{ position:'relative', height:130 }}>

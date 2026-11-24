@@ -8,6 +8,7 @@ import { sessionGet, sessionSet } from '../sessionCache.js';
 import { haversineKm, formatDistance, timeHint, proximityOf } from '../geo.js';
 import { PrimaryBtn } from '../ui.jsx';
 import { placeImage, mapboxToken } from '../staticMap.js';
+import Logo from '../logo.jsx';
 
 export default function SavedTab({ coords, hasFix = true, push, showToast }){
   const { user } = useAuth();
@@ -116,7 +117,7 @@ export default function SavedTab({ coords, hasFix = true, push, showToast }){
         </div>
       )}
       <div className="pane" style={{ marginTop:18 }}>
-        <div data-testid="generate-itinerary"><PrimaryBtn disabled={busyGen || !rows.length} onClick={generate}><Compass size={17}/> {busyGen ? 'Sequencing stops…' : 'Generate Smart Itinerary'}</PrimaryBtn></div>
+        <div data-testid="generate-itinerary"><PrimaryBtn disabled={busyGen || !rows.length} onClick={generate}><span className="brand-tile" style={{ width:20, height:20, minWidth:20, borderRadius:6, background:'#fff' }}><Logo size={14}/></span> {busyGen ? 'Sequencing stops…' : 'Generate Smart Itinerary'}</PrimaryBtn></div>
         <p style={{ fontSize:11, color:'var(--muted-ink)', textAlign:'center', marginTop:8 }}>LakbAI will automatically sequence stops by distance and sunset timing.</p>
       </div>
     </main>

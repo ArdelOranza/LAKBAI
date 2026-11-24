@@ -70,6 +70,29 @@ describe('ChatTab persistence', () => {
     container.remove();
   });
 
+  it('repaints the current greeting instead of a saved old one', async () => {
+    // Greetings are UI copy, not history: a thread saved before a wording
+    // change must not keep advertising what the assistant no longer mentions.
+    const stale = {
+      ...THREAD,
+      messages: [
+        { id: 'welcome', role: 'ai', text: "Hi! I'm LakbAI. Ask me about bus fares and terminals to any Pangasinan town." },
+        ...THREAD.messages,
+      ],
+    };
+    latestThread.mockResolvedValue(stale);
+    listThreads.mockResolvedValue([stale]);
+    const { container, root } = await renderChat();
+
+    expect(container.textContent).toContain('help you travel around Pangasinan');
+    expect(container.textContent).not.toContain('bus fares and terminals');
+    // The real conversation is still there, under the fresh greeting.
+    expect(container.textContent).toContain('near the lighthouse');
+
+    await React.act(async () => root.unmount());
+    container.remove();
+  });
+
   it('saves what the traveler asked instead of discarding it', async () => {
     latestThread.mockResolvedValue(null);
     listThreads.mockResolvedValue([]);

@@ -79,6 +79,45 @@ export function cardFor(candidate = {}, spots = []){
     lat,
     photos: (candidate.photos && candidate.photos.length) ? candidate.photos : (spot?.photos || []),
     photo: candidate.photo || (candidate.photos && candidate.photos[0]) || (spot?.photos && spot.photos[0]) || null,
+    // Provenance travels with the photo so the detail page can label it and
+    // never mistake a real Wikimedia photo for a curated one.
+    photoSource: candidate.photoSource || spot?.photoSource || undefined,
+    photoPage: candidate.photoPage || spot?.photoPage || undefined,
     spot,
+  };
+}
+
+/**
+ * The full place object a chat card opens in PlaceDetail.
+ *
+ * The card keeps the server's real photo in `photos`, but the old detail
+ * fallback copied only name/coords, so PlaceDetail painted a Mapbox static map
+ * even though the card was showing the real photo. Curated-spot fields fill
+ * the gaps; the card's own values always win.
+ */
+export function cardPlace(card = {}){
+  const spot = card.spot && typeof card.spot === 'object' ? card.spot : {};
+  const photos = (Array.isArray(card.photos) && card.photos.length)
+    ? card.photos
+    : (Array.isArray(spot.photos) ? spot.photos : []);
+  const photo = card.photo || photos[0] || null;
+  return {
+    ...spot,
+    id: card.id || spot.id,
+    name: card.name || spot.name,
+    lng: card.lng ?? spot.lng,
+    lat: card.lat ?? spot.lat,
+    blurb: card.description || spot.blurb || '',
+    categories: (Array.isArray(card.tags) && card.tags.length) ? card.tags : (spot.categories || []),
+    town: card.hint || spot.town || '',
+    rating: card.rating ?? spot.rating,
+    reviews: card.reviews || spot.reviews,
+    fees: card.fees || spot.fees,
+    festival: card.festival || spot.festival,
+    visitorReviews: card.visitorReviews || spot.visitorReviews || [],
+    photos,
+    photo,
+    photoSource: card.photoSource || spot.photoSource,
+    photoPage: card.photoPage || spot.photoPage,
   };
 }

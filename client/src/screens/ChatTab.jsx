@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { chat } from '../api.js';
 import { fetchSpots } from '../spots.js';
-import { cardFor, cardsFromMore } from '../chatCards.js';
+import { cardFor, cardsFromMore, cardPlace } from '../chatCards.js';
 import { answerLead } from '../chatAnswer.js';
 import { latestThread, listThreads, saveThread, cleanMessages, cachedThreads } from '../chatStore.js';
 import { placeImage, mapboxToken } from '../staticMap.js';
@@ -20,15 +20,29 @@ import { buildChatContext } from '../chatContext.js';
 import { MAX_MESSAGE, clampMessage } from '../chatLimits.js';
 import { readLocalPrefs } from '../prefs.js';
 import { PhotoPlaceholder } from '../ui.jsx';
+import AiStatusDot from '../AiStatusDot.jsx';
+import { checkAiStatus } from '../aiStatus.js';
 import Logo from '../logo.jsx';
 // import AiBackdrop from '../AiBackdrop.jsx'; // parked: the chat background stays plain
 
-const WELCOME = { id:'welcome', role:'ai', text:"Hi! I'm LakbAI. Ask me about the places in our verified Pangasinan list — food, tourist spots, fees, or a day trip — and about bus fares and terminals to any Pangasinan town. I answer from those records only, so nothing is made up. Bus fares are LTFRB guides, not live ticket prices; confirm with the conductor or LTFRB 1342." };
+// Short on purpose: say what the assistant is for, not everything it can do.
+// Fares and terminals are answered when asked — they are not advertised here.
+const WELCOME = { id:'welcome', role:'ai', text:"Hi! I'm LakbAI. I'm here to help you travel around Pangasinan — ask me about places, food, fees, or a day trip." };
+/**
+ * The greeting is UI copy, not conversation history. A thread that opened with
+ * the greeting keeps it at the top, but always with the current wording; a
+ * thread saved without one is left untouched (no greeting is injected into an
+ * old conversation).
+ */
+function withWelcome(messages){
+  const list = Array.isArray(messages) ? messages : [];
+  if (!list.length) return [WELCOME];
+  return list.map(m => (m && m.id === 'welcome' ? { ...m, text: WELCOME.text } : m));
+}
 const STARTERS = [
   'Tourist spots in Bayambang',
   'Where should I eat in Dagupan?',
   'Fees at Balungao zipline',
-  'Bus fare from Cubao to Dagupan',
 ];
 const MAP_TOKEN = mapboxToken();
 let uid = 0;
@@ -58,15 +72,15 @@ function distanceLine(km){
 function ChatHero({ card, coords, hasFix = true, user, showToast, push, saved, onSaved, openDirections }){
   const km = hasFix ? haversineKm(coords.lng, coords.lat, card.lng, card.lat) : null;
   const img = placeImage(card, MAP_TOKEN);
-  const place = {
-    ...(card.spot || { id: card.id, name: card.name, lng: card.lng, lat: card.lat, blurb: card.description, categories: card.tags, town: card.hint }),
-    visitorReviews: card.visitorReviews || [],
-  };
+  const place = cardPlace(card);
 
   async function add(e){
     e.stopPropagation();
     if (saved) return;
-    const res = await saveFavorite(user, { id: card.id, name: card.name, lng: card.lng, lat: card.lat });
+    const res = await saveFavorite(user, {
+      id: card.id, name: card.name, lng: card.lng, lat: card.lat,
+      photo: place.photo, categories: place.categories,
+    });
     if (res.error) { showToast('Sign in to save', 'error', res.error); return; }
     onSaved(card);
     showToast('Added to Trip');
@@ -135,10 +149,7 @@ function ChatHero({ card, coords, hasFix = true, user, showToast, push, saved, o
 function ChatRow({ card, coords, hasFix = true, user, push, showToast, saved, onSaved }){
   const km = hasFix ? haversineKm(coords.lng, coords.lat, card.lng, card.lat) : null;
   const img = placeImage(card, MAP_TOKEN);
-  const place = {
-    ...(card.spot || { id: card.id, name: card.name, lng: card.lng, lat: card.lat, blurb: card.description, categories: card.tags, town: card.hint }),
-    visitorReviews: card.visitorReviews || [],
-  };
+  const place = cardPlace(card);
   const meta = [
     card.hint,
     card.rating != null ? '★ ' + card.rating : '',
@@ -148,7 +159,10 @@ function ChatRow({ card, coords, hasFix = true, user, push, showToast, saved, on
   async function add(e){
     e.stopPropagation();
     if (saved) return;
-    const res = await saveFavorite(user, { id: card.id, name: card.name, lng: card.lng, lat: card.lat });
+    const res = await saveFavorite(user, {
+      id: card.id, name: card.name, lng: card.lng, lat: card.lat,
+      photo: place.photo, categories: place.categories,
+    });
     if (res.error) { showToast('Sign in to save', 'error', res.error); return; }
     onSaved(card);
     showToast('Added to Trip');
@@ -202,7 +216,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
         : { id: newThreadId(), created_at: new Date().toISOString() },
     };
   });
-  const [msgs, setMsgs] = useState(() => (initial.latest ? initial.latest.messages : [WELCOME]));
+  const [msgs, setMsgs] = useState(() => withWelcome(initial.latest?.messages));
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [spots, setSpots] = useState([]);
@@ -211,6 +225,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
   const [starters, setStarters] = useState(false);
   const [listening, setListening] = useState(false);
   const [online, setOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine));
+  const [aiDown, setAiDown] = useState(false);
   const [history, setHistory] = useState(() => initial.threads);
   const [openLists, setOpenLists] = useState(() => new Set());
   const listRef = useRef(null);
@@ -243,7 +258,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
       dirtyRef.current = false;
       if (latest) seedUid(latest.messages);
       setHistory(threads);
-      setMsgs(latest ? latest.messages : [WELCOME]);
+      setMsgs(withWelcome(latest?.messages));
       threadRef.current = latest
         ? { id: latest.id, created_at: latest.created_at }
         : { id: newThreadId(), created_at: new Date().toISOString() };
@@ -262,7 +277,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
       seedUid(latest.messages);
       threadRef.current = { id: latest.id, created_at: latest.created_at };
       savedSigRef.current = signatureOf(latest.messages, latest.id);
-      setMsgs(latest.messages);
+      setMsgs(withWelcome(latest.messages));
     }).catch(() => { /* the local mirror already holds the chat */ });
     return () => { alive = false; };
   }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -305,6 +320,14 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
     window.addEventListener('offline', down);
     return () => { window.removeEventListener('online', up); window.removeEventListener('offline', down); };
   }, []);
+  // Keep the status dot honest: ask the server whether the model path is usable
+  // on mount, so a tripped breaker or an unreachable API reads red before the
+  // first message. A failed send flips it too (see send()).
+  useEffect(() => {
+    let alive = true;
+    checkAiStatus().then(ok => { if (alive) setAiDown(!ok); }).catch(() => {});
+    return () => { alive = false; };
+  }, []);
 
   const abortRef = useRef(null);
   async function send(text){
@@ -330,6 +353,9 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
       // The traveler may have opened another thread while this was in flight;
       // its answer belongs to the archived one, not to the new screen.
       if (ctrl.signal.aborted || !stillCurrent()) return;
+      // A reply the model actually produced clears the red dot; a dataset-only
+      // answer (breaker armed) leaves it as the mount check set it.
+      if (out.source === 'dataset+ai') setAiDown(false);
       const candidates = out.candidates || [];
       // Every result becomes a card; the sheet shows the best three first and
       // keeps the rest one tap away instead of dumping bare names as text.
@@ -348,6 +374,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
         return;
       }
       if (!stillCurrent()) return;
+      setAiDown(true);
       setMsgs(m => [...m.filter(x => !x.loading)]);
       showToast('LakbAI is busy — try again in a minute', 'error', e.message);
     } finally {
@@ -389,9 +416,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
     stop();
     dirtyRef.current = true;
     genRef.current += 1;
-    const messages = Array.isArray(t.messages) && t.messages.length
-      ? t.messages
-      : [{ ...WELCOME, at: Date.now() }];
+    const messages = withWelcome(t.messages);
     seedUid(messages);
     threadRef.current = { id: t.id, created_at: t.created_at };
     savedSigRef.current = signatureOf(messages, t.id);
@@ -419,10 +444,10 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
 
   const lastAi = [...msgs].reverse().find(m => m.role === 'ai' && !m.loading);
   // Which chip makes sense next: another fare question after a fare answer,
-  // the place follow-ups after a place, a town bus prompt when the fix says so.
+  // What the next chip is for: the place follow-up, or the general beach prompt.
   const LogoIcon = ({ size = 12 }) => <Logo size={size}/>;
-  const CHIP_ICON = { plan: LogoIcon, more: MapPin, beach: LogoIcon, festival: Ticket, fare: Ticket, bus: Ticket, terminal: Navigation };
-  const followUp = suggestionsFor({ lastAi, coords, hasFix }).map(s => ({
+  const CHIP_ICON = { plan: LogoIcon, more: MapPin, beach: LogoIcon, festival: Ticket };
+  const followUp = suggestionsFor({ lastAi }).map(s => ({
     ...s,
     icon: CHIP_ICON[s.id] || MapPin,
   }));
@@ -438,7 +463,7 @@ export default function ChatTab({ user, coords, hasFix = true, push, setTab, sho
           <div className="h-brand">
             <span className="brand-tile">
               <Logo size={20}/>
-              <i className={'online-dot' + (online ? '' : ' off')}/>
+              <AiStatusDot online={online} aiDown={aiDown}/>
             </span>
             <div className="h-text">
               <b className="chat-title">LakbAI</b>

@@ -44,3 +44,51 @@ test('a rate-limited Groq response is an error with the status attached', async 
     global.fetch = realFetch;
   }
 });
+
+test('the completion length is bounded so a runaway answer cannot eat the budget', async () => {
+  const realFetch = global.fetch;
+  let body;
+  global.fetch = async (_url, init) => {
+    body = JSON.parse(init.body);
+    return { ok: true, json: async () => ({ choices: [{ message: { content: '{"ok":true}' } }] }) };
+  };
+  try {
+    await callGroq('sys', 'payload');
+    assert.equal(body.max_tokens, 1600);
+  } finally {
+    global.fetch = realFetch;
+  }
+});
+
+test('a TPM rejection carries the window the caller should wait', async () => {
+  const realFetch = global.fetch;
+  global.fetch = async () => ({
+    ok: false,
+    status: 413,
+    text: async () => JSON.stringify({ error: { message: 'Rate limit reached ... Please try again in 42.5s. Need more tokens?' } }),
+  });
+  try {
+    await assert.rejects(() => callGroq('sys', 'payload'), e => {
+      assert.equal(e.status, 413);
+      assert.equal(e.retryAfterMs, 42500);
+      return true;
+    });
+  } finally {
+    global.fetch = realFetch;
+  }
+});
+
+test('a retry-after header wins over the message text', async () => {
+  const realFetch = global.fetch;
+  global.fetch = async () => ({
+    ok: false,
+    status: 429,
+    headers: { get: name => (name === 'retry-after' ? '7' : null) },
+    text: async () => '',
+  });
+  try {
+    await assert.rejects(() => callGroq('sys', 'payload'), e => e.retryAfterMs === 7000);
+  } finally {
+    global.fetch = realFetch;
+  }
+});

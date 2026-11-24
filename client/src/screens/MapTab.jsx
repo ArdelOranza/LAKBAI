@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Search, Umbrella, UtensilsCrossed, Landmark, MapPin, LocateFixed, BedDouble, MapPinPlus } from 'lucide-react';
-import { recommend } from '../api.js';
-import { readLocalPrefs } from '../prefs.js';
-import { sessionGet, sessionSet } from '../sessionCache.js';
+import { Search, Umbrella, UtensilsCrossed, MapPin, LocateFixed, BedDouble, MapPinPlus, Church, Shapes } from 'lucide-react';
+import { sessionGet } from '../sessionCache.js';
 import { matches } from '../filters.js';
-import { fetchSpots } from '../spots.js';
-import { haversineKm, proximityOf } from '../geo.js';
+import { fetchCatalogue } from '../catalogue.js';
+import { haversineKm } from '../geo.js';
 import { FALLBACK_CENTER } from '../App.jsx';
 import { Map, MapMarker, MarkerContent } from '@/components/ui/map';
 import { pinPhoto } from '../pinPhoto.js';
@@ -25,10 +23,11 @@ const FAR_PIN_OFFSET = [0, -16];
 const easeOut = t => 1 - Math.pow(1 - t, 3);
 const FILTERS = [
   ['All', MapPin],
-  ['Beaches', Umbrella],
   ['Hotels', BedDouble],
-  ['Food', UtensilsCrossed],
-  ['Events', Landmark],
+  ['Restaurants', UtensilsCrossed],
+  ['Beaches', Umbrella],
+  ['Churches', Church],
+  ['Others', Shapes],
 ];
 
 /** Short label for a map name pill — the full name stays in title/aria. */
@@ -99,21 +98,22 @@ function overlaps(a, b, pad){
 /**
  * Google-Maps-style declutter, done in screen space after the map settles.
  * Pins that would stack on top of a higher-priority pin step aside, and a name
- * pill yields when another label already owns that patch of map. Names are laid
- * out at every zoom, so the map is readable without tapping each pin. Nothing
- * is removed from the data — it fades back in as soon as the traveller pans or
- * zooms to give it room.
+ * label yields only when another label already owns that patch of map. Names
+ * are laid out at every zoom, so the map is readable without tapping each pin.
+ * Nothing is removed from the data — it fades back in as soon as the traveller
+ * pans or zooms to give it room.
  */
 function declutterPins(root){
   if (!root) return;
   const pins = Array.from(root.querySelectorAll('button.spot-pin'));
   if (!pins.length) return;
-  pins.forEach(p => p.classList.remove('is-hidden', 'label-hidden'));
+  pins.forEach(p => p.classList.remove('is-hidden', 'label-hidden', 'label-right'));
   const priority = p => p.classList.contains('active') ? 0 : p.dataset.pin === 'spot' ? 1 : p.dataset.pin === 'discover' ? 3 : 2;
   const ordered = pins
     .map((p, i) => ({ p, i, r: priority(p) }))
     .sort((a, b) => a.r - b.r || a.i - b.i)
     .map(x => x.p);
+  const mapBox = root.getBoundingClientRect();
   const keptPins = [];
   const keptNames = [];
   for (const pin of ordered){
@@ -123,13 +123,15 @@ function declutterPins(root){
     keptPins.push(box);
     const name = pin.querySelector('.pin-name');
     if (!name) continue;
-    // Flip a label that would run past the right edge of the map, then measure
-    // where it actually landed before deciding whether it collides.
-    pin.classList.remove('label-left');
-    if (name.getBoundingClientRect().right > root.getBoundingClientRect().right - 6) pin.classList.add('label-left');
+    // Labels sit to the left of the pin; flip one that would run off the left
+    // edge, then measure where it actually landed before deciding collisions.
+    pin.classList.remove('label-right');
+    if (name.getBoundingClientRect().left < mapBox.left + 6) pin.classList.add('label-right');
     const label = name.getBoundingClientRect();
     if (!label.width) continue;
-    if (keptNames.some(b => overlaps(label, b, 1)) || keptPins.some(b => b !== box && overlaps(label, b, 0))) pin.classList.add('label-hidden');
+    // Only another name can hide a name. A neighbouring pin sits beside the
+    // text in Google Maps too, and blanking the label there loses the place.
+    if (keptNames.some(b => overlaps(label, b, 1))) pin.classList.add('label-hidden');
     else keptNames.push(label);
   }
 }
@@ -138,12 +140,9 @@ function declutterPins(root){
 export default function MapTab({ coords, push, showToast, user, setTab, openDirections }){
   const [radius, setRadius] = useState(5);
   const [filter, setFilter] = useState('All');
-  // Seed from the same coords-keyed lookup the effect writes, not a legacy
-  // unkeyed key that could be pins from a previous location/radius.
-  const keyFor = (r, c) => `lakbai.rec.nearby:${r}:${c.lng.toFixed(3)},${c.lat.toFixed(3)}`;
-  const coordsBucket = `${coords.lng.toFixed(3)},${coords.lat.toFixed(3)}`;
-  const [places, setPlaces] = useState(() => sessionGet(keyFor(radius, coords)) || []);
-  const [spots, setSpots] = useState([]);
+  // The one shared catalogue (curated + community + dataset), not a per-query
+  // recommendation: every pin here is also a row in the Dining/Beaches lists.
+  const [places, setPlaces] = useState([]);
   const [selectedSpot, setSelectedSpot] = useState(null);
   const [addOpen, setAddOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -240,25 +239,13 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
   useEffect(() => { scheduleDeclutter(); });
 
   useEffect(() => {
-    const key = keyFor(radius, coords);
-    const hit = sessionGet(key);
-    if (hit) setPlaces(hit); // instant paint, then live revalidation below
     let alive = true;
     setBusy(true);
-    recommend(`nearby Pangasinan attractions restaurants events within ${radius} km`, proximityOf(coords, hasFix), readLocalPrefs(user))
-      .then(out => {
-        if (!alive) return;
-        const ps = out.places || [];
-        setPlaces(ps);
-        sessionSet(key, ps);
-      })
-      .catch(e => { if (alive) showToast('Map data unavailable', 'error', e.message); })
+    fetchCatalogue()
+      .then(list => { if (alive) setPlaces(list || []); })
+      .catch(e => { if (alive) showToast('Offline — places load when the app has been opened online once', 'error', e.message); })
       .finally(() => { if (alive) setBusy(false); });
     return () => { alive = false; };
-  }, [radius, coordsBucket]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    fetchSpots().then(setSpots).catch(() => showToast('Offline — curated pins load when the app has been opened online once', 'error'));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // A filter or radius change must close a popup that no longer belongs to the
@@ -270,14 +257,6 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
   // Places without coordinates can't be pinned — drop them, never render an
   // invalid marker.
   const filtered = useMemo(() => places.filter(p => Number.isFinite(p.lng) && Number.isFinite(p.lat) && matches(p, filter) && withinRadius(p)), [places, filter, radius, hasFix, coords.lng, coords.lat]); // eslint-disable-line react-hooks/exhaustive-deps
-  const catFor = f => f === 'Food' ? 'Food' : f === 'Events' ? 'Events' : f === 'Hotels' ? 'Hotels' : 'Beaches';
-  const filteredSpots = useMemo(() => {
-    const base = filter === 'All'
-      ? spots.filter(s => Number.isFinite(s.lng) && Number.isFinite(s.lat))
-      // Guard: a malformed record without categories must never throw.
-      : spots.filter(s => Number.isFinite(s.lng) && Number.isFinite(s.lat) && (s.categories || []).some(c => matches({ name:s.name, categories:s.categories }, catFor(filter))));
-    return base.filter(s => withinRadius(s));
-  }, [spots, filter, radius, hasFix, coords.lng, coords.lat]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // U14-B: Mapbox-discovered places (from SearchResults) join the live map,
   // visibly distinct, under the same radius and chip filters.
@@ -289,14 +268,14 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
     discovered.filter(p => Number.isFinite(p.lng) && Number.isFinite(p.lat) && matches(p, filter) && withinRadius(p)),
   [discovered, filter, radius, hasFix, coords.lng, coords.lat]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // One pin per place. The three layers overlap (the curated catalogue and the
-  // imported dataset share plenty of buildings, and a Mapbox discovery can be a
-  // place the dataset already has), so a curated spot claims its pin first, then
-  // the dataset row, then the discovery. Mall tenants never merge: proximity
-  // alone cannot tell one business from the next.
+  // One pin per place. The catalogue already reconciles the curated spots with
+  // the dataset (that is the whole point of the union), but a Mapbox discovery
+  // can still be a place the catalogue pins, so the discovery layer yields.
+  // Mall tenants never merge: proximity alone cannot tell one business from
+  // the next.
   const shown = useMemo(
-    () => mergePins({ spots: filteredSpots, rec: filtered, discover: filteredDiscover }),
-    [filteredSpots, filtered, filteredDiscover],
+    () => mergePins({ spots: filtered, discover: filteredDiscover }),
+    [filtered, filteredDiscover],
   );
 
   return (
@@ -334,16 +313,6 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
             </MarkerContent>
           </MapMarker>
         )}
-        {shown.rec.map(p => (
-          <MapMarker key={p.id} longitude={p.lng} latitude={p.lat} anchor="center" offset={detailed ? undefined : FAR_PIN_OFFSET} onClick={() => push({ name:'detail', place:p })}>
-            <MarkerContent>
-              <button type="button" className={'spot-pin' + (detailed ? ' bubble' : '')} data-pin="rec" title={p.name} aria-label={p.name}>
-                <PinMark photo={pinPhoto(p, detailed)} bubble={detailed}/>
-                <span className="pin-name">{shortName(p.name)}</span>
-              </button>
-            </MarkerContent>
-          </MapMarker>
-        ))}
         {shown.spots.map(s => {
           const active = selectedSpot && selectedSpot.id === s.id;
           return (
@@ -384,7 +353,7 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
       </div>
 
       {busy && <div style={{ position:'absolute', top:110, left:12, zIndex:5 }}><span className="shimmer chip" style={{ background:'#fff' }}>Loading nearby…</span></div>}
-      {!busy && !shown.rec.length && !shown.spots.length && !shown.discover.length && (
+      {!busy && !shown.spots.length && !shown.discover.length && (
         <div style={{ position:'absolute', top:110, left:12, right:12, zIndex:5, display:'grid', gap:6, justifyItems:'start' }}>
           <span className="chip" style={{ background:'#fff' }}>No stops here yet — widen the radius.</span>
           <button type="button" data-testid="add-place-link" onClick={() => setAddOpen(true)} style={{ background:'none', border:'none', padding:'2px 4px', fontSize:12.5, fontWeight:600, color:'var(--primary)' }}>
@@ -392,7 +361,7 @@ export default function MapTab({ coords, push, showToast, user, setTab, openDire
           </button>
         </div>
       )}
-      {!busy && !shown.rec.length && !shown.discover.length && shown.spots.length > 0 && <div style={{ position:'absolute', top:110, left:12, zIndex:5 }}><span className="chip" style={{ background:'#fff' }}>{shown.spots.length} curated{filter === 'All' ? '' : ' ' + filter.toLowerCase()} spots</span></div>}
+      {!busy && shown.spots.length > 0 && !shown.discover.length && <div style={{ position:'absolute', top:110, left:12, zIndex:5 }}><span className="chip" style={{ background:'#fff' }}>{shown.spots.length} place{shown.spots.length === 1 ? '' : 's'}{filter === 'All' ? '' : ' · ' + filter.toLowerCase()}</span></div>}
 
       <button
         type="button"

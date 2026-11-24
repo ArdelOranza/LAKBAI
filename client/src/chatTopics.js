@@ -8,7 +8,6 @@ import { haversineKm } from './geo.js';
 export const TOPICS = [
   { id: 'places', label: 'Places', icon: 'pin' },
   { id: 'food', label: 'Food', icon: 'food' },
-  { id: 'commute', label: 'Commute', icon: 'bus' },
 ];
 
 // Same town anchors the chips use — only to name the town, never to rank places.
@@ -28,7 +27,6 @@ const ACTIVE = {
   discover: 'places',
   nearby: 'places',
   food: 'food',
-  commute: 'commute',
 };
 
 function nearestTown(coords){
@@ -44,14 +42,10 @@ function nearestTown(coords){
 function questionFor(id, place, town){
   if (place){
     if (id === 'food') return `Where should I eat near ${place}?`;
-    if (id === 'commute') return `How much is the bus fare to ${place}?`;
     return `Show me places like ${place}`;
   }
   const where = town || 'Pangasinan';
   if (id === 'food') return `Where should I eat in ${where}?`;
-  // Without a named town the honest default is the provincial capital's route:
-  // Cubao is the terminal most travelers actually leave from.
-  if (id === 'commute') return town ? `How much is the bus fare from Cubao to ${town}?` : 'How much is the bus fare to Dagupan?';
   return `Tourist spots in ${where}`;
 }
 

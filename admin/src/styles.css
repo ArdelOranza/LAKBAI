@@ -32,6 +32,13 @@ body{margin:0;font-family:Inter,system-ui,sans-serif;background:#fff;color:#111;
 .list{max-height:70vh;overflow:auto;display:grid;gap:0;border:1px solid #eee;border-radius:10px;background:#fff}
 .row{display:grid;gap:2px;text-align:left;width:100%;border:none;border-bottom:1px solid #f0f0f0;border-radius:0;background:#fff;padding:12px;cursor:pointer}
 .row:last-child{border-bottom:none}
+.row-wrap{position:relative}
+.row-wrap .row{padding-right:48px}
+.row-wrap:last-child .row{border-bottom:none}
+/* Opens Google in a new tab for this row without hijacking the row click. */
+.row-search{position:absolute;top:8px;right:8px;width:30px;height:30px;display:grid;place-items:center;border:1px solid #ddd;border-radius:8px;background:#fff;color:#111;text-decoration:none;transition:background .15s ease,border-color .15s ease}
+.row-search:hover{background:#f3f4f6;border-color:#bbb}
+.row-search:focus-visible{outline:2px solid #111;outline-offset:2px}
 .row:hover{background:#fafafa}
 .row.on{background:#f5f5f5}
 .row-title{font-size:14px;font-weight:550}

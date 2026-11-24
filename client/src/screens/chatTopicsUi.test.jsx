@@ -38,7 +38,7 @@ async function askFare(container){
 }
 
 describe('chat topics after a fare answer', () => {
-  it('marks Commute active and offers another fare question', async () => {
+  it('leaves every topic unselected and advertises no fare', async () => {
     const container = document.createElement('div');
     document.body.appendChild(container);
     const root = createRoot(container);
@@ -54,15 +54,15 @@ describe('chat topics after a fare answer', () => {
     await askFare(container);
 
     const commute = container.querySelector('[data-testid="topic-commute"]');
-    expect(commute.getAttribute('aria-selected')).toBe('true');
+    expect(commute).toBe(null);
     expect(container.textContent).toContain('₱467.50');
 
     const chips = [...container.querySelectorAll('.quick-action')].map(b => b.textContent);
-    expect(chips.join(' | ')).toContain('Fare to another town');
-    // One pill is a suggestion; a wall of pills is clutter.
+    // The answer is there; the UI just doesn't push another fare question.
+    expect(chips.join(' | ')).not.toMatch(/fare|bus/i);
     expect(chips.length).toBe(1);
     expect([...container.querySelectorAll('.topic-tab')].map(b => b.textContent))
-      .toEqual(['Places', 'Food', 'Commute']);
+      .toEqual(['Places', 'Food']);
 
     await React.act(async () => root.unmount());
     container.remove();
