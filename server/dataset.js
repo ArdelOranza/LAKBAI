@@ -830,17 +830,18 @@ function photoFields(photos){
 }
 
 function answerFor(intent, entries){
-  const lead = intent === 'food' ? 'Where to eat'
-    : intent === 'event' ? 'Events worth catching'
+  if (!entries.length) return NO_MATCH;
+  const lead = intent === 'food' ? "Here's where I'd eat"
+    : intent === 'event' ? "Here's what's on"
     : intent === 'nearby' ? 'Closest to you'
-    : intent === 'plan' ? 'A day worth taking'
-    : 'Worth a look';
+    : intent === 'plan' ? "Here's how I'd spend the day"
+    : 'A few good options';
   const bullets = entries.slice(0, 5).map(e => {
-    const meta = [e.town, e.rating ? `${e.rating}★${e.reviews ? ` · ${e.reviews} reviews` : ''}` : '', e.price || ''].filter(Boolean).join(' · ');
+    const where = e.town ? ` in ${e.town}` : '';
     const why = e.description ? ' — ' + firstSentence(e.description) : '';
-    return `- **${e.name}**${meta ? ` (${meta})` : ''}${why}`;
+    return `- **${e.name}**${where}${why}`;
   }).join('\n');
-  return `${lead}:\n${bullets}`;
+  return `${lead}:\n\n${bullets}`;
 }
 
 function spotlightFor(entries){
