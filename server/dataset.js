@@ -35,18 +35,25 @@ const num = v => {
   return Number.isFinite(n) ? n : null;
 };
 
-// Every JSON in server/data is part of the reference set: places.json holds the
-// restaurants, spots.json the tourist spots. LAKBAI_DATA narrows it to one file
-// (used by the tests).
+// Only these files are place records. The folder also holds transit tables
+// (LTFRB fares, terminal directory/coords) and runtime caches (photo caches,
+// admin overlays); globbing them in added 48 zero-detail town rows and made
+// every photo-cache write look like a dataset edit.
+const PLACE_FILES = [
+  'places.json',
+  'spots.json',
+  'pangasinan-150.json',
+  'pangasinan-5towns-food.json',
+  'pangasinan-5towns-stays.json',
+];
+
 function dataFiles(){
   const env = process.env.LAKBAI_DATA;
   if (env) return fs.existsSync(env) ? [env] : [];
-  try {
-    return fs.readdirSync(DATA_DIR)
-      .filter(f => f.toLowerCase().endsWith('.json'))
-      .sort()
-      .map(f => path.join(DATA_DIR, f));
-  } catch { return []; }
+  return PLACE_FILES
+    .map(f => path.join(DATA_DIR, f))
+    .filter(f => fs.existsSync(f))
+    .sort();
 }
 
 // --- coordinates that only exist in prose ---------------------------------

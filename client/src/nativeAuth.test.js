@@ -103,21 +103,23 @@ describe('completeNativeAuth', () => {
     expect(browserClose).toHaveBeenCalled();
   });
 
-  it('accepts the implicit-flow tokens too, so email links also land in the app', async () => {
+  it('refuses an implicit-flow token link instead of minting a session', async () => {
     const supabase = fakeSupabase();
     const url = 'com.lakbai.app://auth-callback#access_token=at1&refresh_token=rt1&expires_in=3600&type=signup';
     const res = await completeNativeAuth(url, supabase);
-    expect(res).toEqual({ handled: true, recovery: false, error: null });
-    expect(supabase.auth.setSession).toHaveBeenCalledWith({ access_token: 'at1', refresh_token: 'rt1' });
+    expect(res.handled).toBe(true);
+    expect(res.error).toMatch(/older flow|sign in again/i);
+    expect(supabase.auth.exchangeCodeForSession).not.toHaveBeenCalled();
+    expect(supabase.auth.setSession).not.toHaveBeenCalled();
   });
 
   it('flags a recovery link before minting the session, so no signed-in flash', async () => {
     const supabase = fakeSupabase();
     const order = [];
-    supabase.auth.setSession.mockImplementation(async () => { order.push('session'); return { data: {}, error: null }; });
+    supabase.auth.exchangeCodeForSession.mockImplementation(async () => { order.push('session'); return { data: {}, error: null }; });
     const onRecovery = vi.fn(() => order.push('recovery'));
     const res = await completeNativeAuth(
-      'com.lakbai.app://auth-callback#access_token=at&refresh_token=rt&type=recovery',
+      'com.lakbai.app://auth-callback?code=rec-code&type=recovery',
       supabase,
       { onRecovery },
     );

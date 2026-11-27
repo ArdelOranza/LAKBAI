@@ -10,8 +10,8 @@ try { fs.unlinkSync(tmpFile); } catch { /* fresh */ }
 
 const { photosFor, setPhotos, allPhotos } = require('../adminPhotos.js');
 
-test('setPhotos persists real photos per restaurant id', () => {
-  setPhotos('ChIJabc', ['https://example.com/a.jpg', 'https://example.com/b.jpg']);
+test('setPhotos persists real photos per restaurant id', async () => {
+  await setPhotos('ChIJabc', ['https://example.com/a.jpg', 'https://example.com/b.jpg']);
   assert.deepEqual(photosFor('ChIJabc'), ['https://example.com/a.jpg', 'https://example.com/b.jpg']);
   assert.deepEqual(allPhotos()['ChIJabc'].photos, ['https://example.com/a.jpg', 'https://example.com/b.jpg']);
   // a fresh read (no in-memory state) still sees them
@@ -19,17 +19,17 @@ test('setPhotos persists real photos per restaurant id', () => {
   assert.deepEqual(photosFor('unknown'), []);
 });
 
-test('an empty list clears the entry instead of storing an empty overlay', () => {
-  setPhotos('ChIJabc', []);
+test('an empty list clears the entry instead of storing an empty overlay', async () => {
+  await setPhotos('ChIJabc', []);
   assert.deepEqual(photosFor('ChIJabc'), []);
   assert.equal(allPhotos()['ChIJabc'], undefined);
 });
 
-test('rejects non-http URLs, non-arrays and caps the list at 20', () => {
-  assert.throws(() => setPhotos('ChIJabc', ['javascript:alert(1)']), /http/i);
-  assert.throws(() => setPhotos('ChIJabc', 'https://example.com/a.jpg'), /array/i);
+test('rejects non-http URLs, non-arrays and caps the list at 20', async () => {
+  await assert.rejects(() => setPhotos('ChIJabc', ['javascript:alert(1)']), /http/i);
+  await assert.rejects(() => setPhotos('ChIJabc', 'https://example.com/a.jpg'), /array/i);
   const many = Array.from({ length: 25 }, (_, i) => `https://example.com/${i}.jpg`);
-  assert.equal(setPhotos('ChIJabc', many).photos.length, 20);
+  assert.equal((await setPhotos('ChIJabc', many)).photos.length, 20);
 });
 
 test('a corrupt or missing store reads as empty', () => {

@@ -214,3 +214,42 @@ test('photoUrl is 404 for a submission without a photo', async () => {
   const store = createStore({ config: CONFIG, fetch });
   await assert.rejects(() => store.photoUrl(ROW.id), e => e.status === 404);
 });
+
+test('approve never promotes a photo that lives in another user folder', async () => {
+  // The row is inserted by the traveller, so photo_path is attacker-controlled.
+  // A service-role copy of someone else's private object would publish it.
+  const foreign = { ...pendingRow(), photo_path: 'user-2/photo.jpg' };
+  const fetch = fakeFetch({
+    'place_submissions?id=eq.': { method: 'GET', body: [foreign] },
+    'place_submissions': { method: 'PATCH', body: [{ ...foreign, status: 'approved' }] },
+    '/object/copy': { method: 'POST', body: { Key: 'place-photos/user-2/photo.jpg' } },
+  });
+  const store = createStore({ config: CONFIG, fetch });
+  const row = await store.approve(ROW.id);
+  assert.equal(fetch.calls.some(c => c.url.includes('/object/copy')), false, 'must not copy a foreign object');
+  assert.equal(row.photo, null);
+});
+
+test('reject never deletes a photo that lives in another user folder', async () => {
+  const foreign = { ...pendingRow(), photo_path: 'user-2/photo.jpg' };
+  const fetch = fakeFetch({
+    'place_submissions?id=eq.': { method: 'GET', body: [foreign] },
+    'place_submissions': { method: 'PATCH', body: [{ ...foreign, status: 'rejected' }] },
+    'place-submissions/user-2/photo.jpg': { method: 'DELETE', body: {} },
+  });
+  const store = createStore({ config: CONFIG, fetch });
+  await store.reject(ROW.id, 'Not a real place');
+  assert.equal(fetch.calls.some(c => c.method === 'DELETE'), false, 'must not delete a foreign object');
+});
+
+test('photoUrl refuses a foreign or traversing path instead of signing it', async () => {
+  for (const photo_path of ['user-2/photo.jpg', '../secret.jpg', '/etc/passwd', 'user-1/../../secret.jpg']){
+    const fetch = fakeFetch({
+      'place_submissions?id=eq.': { method: 'GET', body: [{ ...ROW, photo_path }] },
+      '/object/sign/': { method: 'POST', body: { signedURL: '/x?token=abc' } },
+    });
+    const store = createStore({ config: CONFIG, fetch });
+    await assert.rejects(() => store.photoUrl(ROW.id), e => e.status === 404, photo_path + ' must be refused');
+    assert.equal(fetch.calls.some(c => c.url.includes('/object/sign/')), false);
+  }
+});

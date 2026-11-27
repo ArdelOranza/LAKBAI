@@ -10,8 +10,8 @@
 // `value` is the same { src, page, title } the lookup returns, or null for a
 // miss. A miss expires sooner than a hit so a newly uploaded Commons photo can
 // still be picked up.
-const fs = require('fs');
 const path = require('path');
+const { createJsonStore } = require('./jsonStore.js');
 
 const DAY = 24 * 60 * 60 * 1000;
 const MAX_ENTRIES = 5000;
@@ -21,12 +21,21 @@ function defaultFile(){
     || path.join(__dirname, 'data', 'photo-cache.json');
 }
 
+function normalizeDoc(raw){
+  return {
+    version: 1,
+    photos: (raw && raw.photos && typeof raw.photos === 'object' && !Array.isArray(raw.photos)) ? raw.photos : {},
+  };
+}
+
 /**
  * @param {object} [opts]
  * @param {string} [opts.file] on-disk cache file
  * @param {number} [opts.hitTtl] how long a found photo is reused
  * @param {number} [opts.missTtl] how long a "not found" answer is reused
  * @param {() => number} [opts.now] clock, injectable for tests
+ * @param {object} [opts.env] environment, injectable for tests
+ * @param {Function} [opts.fetchImpl] Supabase fetch, injectable for tests
  */
 function createPhotoCache(opts = {}){
   const file = opts.file || defaultFile();
@@ -34,35 +43,52 @@ function createPhotoCache(opts = {}){
   const missTtl = opts.missTtl === undefined ? 14 * DAY : opts.missTtl;
   const now = opts.now || Date.now;
 
+  // The cache is best-effort: a failed save must never break a photo lookup.
+  // The document is a row in Supabase in production and the JSON file locally.
+  const store = createJsonStore({
+    name: 'photo-cache',
+    file,
+    defaults: () => ({ version: 1, photos: {} }),
+    normalize: normalizeDoc,
+    env: opts.env,
+    fetchImpl: opts.fetchImpl,
+  });
+
   let loaded = false;
   const entries = new Map(); // key -> { value, at }
+
+  function applyDoc(doc){
+    const src = doc && doc.photos && typeof doc.photos === 'object' ? doc.photos : {};
+    for (const [key, entry] of Object.entries(src)){
+      if (!entry || typeof entry.at !== 'number') continue;
+      // Only keep values this module can serve, so a hand-edited or corrupt
+      // row cannot become a broken image in the app.
+      const value = entry.value && typeof entry.value === 'object' && entry.value.src
+        ? { src: String(entry.value.src), page: String(entry.value.page || ''), title: String(entry.value.title || '') }
+        : null;
+      entries.set(key, { value, at: entry.at });
+    }
+  }
 
   function load(){
     if (loaded) return;
     loaded = true;
-    try {
-      const raw = JSON.parse(fs.readFileSync(file, 'utf8'));
-      const src = raw && raw.photos && typeof raw.photos === 'object' ? raw.photos : {};
-      for (const [key, entry] of Object.entries(src)){
-        if (!entry || typeof entry.at !== 'number') continue;
-        // Only keep values this module can serve, so a hand-edited or corrupt
-        // row cannot become a broken image in the app.
-        const value = entry.value && typeof entry.value === 'object' && entry.value.src
-          ? { src: String(entry.value.src), page: String(entry.value.page || ''), title: String(entry.value.title || '') }
-          : null;
-        entries.set(key, { value, at: entry.at });
-      }
-    } catch { /* no cache yet, or unreadable: start empty */ }
+    applyDoc(store.read());
+  }
+
+  /** Load the remote document (no-op for the file backend). */
+  async function ready(){
+    await store.ready();
+    if (!loaded){ loaded = true; applyDoc(store.read()); }
   }
 
   function save(){
-    try {
-      fs.mkdirSync(path.dirname(file), { recursive: true });
-      fs.writeFileSync(file, JSON.stringify({
-        version: 1,
-        photos: Object.fromEntries(entries),
-      }) + '\n', 'utf8');
-    } catch { /* a read-only or full disk must not break a lookup */ }
+    // Fire-and-forget: the in-memory entry is already correct, and losing one
+    // cache write only costs a Commons lookup next boot.
+    store.write({
+      version: 1,
+      photos: Object.fromEntries(entries),
+    }).catch(() => { /* best effort */ });
   }
 
   function prune(){
@@ -73,6 +99,8 @@ function createPhotoCache(opts = {}){
 
   return {
     file,
+    backend: store.backend,
+    ready,
     /** Cached answer, or undefined when the place has never been looked up. */
     get(key){
       load();

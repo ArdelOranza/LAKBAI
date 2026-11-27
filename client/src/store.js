@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient.js';
-import { peekOutbox, removeFirst, queueReview, queueFavDelete, stripForInsert } from './outbox.js';
+import { peekOutbox, removeById, queueReview, queueFavDelete, stripForInsert } from './outbox.js';
 import { submissionRow } from './placeSubmission.js';
 export async function saveFavorite(user, place){
   if (!supabase || !user) return { error: 'login required' };
@@ -38,8 +38,20 @@ export async function removeFavorite(user, placeId){
   try { await flushOutbox(user); } catch { /* keep queue */ }
   return { queued: false };
 }
-export async function flushOutbox(user){
-  if (!supabase || !user) return;
+// One drain per user at a time. Panels and Saved both flush on mount/online,
+// and a post can flush too: without this lock two runs peek the same queue and
+// one entry is written twice while the next is removed unsynced.
+const draining = new Map();
+export function flushOutbox(user){
+  if (!supabase || !user) return Promise.resolve();
+  const key = String(user.id || 'anonymous');
+  const running = draining.get(key);
+  if (running) return running;
+  const run = drainOutbox(user).finally(() => draining.delete(key));
+  draining.set(key, run);
+  return run;
+}
+async function drainOutbox(user){
   // Peek-then-remove: only pop an entry after its write succeeds. On failure
   // the whole queue (including later entries) stays queued in order.
   while (true) {
@@ -53,7 +65,7 @@ export async function flushOutbox(user){
       ({ error } = await supabase.from('reviews').insert({ ...stripForInsert(r), user_id: user.id }));
     }
     if (error) return;
-    removeFirst(user);
+    removeById(user, r.id);
   }
 }
 const PLANS_KEY = 'lakbai-plans';

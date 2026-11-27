@@ -10,7 +10,10 @@ const community = require('./communityPlaces.js');
 
 function createSpotList({ listCurated = () => adminStore.listSpots(), approved = () => community.approvedSpots() } = {}){
   async function listSpots(){
-    const curated = listCurated();
+    // With the Supabase backend the admin document loads asynchronously; wait
+    // for it so the first request after a cold start already sees every edit.
+    try { await adminStore.ready(); } catch { /* degrade to the file/default list */ }
+    const curated = await listCurated();
     let extra = [];
     try {
       extra = await approved();

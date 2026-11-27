@@ -32,6 +32,23 @@ function httpError(status, message){
   return e;
 }
 
+const SAFE_PHOTO = /^([A-Za-z0-9._-]{1,64})\/([A-Za-z0-9._-]{1,128})\.(jpe?g|png|webp)$/i;
+
+/**
+ * The row's photo path, only when it names an object inside that submitter's
+ * folder. `photo_path` comes from the traveller, and the service key bypasses
+ * Storage RLS — without this check an admin preview/approval could sign, copy
+ * or delete another user's private file.
+ */
+function ownedPhotoPath(row){
+  const p = String((row && row.photo_path) || '');
+  if (!p) return null;
+  const m = SAFE_PHOTO.exec(p);
+  if (!m) return null;
+  if (!row.user_id || m[1] !== String(row.user_id)) return null;
+  return p;
+}
+
 /** A stored row as the spot shape the map, search and admin already render. */
 function toSpot(row){
   const photo = row.photo || null;
@@ -156,16 +173,18 @@ function createStore({ fetch = globalThis.fetch, config = envConfig(), now = () 
   }
 
   async function promotePhoto(row){
+    const key = ownedPhotoPath(row);
+    if (!key) return null;
     await storage('object/copy', {
       method: 'POST',
       body: {
         bucketId: PRIVATE_BUCKET,
-        sourceKey: row.photo_path,
+        sourceKey: key,
         destinationBucket: PUBLIC_BUCKET,
-        destinationKey: row.photo_path,
+        destinationKey: key,
       },
     });
-    const publicUrl = config.url + '/storage/v1/object/public/' + PUBLIC_BUCKET + '/' + row.photo_path;
+    const publicUrl = config.url + '/storage/v1/object/public/' + PUBLIC_BUCKET + '/' + key;
     await rest('place_submissions', {
       method: 'PATCH',
       params: 'id=eq.' + encodeURIComponent(row.id),
@@ -200,7 +219,8 @@ function createStore({ fetch = globalThis.fetch, config = envConfig(), now = () 
     const row = await fetchRow(id);
     if (row.status !== 'pending') throw httpError(409, 'Nothing to reject: this submission is ' + row.status);
     const updated = await patchPending(id, { status: 'rejected', review_note: reason, reviewed_at: now() });
-    if (row.photo_path) await dropPhoto(row.photo_path).catch(() => { /* a stray private object is not worth failing the review */ });
+    const key = ownedPhotoPath(row);
+    if (key) await dropPhoto(key).catch(() => { /* a stray private object is not worth failing the review */ });
     invalidate();
     return updated;
   }
@@ -208,8 +228,9 @@ function createStore({ fetch = globalThis.fetch, config = envConfig(), now = () 
   /** A short-lived link for a photo that is not public yet. */
   async function photoUrl(id){
     const row = await fetchRow(id);
-    if (!row.photo_path) throw httpError(404, 'This submission has no photo');
-    const data = await storage('object/sign/' + PRIVATE_BUCKET + '/' + row.photo_path, {
+    const key = ownedPhotoPath(row);
+    if (!key) throw httpError(404, 'This submission has no usable photo');
+    const data = await storage('object/sign/' + PRIVATE_BUCKET + '/' + key, {
       method: 'POST',
       body: { expiresIn: SIGNED_URL_SECONDS },
     });

@@ -4,31 +4,35 @@
 // layers a small persisted patch file on top so admins can edit names,
 // coords, categories, blurbs and REAL photo URLs without editing code.
 // File layout: { patches: { [baseId]: patchFields }, added: [fullSpot], deleted: [baseId] }
-const fs = require('fs');
 const path = require('path');
 const { SPOTS } = require('./spots.js');
 const { photoFor } = require('./spotPhotos.js');
+const { createJsonStore } = require('./jsonStore.js');
 
 function dataFile(){
   return process.env.LAKBAI_ADMIN_FILE || path.join(__dirname, 'data', 'admin-spots.json');
 }
 
-function readDoc(){
-  try {
-    const raw = JSON.parse(fs.readFileSync(dataFile(), 'utf8'));
-    return {
-      patches: (raw && raw.patches && typeof raw.patches === 'object') ? raw.patches : {},
-      added: Array.isArray(raw.added) ? raw.added : [],
-      deleted: Array.isArray(raw.deleted) ? raw.deleted : [],
-    };
-  } catch { return { patches: {}, added: [], deleted: [] }; }
+function normalizeDoc(raw){
+  return {
+    patches: (raw && raw.patches && typeof raw.patches === 'object' && !Array.isArray(raw.patches)) ? raw.patches : {},
+    added: Array.isArray(raw && raw.added) ? raw.added : [],
+    deleted: Array.isArray(raw && raw.deleted) ? raw.deleted : [],
+  };
 }
 
-function writeDoc(doc){
-  const f = dataFile();
-  fs.mkdirSync(path.dirname(f), { recursive: true });
-  fs.writeFileSync(f, JSON.stringify(doc, null, 2), 'utf8');
-}
+// Production keeps this document in Supabase (Render has no persistent disk);
+// local dev and tests keep using the JSON file. See jsonStore.js.
+const store = createJsonStore({
+  name: 'admin-spots',
+  file: dataFile(),
+  defaults: () => ({ patches: {}, added: [], deleted: [] }),
+  normalize: normalizeDoc,
+});
+
+function readDoc(){ return store.read(); }
+function writeDoc(doc){ return store.write(doc); }
+function ready(){ return store.ready(); }
 
 const BBOX = { lngMin: 119.7, lngMax: 120.7, latMin: 15.7, latMax: 16.5 };
 const inBox = (lng, lat) => lng >= BBOX.lngMin && lng <= BBOX.lngMax && lat >= BBOX.latMin && lat <= BBOX.latMax;
@@ -149,7 +153,7 @@ function nextCustomId(name, town){
   return base + '-' + n;
 }
 
-function createSpot(data){
+async function createSpot(data){
   const clean = validateSpot({ ...(data || {}) });
   // An explicit id is honoured only when it survives slugging and is unused:
   // otherwise the spot is written with an empty/duplicate id, which means it
@@ -188,11 +192,11 @@ function createSpot(data){
   // revive from deleted if id collides with a deleted base id
   doc.deleted = doc.deleted.filter(d => d !== id);
   doc.added.push(spot);
-  writeDoc(doc);
+  await writeDoc(doc);
   return spot;
 }
 
-function updateSpot(id, patchData){
+async function updateSpot(id, patchData){
   const doc = readDoc();
   const base = SPOTS.find(s => s.id === id);
   const addedIdx = doc.added.findIndex(s => s.id === id);
@@ -207,15 +211,15 @@ function updateSpot(id, patchData){
   doc.deleted = doc.deleted.filter(d => d !== id);
   if (addedIdx !== -1){
     doc.added[addedIdx] = { ...doc.added[addedIdx], ...clean, id };
-    writeDoc(doc);
+    await writeDoc(doc);
     return doc.added[addedIdx];
   }
   doc.patches[id] = { ...(doc.patches[id] || {}), ...clean };
-  writeDoc(doc);
+  await writeDoc(doc);
   return mergeOne(base, { ...doc.patches[id] });
 }
 
-function deleteSpot(id){
+async function deleteSpot(id){
   const doc = readDoc();
   const base = SPOTS.find(s => s.id === id);
   const addedIdx = doc.added.findIndex(s => s.id === id);
@@ -226,48 +230,92 @@ function deleteSpot(id){
   }
   if (addedIdx !== -1) doc.added.splice(addedIdx, 1);
   else if (!doc.deleted.includes(id)) doc.deleted.push(id);
-  writeDoc(doc);
+  await writeDoc(doc);
   return { id, deleted: true };
 }
 
 const crypto = require('crypto');
+const { promisify } = require('util');
+const scrypt = promisify(crypto.scrypt);
+const TOKEN_MAX_BYTES = 256;
+
 // Hashed admin auth: ADMIN_TOKEN (plain, in .env) is hashed once at
 // first use with scrypt + random salt and never kept as plain afterwards.
 // Set ADMIN_TOKEN_HASH=scrypt$saltHex$hashHex to persist a precomputed hash.
-let cachedHash = null;
-let cachedPlain = null;
-let cachedPre = null;
-function tokenHash(){
-  const plain = process.env.ADMIN_TOKEN || '';
-  const pre = process.env.ADMIN_TOKEN_HASH || '';
-  if (cachedHash && cachedPlain === plain && cachedPre === pre) return cachedHash;
-  cachedPlain = plain; cachedPre = pre;
-  if (pre.startsWith('scrypt$')){
-    const [, saltHex, hashHex] = pre.split('$');
-    cachedHash = { salt: Buffer.from(saltHex, 'hex'), hash: Buffer.from(hashHex, 'hex') };
-    return cachedHash;
-  }
-  if (!plain) { cachedHash = null; return null; }
-  const salt = crypto.randomBytes(16);
-  const hash = crypto.scryptSync(plain, salt, 64);
-  cachedHash = { salt, hash };
-  return cachedHash;
-}
-function matchesToken(presented){
-  const entry = tokenHash();
-  if (!entry) return false;
-  const presentedHash = crypto.scryptSync(String(presented || ''), entry.salt, 64);
-  return presentedHash.length === entry.hash.length && crypto.timingSafeEqual(presentedHash, entry.hash);
-}
-function requireAdmin(req, res, next){
-  if (!tokenHash()){
-    return res.status(503).json({ error: 'Admin disabled: set ADMIN_TOKEN or ADMIN_TOKEN_HASH on the server.' });
-  }
-  const got = (req.headers && (req.headers['x-admin-token'] || req.headers['X-Admin-Token'])) || '';
-  if (!matchesToken(got)){
-    return res.status(401).json({ error: 'Unauthorized — admin token required.' });
-  }
-  return next();
+//
+// scrypt is deliberately async: it is CPU-heavy by design, and the sync form
+// blocks the event loop for the whole hash. A token check must not stall every
+// other request on the API. The first plain-token check pays one hash, then the
+// derived entry is cached for the life of the process.
+//
+// A malformed ADMIN_TOKEN_HASH is a configuration error: admin is disabled
+// (503) rather than every request throwing a 500 from Buffer.from/hex parsing.
+let cache = { key: null, entry: null, pending: null };
+
+/** Parsed hash, `null` when none is set, or `undefined` when the value is malformed. */
+function parsePrecomputed(pre){
+  if (!pre) return null;
+  if (!pre.startsWith('scrypt$')) return undefined;
+  const parts = pre.split('$');
+  if (parts.length !== 3) return undefined;
+  const [, saltHex, hashHex] = parts;
+  if (!/^[0-9a-f]+$/i.test(saltHex) || !/^[0-9a-f]+$/i.test(hashHex)) return undefined;
+  if (saltHex.length < 16 || hashHex.length < 32 || saltHex.length > 1024 || hashHex.length > 1024) return undefined;
+  return { salt: Buffer.from(saltHex, 'hex'), hash: Buffer.from(hashHex, 'hex') };
 }
 
-module.exports = { listSpots, getSpot, createSpot, updateSpot, deleteSpot, validateSpot, requireAdmin, inBox, _file: dataFile };
+async function tokenHash(){
+  const plain = process.env.ADMIN_TOKEN || '';
+  const pre = process.env.ADMIN_TOKEN_HASH || '';
+  const key = plain + '\n' + pre;
+  if (cache.key === key) return cache.pending || cache.entry;
+  const parsed = parsePrecomputed(pre);
+  if (parsed !== null){
+    // Precomputed (valid) or malformed (undefined → disabled). Cheap and sync.
+    cache = { key, entry: parsed || null, pending: null };
+    return cache.entry;
+  }
+  if (!plain){ cache = { key, entry: null, pending: null }; return null; }
+  const pending = (async () => {
+    const salt = crypto.randomBytes(16);
+    const hash = await scrypt(plain, salt, 64);
+    return { salt, hash };
+  })();
+  cache = { key, entry: null, pending };
+  try {
+    const entry = await pending;
+    if (cache.key === key) cache = { key, entry, pending: null };
+    return entry;
+  } catch {
+    if (cache.key === key) cache = { key, entry: null, pending: null };
+    return null;
+  }
+}
+
+async function matchesToken(presented){
+  const s = String(presented || '');
+  if (!s || Buffer.byteLength(s, 'utf8') > TOKEN_MAX_BYTES) return false;
+  const entry = await tokenHash();
+  if (!entry) return false;
+  const presentedHash = await scrypt(s, entry.salt, entry.hash.length);
+  return presentedHash.length === entry.hash.length && crypto.timingSafeEqual(presentedHash, entry.hash);
+}
+
+async function requireAdmin(req, res, next){
+  try {
+    if (!(await tokenHash())){
+      return res.status(503).json({ error: 'Admin disabled: set ADMIN_TOKEN or ADMIN_TOKEN_HASH on the server.' });
+    }
+    const got = (req.headers && (req.headers['x-admin-token'] || req.headers['X-Admin-Token'])) || '';
+    if (!(await matchesToken(got))){
+      return res.status(401).json({ error: 'Unauthorized — admin token required.' });
+    }
+    return next();
+  } catch {
+    // A hashing failure is an auth failure, never an unhandled rejection in
+    // Express 4 (which would hang the request until the socket times out).
+    return res.status(401).json({ error: 'Unauthorized — admin token required.' });
+  }
+}
+
+module.exports = { listSpots, getSpot, createSpot, updateSpot, deleteSpot, validateSpot, requireAdmin, inBox, ready, _file: dataFile };

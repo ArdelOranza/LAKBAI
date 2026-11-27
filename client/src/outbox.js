@@ -4,6 +4,13 @@
 const keyFor = user => `lakbai-review-outbox:${user?.id || 'anonymous'}`;
 const ALLOW = ['place_id', 'place_name', 'score', 'text'];
 
+/** Stable per-entry id so a flush removes the row it actually wrote. */
+function newId(){
+  const c = globalThis.crypto;
+  if (c && typeof c.randomUUID === 'function') return c.randomUUID();
+  return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+}
+
 function readRaw(user){
   try {
     const v = JSON.parse(localStorage.getItem(keyFor(user)) || '[]');
@@ -28,17 +35,28 @@ export function removeFirst(user){
   writeRaw(user, rest);
   return first;
 }
+/** Remove one specific queued entry; legacy rows without an id fall back to the head. */
+export function removeById(user, id){
+  const box = readRaw(user);
+  if (!box.length) return undefined;
+  if (!id) return removeFirst(user);
+  const i = box.findIndex(r => r && r.id === id);
+  if (i === -1) return removeFirst(user);
+  const [gone] = box.splice(i, 1);
+  writeRaw(user, box);
+  return gone;
+}
 export function queueReview(user, row){
   const box = readRaw(user);
   const safeRow = {};
   for (const k of ALLOW) if (row && k in row) safeRow[k] = row[k];
-  box.push({ ...safeRow, kind:'review', at: Date.now() });
+  box.push({ ...safeRow, kind:'review', at: Date.now(), id: newId() });
   writeRaw(user, box);
   return box;
 }
 export function queueFavDelete(user, placeId){
   const box = readRaw(user);
-  box.push({ kind:'favdelete', placeId });
+  box.push({ kind:'favdelete', placeId, id: newId() });
   writeRaw(user, box);
   return box;
 }

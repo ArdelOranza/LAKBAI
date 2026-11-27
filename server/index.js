@@ -2,8 +2,75 @@ require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') }
 const express = require('express');
 const cors = require('cors');
 const app = express();
-app.use(cors());
-app.use(express.json());
+// Render terminates TLS one hop in front of the container, so req.ip is the
+// traveller's address (the rate limiter keys on it, not on the proxy's).
+app.set('trust proxy', 1);
+
+// Only the shipped front ends may call this API from a browser. A wildcard
+// would let any page on the internet use the deployment (and its AI quota) as
+// its backend; `ALLOWED_ORIGINS` overrides the defaults with a comma list.
+const DEFAULT_ORIGINS = [
+  process.env.APP_ORIGIN || 'https://lakbai-app.onrender.com',
+  process.env.ADMIN_ORIGIN || 'https://lakbai-admin.onrender.com',
+  'http://localhost:5199',
+  'http://127.0.0.1:5199',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:5174',
+  'capacitor://localhost',
+  'https://localhost',
+];
+const ALLOWED_ORIGINS = new Set(
+  String(process.env.ALLOWED_ORIGINS || DEFAULT_ORIGINS.join(','))
+    .split(',').map(s => s.trim()).filter(Boolean)
+);
+const ALLOW_ANY_ORIGIN = ALLOWED_ORIGINS.has('*');
+app.use(cors({
+  origin(origin, cb){
+    // No Origin header: a native app, curl, or a same-origin GET. CORS does not
+    // apply, so let it through.
+    if (!origin || ALLOW_ANY_ORIGIN || ALLOWED_ORIGINS.has(origin)) return cb(null, true);
+    return cb(Object.assign(new Error('Origin not allowed'), { status: 403 }));
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'X-Admin-Token'],
+  maxAge: 86400,
+}));
+// Bounded bodies: the chat endpoint caps messages at 500 chars, so a huge JSON
+// body is only ever an attack or a bug. 16kb fits the admin photo lists too.
+app.use(express.json({ limit: '16kb' }));
+
+// A small in-memory limiter. Per-IP and per-process: enough to stop one client
+// from draining the shared AI/Mapbox quota or brute-forcing the admin token.
+// (Render's free tier runs a single instance; a fleet would need a shared store.)
+function rateLimit({ windowMs, max }){
+  const hits = new Map();
+  const sweep = setInterval(() => {
+    const now = Date.now();
+    for (const [k, v] of hits) if (v.resetAt <= now) hits.delete(k);
+  }, windowMs);
+  sweep.unref();
+  return (req, res, next) => {
+    const now = Date.now();
+    const key = req.ip || 'unknown';
+    let rec = hits.get(key);
+    if (!rec || rec.resetAt <= now) rec = { count: 0, resetAt: now + windowMs };
+    rec.count += 1;
+    hits.set(key, rec);
+    if (rec.count > max){
+      res.set('Retry-After', String(Math.max(1, Math.ceil((rec.resetAt - now) / 1000))));
+      return res.status(429).json({ error: 'Too many requests. Please try again shortly.' });
+    }
+    next();
+  };
+}
+// Model-backed routes: 30 messages a minute is far above normal use and well
+// below what would exhaust the free provider quotas.
+app.use(['/api/chat', '/api/recommend', '/api/plan', '/api/places'], rateLimit({ windowMs: 60_000, max: 30 }));
+// The admin token is the only credential on that surface: leave no room for
+// online guessing.
+app.use('/api/admin', rateLimit({ windowMs: 15 * 60_000, max: 60 }));
+
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 // The API host is public, so opening it should identify the service instead of
 // showing Express's default "Cannot GET /" to anyone who checks the deployment.
@@ -233,20 +300,20 @@ app.get('/api/places', async (req, res) => {
 });
 
 // --- separate admin API (see admin/ app). Token-guarded, token lives in ADMIN_TOKEN.
-app.get('/api/admin/spots', adminStore.requireAdmin, (req, res) => {
-  try { res.json({ spots: adminStore.listSpots() }); }
+app.get('/api/admin/spots', adminStore.requireAdmin, async (req, res) => {
+  try { await adminStore.ready(); res.json({ spots: adminStore.listSpots() }); }
   catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
-app.post('/api/admin/spots', adminStore.requireAdmin, (req, res) => {
-  try { res.status(201).json({ spot: adminStore.createSpot(req.body || {}) }); }
+app.post('/api/admin/spots', adminStore.requireAdmin, async (req, res) => {
+  try { res.status(201).json({ spot: await adminStore.createSpot(req.body || {}) }); }
   catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
-app.put('/api/admin/spots/:id', adminStore.requireAdmin, (req, res) => {
-  try { res.json({ spot: adminStore.updateSpot(req.params.id, req.body || {}) }); }
+app.put('/api/admin/spots/:id', adminStore.requireAdmin, async (req, res) => {
+  try { res.json({ spot: await adminStore.updateSpot(req.params.id, req.body || {}) }); }
   catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
-app.delete('/api/admin/spots/:id', adminStore.requireAdmin, (req, res) => {
-  try { res.json(adminStore.deleteSpot(req.params.id)); }
+app.delete('/api/admin/spots/:id', adminStore.requireAdmin, async (req, res) => {
+  try { res.json(await adminStore.deleteSpot(req.params.id)); }
   catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 
@@ -260,16 +327,16 @@ function restaurantRows(){
       categories: e.categories, rating: e.rating, reviews: e.reviews, photos: e.photos,
     }));
 }
-app.get('/api/admin/places', adminStore.requireAdmin, (req, res) => {
-  try { res.json({ places: restaurantRows() }); }
+app.get('/api/admin/places', adminStore.requireAdmin, async (req, res) => {
+  try { await adminPhotos.ready(); res.json({ places: restaurantRows() }); }
   catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
-app.put('/api/admin/places/:id/photos', adminStore.requireAdmin, (req, res) => {
+app.put('/api/admin/places/:id/photos', adminStore.requireAdmin, async (req, res) => {
   try {
     const id = String(req.params.id);
     const exists = allEntries().some(e => e.id === id && e.kind === 'restaurants');
     if (!exists) return res.status(404).json({ error: 'Place not found: ' + id });
-    res.json({ place: adminPhotos.setPhotos(id, (req.body || {}).photos) });
+    res.json({ place: await adminPhotos.setPhotos(id, (req.body || {}).photos) });
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 app.post('/api/admin/photos/find', adminStore.requireAdmin, async (req, res) => {
@@ -312,6 +379,23 @@ app.get('/api/weather', async (req, res) => {
     res.json(await cached(`wx:${lat.toFixed(3)},${lng.toFixed(3)}`, 10 * 60000, () => getWeather(lng, lat)));
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
+// Rejected CORS origins arrive here as an error from the middleware. Answer
+// with the status that error carries (403) instead of Express's default 500.
+app.use((err, req, res, next) => {
+  if (res.headersSent) return next(err);
+  const status = err && err.status ? err.status : 500;
+  res.status(status).json({ error: status === 403 ? 'Origin not allowed.' : 'Request failed.' });
+});
+
 const PORT = process.env.PORT || 3001;
-if (require.main === module) app.listen(PORT, () => console.log('Lakbai server on ' + PORT));
+if (require.main === module){
+  // Load the persisted admin documents before accepting traffic, so a cold
+  // start serves the real spots/photos (not the empty defaults) immediately.
+  const warm = [adminStore.ready(), adminPhotos.ready(), photoCache.ready()];
+  Promise.allSettled(warm).then(results => {
+    const failed = results.filter(r => r.status === 'rejected');
+    if (failed.length) console.warn('Admin store warm-up failed:', failed.map(r => r.reason && r.reason.message).join('; '));
+    app.listen(PORT, () => console.log('Lakbai server on ' + PORT));
+  });
+}
 module.exports = app;

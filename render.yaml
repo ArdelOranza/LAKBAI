@@ -33,6 +33,10 @@ services:
         sync: false
       - key: SUPABASE_SERVICE_KEY
         sync: false
+      # Render's free tier has no persistent disk: admin edits and the photo
+      # cache live in Supabase `admin_documents` (migration 0006).
+      - key: LAKBAI_STORE
+        value: supabase
 
   - type: web
     name: lakbai-app

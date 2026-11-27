@@ -1,10 +1,14 @@
 # Pangasinan dataset
 
-Every `.json` file in this folder is part of the reference set:
+Every **place record** in this folder is part of the reference set. The server
+reads this explicit allowlist (everything else in the folder is a transit table
+or a runtime cache and is deliberately ignored):
 
 - `places.json` — the verified restaurants
 - `spots.json` — the verified tourist spots (Eastern and Southern Pangasinan)
 - `pangasinan-150.json` — the 150-spot province-wide directory (all towns)
+- `pangasinan-5towns-food.json` — the five-town food directory
+- `pangasinan-5towns-stays.json` — the five-town stays directory
 
 `allEntries()` deduplicates by normalized name, so places that appear in both
 `spots.json` and `pangasinan-150.json` (18 of them) are returned once — the

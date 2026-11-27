@@ -56,8 +56,10 @@ export async function startGoogleSignIn(supabase){
 }
 
 /**
- * Turn a callback URL into a session. Handles both shapes Supabase can return:
- * `?code=` (PKCE) and `#access_token=…` (implicit, which email links use).
+ * Turn a callback URL into a session. Only the PKCE shape (`?code=`) is
+ * accepted: the implicit flow puts the access token in a URL fragment, where
+ * any page the link opens can read it, so an old-style link is refused instead
+ * of being turned into a session.
  */
 export async function completeNativeAuth(url, supabase, { onRecovery } = {}){
   if (!isAuthCallback(url)) return { handled: false };
@@ -82,11 +84,11 @@ export async function completeNativeAuth(url, supabase, { onRecovery } = {}){
     return { handled: true, recovery, error: error ? friendlyAuthError(String(error.message || error)) : null };
   }
 
-  const accessToken = hash.get('access_token');
-  const refreshToken = hash.get('refresh_token');
-  if (accessToken && refreshToken){
-    const { error } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
-    return { handled: true, recovery, error: error ? friendlyAuthError(String(error.message || error)) : null };
+  // Implicit-flow links carry the token in the fragment. Accepting one would
+  // undo PKCE: whoever opened the link could mint the session without the
+  // verifier. Ask for a fresh PKCE link instead.
+  if (hash.get('access_token') || parsed.searchParams.get('access_token')){
+    return { handled: true, recovery, error: 'That sign-in link is from an older flow. Open LakbAI and sign in again.' };
   }
 
   return { handled: true, recovery, error: 'That sign-in link is incomplete. Try again from the app.' };

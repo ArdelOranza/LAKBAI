@@ -1,6 +1,6 @@
 import { apiUrl } from './apiBase.js';
-import { fetchSpots, bustSpotsCache } from './spots.js';
-import { fetchCatalogue, bustCatalogueCache } from './catalogue.js';
+import { fetchSpots } from './spots.js';
+import { fetchCatalogue } from './catalogue.js';
 
 /** The http(s) photo urls a place list carries (admin photos ride on `photo`). */
 export function photoUrls(spots){
@@ -24,21 +24,16 @@ export function preloadPhotos(spots, load){
  *
  * 1. A Render free instance sleeps after ~15 min idle, and the next request
  *    waits through a ~30-60s cold start — a health ping starts that clock now.
- * 2. Both place lists are refreshed past their offline caches: the shared
- *    catalogue (map + Dining) and the curated spots (chat cards). Their photos
- *    are where an admin's freshly saved picture rides.
+ * 2. Both place lists are network-first and overwrite their offline cache only
+ *    on success, so nothing is cleared up front: a cold start with no signal
+ *    keeps the last good catalogue instead of wiping it.
  */
-export async function warmUp({ fetchImpl, spots = fetchSpots, catalogue = fetchCatalogue, bust = bustSpotsCache, bustCatalogue = bustCatalogueCache, loadImage } = {}){
+export async function warmUp({ fetchImpl, spots = fetchSpots, catalogue = fetchCatalogue, loadImage } = {}){
   const doFetch = fetchImpl || ((...a) => fetch(...a));
   try { await doFetch(apiUrl('/api/health'), { cache: 'no-store' }); } catch { /* offline is fine */ }
-  const all = [];
-  for (const [load, clear] of [[spots, bust], [catalogue, bustCatalogue]]){
-    try {
-      clear();
-      const list = await load();
-      if (Array.isArray(list)) all.push(...list);
-    } catch { /* one list failing must not stop the other */ }
-  }
+  // One list failing must not stop the other, and both are independent.
+  const results = await Promise.allSettled([spots(), catalogue()]);
+  const all = results.flatMap(r => r.status === 'fulfilled' && Array.isArray(r.value) ? r.value : []);
   preloadPhotos(all, loadImage);
   return all;
 }

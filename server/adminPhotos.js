@@ -4,8 +4,8 @@
 // rewritten by the admin app. Photos an editor adds live here, keyed by the
 // restaurant's stable dataset id, and dataset.js layers them on at read time.
 // File layout: { places: { [id]: { photos: [url, ...] } } }
-const fs = require('fs');
 const path = require('path');
+const { createJsonStore } = require('./jsonStore.js');
 
 function dataFile(){
   return process.env.LAKBAI_ADMIN_PHOTOS_FILE || path.join(__dirname, 'data', 'admin-photos.json');
@@ -18,24 +18,27 @@ const isHttpUrl = v => {
   } catch { return false; }
 };
 
-function readDoc(){
-  try {
-    const raw = JSON.parse(fs.readFileSync(dataFile(), 'utf8'));
-    const src = raw && raw.places && typeof raw.places === 'object' && !Array.isArray(raw.places) ? raw.places : {};
-    const places = {};
-    for (const [id, v] of Object.entries(src)){
-      const photos = Array.isArray(v && v.photos) ? v.photos.filter(isHttpUrl).map(String) : [];
-      if (photos.length) places[id] = { photos };
-    }
-    return { places };
-  } catch { return { places: {} }; }
+function normalizeDoc(raw){
+  const src = raw && raw.places && typeof raw.places === 'object' && !Array.isArray(raw.places) ? raw.places : {};
+  const places = {};
+  for (const [id, v] of Object.entries(src)){
+    const photos = Array.isArray(v && v.photos) ? v.photos.filter(isHttpUrl).map(String) : [];
+    if (photos.length) places[id] = { photos };
+  }
+  return { places };
 }
 
-function writeDoc(doc){
-  const f = dataFile();
-  fs.mkdirSync(path.dirname(f), { recursive: true });
-  fs.writeFileSync(f, JSON.stringify(doc, null, 2), 'utf8');
-}
+// Supabase in production, JSON file locally. See jsonStore.js.
+const store = createJsonStore({
+  name: 'admin-photos',
+  file: dataFile(),
+  defaults: () => ({ places: {} }),
+  normalize: normalizeDoc,
+});
+
+function readDoc(){ return store.read(); }
+function writeDoc(doc){ return store.write(doc); }
+function ready(){ return store.ready(); }
 
 function cleanPhotos(list){
   if (!Array.isArray(list)) {
@@ -62,13 +65,13 @@ function photosFor(id){
   return hit ? hit.photos.slice() : [];
 }
 
-function setPhotos(id, list){
+async function setPhotos(id, list){
   const photos = cleanPhotos(list);
   const doc = readDoc();
   if (photos.length) doc.places[String(id)] = { photos };
   else delete doc.places[String(id)];
-  writeDoc(doc);
+  await writeDoc(doc);
   return { id: String(id), photos };
 }
 
-module.exports = { allPhotos, photosFor, setPhotos, cleanPhotos, _file: dataFile };
+module.exports = { allPhotos, photosFor, setPhotos, cleanPhotos, ready, _file: dataFile };

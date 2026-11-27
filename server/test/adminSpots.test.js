@@ -25,10 +25,10 @@ test('curated base ships when admin file is empty', () => {
   assert.ok(spots.every(s => s.name && s.town));
 });
 
-test('updateSpot patches a base spot, incl. photos, and persists', () => {
+test('updateSpot patches a base spot, incl. photos, and persists', async () => {
   resetFile({ patches: {}, added: [], deleted: [] });
   const base = listSpots()[0];
-  const updated = updateSpot(base.id, { name: base.name + ' — edited', photos: ['https://example.com/a.jpg'], blurb: 'new blurb' });
+  const updated = await updateSpot(base.id, { name: base.name + ' — edited', photos: ['https://example.com/a.jpg'], blurb: 'new blurb' });
   assert.equal(updated.name, base.name + ' — edited');
   assert.deepEqual(updated.photos, ['https://example.com/a.jpg']);
   assert.equal(updated.blurb, 'new blurb');
@@ -36,43 +36,43 @@ test('updateSpot patches a base spot, incl. photos, and persists', () => {
   assert.equal(getSpot(base.id).name, base.name + ' — edited');
 });
 
-test('createSpot adds a new site and invalid coords are rejected', () => {
+test('createSpot adds a new site and invalid coords are rejected', async () => {
   resetFile({ patches: {}, added: [], deleted: [] });
-  const created = createSpot({ name: 'Test Falls', town: 'Bolinao', district: '1', lng: 119.84, lat: 16.25, categories: ['Nature'], photos: ['https://example.com/f.jpg'] });
+  const created = await createSpot({ name: 'Test Falls', town: 'Bolinao', district: '1', lng: 119.84, lat: 16.25, categories: ['Nature'], photos: ['https://example.com/f.jpg'] });
   assert.ok(created.id.startsWith('custom-'));
   assert.equal(getSpot(created.id).name, 'Test Falls');
   assert.ok(listSpots().some(s => s.id === created.id));
   // outside bbox must throw 400
-  assert.throws(() => createSpot({ name: 'Boracay', town: 'Aklan', lng: 121.9, lat: 11.9 }), /outside|bbox|Pangasinan/i);
+  await assert.rejects(() => createSpot({ name: 'Boracay', town: 'Aklan', lng: 121.9, lat: 11.9 }), /outside|bbox|Pangasinan/i);
   // bad photo URL must throw
-  assert.throws(() => updateSpot(created.id, { photos: ['javascript:alert(1)'] }), /http/i);
+  await assert.rejects(() => updateSpot(created.id, { photos: ['javascript:alert(1)'] }), /http/i);
 });
 
-test('createSpot rejects an unusable or duplicate id instead of writing a ghost spot', () => {
+test('createSpot rejects an unusable or duplicate id instead of writing a ghost spot', async () => {
   resetFile({ patches: {}, added: [], deleted: [] });
   // An explicit id that slugs to nothing used to be written as id "" and then
   // dropped by listSpots(), so the caller saw 201 for a spot that never showed.
-  assert.throws(() => createSpot({ name: 'Probe Spot', town: 'Dagupan', id: '!!!' }), /id/i);
+  await assert.rejects(() => createSpot({ name: 'Probe Spot', town: 'Dagupan', id: '!!!' }), /id/i);
   // A base id must not be duplicated: two entries with one id mean one pin.
-  assert.throws(() => createSpot({ name: 'Patar Copy', town: 'Bolinao', id: 'patar-beach-bolinao' }), /already|exists|taken/i);
+  await assert.rejects(() => createSpot({ name: 'Patar Copy', town: 'Bolinao', id: 'patar-beach-bolinao' }), /already|exists|taken/i);
   // A sane explicit id still works and is visible.
-  const ok = createSpot({ name: 'Probe Spot', town: 'Dagupan', id: 'probe-spot' });
+  const ok = await createSpot({ name: 'Probe Spot', town: 'Dagupan', id: 'probe-spot' });
   assert.equal(ok.id, 'probe-spot');
   assert.ok(listSpots().some(s => s.id === 'probe-spot'));
   assert.equal(listSpots().filter(s => s.id === 'patar-beach-bolinao').length, 1);
 });
 
-test('deleteSpot hides a base spot and validateSpot rejects empty names', () => {
+test('deleteSpot hides a base spot and validateSpot rejects empty names', async () => {
   resetFile({ patches: {}, added: [], deleted: [] });
   const base = listSpots()[0];
-  deleteSpot(base.id);
+  await deleteSpot(base.id);
   assert.equal(getSpot(base.id), null);
   assert.ok(!listSpots().some(s => s.id === base.id));
   assert.throws(() => validateSpot({ name: '  ', town: '' }), /name|town/i);
-  assert.throws(() => updateSpot('missing-id', { name: 'x' }), /not found|Not found/i);
+  await assert.rejects(() => updateSpot('missing-id', { name: 'x' }), /not found|Not found/i);
 });
 
-test('wikimedia photos fill empty spots, admin photos still win', () => {
+test('wikimedia photos fill empty spots, admin photos still win', async () => {
   resetFile({ patches: {}, added: [], deleted: [] });
   const id = 'patar-beach-bolinao';
   fs.writeFileSync(spotPhotosFile, JSON.stringify({ photos: {
@@ -83,7 +83,7 @@ test('wikimedia photos fill empty spots, admin photos still win', () => {
   assert.equal(filled.photoSource, 'wikimedia');
   assert.equal(filled.photoPage, 'https://commons.wikimedia.org/wiki/File:Patar_Beach.jpg');
   // a curated/admin photo must win over the Wikimedia mapping
-  updateSpot(id, { photos: ['https://example.com/admin.jpg'] });
+  await updateSpot(id, { photos: ['https://example.com/admin.jpg'] });
   const admin = listSpots().find(s => s.id === id);
   assert.deepEqual(admin.photos, ['https://example.com/admin.jpg']);
   assert.equal(admin.photoSource, 'json');
@@ -93,7 +93,7 @@ test('wikimedia photos fill empty spots, admin photos still win', () => {
   assert.equal(bare.photoSource, 'mapbox');
 });
 
-test('requireAdmin guards by x-admin-token', () => {
+test('requireAdmin guards by x-admin-token', async () => {
   const prev = process.env.ADMIN_TOKEN;
   process.env.ADMIN_TOKEN = 'secret-admin-token';
   const mk = hdr => ({
@@ -105,13 +105,13 @@ test('requireAdmin guards by x-admin-token', () => {
   let calls, next;
   // good token passes through
   calls = {}; let passed = false;
-  requireAdmin(mk({ 'x-admin-token': 'secret-admin-token' }), mk({ 'x-admin-token': 'secret-admin-token' }), () => { passed = true; });
+  await requireAdmin(mk({ 'x-admin-token': 'secret-admin-token' }), mk({ 'x-admin-token': 'secret-admin-token' }), () => { passed = true; });
   assert.equal(passed, true);
   // bad token 401
   calls = {}; passed = false;
   const req2 = { headers: { 'x-admin-token': 'wrong' } };
   const res2 = { status(c){ calls.code = c; this.statusCode = c; return this; }, json(o){ calls.body = o; } };
-  requireAdmin(req2, res2, () => { passed = true; });
+  await requireAdmin(req2, res2, () => { passed = true; });
   assert.equal(passed, false);
   assert.equal(calls.code, 401);
   if (prev === undefined) delete process.env.ADMIN_TOKEN; else process.env.ADMIN_TOKEN = prev;
