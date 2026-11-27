@@ -10,10 +10,11 @@
 // from the file. Writes are awaited so an admin save cannot report success
 // before it has actually been persisted.
 //
-// Enable the Supabase backend with LAKBAI_STORE=supabase plus SUPABASE_URL and
-// SUPABASE_SERVICE_KEY. Without the flag nothing changes, so a local .env that
-// happens to contain the project's Supabase keys does not turn the test suite
-// into a network client.
+// Enable the Supabase backend with LAKBAI_STORE=supabase. On Render it is
+// selected automatically when SUPABASE_URL and SUPABASE_SERVICE_KEY exist;
+// LAKBAI_STORE=file overrides that. Local dev and tests stay on the file, so a
+// local .env that happens to contain the project's Supabase keys does not turn
+// the test suite into a network client.
 const fs = require('fs');
 const path = require('path');
 
@@ -23,6 +24,22 @@ function supabaseConfig(env){
   const url = String(env.SUPABASE_URL || '').replace(/\/+$/, '');
   const key = env.SUPABASE_SERVICE_KEY || '';
   return url && key ? { url, key } : null;
+}
+
+/**
+ * Which backend a store uses.
+ *
+ * `LAKBAI_STORE=supabase` is the explicit switch; `file` forces the JSON file.
+ * On Render the Supabase backend is selected automatically when the service key
+ * is present — that is the whole point of the fix, and it must not depend on a
+ * blueprint env var having been synced. Local dev and the test runner stay on
+ * the file backend even when the .env happens to contain Supabase keys.
+ */
+function usesSupabase(env){
+  if (env.LAKBAI_STORE === 'file') return false;
+  if (env.LAKBAI_STORE === 'supabase') return true;
+  const onRender = env.RENDER === 'true' || Boolean(env.RENDER_SERVICE_ID) || Boolean(env.RENDER_SERVICE_NAME);
+  return onRender && Boolean(env.SUPABASE_URL) && Boolean(env.SUPABASE_SERVICE_KEY);
 }
 
 function storeError(status, message){
@@ -47,7 +64,7 @@ function createJsonStore(opts = {}){
   const normalize = opts.normalize || (doc => doc);
   const defaults = opts.defaults === undefined ? {} : opts.defaults;
   const fetchImpl = opts.fetchImpl || globalThis.fetch;
-  const config = env.LAKBAI_STORE === 'supabase' ? supabaseConfig(env) : null;
+  const config = usesSupabase(env) ? supabaseConfig(env) : null;
   const backend = config ? 'supabase' : 'file';
 
   let memory = null;

@@ -48,8 +48,35 @@ test('without LAKBAI_STORE the file backend is used, even with Supabase keys pre
   assert.deepEqual(store.read(), { added: [{ id: 'a' }] });
 });
 
-test('the Supabase backend hydrates the row and upserts on save', async () => {
-  const { calls, fetchImpl } = fakeSupabase([{ doc: { patches: { p1: { name: 'Patched' } }, added: [], deleted: [] } }]);
+test('Render selects Supabase automatically when the service key is present', () => {
+  const store = createJsonStore({
+    name: 'admin-spots',
+    file: tempFile('render'),
+    defaults: {},
+    env: { RENDER: 'true', SUPABASE_URL: 'https://db.example', SUPABASE_SERVICE_KEY: 'service-key' },
+    fetchImpl: async () => ({ ok: true, json: async () => [] }),
+  });
+  assert.equal(store.backend, 'supabase');
+});
+
+test('LAKBAI_STORE=file still wins, and a Render service without keys stays on disk', () => {
+  const forced = createJsonStore({
+    name: 'admin-spots',
+    file: tempFile('forced'),
+    defaults: {},
+    env: { LAKBAI_STORE: 'file', RENDER: 'true', SUPABASE_URL: 'https://db.example', SUPABASE_SERVICE_KEY: 'k' },
+  });
+  assert.equal(forced.backend, 'file');
+  const noKeys = createJsonStore({
+    name: 'admin-spots',
+    file: tempFile('nokeys'),
+    defaults: {},
+    env: { RENDER: 'true', SUPABASE_URL: 'https://db.example' },
+  });
+  assert.equal(noKeys.backend, 'file');
+});
+
+test('the Supabase backend hydrates the row and upserts on save', async () => {  const { calls, fetchImpl } = fakeSupabase([{ doc: { patches: { p1: { name: 'Patched' } }, added: [], deleted: [] } }]);
   const store = createJsonStore({
     name: 'admin-spots',
     file: tempFile('supa'),
